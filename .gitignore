@@ -1,0 +1,19 @@
+
+.vs*/
+*.code*
+build/
+bin/
+obj/
+dist/
+packages-dist/
+*.user
+*.filters
+*.log
+* - Copy
+__*.*
+_bak*/
+.bak*/
+x64/
+x86/
+Win32/
+CMake*
