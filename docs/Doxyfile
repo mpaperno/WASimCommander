@@ -1,0 +1,250 @@
+# Doxyfile 1.8.17
+
+@INCLUDE = ./version.Doxyfile
+
+PROJECT_LOGO           = "Logo.png"
+ABBREVIATE_BRIEF       = _dummy_
+FULL_PATH_NAMES        = YES
+STRIP_FROM_PATH        = ../
+ALWAYS_DETAILED_SEC    = YES
+JAVADOC_AUTOBRIEF      = YES
+QT_AUTOBRIEF           = YES
+MULTILINE_CPP_IS_BRIEF = YES
+TAB_SIZE               = 2
+ALIASES                = \
+                         "refwc{1}=\ref WASimCommander::\1 \"\1\"" \
+                         "refwce{1}=\ref WASimCommander::Enums::\1 \"\1\"" \
+                         "refwcc{1}=\ref WASimCommander::Client::\1 \"\1\"" \
+                         "refwcli{1}=\ref WASimCommander::CLI::\1 \"\1\"" \
+                         "refwclie{1}=\ref WASimCommander::CLI::Enums::\1 \"\1\"" \
+                         "refwclis{1}=\ref WASimCommander::CLI::Structs::\1 \"\1\"" \
+                         "default{1}=\n<b>Default</b> value is \c \1.\n" \
+                         "reimp{1}=Reimplemented from \c \1." \
+                         "reimp=Reimplemented from superclass." \
+                         "default=<b>Default</b> value:" \
+                         "pacc=\par Access functions:^^" \
+                         "psig=\par Notifier signal:^^" \
+                         "intern=\par<b>Internal use only.</b>" \
+                         "qflags{2}=<p>The \ref \1 type is a typedef for `QFlags<\2>`. It stores an OR combination of \ref \2 values.</p>"
+
+TOC_INCLUDE_HEADINGS   = 5
+AUTOLINK_SUPPORT       = YES
+BUILTIN_STL_SUPPORT    = YES
+CPP_CLI_SUPPORT        = YES
+DISTRIBUTE_GROUP_DOC   = YES
+GROUP_NESTED_COMPOUNDS = YES
+INLINE_GROUPED_CLASSES = YES
+INLINE_SIMPLE_STRUCTS  = YES
+TYPEDEF_HIDES_STRUCT   = NO
+
+#---------------------------------------------------------------------------
+# Build related configuration options
+#---------------------------------------------------------------------------
+
+EXTRACT_ALL            = NO
+EXTRACT_STATIC         = YES
+EXTRACT_LOCAL_CLASSES  = NO
+HIDE_UNDOC_MEMBERS     = NO
+HIDE_UNDOC_CLASSES     = YES
+HIDE_FRIEND_COMPOUNDS  = YES
+FORCE_LOCAL_INCLUDES   = YES
+SORT_MEMBER_DOCS       = NO
+SORT_BRIEF_DOCS        = NO
+SORT_MEMBERS_CTORS_1ST = YES
+SORT_GROUP_NAMES       = YES
+SORT_BY_SCOPE_NAME     = YES
+SHOW_USED_FILES        = YES
+LAYOUT_FILE            = DoxygenLayout.xml
+
+#---------------------------------------------------------------------------
+# Configuration options related to warning and progress messages
+#---------------------------------------------------------------------------
+
+QUIET                  = YES
+WARNINGS               = NO
+WARN_IF_UNDOCUMENTED   = NO
+WARN_IF_DOC_ERROR      = NO
+WARN_NO_PARAMDOC       = NO
+WARN_AS_ERROR          = NO
+
+#---------------------------------------------------------------------------
+# Configuration options related to the input files
+#---------------------------------------------------------------------------
+
+INPUT                  = \
+                         ../src/include \
+                         ../src/WASimClient \
+                         ../src/WASimClient_CLI \
+                         ../README.md \
+                         ../CHANGELOG.md \
+                         ../LICENSE.txt \
+                         ../LICENSE.GPL.txt \
+                         ../LICENSE.LGPL.txt
+
+RECURSIVE              = YES
+
+FILE_PATTERNS          = *.c \
+                         *.cc \
+                         *.cxx \
+                         *.cpp \
+                         *.c++ \
+                         *.java \
+                         *.ii \
+                         *.ixx \
+                         *.ipp \
+                         *.i++ \
+                         *.inl \
+                         *.idl \
+                         *.ddl \
+                         *.odl \
+                         *.h \
+                         *.hh \
+                         *.hxx \
+                         *.hpp \
+                         *.h++ \
+                         *.cs \
+                         *.d \
+                         *.php \
+                         *.php4 \
+                         *.php5 \
+                         *.phtml \
+                         *.inc \
+                         *.m \
+                         *.markdown \
+                         *.mm \
+                         *.dox \
+                         *.py \
+                         *.f90 \
+                         *.f \
+                         *.for \
+                         *.tcl \
+                         *.vhd \
+                         *.vhdl \
+                         *.ucf \
+                         *.qsf \
+                         *.as \
+                         *.js \
+                         *.txt \
+                         *.qml
+
+EXCLUDE                =
+
+EXCLUDE_PATTERNS       = \
+                         */logfault.h \
+                         */inipp.h \
+                         */utilities.h \
+                         */.git/* \
+                         */cmake/* \
+                         */CMakeFiles/* \
+                         CMakeLists.txt \
+                         CMakeCache.txt \
+                         */doc?/* \
+                         moc_*.* \
+                         _*.* \
+                         *-?Copy*.* \
+                         */*test* \
+                         *_p.cpp \
+                         *_p.h
+
+EXCLUDE_SYMBOLS        = iterator const_iterator
+
+EXAMPLE_PATH           =
+EXAMPLE_PATTERNS       = *.h *.cpp
+EXAMPLE_RECURSIVE      = YES
+
+FILTER_PATTERNS        =
+
+USE_MDFILE_AS_MAINPAGE = ../README.md
+
+#---------------------------------------------------------------------------
+# Configuration options related to source browsing
+#---------------------------------------------------------------------------
+
+SOURCE_BROWSER         = YES
+STRIP_CODE_COMMENTS    = NO
+
+CLANG_ASSISTED_PARSING = NO
+CLANG_OPTIONS          = -std=c++17 \
+                         -Wno-deprecated-declarations \
+                         "-D WSMCMND_API="
+
+#---------------------------------------------------------------------------
+# Configuration options related to the alphabetical class index
+#---------------------------------------------------------------------------
+
+#---------------------------------------------------------------------------
+# Configuration options related to the HTML output
+#---------------------------------------------------------------------------
+
+GENERATE_HTML          = YES
+HTML_OUTPUT            = html
+HTML_HEADER            = header.html
+HTML_FOOTER            =
+HTML_EXTRA_STYLESHEET  = doxyawesome/doxygen-awesome.css \
+                         customdoxygen.css
+HTML_EXTRA_FILES       = doxyawesome/doxygen-awesome-darkmode-toggle.js \
+                         doxyawesome/doxygen-awesome-paragraph-link.js \
+                         .nojekyll
+HTML_COLORSTYLE_HUE    = 235
+HTML_COLORSTYLE_SAT    = 19
+HTML_COLORSTYLE_GAMMA  = 185
+HTML_TIMESTAMP         = YES
+HTML_DYNAMIC_SECTIONS  = YES
+
+GENERATE_TREEVIEW      = YES
+ENUM_VALUES_PER_LINE   = 1
+TREEVIEW_WIDTH         = 350
+EXT_LINKS_IN_WINDOW    = YES
+
+
+#---------------------------------------------------------------------------
+# Configuration options related to the LaTeX output
+#---------------------------------------------------------------------------
+
+GENERATE_LATEX         = NO
+
+
+#---------------------------------------------------------------------------
+# Configuration options related to the XML output
+#---------------------------------------------------------------------------
+
+GENERATE_XML           = NO
+
+
+#---------------------------------------------------------------------------
+# Configuration options related to the preprocessor
+#---------------------------------------------------------------------------
+
+ENABLE_PREPROCESSING   = YES
+MACRO_EXPANSION        = YES
+EXPAND_ONLY_PREDEF     = NO
+INCLUDE_PATH           = "$(MSFS_SDK)/SimConnect SDK/include"
+PREDEFINED = \
+        WSMCMND_API=\
+        WSE=WASimCommander::Enums \
+        DOXYGEN \
+        Q_DECLARE_FLAGS(flagsType,enumType)="typedef QFlags<enumType> flagsType;" \
+        Q_SLOTS="slots" \
+        Q_SIGNALS="signals" \
+        Q_DECL_CONSTEXPR="constexpr" \
+        Q_DECL_RELAXED_CONSTEXPR="const" \
+        Q_DECL_OVERRIDE="override" \
+        Q_DECL_FINAL="final" \
+        Q_DECL_EQ_DEFAULT="= default" \
+        Q_DECL_EQ_DELETE="= delete" \
+        Q_DECL_NOEXCEPT="noexcept" \
+        Q_DECL_DEPRECATED="" \
+        Q_DECL_UNUSED_MEMBER="" \
+        Q_DECL_VARIABLE_DEPRECATED="" \
+        Q_NULLPTR="nullptr" \
+        Q_DECL_NULLPTR="nullptr" \
+        Q_REQUIRED_RESULT="" \
+        Q_DECL_EXPORT="" \
+        Q_DECL_IMPORT=""
+
+
+#---------------------------------------------------------------------------
+# Configuration options related to the dot tool
+#---------------------------------------------------------------------------
+
+CLASS_GRAPH            = NO

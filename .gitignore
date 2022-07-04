@@ -1,11 +1,10 @@
 
 .vs*/
 *.code*
-build/
+src/build/
 bin/
 obj/
 dist/
-packages-dist/
 *.user
 *.filters
 *.log
