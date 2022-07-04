@@ -1,0 +1,5 @@
+_PackageInt/
+Packages/
+PackagesMetadata/
+PackageSources/WASimModule/*.wasm
+PackageSources/WASimModule/*.ini
