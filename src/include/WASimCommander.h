@@ -161,6 +161,33 @@ namespace WASimCommander
 				setUnitName(unitName);
 		}
 
+		/// Constructs a request for a named variable (`requestType = RequestType::Named`) with optional update period, interval, and epsilon values.
+		explicit DataRequest(uint32_t requestId, char variableType, const char *variableName, uint32_t valueSize,
+		                     WSE::UpdatePeriod period = WSE::UpdatePeriod::Tick, uint32_t interval = 0, float deltaEpsilon = 0.0f) :
+			requestId(requestId), valueSize(valueSize), deltaEpsilon(deltaEpsilon), interval(interval), period(period),  requestType(WSE::RequestType::Named), varTypePrefix(variableType)
+		{
+			if (variableName)
+				setNameOrCode(variableName);
+		}
+		/// Constructs a request for a named Simulator Variable (`requestType = RequestType::Named` and `varTypePrefix = 'A'`) with optional update period, interval, and epsilon values.
+		explicit DataRequest(uint32_t requestId, const char *simVarName, const char *unitName, uint8_t simVarIndex, uint32_t valueSize,
+		                     WSE::UpdatePeriod period = WSE::UpdatePeriod::Tick, uint32_t interval = 0, float deltaEpsilon = 0.0f) :
+			requestId(requestId), valueSize(valueSize), deltaEpsilon(deltaEpsilon), interval(interval), period(period), requestType(WSE::RequestType::Named), simVarIndex(simVarIndex), varTypePrefix('A')
+		{
+			if (simVarName)
+				setNameOrCode(simVarName);
+			if (unitName)
+				setUnitName(unitName);
+		}
+		/// Constructs a calculator code request (`requestType = RequestType::Calculated`) with optional update period, interval, and epsilon values.
+		explicit DataRequest(uint32_t requestId, WSE::CalcResultType resultType, const char *calculatorCode, uint32_t valueSize,
+		                     WSE::UpdatePeriod period = WSE::UpdatePeriod::Tick, uint32_t interval = 0, float deltaEpsilon = 0.0f) :
+			requestId(requestId), valueSize(valueSize), deltaEpsilon(deltaEpsilon), interval(interval), period(period), requestType(WSE::RequestType::Calculated), calcResultType(resultType)
+		{
+			if (calculatorCode)
+				setNameOrCode(calculatorCode);
+		}
+
 		void setNameOrCode(const char *name) { setCharArrayValue(nameOrCode, STRSZ_REQ, name); }  ///< Set the `nameOrCode` member using a const char array.
 		void setUnitName(const char *name) { setCharArrayValue(unitName, STRSZ_UNIT, name); }     ///< Set the `unitName` member using a const char array.
 

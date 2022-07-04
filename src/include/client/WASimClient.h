@@ -25,6 +25,9 @@ and are available at <http://www.gnu.org/licenses/>.
 #include <string>
 #include <vector>
 
+#define WIN32_LEAN_AND_MEAN
+#include <Windows.h>
+
 #include "WASimCommander.h"
 #include "client/exports.h"
 #include "client/enums.h"

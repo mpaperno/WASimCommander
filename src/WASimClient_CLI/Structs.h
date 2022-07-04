@@ -207,32 +207,32 @@ namespace WASimCommander::CLI::Structs
 
 			DataRequest() { }
 			/// <summary> Constructs a request for a named variable (`requestType = RequestType::Named`) with default update period on every `UpdatePeriod.Tick`. </summary>
-			DataRequest(UInt32 requestId, Char variableType, String ^variableName, UInt32 valueSize) :
+			explicit DataRequest(UInt32 requestId, Char variableType, String ^variableName, UInt32 valueSize) :
 				requestId(requestId), valueSize(valueSize), period(UpdatePeriod::Tick),
 				requestType(RequestType::Named), varTypePrefix((Byte)variableType), nameOrCode(variableName)
 			{	}
 			/// <summary> Constructs a request for a named variable (`requestType = RequestType::Named`) with given update period, interval, and epsilon values. </summary>
-			DataRequest(UInt32 requestId, Char variableType, String ^variableName, UInt32 valueSize, UpdatePeriod period, UInt32 interval, float deltaEpsilon) :
+			explicit DataRequest(UInt32 requestId, Char variableType, String ^variableName, UInt32 valueSize, UpdatePeriod period, UInt32 interval, float deltaEpsilon) :
 				requestId(requestId), valueSize(valueSize), deltaEpsilon(deltaEpsilon), interval(interval), period(period),
 				requestType(RequestType::Named), varTypePrefix((Byte)variableType), nameOrCode(variableName)
 			{	}
 			/// <summary> Constructs a request for a named Simulator Variable (`requestType = RequestType::Named` and `varTypePrefix = 'A'`) with default update period on every `UpdatePeriod.Tick`. </summary>
-			DataRequest(UInt32 requestId, String ^simVarName, String ^unitName, Byte simVarIndex, UInt32 valueSize) :
+			explicit DataRequest(UInt32 requestId, String ^simVarName, String ^unitName, Byte simVarIndex, UInt32 valueSize) :
 				requestId(requestId), valueSize(valueSize), period(UpdatePeriod::Tick),
 				requestType(RequestType::Named), simVarIndex(simVarIndex), varTypePrefix('A'), nameOrCode(simVarName), unitName(unitName)
 			{	}
 			/// <summary> Constructs a request for a named Simulator Variable (`requestType = RequestType::Named` and `varTypePrefix = 'A'`) with given update period, interval, and epsilon values. </summary>
-			DataRequest(UInt32 requestId, String ^simVarName, String ^unitName, Byte simVarIndex, UInt32 valueSize, UpdatePeriod period, UInt32 interval, float deltaEpsilon) :
+			explicit DataRequest(UInt32 requestId, String ^simVarName, String ^unitName, Byte simVarIndex, UInt32 valueSize, UpdatePeriod period, UInt32 interval, float deltaEpsilon) :
 				requestId(requestId), valueSize(valueSize), deltaEpsilon(deltaEpsilon), interval(interval), period(period),
 				requestType(RequestType::Named), simVarIndex(simVarIndex), varTypePrefix('A'), nameOrCode(simVarName), unitName(unitName)
 			{	}
 			/// <summary> Constructs a calculator code request (`requestType = RequestType::Calculated`) with default update period on every `UpdatePeriod.Tick`. </summary>
-			DataRequest(UInt32 requestId, CalcResultType resultType, String ^calculatorCode, UInt32 valueSize) :
+			explicit DataRequest(UInt32 requestId, CalcResultType resultType, String ^calculatorCode, UInt32 valueSize) :
 				requestId(requestId), valueSize(valueSize), period(UpdatePeriod::Tick),
 				requestType(RequestType::Calculated), calcResultType(resultType), nameOrCode(calculatorCode)
 			{	}
 			/// <summary> Constructs a calculator code request (`requestType = RequestType::Calculated`) with given update period, interval, and epsilon values.. </summary>
-			DataRequest(UInt32 requestId, CalcResultType resultType, String ^calculatorCode, UInt32 valueSize, UpdatePeriod period, UInt32 interval, float deltaEpsilon) :
+			explicit DataRequest(UInt32 requestId, CalcResultType resultType, String ^calculatorCode, UInt32 valueSize, UpdatePeriod period, UInt32 interval, float deltaEpsilon) :
 				requestId(requestId), valueSize(valueSize), deltaEpsilon(deltaEpsilon), interval(interval), period(period),
 				requestType(RequestType::Calculated), calcResultType(resultType), nameOrCode(calculatorCode)
 			{	}
