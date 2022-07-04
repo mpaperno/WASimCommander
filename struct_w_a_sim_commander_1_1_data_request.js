@@ -1,6 +1,9 @@
 var struct_w_a_sim_commander_1_1_data_request =
 [
     [ "DataRequest", "struct_w_a_sim_commander_1_1_data_request.html#a591d02cc3ae5f62ab3929a27a3665d11", null ],
+    [ "DataRequest", "struct_w_a_sim_commander_1_1_data_request.html#a9a528481c38e9c831b02f599d4058549", null ],
+    [ "DataRequest", "struct_w_a_sim_commander_1_1_data_request.html#a2b8f2d1291d4b8648fcf9823ea1ad483", null ],
+    [ "DataRequest", "struct_w_a_sim_commander_1_1_data_request.html#aa525c57f5a5cf1fd0f1b2a6382f8b782", null ],
     [ "setNameOrCode", "struct_w_a_sim_commander_1_1_data_request.html#abd286b545585729f67b92e8ffb2f2cc1", null ],
     [ "setUnitName", "struct_w_a_sim_commander_1_1_data_request.html#a38f3c3990781cd8b099f1660fa806c40", null ],
     [ "operator<<", "struct_w_a_sim_commander_1_1_data_request.html#a742b1a54b71b0161b469702fa05a484d", null ],

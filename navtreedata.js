@@ -33,17 +33,19 @@ var NAVTREE =
           [ "Core Components", "index.html#autotoc_md6", null ],
           [ "Desktop GUI", "index.html#autotoc_md7", null ]
         ] ],
-        [ "Documentation", "index.html#autotoc_md9", null ],
-        [ "Credits", "index.html#autotoc_md11", null ],
-        [ "Copyright, License, and Disclaimer", "index.html#autotoc_md13", [
-          [ "API Library and Client Components", "index.html#autotoc_md14", null ],
-          [ "WASM Module Server and GUI Components", "index.html#autotoc_md15", null ],
-          [ "General", "index.html#autotoc_md16", null ]
+        [ "Downloads", "index.html#autotoc_md9", null ],
+        [ "Documentation & Examples", "index.html#autotoc_md11", null ],
+        [ "Issues, Support, Suggestions, Discussion", "index.html#autotoc_md13", null ],
+        [ "Credits", "index.html#autotoc_md15", null ],
+        [ "Copyright, License, and Disclaimer", "index.html#autotoc_md17", [
+          [ "API Library and Client Components", "index.html#autotoc_md18", null ],
+          [ "WASM Module Server and GUI Components", "index.html#autotoc_md19", null ],
+          [ "General", "index.html#autotoc_md20", null ]
         ] ]
       ] ]
     ] ],
     [ "WASimCommander - Changes Log", "md__c_h_a_n_g_e_l_o_g.html", [
-      [ "1.0.0.5-beta1 (Jul-04-2022)", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md18", null ]
+      [ "1.0.0.5-beta1 (Jul-04-2022)", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md22", null ]
     ] ],
     [ "LICENSE.txt", "_l_i_c_e_n_s_e_8txt.html", null ],
     [ "LICENSE.GPL.txt", "_l_i_c_e_n_s_e_8_g_p_l_8txt.html", null ],
@@ -84,8 +86,8 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "_assembly_info_8cpp_source.html",
-"namespace_w_a_sim_commander_1_1_c_l_i_1_1_enums.html#a54c5afbe79f156bc4bc22d65cf52f9fcad91be9b5ceb9fe0af02b9b02413eccf8",
-"struct_w_a_sim_commander_1_1_data_request.html#a47569a8295e1f5179f56d854403cd461"
+"namespace_w_a_sim_commander_1_1_c_l_i_1_1_enums.html#a54c5afbe79f156bc4bc22d65cf52f9fca441fa38900c1d5dd18554dd819925771",
+"struct_w_a_sim_commander_1_1_data_request.html"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

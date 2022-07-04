@@ -111,15 +111,15 @@ $(document).ready(function(){initNavTree('index.html',''); initResizable(); });
 <div class="textblock"><p ><a class="anchor" id="md_README"></a> <a href="https://github.com/mpaperno/WASimCommander/releases" target="_blank"><img src="https://img.shields.io/github/v/release/mpaperno/WASimCommander?include_prereleases" alt="GitHub release (latest by date including pre-releases)" class="inline"/></a> <a href="LICENSE.GPL.txt" target="_blank"><img src="https://img.shields.io/badge/license-GPLv3-blue.svg" alt="GPLv3 License" style="pointer-events: none;" class="inline"/></a> <a href="LICENSE.LGPL.txt" target="_blank"><img src="https://img.shields.io/badge/license-LGPLv3-blue.svg" alt="LGPGv3 License" style="pointer-events: none;" class="inline"/></a></p>
 <h1><a class="anchor" id="autotoc_md0"></a>
 WASimCommander</h1>
-<div align="center"> <img src="https://mpaperno.github.io/WASimCommander/WASim-Logo_760x190.png" alt="" style="width: auto;" class="inline"/> </div><h2><a class="anchor" id="autotoc_md1"></a>
+<div align="center"> <img src="https://github.com/mpaperno/WASimCommander/wiki/images/logo/WASim-Logo_640x160.png" alt="" style="width: auto;" class="inline"/> </div><h2><a class="anchor" id="autotoc_md1"></a>
 Remote access to the Microsoft Flight Simulator 2020 "Gauge API."</h2>
-<p ><b>A WASM module-based Server and a local Client API combination.</b></p>
-<p >This project is targeted at other MSFS developers who need a convenient way to remotely access parts of the Simulator which are normally inaccessible via <em>SimConnect</em>, such as locally-defined aircraft variables or custom events.</p>
+<p ><b>A WASM module-based Server and a full Client API combination.</b></p>
+<p >This project is geared towards other MSFS developers/coders who need a convenient way to remotely access parts of the Simulator which are normally inaccessible via <em>SimConnect</em>, such as locally-defined aircraft variables or custom events.</p>
 <p >The system also provides direct access to functions from within the Simulator environment and in many cases could be used as a simpler alternative to <em>SimConnect</em> for basic functionality like reading/setting Simulation Variables or triggering Key Events. <em>SimConnect</em> is still used as the network "transport" layer, but this usage is abstracted into, essentially, an implementation detail.</p>
 <h3><a class="anchor" id="autotoc_md2"></a>
 Motivation</h3>
-<p >One of the motivations for this project was seeing multiple MSFS tool authors creating their own WASM modules and protocols just to support their own product. There is nothing wrong with this, of course, but for the Sim user it can be a disadvantage on several levels. They may end up running multiple versions of modules which all do eseentially the same thing, and it may be confusing which WASM module they need to support which tool, just to name two obvious issues. For the developer, programming the WASM modules comes with its own quirks, too, not to mention the time involved, and regardless of the supposed isolated environment a WASM module is supposed to run in, it's still very easy to take down the whole Simulator with some errant code.</p>
-<p >Since MS/Asobo have been "slow" to add further remote access features to <em>SimConnect</em> (or come up with some other method), this project is an attempt at establishing a "standard" or "common" way of doing so. At the least I hope it motivates <em>some</em> kind of standards adoption.</p>
+<p >One of the motivations for this project was seeing multiple MSFS tool authors and casual hackers creating their own WASM modules and protocols just to support their own product or need. There is nothing wrong with this, of course, but for the Sim user it can be a disadvantage on several levels. They may end up running multiple versions of modules which all do eseentially the same thing, and it may be confusing which WASM module they need to support which tool, just to name two obvious issues. For the developer, programming the WASM modules comes with its own quirks, too, not to mention the time involved. And regardless of the supposed isolated environment a WASM module is supposed to run in, it's still very easy to take down the whole Simulator with some errant code... ;-)</p>
+<p >Since MS/Asobo have been, ahem, "slow" to add further remote access features to <em>SimConnect</em> (or come up with some other method), this project is an attempt at establishing a "standard" or "common" way of doing so. At the least I hope it motivates <em>some</em> kind of standards adoption.</p>
 <p >On a more practical note, I will be using it with the <a href="https://github.com/mpaperno/MSFSTouchPortalPlugin" target="_blank">MSFS Touch Portal Plugin</a> which I'm currently maintaining.</p>
 <hr  />
  <h3><a class="anchor" id="autotoc_md4"></a>
@@ -143,11 +143,11 @@ Remote Capabilities</h4>
 <li><b>Subscribe</b> to <em>Calculator Code</em> and <em>Get Variable</em> results:<ul>
 <li>Get "push" notifications whenever result values change; Change monitoring can be configured at any rate down to the millisecond (~25ms minimum). Can also be configured to use the "delta epsilon" feature of SimConnect (to ignore insignificant changes in value) or, conversely, to always send updates even when values do not change.</li>
 <li>Optionally perform manual ("polled") updates of subscriptions at any interval of your choice.</li>
-<li>Any calculator code saved in subscriptions is pre-compiled to a more efficient byte code representation before being passed to the respective calculator functions. This significantly improves performance for recurring calculations.</li>
+<li>Any calculator code saved in subscriptions is <b>pre-compiled to a more efficient byte code</b> representation before being passed to the respective calculator functions. This significantly improves performance for recurring calculations.</li>
 </ul>
 </li>
 <li><b>Register Named Events</b>:<ul>
-<li>Save recurring "set events," like activiating controls using calculator code, for more efficient and simpler re-use. Saved calculator code is pre-compiled to a more efficient byte code representation before being passed to the calculator function. This significantly improves performance for recurring calculations.</li>
+<li>Save recurring "set events," like activiating controls using calculator code, for more efficient and simpler re-use. Saved calculator code is pre-compiled to a more efficient byte code representation before being passed to the calculator function. This significantly improves performance for recurring events.</li>
 <li>Registered events can be executed "natively" via <em>WASim API</em> by simply sending a short command with the saved event ID.</li>
 <li>Saved events can also be named and executed via standard SimConnect commands <code>SimConnect_MapClientEventToSimEvent(id, "event_name")</code> and <code>SimConnect_TransmitClientEvent(id)</code>.</li>
 <li>Event names can be completely custom (including a <code>.</code> (period) as per SimConnect convention), or derive from the connected Client's name (to ensure uniqueness).</li>
@@ -183,13 +183,34 @@ Desktop GUI</h4>
 <li>Includes a full-featured desktop application which demonstrates/tests all available features of the API.</li>
 <li>Fully usable as a standalone application which saves preferences, imports/exports lists of data subscriptions/registered events, and other usabililty features.</li>
 </ul>
+<p >&#160; </p>
+<div align="center"> <a href="https://github.com/mpaperno/WASimCommander/wiki/images/gui/wasimui-dark-new-v1005.png"><img src="https://github.com/mpaperno/WASimCommander/wiki/images/gui/wasimui-dark-new-v1005.png" alt="" style="width: 65%;" class="inline"/></a> </div> <p >&#160; </p>
 <hr  />
  <h3><a class="anchor" id="autotoc_md9"></a>
-Documentation</h3>
-<p >API docuemntation generated from source comments is published here: <a href="https://mpaperno.github.io/WASimCommander/">https://mpaperno.github.io/WASimCommander/</a></p>
-<p >More to come... for now there's always The Source Code to read... :-)</p>
+Downloads</h3>
+<p >Over in the <a href="https://github.com/mpaperno/WASimCommander/releases" target="_blank">Releases</a> there are 3 packages provided. (The actual file names have version numbers appended.)</p><ul>
+<li><code>WASimCommander_SDK</code> - All header files, pre-built static and dynamic libs, packaged WASM module, pre-build GUI, reference documentation, and other tools/examples.</li>
+<li><code>WASimModule</code> - Just the WASM module component, ready to be dropped into a MSFS <em>Community</em> folder.</li>
+<li><code>WASimUI</code> - Just the GUI application, which is very handy in combination with the WASM module for exploring the system.</li>
+</ul>
+<p ><em>Watch</em> -&gt; <em>Custom</em> -&gt; <em>Releases</em> this repo (button at top) or subscribe to the <a href="https://github.com/mpaperno/WASimCommander/releases.atom" target="_blank">ATOM feed</a> for release notifications.</p>
 <hr  />
  <h3><a class="anchor" id="autotoc_md11"></a>
+Documentation &amp; Examples</h3>
+<p >There are two basic <code>C++</code> and <code>C#</code> console-style tests/examples included in the <a href="https://github.com/mpaperno/WASimCommander/tree/main/src/Testing" target="_blank">src/Testing</a> folder. If you like reading code, this is the place to start.</p>
+<p >API docuemntation generated from source comments is published here: <a href="https://mpaperno.github.io/WASimCommander/">https://mpaperno.github.io/WASimCommander/</a> <br  />
+ A good place to start with the docs is probably the <a href="https://mpaperno.github.io/WASimCommander/class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html" target="_blank"><code>WASimClient</code></a> page.</p>
+<p >The GUI is written in C++ (using Qt library for UI), and while not the simplest example, <em>is</em> a full implementation of almost all the available API features. The main <code>WASimClient</code> interactions all happen in the <code>MainWindow::Private</code> class at the top of the <a href="https://github.com/mpaperno/WASimCommander/tree/main/src/WASimUI/WASimUI.cpp#L80" target="_blank">WASimUi.cpp</a> file.</p>
+<p >More to come... or <a href="https://github.com/mpaperno/WASimCommander/tree/main/src" target="_blank">Just Read The Source</a> :-)</p>
+<hr  />
+ <h3><a class="anchor" id="autotoc_md13"></a>
+Issues, Support, Suggestions, Discussion</h3>
+<p >The GitHub repository is the primary source of all these things. You know what to do...</p>
+<p >Use the <a href="https://github.com/mpaperno/WASimCommander/issues" target="_blank">Issues</a> feature for bug reports and concise feature suggestions.</p>
+<p >Use <a href="https://github.com/mpaperno/WASimCommander/discussions" target="_blank">Discussions</a> for any other topic.</p>
+<p >Most flight simulator forums seem fairly strict about <em>not</em> using their site to provide product support. So please use GitHub, unless you're absolutely sure no rules would be broken or toes stepped upon otherwise.</p>
+<hr  />
+ <h3><a class="anchor" id="autotoc_md15"></a>
 Credits</h3>
 <p >This project is written, tested, and documented by myself, Maxim (Max) Paperno.<br  />
  <a href="https://github.com/mpaperno/">https://github.com/mpaperno/</a></p>
@@ -202,17 +223,17 @@ Credits</h3>
 <li><a href="https://material.io/" target="_blank">Material Icons</a> - Google, Apache License v2.0.</li>
 </ul>
 <hr  />
- <h3><a class="anchor" id="autotoc_md13"></a>
+ <h3><a class="anchor" id="autotoc_md17"></a>
 Copyright, License, and Disclaimer</h3>
 <p ><a class="el" href="namespace_w_a_sim_commander.html" title="WASimCommander main namespace. Defines constants and structs used in Client-Server interactions....">WASimCommander</a> Project <br  />
  COPYRIGHT: Maxim Paperno; All Rights Reserved.</p>
-<h4><a class="anchor" id="autotoc_md14"></a>
+<h4><a class="anchor" id="autotoc_md18"></a>
 API Library and Client Components</h4>
 <p >Dual licensed under the terms of either the GNU General Public License (<b>GPL</b>) or the GNU Lesser General Public License (<b>LGPL</b>), as published by the Free Software Foundation, either <b>version 3</b> of the Licenses, or (at your option) any later version.</p>
-<h4><a class="anchor" id="autotoc_md15"></a>
+<h4><a class="anchor" id="autotoc_md19"></a>
 WASM Module Server and GUI Components</h4>
 <p >Licensed under the terms of the GNU General Public License (<b>GPL</b>) as published by the Free Software Foundation, either <b>version 3</b> of the License, or (at your option) any later version.</p>
-<h4><a class="anchor" id="autotoc_md16"></a>
+<h4><a class="anchor" id="autotoc_md20"></a>
 General</h4>
 <p >This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.</p>
 <p >Copies of the GNU GPL and LGPL are included with this project and are available at <a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>.</p>
@@ -224,7 +245,7 @@ General</h4>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Mon Jul 4 2022 08:12:13 for WASimCommander by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.4 </li>
+    <li class="footer">Generated on Mon Jul 4 2022 18:10:02 for WASimCommander by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.4 </li>
   </ul>
 </div>
 </body>
