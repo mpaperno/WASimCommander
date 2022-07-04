@@ -1130,14 +1130,6 @@ WASimUI::WASimUI(QWidget *parent) :
 	//QMenu *menu = ui.menuBar->addMenu(tr("Menu"));
 	//menu->addActions(this->actions());
 
-	qDebug() << geometry() << ui.dwLog->geometry() << ui.dwRequests->geometry() << ui.dwEventsList->geometry();
-
-	// set up default window geometry.. because automatic isn't good enough!
-	//resize(1130, 940);
-	//ui.dwLog->resize(ui.dwLog->width(), 260);
-	//ui.dwEventsList->resize(340, ui.dwEventsList->height());
-	//qDebug() << geometry() << ui.dwLog->geometry() << ui.dwRequests->geometry() << ui.dwEventsList->geometry();
-
 	// show window
 	show();
 	// set up default window geometry.. because automatic isn't good enough
@@ -1146,8 +1138,6 @@ WASimUI::WASimUI(QWidget *parent) :
 	// now restore any saved settings
 	d->readSettings();
 	styleAct->setChecked(Utils::isDarkStyle());
-
-	qDebug() << geometry() << ui.dwLog->geometry() << ui.dwRequests->geometry() << ui.dwEventsList->geometry();
 }
 
 void WASimUI::onClientEvent(const ClientEvent &ev)
