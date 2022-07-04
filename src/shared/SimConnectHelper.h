@@ -29,12 +29,11 @@ and are available at <http://www.gnu.org/licenses/>.
 
 #include "WASimCommander.h"
 #include "utilities.h"
-//#include "SimConnectRequestTracker.h"
+#include "SimConnectRequestTracker.h"
 
 namespace WASimCommander {
-	namespace Utilities
-{
-	class SimConnectRequestTracker;  // !! this only works if SimConnectRequestTracker.h is #included before this header !!
+	namespace Utilities {
+		namespace SimConnectHelper {
 
 	static bool ENABLE_SIMCONNECT_REQUEST_TRACKING = false;  // this can be changed even at runtime
 
@@ -43,39 +42,94 @@ namespace WASimCommander {
 	// (For all the fancy new C++ features, no std way to get function name even at compile time... we still need macros :-| )
 	#define INVOKE_SIMCONNECT(F, ...)  WASimCommander::Utilities::SimConnectHelper::invokeSimConnect(#F, &SimConnect_##F, __VA_ARGS__)
 
-	class WSMCMND_API SimConnectHelper
+	static SimConnectRequestTracker *simRequestTracker()
 	{
-	public:
-		static SimConnectRequestTracker *simRequestTracker();
+		static SimConnectRequestTracker tracker { /*maxRecords*/ 200 };
+		return &tracker;
+	}
 
-		// Main SimConnect function invoker template which does the actual call, logs any error or creates a request record, and returns the HRESULT from SimConnect.
-		template<typename... Args>
-		static HRESULT simConnectProxy(const char *fname, std::function<HRESULT(HANDLE, Args...)> f, HANDLE hSim, Args... args)
-		{
-			const HRESULT hr = std::bind(f, std::forward<HANDLE>(hSim), std::forward<Args>(args)...)();
-			if FAILED(hr)
-				LOG_ERR << "Error: " << fname << '(' << SimConnectRequestTracker::printArgs(args...) << ") failed with " << LOG_HR(hr);
-			else if (ENABLE_SIMCONNECT_REQUEST_TRACKING)
-				simRequestTracker()->addRequestRecord(hSim, fname, args...);
+	// Main SimConnect function invoker template which does the actual call, logs any error or creates a request record, and returns the HRESULT from SimConnect.
+	template<typename... Args>
+	static HRESULT simConnectProxy(const char *fname, std::function<HRESULT(HANDLE, Args...)> f, HANDLE hSim, Args... args)
+	{
+		const HRESULT hr = std::bind(f, std::forward<HANDLE>(hSim), std::forward<Args>(args)...)();
+		if FAILED(hr)
+			LOG_ERR << "Error: " << fname << '(' << SimConnectRequestTracker::printArgs(args...) << ") failed with " << LOG_HR(hr);
+		else if (ENABLE_SIMCONNECT_REQUEST_TRACKING)
+			SimConnectHelper::simRequestTracker()->addRequestRecord(hSim, fname, args...);
+		return hr;
+	}
+
+	// Because we really want type deduction, we can invoke simConnectProxy() via this template w/out specifying each argument type.
+	template<typename... Args>
+	static HRESULT invokeSimConnect(const char *fname, HRESULT(*f)(HANDLE, Args...), HANDLE hSim, Args... args)	{
+		return simConnectProxy(fname, std::function<HRESULT(HANDLE, Args...)>(f), hSim, args...);
+	}
+
+	static void setMaxTrackedRequests(uint32_t maxRecords) {
+		simRequestTracker()->setMaxRecords(maxRecords);
+	}
+
+	static void logSimConnectException(void *pData)
+	{
+		SIMCONNECT_RECV_EXCEPTION *data = reinterpret_cast<SIMCONNECT_RECV_EXCEPTION *>(pData);
+		if (ENABLE_SIMCONNECT_REQUEST_TRACKING)
+			LOG_WRN << "SimConnect exception: " << simRequestTracker()->getRequestRecord(data->dwSendID, data->dwException, data->dwIndex);
+		else
+			LOG_WRN << "SimConnect exception: " << SimConnectRequestTracker::exceptionName(data->dwException) << "; SendId: " << data->dwSendID << "; Index: " << data->dwIndex;
+	}
+
+	static void logSimVersion(void* pData)
+	{
+		SIMCONNECT_RECV_OPEN *d = reinterpret_cast<SIMCONNECT_RECV_OPEN *>(pData);
+		LOG_INF << "Connected to Simulator " << std::quoted(d->szApplicationName)
+			<< " v" << d->dwApplicationVersionMajor << '.' << d->dwApplicationVersionMinor << '.' << d->dwApplicationBuildMajor << '.' << d->dwApplicationBuildMinor
+			<< ", with SimConnect v" << d->dwSimConnectVersionMajor << '.' << d->dwSimConnectVersionMinor << '.' << d->dwSimConnectBuildMajor << '.' << d->dwSimConnectBuildMinor
+			<< " (Server v" << d->dwVersion << ')';
+	}
+
+	static HRESULT addClientDataDefinition(HANDLE hSim, DWORD cddId, DWORD szOrType, float epsilon = 0.0f, DWORD offset = -1 /*SIMCONNECT_CLIENTDATAOFFSET_AUTO*/)
+	{
+		return INVOKE_SIMCONNECT(AddToClientDataDefinition, hSim, (SIMCONNECT_CLIENT_DATA_DEFINITION_ID)cddId, offset, szOrType, epsilon, SIMCONNECT_UNUSED);
+	}
+
+	static HRESULT removeClientDataDefinition(HANDLE hSim, DWORD cddId)
+	{
+		return INVOKE_SIMCONNECT(ClearClientDataDefinition, hSim, (SIMCONNECT_CLIENT_DATA_DEFINITION_ID)cddId);
+	}
+
+	static HRESULT registerDataArea(HANDLE hSim, const std::string &name, DWORD cdaID, DWORD cddId, DWORD szOrType, bool createCDA, bool readonly = false, float epsilon = 0.0f)
+	{
+		HRESULT hr;
+		// Map a unique named data storage area to CDA ID.
+		if FAILED(hr = INVOKE_SIMCONNECT(MapClientDataNameToID, hSim, name.c_str(), (SIMCONNECT_CLIENT_DATA_ID)cdaID))
 			return hr;
+		if (createCDA) {
+			// Reserve data storage area for actual size using the CDA ID.
+			const uint32_t actualSize = getActualValueSize(szOrType);
+			if FAILED(hr = INVOKE_SIMCONNECT(CreateClientData, hSim, cdaID, (DWORD)actualSize, readonly ? SIMCONNECT_CREATE_CLIENT_DATA_FLAG_READ_ONLY : SIMCONNECT_CREATE_CLIENT_DATA_FLAG_DEFAULT))
+				return hr;
 		}
+		// Define a single storage space within the data store using the CDA DefineID, of the full given size and automatic offset.
+		if (cddId)
+			return addClientDataDefinition(hSim, cddId, szOrType, epsilon);
+		return S_OK;
+	}
 
-		// Because we really want type deduction, we can invoke simConnectProxy() via this template w/out specifying each argument type.
-		template<typename... Args>
-		static HRESULT invokeSimConnect(const char *fname, HRESULT(*f)(HANDLE, Args...), HANDLE hSim, Args... args)
-		{
-			return simConnectProxy(fname, std::function<HRESULT(HANDLE, Args...)>(f), hSim, args...);
-		}
+	static HRESULT newClientEvent(HANDLE hSim, DWORD evId, const std::string &evName, DWORD grpId = -1, DWORD priority = 0, bool maskable = false)
+	{
+		HRESULT hr;
+		if FAILED(hr = INVOKE_SIMCONNECT(MapClientEventToSimEvent, hSim, (SIMCONNECT_CLIENT_EVENT_ID)evId, evName.c_str()))
+			return hr;
+		if ((int)grpId == -1)
+			return hr;
+		if FAILED(hr = INVOKE_SIMCONNECT(AddClientEventToNotificationGroup, hSim, (SIMCONNECT_NOTIFICATION_GROUP_ID)grpId, (SIMCONNECT_CLIENT_EVENT_ID)evId, (BOOL)maskable))
+			return hr;
+		if (priority)
+			hr = INVOKE_SIMCONNECT(SetNotificationGroupPriority, hSim, (SIMCONNECT_NOTIFICATION_GROUP_ID)grpId, priority);
+		return hr;
+	}
 
-		static void setMaxTrackedRequests(uint32_t maxRecords);
-		static void logSimConnectException(void *pData);
-		static void logSimVersion(void* pData);
-
-		static HRESULT addClientDataDefinition(HANDLE hSim, DWORD cddId, DWORD szOrType, float epsilon = 0.0f, DWORD offset = -1 /*SIMCONNECT_CLIENTDATAOFFSET_AUTO*/);
-		static HRESULT removeClientDataDefinition(HANDLE hSim, DWORD cddId);
-		static HRESULT registerDataArea(HANDLE hSim, const std::string &name, DWORD cdaID, DWORD cddId, DWORD szOrType, bool createCDA, bool readonly = false, float epsilon = 0.0f);
-		static HRESULT newClientEvent(HANDLE hSim, DWORD evId, const std::string &evName, DWORD grpId = -1, DWORD priority = 0, bool maskable = false);
-	};
-
+		} // SimConnectHelper
 	}  // Utilities
 }  // WASimCommander

@@ -41,9 +41,8 @@ and is also available at <http://www.gnu.org/licenses/>.
 #define LOGFAULT_THREAD_NAME  WSMCMND_SERVER_NAME
 
 #include "WASimCommander.h"
-#include "SimConnectRequestTracker.h"
-#include "SimConnectHelper.h"
 #include "utilities.h"
+#include "SimConnectHelper.h"
 #include "token_vars.h"
 #include "key_events.h"
 
@@ -1542,7 +1541,7 @@ MSFS_CALLBACK void module_init(void)
 	// default logging levels
 	LogLevel consoleLogLevel = LogLevel::Info, fileLogLevel = LogLevel::Info;
 	// set default tracked requests limit based on current global setting
-	uint32_t requestTrackingMaxRecords = Utilities::ENABLE_SIMCONNECT_REQUEST_TRACKING ? 50 : 0;
+	uint32_t requestTrackingMaxRecords = SimConnectHelper::ENABLE_SIMCONNECT_REQUEST_TRACKING ? 50 : 0;
 
 	// Read initial config from file
 	ifstream is(cfgFile);
@@ -1575,7 +1574,7 @@ MSFS_CALLBACK void module_init(void)
 	LOG_INF << "Initializing " WSMCMND_PROJECT_NAME " " WSMCMND_SERVER_NAME " v" WSMCMND_VERSION_STR;
 
 	// set up request tracking
-	if ((Utilities::ENABLE_SIMCONNECT_REQUEST_TRACKING = (requestTrackingMaxRecords > 0)))
+	if ((SimConnectHelper::ENABLE_SIMCONNECT_REQUEST_TRACKING = (requestTrackingMaxRecords > 0)))
 		SimConnectHelper::setMaxTrackedRequests(requestTrackingMaxRecords);
 
 	HRESULT hr;

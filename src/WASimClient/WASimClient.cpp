@@ -47,9 +47,8 @@ prior written authorization from the authors.
 
 #include "client/WASimClient.h"
 //#include "private/wasimclient_p.h"
-#include "SimConnectRequestTracker.h"
-#include "SimConnectHelper.h"
 #include "utilities.h"
+#include "SimConnectHelper.h"
 #include "inipp.h"
 
 namespace WASimCommander::Client
@@ -316,7 +315,7 @@ class WASimClient::Private
 		}
 		settings.logFilePath = cwd;
 		// set default tracked requests limit based on current global setting
-		int requestTrackingMaxRecords = Utilities::ENABLE_SIMCONNECT_REQUEST_TRACKING ? 200 : 0;
+		int requestTrackingMaxRecords = SimConnectHelper::ENABLE_SIMCONNECT_REQUEST_TRACKING ? 200 : 0;
 
 		// Determine config file to use.
 		const char *fn = "client_conf.ini";
@@ -360,7 +359,7 @@ class WASimClient::Private
 		setFileLogLevel(settings.logLevel(LogSource::Client, LogFacility::File));
 		setConsoleLogLevel(settings.logLevel(LogSource::Client, LogFacility::Console));
 		// set up request tracking
-		if ((Utilities::ENABLE_SIMCONNECT_REQUEST_TRACKING = (requestTrackingMaxRecords > 0)))
+		if ((SimConnectHelper::ENABLE_SIMCONNECT_REQUEST_TRACKING = (requestTrackingMaxRecords > 0)))
 			SimConnectHelper::setMaxTrackedRequests(requestTrackingMaxRecords);
 	}
 

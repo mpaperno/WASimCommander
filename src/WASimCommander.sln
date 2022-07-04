@@ -43,7 +43,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "shared", "shared", "{397C89
 	ProjectSection(SolutionItems) = preProject
 		shared\inipp.h = shared\inipp.h
 		shared\logfault.h = shared\logfault.h
-		shared\SimConnectHelper.cpp = shared\SimConnectHelper.cpp
 		shared\SimConnectHelper.h = shared\SimConnectHelper.h
 		shared\SimConnectRequestTracker.h = shared\SimConnectRequestTracker.h
 		shared\utilities.h = shared\utilities.h
