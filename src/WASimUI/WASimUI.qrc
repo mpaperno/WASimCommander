@@ -1,0 +1,16 @@
+<RCC>
+    <qresource prefix="/fonts">
+        <file alias="MaterialIcons-Regular.ttf">resources/MaterialIcons-Regular.ttf</file>
+        <file alias="IcoMoon-Free.ttf">resources/IcoMoon-Free.ttf</file>
+    </qresource>
+    <qresource prefix="/cmaps">
+        <file alias="materialicons.cmap.json">resources/materialicons.cmap.json</file>
+        <file alias="icomooon.cmap.json">resources/icomooon.cmap.json</file>
+    </qresource>
+    <qresource prefix="/images">
+        <file alias="logo_96.png">resources/WASim-Logo_96.png</file>
+    </qresource>
+    <qresource prefix="/style">
+        <file alias="style.css">resources/style.css</file>
+    </qresource>
+</RCC>

@@ -1,0 +1,53 @@
+QDockWidget {
+  border: 1px solid palette(mid);
+  titlebar-close-icon: url(close.glyph);
+  titlebar-normal-icon: url(open_in_new.glyph);
+}
+
+QDockWidget::title{
+  padding:4px;
+  border:1px solid palette(mid);
+  border-bottom:0;
+}
+
+QDockWidget::close-button,
+QDockWidget::float-button{
+  subcontrol-position:top right;
+  subcontrol-origin:margin;
+  position:absolute;
+  top:3px;
+  right:5px;
+  width:20px;
+  height:20px;
+}
+QDockWidget::float-button{
+  right:25px;
+}
+
+QGroupBox {
+  border: 0 solid palette(mid);
+  border-top-width: 1px;
+  border-radius: 0;
+  margin: 0;
+  margin-top: .6em;
+  padding: 12px 0 0;
+  font-weight: bold;
+}
+QGroupBox::title {
+  font-weight: bold;
+  padding: 0 10px 0 0;
+  subcontrol-origin: border;
+  subcontrol-position: top left;
+  top: -.6em;
+ }
+
+QTableView {
+  gridline-color: palette(mid);
+}
+
+QFrame[frameShape="4"], /* QFrame::HLine == 0x0004 */
+QFrame[frameShape="5"]  /* QFrame::VLine == 0x0005 */
+{
+  color: palette(mid);
+  qproperty-frameShadow: Plain;
+}
