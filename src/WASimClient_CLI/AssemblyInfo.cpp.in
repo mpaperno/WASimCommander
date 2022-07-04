@@ -1,0 +1,29 @@
+
+// @AUTOGEN_MSG@
+
+using namespace System;
+using namespace System::Reflection;
+using namespace System::Runtime::CompilerServices;
+using namespace System::Runtime::InteropServices;
+using namespace System::Security::Permissions;
+
+#ifdef _DEBUG
+[assembly:AssemblyTitleAttribute(L"@CLIENT_NAME@ [DBG]")];
+[assembly:AssemblyConfigurationAttribute("Debug")]
+#else
+[assembly:AssemblyTitleAttribute(L"@CLIENT_NAME@")];
+[assembly:AssemblyConfigurationAttribute("Release")]
+#endif
+
+[assembly:AssemblyDescriptionAttribute(L"CLI Wrapper for @PROJECT_NAME@'s general API and the @CLIENT_NAME@ class.")];
+[assembly:AssemblyCompanyAttribute(L"Maxim Paperno")];
+[assembly:AssemblyProductAttribute(L"@PROJECT_NAME@ - @PROJECT_DESC@")];
+[assembly:AssemblyCopyrightAttribute(L"@PROJECT_COPY@")];
+[assembly:AssemblyTrademarkAttribute(L"")];
+[assembly:AssemblyCultureAttribute(L"")];
+
+[assembly:AssemblyVersionAttribute(L"@VERSION_STRING@")];
+[assembly:AssemblyFileVersionAttribute("@VERSION_STRING@")];
+[assembly:AssemblyInformationalVersionAttribute("@VERSION_STRING@@VER_NAME@")];
+
+[assembly:ComVisible(false)];
