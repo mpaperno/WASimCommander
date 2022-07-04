@@ -140,12 +140,20 @@ if ($LastExitCode -ge 8) { Write-Output($LastExitCode); Exit 1  }
 robocopy "$BuildPath\${CLIENT_NAME}_CLI\Debug-$Platform" "$libManaged" *.dll $copyOptions
 if ($LastExitCode -ge 8) { Write-Output($LastExitCode); Exit 1  }
 
+# libs licence and readme
+robocopy "$SrcPath\${CLIENT_NAME}" "$PackagePath\lib" *.txt *.md $copyOptions
+if ($LastExitCode -ge 8) { Write-Output($LastExitCode); Exit 1  }
+
 # Module
 robocopy "$ModuleDest\Packages" "$ModulePackage" $copyOptions /XF .*
+if ($LastExitCode -ge 8) { Write-Output($LastExitCode); Exit 1  }
+robocopy "$SrcPath\${SERVER_NAME}" "$ModulePackage" *.txt *.md $copyOptions
 if ($LastExitCode -ge 8) { Write-Output($LastExitCode); Exit 1  }
 
 # GUI
 robocopy "$BuildPath\${APP_GUI_NAME}\Release-$Platform" "$PackagePath\bin\${APP_GUI_NAME}" $copyOptions /XF *.log* opengl32sw.dll vc_redist*.*
+if ($LastExitCode -ge 8) { Write-Output($LastExitCode); Exit 1  }
+robocopy "$SrcPath\${APP_GUI_NAME}" "$PackagePath\bin\${APP_GUI_NAME}" LICENSE.* *.md $copyOptions
 if ($LastExitCode -ge 8) { Write-Output($LastExitCode); Exit 1  }
 
 # Test/demo app(s)

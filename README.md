@@ -6,7 +6,7 @@
 # WASimCommander
 
 <div align="center">
-<img src="https://github.com/mpaperno/WASimCommander/wiki/images/logo/WASim-Logo_760x190.png" style="width: auto;" />
+<img src="https://github.com/mpaperno/WASimCommander/wiki/images/logo/WASim-Logo_640x160.png" style="width: auto;" />
 </div>
 
 ## Remote access to the Microsoft Flight Simulator 2020 "Gauge API."
@@ -103,7 +103,7 @@ Over in the [Releases](https://github.com/mpaperno/WASimCommander/releases) ther
 - `WASimModule` - Just the WASM module component, ready to be dropped into a MSFS _Community_ folder.
 - `WASimUI` - Just the GUI application, which is very handy in combination with the WASM module for exploring the system.
 
-_Watch_ -> _Custom_ -> _Releases_ this repo (button at top) or subscribe to the ATOM feed  (https://github.com/mpaperno/WASimCommander/releases/atom) for release notifications.
+_Watch_ -> _Custom_ -> _Releases_ this repo (button at top) or subscribe to the [ATOM feed](https://github.com/mpaperno/WASimCommander/releases.atom) for release notifications.
 
 -------------
 ### Documentation & Examples
@@ -112,11 +112,14 @@ API docuemntation generated from source comments is published here: https://mpap
 A good place to start with the docs is probably the [`WASimClient`](https://mpaperno.github.io/WASimCommander/class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html) page.
 
 There is one basic C# console test/example included in the 
-[src/Testing/CS_BasicConsole](https://github.com/mpaperno/WASimCommander/tree/main/src/Testing/CS_BasicConsole/CS_BasicConsole.cs) 
+[src/Testing/CS_BasicConsole](https://github.com/mpaperno/WASimCommander/tree/main/src/Testing/CS_BasicConsole/Program.cs) 
 folder (C++ example forthcoming, but it's very similar):
 
+The GUI is written in C++ (using Qt library for UI), and while not the simplest example, _is_ a full implementation of almost all the available
+API features. The main `WASimClient` interactions all happen in the `MainWindow::Private` class at the top of the 
+[WASimUi.cpp](https://github.com/mpaperno/WASimCommander/tree/main/src/WASimUI/WASimUI.cpp#L80) file.
 
-More to come... for now there's always The Source Code to read... :-)
+More to come... or [Just Read The Source](https://github.com/mpaperno/WASimCommander/tree/main/src) :-)
 
 -------------
 ### Issues, Support, Suggestions, Discussion
