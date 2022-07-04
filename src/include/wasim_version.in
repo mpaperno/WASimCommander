@@ -1,0 +1,50 @@
+/*
+This file is part of the WASimCommander project.
+https://github.com/mpaperno/WASimCommander
+
+COPYRIGHT: (c) Maxim Paperno; All Rights Reserved.
+
+This file may be used under the terms of either the GNU General Public License (GPL)
+or the GNU Lesser General Public License (LGPL), as published by the Free Software
+Foundation, either version 3 of the Licenses, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+Copies of the GNU GPL and LGPL are included with this project
+and are available at <http://www.gnu.org/licenses/>.
+*/
+
+// @AUTOGEN_MSG@
+
+#pragma once
+
+#define WSMCMND_PROJECT_NAME      "@PROJECT_NAME@"
+#define WSMCMND_CLIENT_NAME       "@CLIENT_NAME@"
+#define WSMCMND_SERVER_NAME       "@SERVER_NAME@"
+#define WSMCMND_GUI_NAME          "@APP_GUI_NAME@"
+
+#define WSMCMND_VER_MAJOR         @VER_MAJOR@
+#define WSMCMND_VER_MINOR         @VER_MINOR@
+#define WSMCMND_VER_PATCH         @VER_PATCH@
+#define WSMCMND_VER_BUILD         @VER_BUILD@
+// Git commit hash (top 8 bytes)
+#define WSMCMND_VER_COMIT         @VER_COMIT@UL
+/// Version number in 32 bit "binary coded decimal", eg. 0x01230400 = 1.23.4.0
+#define WSMCMND_VERSION           @VERSION@UL
+/// Possible version suffix, eg "-beta1"  (can be blank for release versions)
+#define WSMCMND_VER_NAME          "@VER_NAME@"
+/// Dotted version string Maj.Min.Pat.Bld, eg. "1.23.4.0"
+#define WSMCMND_VERSION_STR       "@VERSION_STRING@"
+/// Dotted version string with possible suffix, eg. "1.23.4.0-beta1"
+#define WSMCMND_VERSION_INFO      "@VERSION_STRING@@VER_NAME@"
+/// Build date & time in ISO-8601 "Zulu Time" format, UTC
+#define WSMCMND_BUILD_DATE        "@BUILD_DATE@"
+
+
+#define WSMCMND_PROJECT_URL       "@PROJECT_URL@"
+#define WSMCMND_PROJECT_COPYRIGHT "@PROJECT_COPY@"
+#define WSMCMND_PROJECT_DESCRIPT  "@PROJECT_DESC@"
+#define WSMCMND_PROJECT_LICENSE   "@PROJECT_LIC@"
