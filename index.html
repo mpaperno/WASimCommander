@@ -33,9 +33,9 @@
 <table cellspacing="0" cellpadding="0">
  <tbody>
  <tr id="projectrow">
-  <td id="projectlogo"><img alt="Logo" src="Logo.png" title="WASimCommander - MSFS WASM Integration"/></td>
+  <td id="projectlogo"><img alt="Logo" src="Logo.png" title="WASimCommander - Remote access to the Microsoft Flight Simulator 2020 Gauge API."/></td>
   <td id="projectalign">
-   <div id="projectname"><!-- WASimCommander --><span id="projectnumber">&#160;v1.0.0.3</span>
+   <div id="projectname"><!-- WASimCommander --><span id="projectnumber">&#160;v1.0.0.5-beta1</span>
    </div>
   </td>
  </tr>
@@ -109,37 +109,37 @@ $(document).ready(function(){initNavTree('index.html',''); initResizable(); });
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p ><a class="anchor" id="md_README"></a> <a href="https://github.com/mpaperno/WASimCommander/releases" target="_blank"><img src="https://img.shields.io/github/v/release/mpaperno/WASimCommander?include_prereleases" alt="GitHub release (latest by date including pre-releases)" class="inline"/></a> <a href="LICENSE.GPL.txt" target="_blank"><img src="https://img.shields.io/badge/license-GPLv3-blue.svg" alt="GPLv3 License" style="pointer-events: none;" class="inline"/></a> <a href="LICENSE.LGPL.txt" target="_blank"><img src="https://img.shields.io/badge/license-LGPLv3-blue.svg" alt="LGPGv3 License" style="pointer-events: none;" class="inline"/></a></p>
-<h1><a class="anchor" id="autotoc_md1"></a>
+<h1><a class="anchor" id="autotoc_md0"></a>
 WASimCommander</h1>
-<h2><a class="anchor" id="autotoc_md2"></a>
-Remote access to the Microsoft Flight Simulator 2020 "Guage API."</h2>
+<div align="center"> <img src="https://mpaperno.github.io/WASimCommander/WASim-Logo_760x190.png" alt="" style="width: auto;" class="inline"/> </div><h2><a class="anchor" id="autotoc_md1"></a>
+Remote access to the Microsoft Flight Simulator 2020 "Gauge API."</h2>
 <p ><b>A WASM module-based Server and a local Client API combination.</b></p>
 <p >This project is targeted at other MSFS developers who need a convenient way to remotely access parts of the Simulator which are normally inaccessible via <em>SimConnect</em>, such as locally-defined aircraft variables or custom events.</p>
 <p >The system also provides direct access to functions from within the Simulator environment and in many cases could be used as a simpler alternative to <em>SimConnect</em> for basic functionality like reading/setting Simulation Variables or triggering Key Events. <em>SimConnect</em> is still used as the network "transport" layer, but this usage is abstracted into, essentially, an implementation detail.</p>
-<h3><a class="anchor" id="autotoc_md3"></a>
+<h3><a class="anchor" id="autotoc_md2"></a>
 Motivation</h3>
 <p >One of the motivations for this project was seeing multiple MSFS tool authors creating their own WASM modules and protocols just to support their own product. There is nothing wrong with this, of course, but for the Sim user it can be a disadvantage on several levels. They may end up running multiple versions of modules which all do eseentially the same thing, and it may be confusing which WASM module they need to support which tool, just to name two obvious issues. For the developer, programming the WASM modules comes with its own quirks, too, not to mention the time involved, and regardless of the supposed isolated environment a WASM module is supposed to run in, it's still very easy to take down the whole Simulator with some errant code.</p>
 <p >Since MS/Asobo have been "slow" to add further remote access features to <em>SimConnect</em> (or come up with some other method), this project is an attempt at establishing a "standard" or "common" way of doing so. At the least I hope it motivates <em>some</em> kind of standards adoption.</p>
 <p >On a more practical note, I will be using it with the <a href="https://github.com/mpaperno/MSFSTouchPortalPlugin" target="_blank">MSFS Touch Portal Plugin</a> which I'm currently maintaining.</p>
 <hr  />
- <h3><a class="anchor" id="autotoc_md5"></a>
+ <h3><a class="anchor" id="autotoc_md4"></a>
 Features</h3>
-<h4><a class="anchor" id="autotoc_md6"></a>
-Capabilities</h4>
+<h4><a class="anchor" id="autotoc_md5"></a>
+Remote Capabilities</h4>
 <ul>
 <li><b>Execute Calculator Code</b>:<ul>
 <li>With or without a returned result; Result returned as numeric and string types.</li>
 <li>Formatted results from <code>format_calculator_string()</code> using <a href="https://docs.flightsimulator.com/html/Samples_And_Tutorials/Samples/#strings" target="_blank">RPN String Formatting</a></li>
 </ul>
 </li>
-<li><b>Get Variable</b>: Return numeric result from any type of variable accessible to a standalone WASM module (basically everything but Guage and Instrument types, but also including Token vars).<ul>
+<li><b>Get Variable</b>: Return numeric result from any type of variable accessible to a standalone WASM module (basically everything but Gauge and Instrument types, but also including Token vars).<ul>
 <li>With optional Unit specifier for variable types which support it.</li>
 </ul>
 </li>
 <li><b>Set Variable</b>: Set the numeric value of any settable variable type, with optional Unit specifier for variable types which support it.</li>
-<li><b>Create Variable</b>: Create a new Local variable if it doesn't already exist.</li>
+<li><b>Create Variable</b>: Create (and get/set) a new Local variable if it doesn't already exist.</li>
 <li><b>List Local Variables</b>: Get a list of all available 'L' variables with their names and current IDs.</li>
-<li><b>Lookup</b>: Return a numeric ID for a SimVar/Local/Token variable or Unit name.</li>
+<li><b>Lookup</b>: Return a numeric ID for a SimVar/Local/Token variable, Unit, or Key Event name.</li>
 <li><b>Subscribe</b> to <em>Calculator Code</em> and <em>Get Variable</em> results:<ul>
 <li>Get "push" notifications whenever result values change; Change monitoring can be configured at any rate down to the millisecond (~25ms minimum). Can also be configured to use the "delta epsilon" feature of SimConnect (to ignore insignificant changes in value) or, conversely, to always send updates even when values do not change.</li>
 <li>Optionally perform manual ("polled") updates of subscriptions at any interval of your choice.</li>
@@ -148,38 +148,48 @@ Capabilities</h4>
 </li>
 <li><b>Register Named Events</b>:<ul>
 <li>Save recurring "set events," like activiating controls using calculator code, for more efficient and simpler re-use. Saved calculator code is pre-compiled to a more efficient byte code representation before being passed to the calculator function. This significantly improves performance for recurring calculations.</li>
-<li>Saved events can be named and executed via standard SimConnect commands <code>SimConnect_MapClientEventToSimEvent(id, "event_name")</code> and <code>SimConnect_TransmitClientEvent(id)</code>.</li>
+<li>Registered events can be executed "natively" via <em>WASim API</em> by simply sending a short command with the saved event ID.</li>
+<li>Saved events can also be named and executed via standard SimConnect commands <code>SimConnect_MapClientEventToSimEvent(id, "event_name")</code> and <code>SimConnect_TransmitClientEvent(id)</code>.</li>
 <li>Event names can be completely custom (including a <code>.</code> (period) as per SimConnect convention), or derive from the connected Client's name (to ensure uniqueness).</li>
-<li>Registered events can also be executed "natively" via <em>WASim API</em> by simply sending a short command with the saved event ID.</li>
 </ul>
 </li>
 <li><b>Send Simulator "Key Events"</b> directly by ID (instead of going through the SimConnect mapping process or executing calculator code). Much more efficient than the other methods.</li>
 <li><b>Remote Logging</b>: Log messages (errors, warnings, debug, etc) can optionally be sent to the Client, with specific minimum level (eg. only warnings and errros).</li>
 <li><b>Ping</b> the Server to check that the WASM module is installed and running before trying to connect or use its features.</li>
 </ul>
-<h4><a class="anchor" id="autotoc_md7"></a>
+<h4><a class="anchor" id="autotoc_md6"></a>
 Core Components</h4>
 <ul>
 <li>WASM module-based Server supports multiple simultaneous, independent client connections.</li>
-<li>Full-featured Client implementation available as a C++ library (C# wrapper in production).</li>
-<li>Well-defined API for communication between Server module and any client implementation.</li>
+<li>Full-featured Client implementation available as a C++ library and a C#/.NET assembly.</li>
+<li>Well-defined message API for communication between Server module and any client implementation.</li>
 <li>Uses standard SimConnect messages for the base network "transport" layer.</li>
 <li>All data allocations are on client side, so SimConnect limits in WASM module are bypassed (can in theory support unlimited clients).</li>
 <li>No wasted data allocations, each data/variable subscription is stored independently avoiding complications with offets or data overflows.</li>
 <li>Minimum possible impact on MSFS in terms of memory and CPU usage; practically zero effect for Sim user when no clients are connected (Server is idle).</li>
-<li>Extensive logging at configurable levels (debug/info/warning/etc) to multiple destinations (file/console/remote) for both Server and Client. Uses an efficient <b>lazy logging</b> implementation which doesn't evaluate any arguments if the log message will be discarded anyway (eg. a DEBUG level message when minimum logging level is INFO).</li>
+<li>Server periodically checks that a client is still connected by sending "hearbeat" ping requests and enforcing a timeout if no response is received.</li>
+<li>Extensive logging at configurable levels (debug/info/warning/etc) to multiple destinations (file/console/remote) for both Server and Client.<ul>
+<li>Uses an efficient <b>lazy logging</b> implementation which doesn't evaluate any arguments if the log message will be discarded anyway (eg. a DEBUG level message when minimum logging level is INFO).</li>
+<li>Logging levels can be set at startup via config files and changed at runtime for each facility (including remotely on the server).</li>
+</ul>
+</li>
 <li>Includes a SimConnect request/exception tracking feature for detailed diagnostics.</li>
 <li>Extensive documentation for core API and all Client library features.</li>
 <li>Efficiency and runtime safety are core requirements.</li>
 </ul>
-<h4><a class="anchor" id="autotoc_md8"></a>
+<h4><a class="anchor" id="autotoc_md7"></a>
 Desktop GUI</h4>
 <ul>
 <li>Includes a full-featured desktop application which demonstrates/tests all available features of the API.</li>
 <li>Fully usable as a standalone application which saves preferences, imports/exports lists of data subscriptions/registered events, and other usabililty features.</li>
 </ul>
 <hr  />
- <h3><a class="anchor" id="autotoc_md10"></a>
+ <h3><a class="anchor" id="autotoc_md9"></a>
+Documentation</h3>
+<p >API docuemntation generated from source comments is published here: <a href="https://mpaperno.github.io/WASimCommander/">https://mpaperno.github.io/WASimCommander/</a></p>
+<p >More to come... for now there's always The Source Code to read... :-)</p>
+<hr  />
+ <h3><a class="anchor" id="autotoc_md11"></a>
 Credits</h3>
 <p >This project is written, tested, and documented by myself, Maxim (Max) Paperno.<br  />
  <a href="https://github.com/mpaperno/">https://github.com/mpaperno/</a></p>
@@ -192,17 +202,17 @@ Credits</h3>
 <li><a href="https://material.io/" target="_blank">Material Icons</a> - Google, Apache License v2.0.</li>
 </ul>
 <hr  />
- <h3><a class="anchor" id="autotoc_md12"></a>
+ <h3><a class="anchor" id="autotoc_md13"></a>
 Copyright, License, and Disclaimer</h3>
 <p ><a class="el" href="namespace_w_a_sim_commander.html" title="WASimCommander main namespace. Defines constants and structs used in Client-Server interactions....">WASimCommander</a> Project <br  />
  COPYRIGHT: Maxim Paperno; All Rights Reserved.</p>
-<h4><a class="anchor" id="autotoc_md13"></a>
+<h4><a class="anchor" id="autotoc_md14"></a>
 API Library and Client Components</h4>
 <p >Dual licensed under the terms of either the GNU General Public License (<b>GPL</b>) or the GNU Lesser General Public License (<b>LGPL</b>), as published by the Free Software Foundation, either <b>version 3</b> of the Licenses, or (at your option) any later version.</p>
-<h4><a class="anchor" id="autotoc_md14"></a>
+<h4><a class="anchor" id="autotoc_md15"></a>
 WASM Module Server and GUI Components</h4>
 <p >Licensed under the terms of the GNU General Public License (<b>GPL</b>) as published by the Free Software Foundation, either <b>version 3</b> of the License, or (at your option) any later version.</p>
-<h4><a class="anchor" id="autotoc_md15"></a>
+<h4><a class="anchor" id="autotoc_md16"></a>
 General</h4>
 <p >This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.</p>
 <p >Copies of the GNU GPL and LGPL are included with this project and are available at <a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>.</p>
@@ -214,7 +224,7 @@ General</h4>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Fri Jun 24 2022 16:29:08 for WASimCommander by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.4 </li>
+    <li class="footer">Generated on Mon Jul 4 2022 08:12:13 for WASimCommander by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.4 </li>
   </ul>
 </div>
 </body>

@@ -1,0 +1,127 @@
+
+html {
+		--content-maxwidth: auto;
+		--side-nav-arrow-opacity: 0.6;
+    /* --note-color: #969696;
+    --note-color-dark: #634b03;
+    --note-color-darker: #3d2e01; */
+}
+
+/* html.dark-mode {
+    --note-color: #969696;
+    --note-color-dark: #634b03;
+    --note-color-darker: #3d2e01;
+} */
+
+#side-nav {
+	padding-right: 6px !important;
+}
+
+.ui-resizable-e {
+	width: 6px !important;
+}
+
+#titlearea {
+	margin-right: 30px;
+}
+
+#projectlogo img
+{
+	/* max-height: 56px; */
+	max-height: revert;
+	margin-right: revert;
+}
+
+td#projectalign {
+	vertical-align: bottom;
+}
+
+#projectname
+{
+	/*font: bold 280% Tahoma, Arial,sans-serif;*/
+	/*margin: 0px;*/
+	padding: 2px 2px 0px 0px;
+	/* font-variant: small-caps; */
+}
+
+a.el, a.elRef {
+	color: #009b00 !important;
+	font-weight: normal;
+}
+
+a.el:visited, a.elRef:visited {
+	color: #007800 !important;
+	font-weight: normal;
+}
+
+html.dark-mode a.el, a.elRef {
+	color: #06d206 !important;
+	font-weight: normal;
+}
+
+html.dark-mode a.el:visited, html.dark-mode a.elRef:visited {
+	color: #01b501 !important;
+	font-weight: normal;
+}
+
+/*a[target=_blank] {
+	color: #0059b3 !important;
+}*/
+
+.navpath li.navelem a {
+	font-weight: bold
+}
+div.fragment {
+	padding: 5px;
+}
+
+/*div.line {
+	padding: 2px 0;
+	text-indent: 0;
+}*/
+
+/*div.memproto {
+	border-top-left-radius: 4px;
+	background-color: #EBEBEE;
+}*/
+
+/* smaller "Definition at line ..." */
+p.definition {	font-size: 11px !important; }
+
+/* hide large title block over each member details */
+/*h2.memtitle { display: none; }*/
+
+/* prettify detailed member titles */
+table.memname tr { display: inline-table; }
+table.memname td { padding: 1px 0; }
+td.memname { font-weight: bold; }
+
+/* hide brief descriptions in member list, but not for parent class */
+tr[class^="memdesc"] { display: none; }
+
+.github-corner svg {
+    width: 63px;
+    height: 63px;
+		position: absolute;
+		top: 10px;
+		left: 300px;
+		/* right: -20px; */
+    /* fill: var(--primary-light-color); */
+    color: var(--page-background-color);
+		/* transform: scaleX(-1); */
+		z-index: 99;
+}
+.github-corner svg .first-stop {
+    stop-color: #00B4FF;
+}
+.github-corner svg .last-stop {
+    stop-color: #008AC6;
+}
+
+@media screen and (max-width: 1087px) {
+    .github-corner svg {
+				left: auto;
+				right: 0;
+				/* transform: revert; */
+    }
+}
