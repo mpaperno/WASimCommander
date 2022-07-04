@@ -81,13 +81,13 @@ namespace CS_BasicConsole
 				return;
 			}
 
-      // set up a Simulator Variable for testing.
-      const string simVarName = "CG PERCENT";
-      const string simVarUnit = "percent";
+			// set up a Simulator Variable for testing.
+			const string simVarName = "CG PERCENT";
+			const string simVarUnit = "percent";
 
-      // Execute a calculator string with result. We'll try to read the value of the SimVar defined above.
-      const string calcCode = $"(A:{simVarName},{simVarUnit})";
-      if (client.executeCalculatorCode(calcCode, CalcResultType.Double, out double fResult, out string sResult) == HR.OK)
+			// Execute a calculator string with result. We'll try to read the value of the SimVar defined above.
+			const string calcCode = $"(A:{simVarName},{simVarUnit})";
+			if (client.executeCalculatorCode(calcCode, CalcResultType.Double, out double fResult, out string sResult) == HR.OK)
 				Log($"Calculator code '{calcCode}' returned: {fResult} and '{sResult}'", "<<");
 
 			// Get a named Sim Variable value, same one as before, but directly using the Gauge API function aircraft_varget()
@@ -126,13 +126,13 @@ namespace CS_BasicConsole
 				}
 			}
 
-      // Test subscribing to a string type value. We'll use the Sim var "TITLE" (airplane name), which can only be retrieved using calculator code.
-      // We allocate 32 Bytes here to hold the result and we request this one with an update period of Once, which will return a result right away
-      // but will not be scheduled for regular updates. If we wanted to update this value later, we could call the client's `updateDataRequest(requestId)` method.
-      hr = client.saveDataRequest(new DataRequest(
+			// Test subscribing to a string type value. We'll use the Sim var "TITLE" (airplane name), which can only be retrieved using calculator code.
+			// We allocate 32 Bytes here to hold the result and we request this one with an update period of Once, which will return a result right away
+			// but will not be scheduled for regular updates. If we wanted to update this value later, we could call the client's `updateDataRequest(requestId)` method.
+			hr = client.saveDataRequest(new DataRequest(
 				requestId: (uint)Requests.REQUEST_ID_2_STR,
-        resultType: CalcResultType.String,
-        calculatorCode: "(A:TITLE, String)",
+				resultType: CalcResultType.String,
+				calculatorCode: "(A:TITLE, String)",
 				valueSize: 32,
 				period: UpdatePeriod.Once,
 				interval: 0,
@@ -140,21 +140,21 @@ namespace CS_BasicConsole
 			);
 			if (hr == HR.OK) {
 				Log($"Requested TITLE variable.", ">>");
-        if (!dataUpdateEvent.WaitOne(1000))
-          Log("Data subscription update timed out!", "!!");
-      }
+				if (!dataUpdateEvent.WaitOne(1000))
+					Log("Data subscription update timed out!", "!!");
+			}
 
 			// Test getting a list of our data requests back from the Client.
-      Log("Saved Data Requests:", "::");
+			Log("Saved Data Requests:", "::");
 			var requests = client.dataRequests();
-      foreach (DataRequestRecord dr in requests)
-			  Log(dr.ToString());  // Another convenient ToString() override for logging
+			foreach (DataRequestRecord dr in requests)
+				Log(dr.ToString());  // Another convenient ToString() override for logging
 
 			// OK, that was fun... now remove the data subscriptions. We could have done it in the loop above but we're testing things here...
-      // The server will also remove all our subscriptions when we disconnect, but it's nice to be polite!
-      var requestIds = client.dataRequestIdsList();
-      foreach (uint id in requestIds)
-        client.removeDataRequest(id);
+			// The server will also remove all our subscriptions when we disconnect, but it's nice to be polite!
+			var requestIds = client.dataRequestIdsList();
+			foreach (uint id in requestIds)
+				client.removeDataRequest(id);
 
 			// Get a list of all local variables...
 			// Connect to the list results Event
@@ -186,8 +186,8 @@ namespace CS_BasicConsole
 		// This is an event handler for printing Client and Server log messages
 		static void LogHandler(LogRecord lr, LogSource src)
 		{
-      Log($"{src} Log: {lr}", "@@");  // LogRecord has a convenience ToString() override
-    }
+			Log($"{src} Log: {lr}", "@@");  // LogRecord has a convenience ToString() override
+		}
 
 		// Event handler to print the current Client status.
 		static void ClientStatusHandler(ClientEvent ev)
@@ -207,23 +207,23 @@ namespace CS_BasicConsole
 		static void DataSubscriptionHandler(DataRequestRecord dr)
 		{
 			Console.Write($"<< Got Data for request {(Requests)dr.requestId} \"{dr.nameOrCode}\" with Value: ");
-      // Convert the received data into a value using DataRequestRecord's tryConvert() methods.
-      // This could be more efficient in a "real" application, but it's good enough for our tests with only 2 value types.
-      if (dr.tryConvert(out float fVal))
+			// Convert the received data into a value using DataRequestRecord's tryConvert() methods.
+			// This could be more efficient in a "real" application, but it's good enough for our tests with only 2 value types.
+			if (dr.tryConvert(out float fVal))
 				Console.WriteLine($"(float) {fVal}");
 			else if (dr.tryConvert(out string sVal)) {
 				Console.WriteLine($"(string) \"{sVal}\"");
-      }
+			}
 			else
 				Console.WriteLine("Could not convert result data to value!");
 			// signal completion
 			dataUpdateEvent.Set();
 		}
 
-    static void Log(string msg, string prfx = "=:")
-    {
-      Console.WriteLine(prfx + ' ' + msg);
-    }
+		static void Log(string msg, string prfx = "=:")
+		{
+			Console.WriteLine(prfx + ' ' + msg);
+		}
 
 	}
 
