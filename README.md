@@ -108,12 +108,11 @@ _Watch_ -> _Custom_ -> _Releases_ this repo (button at top) or subscribe to the 
 -------------
 ### Documentation & Examples
 
+There are two basic `C++` and `C#` console-style tests/examples included in the [src/Testing](https://github.com/mpaperno/WASimCommander/tree/main/src/Testing) folder.
+If you like reading code, this is the place to start.
+
 API docuemntation generated from source comments is published here: https://mpaperno.github.io/WASimCommander/ <br/>
 A good place to start with the docs is probably the [`WASimClient`](https://mpaperno.github.io/WASimCommander/class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html) page.
-
-There is one basic C# console test/example included in the 
-[src/Testing/CS_BasicConsole](https://github.com/mpaperno/WASimCommander/tree/main/src/Testing/CS_BasicConsole/Program.cs) 
-folder (C++ example forthcoming, but it's very similar):
 
 The GUI is written in C++ (using Qt library for UI), and while not the simplest example, _is_ a full implementation of almost all the available
 API features. The main `WASimClient` interactions all happen in the `MainWindow::Private` class at the top of the 

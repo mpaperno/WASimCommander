@@ -35,7 +35,8 @@ $ModuleDest = "${DistPath}\module"
 $ModulePackage = "${PackagePath}\module"
 
 $testApps = @{
-	"$BuildPath\CS_BasicConsole\Release-$Platform\$Platform\Release\net6.0-windows" = "$PackagePath\bin\CS_BasicConsole"
+	"$BuildPath\CS_BasicConsole\Release-$Platform\$Platform\Release\net6.0-windows" = "$PackagePath\bin\CS_BasicConsole";
+	"$BuildPath\CPP_BasicConsole\Release-$Platform" = "$PackagePath\bin\CPP_BasicConsole"
 }
 
 $buildAll = $Targets.Contains("all")
@@ -145,7 +146,7 @@ robocopy "$SrcPath\${CLIENT_NAME}" "$PackagePath\lib" *.txt *.md $copyOptions
 if ($LastExitCode -ge 8) { Write-Output($LastExitCode); Exit 1  }
 
 # Module
-robocopy "$ModuleDest\Packages" "$ModulePackage" $copyOptions /XF .*
+robocopy "$ModuleDest\Packages" "$ModulePackage" $copyOptions
 if ($LastExitCode -ge 8) { Write-Output($LastExitCode); Exit 1  }
 robocopy "$SrcPath\${SERVER_NAME}" "$ModulePackage" *.txt *.md $copyOptions
 if ($LastExitCode -ge 8) { Write-Output($LastExitCode); Exit 1  }
