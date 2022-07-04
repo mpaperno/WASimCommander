@@ -1,0 +1,7 @@
+<Project>
+  <PropertyGroup>
+    <ProjectName>CS_BasicConsole</ProjectName>
+    <BaseOutputPath>$(SolutionDir)build\$(ProjectName)\$(Configuration)-$(Platform)\</BaseOutputPath>
+    <BaseIntermediateOutputPath>$(SolutionDir)build\$(ProjectName)\obj\$(Configuration)-$(Platform)\</BaseIntermediateOutputPath>
+  </PropertyGroup>
+</Project>
