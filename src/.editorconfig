@@ -1,0 +1,5 @@
+﻿# overrides for top-level config
+[*.{c++,cc,cpp,cppm,cxx,cs,h,h++,hh,hpp,hxx,inl,ipp,ixx,tlh,tli}]
+indent_style=tab
+indent_size = 2
+insert_final_newline=true
