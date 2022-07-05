@@ -41,7 +41,8 @@ On a more practical note, I will be using it with the [MSFS Touch Portal Plugin]
 #### Remote Capabilities
 - **Execute Calculator Code**:
     - With or without a returned result; Result returned as numeric and string types.
-    - Formatted results from `format_calculator_string()` using [RPN String Formatting](https://docs.flightsimulator.com/html/Samples_And_Tutorials/Samples/#strings)
+    - Formatted results from `format_calculator_string()` using 
+      [RPN String Formatting](https://docs.flightsimulator.com/html/Additional_Information/Reverse_Polish_Notation.htm#strings)
 - **Get Variable**: Return numeric result from any type of variable accessible to a standalone WASM module 
     (basically everything but Gauge and Instrument types, but also including Token vars). 
     - With optional Unit specifier for variable types which support it.
