@@ -187,7 +187,7 @@ class WASimClient::Private
 		atomic<LookupItemType> listType { LookupItemType::None };
 		uint32_t token { 0 };
 		shared_ptr<condition_variable_any> cv = make_shared<condition_variable_any>();
-		Clock::time_point nextTimeout {};
+		atomic<Clock::time_point> nextTimeout {};
 		ListResult::listResult_t result;
 		shared_mutex mutex;
 
@@ -687,9 +687,10 @@ class WASimClient::Private
 			LOG_WRN << "Server version does not match WASimClient version " << STREAM_HEX8(WSMCMND_VERSION);
 		setStatus(ClientStatus::Connected);
 
+		// clear any pending list request (unlikely)
+		listResult.reset();
 		// make sure server knows our desired log level and set up data area/request if needed
 		updateServerLogLevel();
-
 		// (re-)register (or delete) any saved DataRequests
 		registerAllDataRequests();
 		// same with calculator events
@@ -810,7 +811,7 @@ class WASimClient::Private
 			timeout = settings.networkTimeout;
 
 		auto stop_waiting = [=]() {
-			return tr->response.commandId != CommandId::None && tr->response.token == token && (!extraPredicate || extraPredicate());
+			return !serverConnected || (tr->response.commandId != CommandId::None && tr->response.token == token && (!extraPredicate || extraPredicate()));
 		};
 
 		HRESULT hr = E_TIMEOUT;
@@ -850,8 +851,8 @@ class WASimClient::Private
 	void waitListRequestEnd()
 	{
 		auto stop_waiting = [this]() {
-			shared_lock lock(listResult.mutex);
-			return listResult.nextTimeout >= Clock::now();
+			//shared_lock lock(listResult.mutex);
+			return listResult.nextTimeout.load() >= Clock::now();
 		};
 
 		Command response;
