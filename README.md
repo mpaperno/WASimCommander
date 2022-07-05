@@ -121,6 +121,38 @@ API features. The main `WASimClient` interactions all happen in the `MainWindow:
 More to come... or [Just Read The Source](https://github.com/mpaperno/WASimCommander/tree/main/src) :-)
 
 -------------
+### Troubleshooting
+
+#### WASM Module
+To check status of the WASM module, enable Developer Mode in MSFS, show the "WASM Debug" window (_Options_ -> _WASM_) and check if the module shows up
+in the list in that window. If not, then it's not installed. If it does and any of the text is RED, it is installed but crashed for some reason (let me know!).
+If the text is green then everything is good on that side.
+
+Also in Dev Mode, check the Console for messages. It may show MSFS errors related to the module, and the module itself logs to the console as well.
+There should be 2 console log messages from the module when it starts up, the latter showing the version number.
+
+The module also logs to a file, though it's a bit tricky to find. On my edition (from MS store) the "working directory" for the modules is <br/>
+`D:\WpSystem\S-1-5-21-611220451-769921231-644967174-1000\AppData\Local\Packages\Microsoft.FlightSimulator_8wekyb3d8bbwe\LocalState\packages\wasimcommander-module\work`
+
+To enable more verbose logging on the module at startup, edit the `server_conf.ini` file which is found in the module's install folder 
+(`Comunity\wasimcommander-module\modules`). There are comments in there indicating the options. 
+
+Keep in mind that the server logging level can also be changed remotely at runtime, but
+of course that only works if you can establish a connection to the module in the first place.
+
+#### WASimClient (or anything using it, like WASimUI)
+
+Basically the log is the primary source of information here. By default it logs at the "Info" level to:
+1) The current console window, assuming there is one (the host app is started from a console). So if using `WASimUI`, for example, just start it from a command prompt.
+2) A file in whatever current directory it is running in (so, for the UI, that would be the UI's install folder). 
+
+Of course if you're using `WASimUI`, it also provides a full logging interface and you can set all the log levels from there, for both client and server sides.
+
+There should also be a `client_conf.ini` file alongside whatever is using the Client
+where initial logging location, levels and network configuration (timeout and SimConnect.cfg index) is set. 
+The config file has comments indicating the available options.
+
+-------------
 ### Issues, Support, Suggestions, Discussion
 
 The GitHub repository is the primary source of all these things. You know what to do...
@@ -131,6 +163,15 @@ Use [Discussions](https://github.com/mpaperno/WASimCommander/discussions) for an
 
 Most flight simulator forums seem fairly strict about _not_ using their site to provide product support. So please use GitHub,
 unless you're absolutely sure no rules would be broken or toes stepped upon otherwise.
+
+-------------
+### Known Issues
+
+- Setting a Local Variable value with the `Set` command ignores any Unit specifier. This is due to a bug in the MSFS WASM library
+  preventing the corresponding _Gauge API_ function `set_named_variable_typed_value()` from being exported. 
+  See bug report at [devsupport.flightsimulator.com](https://devsupport.flightsimulator.com/questions/8604/env-wasm-set-named-variable-typed-value-not-found.html) 
+
+  You can stil use a unit specifier with L vars in calculaotor code. Though I've yet to find an instance where it makes any difference.
 
 -------------
 ### Credits

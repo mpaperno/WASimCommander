@@ -251,7 +251,7 @@ static const HRESULT E_TIMEOUT       = /*ERROR_TIMEOUT*/       1460L | (/*FACILI
 		/// \return `S_OK` (0) - Success;\n
 		///  `E_FAIL` (0x80004005) - General failure (most likely simulator is not running);\n
 		///  `E_TIMEOUT` (0x800705B4) - Connection attempt timed out (simulator/network issue);\n
-		///  `E_INVALIDARG` (0x80070057) - The SimConnect.cfg file did not contain the config index requested in the \c simConnectConfigId parameter;
+		///  `E_INVALIDARG` (0x80070057) - The SimConnect.cfg file did not contain the config index requested in the `simConnectConfigId` parameter;
 		/// \note This method blocks until either the Simulator responds or the timeout has expired. \sa connectSimulator(), defaultTimeout(), setDefaultTimeout()
 		HRESULT connectSimulator(int networkConfigId, uint32_t timeout = 0);
 		/// Shut down all network connections (and disconnect WASimCommander server if connected).
@@ -260,14 +260,14 @@ static const HRESULT E_TIMEOUT       = /*ERROR_TIMEOUT*/       1460L | (/*FACILI
 
 		/// Check if WASimCommander Server exists (Simulator running, the WASIM module is installed and working). Returns server version number, or zero if server did not respond.\n
 		/// This will implicitly call `connectSimulator()` first if it hasn't already been done, using the default network configuration settings. Zero will be returned if the connection could not be established.
-		/// \param timeout Maximum time to wait for response, in milliseconds. Zero (default) means to use the `defaultTimeout()` value. \sa setDefaultTimeout()
+		/// \param timeout Maximum time to wait for response, in milliseconds. Zero (default) means to use the `defaultTimeout()` value.
 		/// \return Server version number, or zero (`0`) if server (or simulator) didn't respond within the timeout period.
 		/// \note This method blocks until either the Server responds or the timeout has expired. \sa defaultTimeout(), setDefaultTimeout()
 		uint32_t pingServer(uint32_t timeout = 0);
 
 		/// Connect to WASimCommander server.
 		/// This will implicitly call \c connectSimulator() first if it hasn't already been done, using the default network configuration setting.
-		/// \param timeout Maximum time to wait for response, in milliseconds. Zero (default) means to use the defaultTimeout() value. \sa setDefaultTimeout()
+		/// \param timeout Maximum time to wait for response, in milliseconds. Zero (default) means to use the `defaultTimeout()` value.
 		/// \return `S_OK` (0) - Success.\n
 		///  `E_FAIL` (0x80004005) - General failure (most likely simulator is not running).\n
 		///  `E_TIMEOUT` (0x800705B4) - Connection attempt timed out (simulator/network issue or WASimCommander WASM module is not installed/running).\n
@@ -305,12 +305,13 @@ static const HRESULT E_TIMEOUT       = /*ERROR_TIMEOUT*/       1460L | (/*FACILI
 		/// \param pfResult A pointer to an initialized variable of `double` to store the result into if `resultType` is `Enums::CalcResultType::Double` or `Enums::CalcResultType::Integer`.
 		/// \param psResult A string pointer to store the string result into. The string version is typically populated even for numeric type requests, but definitely for `Enums::CalcResultType::String` or `Enums::CalcResultType::Formatted` type requests.
 		/// \return `S_OK` on success, `E_FAIL` if the server returned Nak response, `E_NOT_CONNECTED` if not connected to server, or `E_TIMEOUT` on general server communication failure.
-		/// \note This method blocks until either the Server responds or the timeout has expired. \sa defaultTimeout(), setDefaultTimeout()
+		/// \note This method blocks until either the Server responds or the timeout has expired.
+		///
 		/// If you need to execute the same code multiple times, it would be more efficient to save the code as either a data request (for code returning values) or a registered event (for code not returning values).
-		/// The advantage is that in those cases the calculator string is pre-compiled to byte code and saved once, then each invocation the _Gauge API_ calculator functions uses the more efficient byte code version.
+		/// The advantage is that in those cases the calculator string is pre-compiled to byte code and saved once, then each invocation of the _Gauge API_ calculator functions uses the more efficient byte code version.
 		/// (To prevent automatic data updates for data requests, just set the data request period to `Enums::UpdatePeriod::Never` or `Enums::UpdatePeriod::Once` and use the `updateDataRequest()` method to poll for value updates as needed.)
-		/// See `saveDataRequest()` and `saveEvent()` respecitvely for details.
-		/// \sa \refwce{CommandId::Exec}
+		/// See `saveDataRequest()` and `registerEvent()` respecitvely for details.
+		/// \sa \refwce{CommandId::Exec}, defaultTimeout(), setDefaultTimeout()
 		HRESULT executeCalculatorCode(const std::string &code, WSE::CalcResultType resultType = WSE::CalcResultType::None, double *pfResult = nullptr, std::string *psResult = nullptr) const;
 
 		// Variables accessors ------------------------------
@@ -321,10 +322,10 @@ static const HRESULT E_TIMEOUT       = /*ERROR_TIMEOUT*/       1460L | (/*FACILI
 		/// \param variable See `VariableRequest` documentation for descriptions of the individual fields.
 		/// \param pfResult Pointer to a double precision variable to hold the result.
 		/// \return `S_OK` on success, `E_INVALIDARG` on parameter validation errors, `E_NOT_CONNECTED` if not connected to server, `E_TIMEOUT` on server communication failure, or `E_FAIL` if server returns a Nak response.
-		/// \note This method blocks until either the Server responds or the timeout has expired. \sa defaultTimeout(), setDefaultTimeout()
-		/// \sa \refwcc{VariableRequest}, \refwce{CommandId::Get}
+		/// \note This method blocks until either the Server responds or the timeout has expired.
+		/// \sa \refwcc{VariableRequest}, \refwce{CommandId::Get},  defaultTimeout(), setDefaultTimeout()
 		HRESULT getVariable(const VariableRequest &variable, double *pfResult);
-		/// A convenience version of `getVariable(VariableRequest('L', variableName), pfResult)`. See `getVariable()` for details.
+		/// A convenience version of <tt>getVariable(VariableRequest('L', variableName), pfResult)</tt>. See `getVariable()` for details.
 		/// \param variableName Name of the local variable.
 		/// \param pfResult Pointer to a double precision variable to hold the result.
 		/// \return `S_OK` on success, `E_INVALIDARG` on parameter validation errors, `E_NOT_CONNECTED` if not connected to server, `E_TIMEOUT` on server communication failure, or `E_FAIL` if server returns a Nak response.
@@ -409,18 +410,16 @@ static const HRESULT E_TIMEOUT       = /*ERROR_TIMEOUT*/       1460L | (/*FACILI
 		/// \sa \refwce{CommandId::Transmit}, registerEvent(), removeEvent()
 		HRESULT transmitEvent(uint32_t eventId);
 
-		/// Returns a reference to a `RegisteredEvent` which has been previously added with `registerEvent()`. If the event with the given `eventId` doesn't exist, an invalid `RegisteredEvent` is returned which has
+		/// Returns a copy of a `RegisteredEvent` which has been previously added with `registerEvent()`. If the event with the given `eventId` doesn't exist, an invalid `RegisteredEvent` is returned which has
 		/// the members `RegisteredEvent::eventId` set to `-1`, and `RegisteredEvent::code` and `RegisteredEvent::name` both empty.
-		/// \note The reference will become invalid if the request is removed with `removeEvent()`. Only use the reference for short-term needs and make a copy if longer term storage is required.
 		RegisteredEvent registeredEvent(uint32_t eventId);
-		/// Returns a list of all registered events which have been added to the Client with `registerEvent()`.
-		/// \note Event object references will become invalid if the event is removed with `removeEvent()`. Only use the references for short-term needs and make a copy if longer term storage is required.
+		/// Returns a list of all registered events which have been added to the Client with `registerEvent()`. The list members are created by copy.
 		std::vector<RegisteredEvent> registeredEvents() const;
 
 		// Meta data retrieval --------------------------------
 
-		/// Send a request for a list update to the server. The results are delivered using the callback set in \c setListResultsCallback().
-		/// \param itemsType The type of thing to list. Supported types are local variables (`LookupItemType::LocalVariable`, default), subscribed Data Requests (`LookupItemType::DataRequest`), and Registered Events (`LookupItemType::RegisteredEvent`).
+		/// Send a request for a list update to the server. The results are delivered using the callback set in `setListResultsCallback()`.
+		/// \param itemsType The type of thing to list. Supported types are local variables (`Enums::LookupItemType::LocalVariable`, default), subscribed Data Requests (`Enums::LookupItemType::DataRequest`), and Registered Events (`Enums::LookupItemType::RegisteredEvent`).
 		/// \return  `S_OK` on success, `E_INVALIDARG` if the item type is not supported, `E_NOT_CONNECTED` if not connected to server.
 		/// \note The list result callback is invoked from a new thread which delivers the results (\refwcc{ListResult} structure). Also check the `ListResult::result` HRESULT return code to be sure the list command completed successfully
 		/// (which may be `S_OK`, `E_FAIL` if server returned `Nak`, or `E_TIMEOUT` if the list request did not complete (results may be empty or partial)).
