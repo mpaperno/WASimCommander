@@ -78,19 +78,19 @@ static const auto getEnumName(Enum e, const Range &range) noexcept
 // -----------------------------
 
 // This is an event handler for printing Client and Server log messages.
-static void LogHandler(LogRecord lr, LogSource src)
+static void LogHandler(const LogRecord &lr, LogSource src)
 {
 	Log("@@")() << getEnumName(src, LogSourceNames) << ": " << lr;  // LogRecord has a convenient  stream operator
 }
 
 // Handler to print the current Client status (connecting, disconnected, etc).
-static void ClientStatusHandler(ClientEvent ev)
+static void ClientStatusHandler(const ClientEvent &ev)
 {
 	Log("^^")() << "Client event "  << getEnumName(ev.eventType, ClientEventTypeNames) << " - " << quoted(ev.message) << "; Client status: " << hex << setw(2) << setfill('0') << (uint16_t)ev.status;
 }
 
 // Event handler for showing listing results (eg. local vars list)
-static void ListResultsHandler(ListResult lr)
+static void ListResultsHandler(const ListResult &lr)
 {
 	Log()() << "ListResult{ " << getEnumName(lr.listType, LookupItemTypeNames) << "; status: " << hex << setw(8) << setfill('0') << lr.result << " Values: ";
 	for (const auto & [k, v] : lr.list)
@@ -100,7 +100,7 @@ static void ListResultsHandler(ListResult lr)
 }
 
 // Event handler to process data value subscription updates.
-static void DataSubscriptionHandler(DataRequestRecord dr)
+static void DataSubscriptionHandler(const DataRequestRecord &dr)
 {
 	cout << "<< Got Data for request " << dr.requestId << " " << quoted(dr.nameOrCode) << " with Value: ";
 	// Convert the received data into a usable value.
@@ -124,7 +124,7 @@ static void DataSubscriptionHandler(DataRequestRecord dr)
 
 int main()
 {
-	Log("Initializing WASimClient...");
+	Log()() << "Initializing WASimClient...";
 
 	// Create
 	WASimClient client = WASimClient(0x0C997E57);  // "CPPTEST"  :)
