@@ -204,13 +204,37 @@ Documentation &amp; Examples</h3>
 <p >More to come... or <a href="https://github.com/mpaperno/WASimCommander/tree/main/src" target="_blank">Just Read The Source</a> :-)</p>
 <hr  />
  <h3><a class="anchor" id="autotoc_md13"></a>
+Troubleshooting</h3>
+<h4><a class="anchor" id="autotoc_md14"></a>
+WASM Module</h4>
+<p >To check status of the WASM module, enable Developer Mode in MSFS, show the "WASM Debug" window (<em>Options</em> -&gt; <em>WASM</em>) and check if the module shows up in the list in that window. If not, then it's not installed. If it does and any of the text is RED, it is installed but crashed for some reason (let me know!). If the text is green then everything is good on that side.</p>
+<p >Also in Dev Mode, check the Console for messages. It may show MSFS errors related to the module, and the module itself logs to the console as well. There should be 2 console log messages from the module when it starts up, the latter showing the version number.</p>
+<p >The module also logs to a file, though it's a bit tricky to find. On my edition (from MS store) the "working directory" for the modules is <br  />
+ <code>D:\WpSystem\S-1-5-21-611220451-769921231-644967174-1000\AppData\Local\Packages\Microsoft.FlightSimulator_8wekyb3d8bbwe\LocalState\packages\wasimcommander-module\work</code></p>
+<p >To enable more verbose logging on the module at startup, edit the <code>server_conf.ini</code> file which is found in the module's install folder (<code>Comunity\wasimcommander-module\modules</code>). There are comments in there indicating the options.</p>
+<p >Keep in mind that the server logging level can also be changed remotely at runtime, but of course that only works if you can establish a connection to the module in the first place.</p>
+<h4><a class="anchor" id="autotoc_md15"></a>
+WASimClient (or anything using it, like WASimUI)</h4>
+<p >Basically the log is the primary source of information here. By default it logs at the "Info" level to: 1) The current console window, assuming there is one (the host app is started from a console). So if using <code>WASimUI</code>, for example, just start it from a command prompt. 2) A file in whatever current directory it is running in (so, for the UI, that would be the UI's install folder).</p>
+<p >Of course if you're using <code>WASimUI</code>, it also provides a full logging interface and you can set all the log levels from there, for both client and server sides.</p>
+<p >There should also be a <code>client_conf.ini</code> file alongside whatever is using the Client where initial logging location, levels and network configuration (timeout and SimConnect.cfg index) is set. The config file has comments indicating the available options.</p>
+<hr  />
+ <h3><a class="anchor" id="autotoc_md17"></a>
 Issues, Support, Suggestions, Discussion</h3>
 <p >The GitHub repository is the primary source of all these things. You know what to do...</p>
 <p >Use the <a href="https://github.com/mpaperno/WASimCommander/issues" target="_blank">Issues</a> feature for bug reports and concise feature suggestions.</p>
 <p >Use <a href="https://github.com/mpaperno/WASimCommander/discussions" target="_blank">Discussions</a> for any other topic.</p>
 <p >Most flight simulator forums seem fairly strict about <em>not</em> using their site to provide product support. So please use GitHub, unless you're absolutely sure no rules would be broken or toes stepped upon otherwise.</p>
 <hr  />
- <h3><a class="anchor" id="autotoc_md15"></a>
+ <h3><a class="anchor" id="autotoc_md19"></a>
+Known Issues</h3>
+<ul>
+<li><p class="startli">Setting a Local Variable value with the <code>Set</code> command ignores any Unit specifier. This is due to a bug in the MSFS WASM library preventing the corresponding <em>Gauge API</em> function <code>set_named_variable_typed_value()</code> from being exported. See bug report at <a href="https://devsupport.flightsimulator.com/questions/8604/env-wasm-set-named-variable-typed-value-not-found.html" target="_blank">devsupport.flightsimulator.com</a></p>
+<p class="startli">You can stil use a unit specifier with L vars in calculaotor code. Though I've yet to find an instance where it makes any difference.</p>
+</li>
+</ul>
+<hr  />
+ <h3><a class="anchor" id="autotoc_md21"></a>
 Credits</h3>
 <p >This project is written, tested, and documented by myself, Maxim (Max) Paperno.<br  />
  <a href="https://github.com/mpaperno/">https://github.com/mpaperno/</a></p>
@@ -223,17 +247,17 @@ Credits</h3>
 <li><a href="https://material.io/" target="_blank">Material Icons</a> - Google, Apache License v2.0.</li>
 </ul>
 <hr  />
- <h3><a class="anchor" id="autotoc_md17"></a>
+ <h3><a class="anchor" id="autotoc_md23"></a>
 Copyright, License, and Disclaimer</h3>
 <p ><a class="el" href="namespace_w_a_sim_commander.html" title="WASimCommander main namespace. Defines constants and structs used in Client-Server interactions....">WASimCommander</a> Project <br  />
  COPYRIGHT: Maxim Paperno; All Rights Reserved.</p>
-<h4><a class="anchor" id="autotoc_md18"></a>
+<h4><a class="anchor" id="autotoc_md24"></a>
 API Library and Client Components</h4>
 <p >Dual licensed under the terms of either the GNU General Public License (<b>GPL</b>) or the GNU Lesser General Public License (<b>LGPL</b>), as published by the Free Software Foundation, either <b>version 3</b> of the Licenses, or (at your option) any later version.</p>
-<h4><a class="anchor" id="autotoc_md19"></a>
+<h4><a class="anchor" id="autotoc_md25"></a>
 WASM Module Server and GUI Components</h4>
 <p >Licensed under the terms of the GNU General Public License (<b>GPL</b>) as published by the Free Software Foundation, either <b>version 3</b> of the License, or (at your option) any later version.</p>
-<h4><a class="anchor" id="autotoc_md20"></a>
+<h4><a class="anchor" id="autotoc_md26"></a>
 General</h4>
 <p >This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.</p>
 <p >Copies of the GNU GPL and LGPL are included with this project and are available at <a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>.</p>
@@ -245,7 +269,7 @@ General</h4>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Mon Jul 4 2022 18:10:02 for WASimCommander by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.4 </li>
+    <li class="footer">Generated on Tue Jul 5 2022 16:00:16 for WASimCommander by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.4 </li>
   </ul>
 </div>
 </body>
