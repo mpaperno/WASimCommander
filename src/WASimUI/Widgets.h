@@ -254,12 +254,12 @@ public:
 		addItem(tr("C: GPS *"),    'C');
 		addItem(tr("E: Env. *"),   'E');
 		addItem(tr("H: HTML"),     'H');
-		//addItem(tr("I: Instr."),   'I');
+		//addItem(tr("I: Instr."),   'I');  // only for gauge modules
 		addItem(tr("K: Key"),      'K');
 		addItem(tr("L: Local *"),  'L');
 		addItem(tr("M: Mouse"),    'M');
-		//addItem(tr("O: Comp."),    'O');
-		addItem(tr("R: Resource"), 'R');
+		//addItem(tr("O: Comp."),    'O');  // only for gauge modules
+		//addItem(tr("R: Resource"), 'R');  // strings only, can't be read with "Get" command or set at all
 		addItem(tr("T: Token"),    'T');
 		addItem(tr("Z: Custom"),   'Z');
 

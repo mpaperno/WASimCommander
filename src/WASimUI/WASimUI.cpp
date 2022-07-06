@@ -107,7 +107,7 @@ public:
 			if (resType == CalcResultType::Double || resType == CalcResultType::Integer)
 				ui->leCalcResult->setText(QStringLiteral("%1").arg(fRes, 0, 'f', (resType == CalcResultType::Double ? 7 : 0)));
 			else if (resType == CalcResultType::String || resType == CalcResultType::Formatted)
-				ui->leCalcResult->setText(QString::fromStdString(sRes));
+				ui->leCalcResult->setText(sRes.empty() ? tr("Result returned empty string") : QString::fromStdString(sRes));
 			else
 				ui->leCalcResult->setText(tr("Execute succeeded w/out return value."));
 		}
