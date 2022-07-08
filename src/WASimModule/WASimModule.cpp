@@ -1316,6 +1316,20 @@ bool executeClientEvent(const Client *c, uint32_t eventId, string *ackMsg = null
 }
 #pragma endregion  Registered Events
 
+void sendKeyEvent(const Client *c, const Command *const cmd)
+{
+	uint32_t keyId = cmd->uData;
+	if (!keyId && cmd->sData[0] > 0)
+		keyId = Utilities::getKeyEventId(cmd->sData);    // Intellicode erroneous error flag
+
+	if (keyId /* MAYBE: > KEY_ID_MIN */) {
+		send_key_event(keyId, (UINT32)cmd->fData);
+		sendAckNak(c, *cmd);
+		return;
+	}
+	sendAckNak(c, *cmd, false, "Named Key Event not found.");
+}
+
 #pragma endregion Command Handlers
 
 //----------------------------------------------------------------------------
@@ -1407,8 +1421,8 @@ void processCommand(Client *c, const Command *const cmd)
 			break;
 
 		case CommandId::SendKey:
-			send_key_event(cmd->uData, (UINT32)cmd->fData);
-			break;
+			sendKeyEvent(c, cmd);
+			return;
 
 		case CommandId::Log:
 			ack = setLogLevel(c, cmd, &ackMsg);

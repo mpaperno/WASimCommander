@@ -49,20 +49,20 @@ namespace WSMCMND_ENUM_NAMESPACE
 		              ///  `Ack` is returned on success with the ID of the variable/unit in the `fData` member (as an `INT32`) and the original requested string name echoed back in `sData`. In case of lookup failure, a `Nak` reponse is returned with possible reason in `sData`.
 		Get,          ///< Get a named variable value with optional unit type. `uData` is a char of the variable type, eg. 'L' for local, 'A' for SimVar, or 'T' for Token. Only 'L', 'A' and 'E' types support unit specifiers.\n
 		              ///  `sData` is the variable name or numeric ID, optionally followed by comma (`,`) and unit name or numeric ID (**no spaces**). For indexed SimVars, include the index after the variable name, separated by a colon (`:`).\n
-									///  For example, a SimVar: ```uData = 'A'; sData = "PROP BETA:2,degrees";``` \n
+		              ///  For example, a SimVar: ```uData = 'A'; sData = "PROP BETA:2,degrees";``` \n
 		              ///  Other variables types can also be requested ('B', 'E', 'M', etc) but such requests are simply converted to a calculator string and processed as an `Exec` type command (using an `Exec` command directly may be more efficient).\n
 		              ///  Result is returned with the `Ack` response in `fData` as a double-precision value. In case of failure a `Nak` is returned with possible error message in `sData`.
 		GetCreate,    ///< Same as `Get` but creates the variable if it doesn't already exist (with `register_named_variable()` _Gauge API_). The returned value will be `0.0` (see `SetCreate` to assign a default value and `Lookup` to check if a variable exists).
 		              ///  **This only works with `L` (local) type variables.**
 		Set,          ///< Set a named local variable with optional unit type. `uData` is a char of the variable type, with default of 'L' for local vars.
 		              ///  `sData` is the variable name or numeric ID (for local vars only), optionally followed by comma (`,`) and unit name (or numeric unit ID for local vars) (**no spaces**). The value to set is passed in `fData` member.\n
-									///  For example, a SimVar: ```uData = 'A'; sData = "PROP RPM:2,rpm"; fData = 2200;```\n
+		              ///  For example, a SimVar: ```uData = 'A'; sData = "PROP RPM:2,rpm"; fData = 2200;```\n
 		              ///  Other variables types can also be set this way ('A', 'H", 'K', etc) but such requests are simply converted to a calculator string and processed as an `Exec` type command (using an `Exec` command directly may be slightly more efficient).
 		SetCreate,    ///< Same as `Set` but creates the variable first if it doesn't already exist (with `register_named_variable()` _Gauge API_). Use the `Lookup` command to check if a variable exists. **This only works with `L` (local) type variables.**
 		Exec,         ///< Run calculator code contained in `sData` with `WASimCommander::CalcResultType` in `uData`. Result, if any, is returned with the `Ack` response, numeric types in `fData` and strings in `sData`.
 		              ///  (Due to the way the _Gauge API_ calculator function works, a string result is typically also returned even when only a numeric result is requested.)\n\n
 		              ///  In case of failure a `Nak` is returned with possible error message in `sData`. Note however that the _Gauge API_ functions often happily return a "success" status even when the actual thing you're trying to do fails. The only feedback
-									///  in this case appears to be the MSFS Console window available from "Dev Tools," which will (usually) log any actual errors.
+		              ///  in this case appears to be the MSFS Console window available from "Dev Tools," which will (usually) log any actual errors.
 		Register,     ///< Register a named Exec-type event. `uData` is a unique event ID, and `sData` a calculator code string. Optional event name in `sData` before a `$` separator (maximum length of \refwc{STRSZ_ENAME}). Default is to use event ID as string.\n
 		              ///  If the custom event name contains a period (`.`) then it is used as-is. Otherwise "WASimCommander.[client_name]." will be prepended to the given name.\n
 		              ///  Use with `SimConnect_MapClientEventToSimEvent(id, "event_name")` and `SimConnect_TransmitClientEvent()`, or the `Transmit` command (below).\n
@@ -75,8 +75,9 @@ namespace WSMCMND_ENUM_NAMESPACE
 		              ///  manner for subscriptions, by writing the new value to the related client data area. Note also that this command will force an upate of the data, without comparing the result to any (potentially) cached value from previous lookup.
 		SendKey,      ///< `send_key_event(event_id, value)` with `event_id` in `uData` and an optional `UINT32` type `value` in `fData` (default is `0`).\n\n
 		              ///  "The send_key_event function transmits a WM_COMMAND application event. This function transmits a message with the following syntax: `PostMessage(hwndMain, WM_COMMAND, event_id, (LPARAM) value);`"\n\n
-									///  In practice this means you can send a KEY Event ID directly to the simulator, bypassing SimConnect event name mappings or calculator code evaluation. The event IDs can be found in the MSFS SDK's `MSFS/Legacy/gauges.h` header file as `KEY_*` macros,
-									///  and are also available via the `Lookup` command. Custom event IDs (registered by gauges or other modules) can also be triggered this way. There may be other uses for this command... TBD.
+		              ///  In practice this means you can send a KEY Event ID directly to the simulator, bypassing SimConnect event name mappings or calculator code evaluation. The event IDs can be found in the MSFS SDK's `MSFS/Legacy/gauges.h` header file as `KEY_*` macros,
+		              ///  and are also available via the `Lookup` command. If this command is sent with `uData` == 0 and `sData` contains a string, a `LookupItemType::KeyEventId` lookup will be performed on the Key Event name first and the resulting ID (if any) used.\n\n
+		              ///  Custom event IDs (registered by gauges or other modules) can also be triggered this way. There may be other uses for this command... TBD.
 		Log,          ///< Set severity level for logging to the Client's `LogRecord` data area. `uData` should be one of the `WASimCommander::LogLevel` enum values. `LogLevel::None` disables logging, which is also the initial default for a newly connected Client.
 		              ///  Additionally, the server-wide log levels can be set for the file and console loggers independently. To specify these levels, set `fData` to one of the `WASimCommander::LogFacility` enum values. The default of `0` assumes `LogFacility::Remote`.
 	};
