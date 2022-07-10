@@ -69,6 +69,8 @@ namespace WASimCommander::CLI::Structs
 
 			void fromStdStr(const std::string &str) {
 				clear();
+				if (str.empty())
+					return;
 				const pin_ptr<Byte> ptr = &_item;
 				const uint32_t len = std::min<uint32_t>(SIZE-1, (uint32_t)str.size());
 				memcpy(ptr, str.data(), len);
@@ -78,6 +80,8 @@ namespace WASimCommander::CLI::Structs
 
 			void fromManagedStr(String ^str) {
 				clear();
+				if (String::IsNullOrEmpty(str))
+					return;
 				const pin_ptr<Byte> ptr = &_item;
 				const array<Byte> ^strData = Text::Encoding::UTF8->GetBytes(str);
 				const pin_ptr<Byte> src = &strData[0];
