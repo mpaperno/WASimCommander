@@ -33,6 +33,7 @@ $PackagePath = "$DistPath\package"
 $ModulePath = "${SrcPath}\WASimModule\WASimModuleProject\WASimCommander-Module\WASimCommander-Module.xml"
 $ModuleDest = "${DistPath}\module"
 $ModulePackage = "${PackagePath}\module"
+$DocsDistroPath = "$RootPath\..\WASimCommander-project\gh-pages"
 
 $testApps = @{
 	"$BuildPath\CS_BasicConsole\Release-$Platform\$Platform\Release\net6.0-windows" = "$PackagePath\bin\CS_BasicConsole";
@@ -98,6 +99,9 @@ if ($build.module)
 	# -nopause
 }
 
+$copyOptions = @("/S", "/A", "/NP", "/LOG+:""$DistPath\copy.log""")
+Remove-Item "$DistPath\copy.log" -ErrorAction Ignore | Out-Null
+
 if ($build.docs)
 {
   Write-Output "Generating documentation with Doxygen..."
@@ -105,6 +109,10 @@ if ($build.docs)
   Remove-Item "${DocsPath}\html" -Force -Recurse
 	& $Doxygen "Doxyfile"
 	Pop-Location
+	if (Test-Path $DocsDistroPath) {
+		robocopy "${DocsPath}\html" "$DocsDistroPath" /XD .git /MIR $copyOptions
+		Write-Output "Copied docs to distro folder $DocsDistroPath"
+	}
 }
 
 if (-not $build.package) {
@@ -117,9 +125,6 @@ $libPath = "$PackagePath\lib\MSVS-${MsvcName}"
 $libStatic = "${libPath}\static"
 $libDynamic = "${libPath}\dynamic"
 $libManaged = "${libPath}\managed"
-
-$copyOptions = @("/S", "/A", "/NP", "/LOG+:""$DistPath\copy.log""")
-Remove-Item "$DistPath\copy.log" -ErrorAction Ignore | Out-Null
 
 # include folder
 robocopy "$SrcPath\include" "$PackagePath\include" $copyOptions /XF .* *.in
@@ -185,13 +190,13 @@ $destZipFile = "$DistPath\${SERVER_NAME}-$fileVersion.zip"
 if (Test-Path $destZipFile) {
   Remove-Item $destZipFile -Force
 }
-& "$ZipUtil" a "$destZipFile" "$ModulePackage\*" -tzip
+& "$ZipUtil" a "$destZipFile" "$ModulePackage\*" "$PackagePath\CHANGELOG.md" -tzip
 
 $destZipFile = "$DistPath\${APP_GUI_NAME}-$fileVersion.zip"
 if (Test-Path $destZipFile) {
   Remove-Item $destZipFile -Force
 }
-& "$ZipUtil" a "$destZipFile" "$PackagePath\bin\${APP_GUI_NAME}" -tzip
+& "$ZipUtil" a "$destZipFile" "$PackagePath\bin\${APP_GUI_NAME}" "$PackagePath\CHANGELOG.md" -tzip
 
 
 Write-Output ("`nC'est fini!")
