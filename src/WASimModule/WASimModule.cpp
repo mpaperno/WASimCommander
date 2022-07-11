@@ -436,17 +436,20 @@ Client *getOrCreateClient(uint32_t clientId)
 		return c;
 	}
 
+	// New client
 	Client c(clientId);
 	// assign unique IDs for SimConnect data definitions (these are used for ClientDataID, DefineID and RequestID)
 	c.cddID_command = g_nextClienDataId++;
 	c.cddID_response = g_nextClienDataId++;
 	c.cddID_request = g_nextClienDataId++;
 
+	// register the command, response, and data request areas for this client with SimConnect; dispose client if that fails.
 	if (!registerClientCommandDataAreas(&c) || !registerClientRequestDataArea(&c))
 		return nullptr;
 
 	// move client record into map
 	Client *pC = &g_mClients.emplace(clientId, move(c)).first->second;
+	// save mappings of the command and request data IDs (which SimConnect sends us) to the client record; for lookup in message dispatch.
 	g_mDefinitionIds.emplace(piecewise_construct, forward_as_tuple(c.cddID_command), forward_as_tuple(RecordType::CommandData, pC));  // no try_emplace?
 	g_mDefinitionIds.emplace(piecewise_construct, forward_as_tuple(c.cddID_request), forward_as_tuple(RecordType::RequestData, pC));
 
@@ -476,6 +479,8 @@ Client *connectClient(uint32_t id)
 	return connectClient(getOrCreateClient(id));
 }
 
+void checkTriggerEventNeeded();  // forward, in Utility Functions just below
+
 // marks client as disconnected or timed out and clears any saved requests/events
 void disconnectClient(Client *c, ClientStatus newStatus = ClientStatus::Disconnected)
 {
@@ -494,6 +499,7 @@ void disconnectClient(Client *c, ClientStatus newStatus = ClientStatus::Disconne
 	c->events.clear();
 
 	LOG_INF << "Disconnected Client " << c->name;
+	checkTriggerEventNeeded();  // check if anyone is still connected
 }
 
 // disconnects _and_ sends a Disconnect command to client with given message
@@ -546,11 +552,32 @@ bool setClientLogLevel(Client *c, LogLevel level)
 // this runs once we have any requests to keep updated which essentially starts the tick() processing.
 void registerTriggerEvents()
 {
-	// sub system events
+	// use "Frame" event as trigger for our tick() loop
 	if FAILED(INVOKE_SIMCONNECT(SubscribeToSystemEvent, g_hSimConnect, (SIMCONNECT_CLIENT_EVENT_ID)EVENT_FRAME, "Frame"))
 		return;
 	g_triggersRegistered = true;
 	LOG_INF << "DataRequest data update processing started.";
+}
+
+// and here is the opposite... if all clients disconnect we can stop the ticker loop.
+void unregisterTriggerEvents()
+{
+	if FAILED(INVOKE_SIMCONNECT(UnsubscribeFromSystemEvent, g_hSimConnect, (SIMCONNECT_CLIENT_EVENT_ID)EVENT_FRAME))
+		return;
+	g_triggersRegistered = false;
+	LOG_INF << "DataRequest update processing stopped.";
+}
+
+// check if any clients are connected and stop the tick() trigger if none are;
+// we could also call this from removeRequest() and check each connected client if
+//  they still have any active data subscriptions... but that seems excessive.
+void checkTriggerEventNeeded()
+{
+	for (const clientMap_t::value_type &it : g_mClients) {
+		if (it.second.status == ClientStatus::Connected)
+			return;
+	}
+	unregisterTriggerEvents();
 }
 
 bool execCalculatorCode(const char *code, calcResult_t &result, bool precompiled = false)
