@@ -24,7 +24,7 @@ function Make-Version {
 	$Tokens.Add("VER_NAME",  $VER_NAME)
 	$Tokens.Add("VERSION",   "0x{0:X8}" -f ($VER_MAJOR -shl 24 -bor $VER_MINOR -shl 16 -bor $VER_PATCH -shl 8 -bor $VER_BUILD))
 	$Tokens.Add("VERSION_STRING", "{0}.{1}.{2}.{3}" -f ($VER_MAJOR,$VER_MINOR,$VER_PATCH,$VER_BUILD))
-	$Tokens.Add("BUILD_DATE", (Get-Date).ToUniversalTime().ToString("yyyy-mm-ddTHH:mm:ssZ"))
+	$Tokens.Add("BUILD_DATE", (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ"))
 
 	$Tokens.Add("PROJECT_NAME",  $PROJECT_NAME)
 	$Tokens.Add("CLIENT_NAME",   $CLIENT_NAME)
