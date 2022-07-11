@@ -1,2 +1,7 @@
 <ReleaseNote Version="1.0.0" Date="2022-7-4">Initial release! v1.0.0.5-beta1</ReleaseNote>
+<ReleaseNote Version="1.0.1" Date="2022-7-11">v1.0.0.6-beta2
+* Fixed that Formatted type calculation
+results cannot be pre-compiled.
+* Event loop is paused when last client
+disconnects.</ReleaseNote>
 

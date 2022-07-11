@@ -29,19 +29,19 @@ and are available at <http://www.gnu.org/licenses/>.
 #define WSMCMND_VER_MAJOR         1
 #define WSMCMND_VER_MINOR         0
 #define WSMCMND_VER_PATCH         0
-#define WSMCMND_VER_BUILD         5
+#define WSMCMND_VER_BUILD         6
 // Git commit hash (top 8 bytes)
-#define WSMCMND_VER_COMIT         0x5D24E73BUL
+#define WSMCMND_VER_COMIT         0x9825B81DUL
 /// Version number in 32 bit "binary coded decimal", eg. 0x01230400 = 1.23.4.0
-#define WSMCMND_VERSION           0x01000005UL
+#define WSMCMND_VERSION           0x01000006UL
 /// Possible version suffix, eg "-beta1"  (can be blank for release versions)
-#define WSMCMND_VER_NAME          "-beta1"
+#define WSMCMND_VER_NAME          "-beta2"
 /// Dotted version string Maj.Min.Pat.Bld, eg. "1.23.4.0"
-#define WSMCMND_VERSION_STR       "1.0.0.5"
+#define WSMCMND_VERSION_STR       "1.0.0.6"
 /// Dotted version string with possible suffix, eg. "1.23.4.0-beta1"
-#define WSMCMND_VERSION_INFO      "1.0.0.5-beta1"
+#define WSMCMND_VERSION_INFO      "1.0.0.6-beta2"
 /// Build date & time in ISO-8601 "Zulu Time" format, UTC
-#define WSMCMND_BUILD_DATE        "2022-04-04T11:04:56Z"
+#define WSMCMND_BUILD_DATE        "2022-07-11T03:45:20Z"
 
 
 #define WSMCMND_PROJECT_URL       "https://github.com/mpaperno/WASimCommander"
