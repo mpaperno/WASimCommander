@@ -1194,7 +1194,9 @@ bool addOrUpdateRequest(Client *c, const DataRequest *const req)
 		}
 	}
 	// calculated value, update compiled string if needed
-	else if (tr->calcBytecode.empty()) {
+	// NOTE: compiling code for format_calculator_string() doesn't seem to work as advertised in the docs, see:
+	//   https://devsupport.flightsimulator.com/questions/9513/gauge-calculator-code-precompile-with-code-meant-f.html
+	else if (tr->calcResultType != CalcResultType::Formatted && tr->calcBytecode.empty()) {
 		// assume the command has changed and re-compile
 		PCSTRINGZ pCompiled = nullptr;
 		UINT32 pCompiledSize = STRSZ_REQ;
