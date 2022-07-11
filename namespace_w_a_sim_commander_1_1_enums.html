@@ -35,7 +35,7 @@
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="Logo.png" title="WASimCommander - Remote access to the Microsoft Flight Simulator 2020 Gauge API."/></td>
   <td id="projectalign">
-   <div id="projectname"><!-- WASimCommander --><span id="projectnumber">&#160;v1.0.0.5-beta1</span>
+   <div id="projectname"><!-- WASimCommander --><span id="projectnumber">&#160;v1.0.0.6-beta2</span>
    </div>
   </td>
  </tr>
@@ -349,7 +349,9 @@ Variables</h2></td></tr>
 <br  />
  "The send_key_event function transmits a WM_COMMAND application event. This function transmits a message with the following syntax: `PostMessage(hwndMain, WM_COMMAND, event_id, (LPARAM) value);`"<br  />
 <br  />
- In practice this means you can send a KEY Event ID directly to the simulator, bypassing SimConnect event name mappings or calculator code evaluation. The event IDs can be found in the MSFS SDK's <code>MSFS/Legacy/gauges.h</code> header file as <code>KEY_*</code> macros, and are also available via the <code>Lookup</code> command. Custom event IDs (registered by gauges or other modules) can also be triggered this way. There may be other uses for this command... TBD. </p>
+ In practice this means you can send a KEY Event ID directly to the simulator, bypassing SimConnect event name mappings or calculator code evaluation. The event IDs can be found in the MSFS SDK's <code>MSFS/Legacy/gauges.h</code> header file as <code>KEY_*</code> macros, and are also available via the <code>Lookup</code> command. If this command is sent with <code>uData</code> == 0 and <code>sData</code> contains a string, a <code><a class="el" href="namespace_w_a_sim_commander_1_1_enums.html#ab1b85706615bc0e57fa6d8d464bf8a3daa9a6f189caf9e0fa5dfe80e1b2272f19" title="Key Event ID, value of KEY_* macros from &quot;guauges.h&quot; header. Available for Lookup command only (use e...">LookupItemType::KeyEventId</a></code> lookup will be performed on the Key Event name first and the resulting ID (if any) used.<br  />
+<br  />
+ Custom event IDs (registered by gauges or other modules) can also be triggered this way. There may be other uses for this command... TBD. </p>
 </td></tr>
 <tr><td class="fieldname"><a id="ae3b1cd5348286e86d8c64ce44734e039ace0be71e33226e4c1db2bcea5959f16b" name="ae3b1cd5348286e86d8c64ce44734e039ace0be71e33226e4c1db2bcea5959f16b"></a>Log&#160;</td><td class="fielddoc"><p >Set severity level for logging to the <a class="el" href="namespace_w_a_sim_commander_1_1_client.html" title="WASimCommander::Client namespace. Defines/declares everything needed to interact with the WASimComman...">Client</a>'s <code><a class="el" href="struct_w_a_sim_commander_1_1_log_record.html" title="Log record structure.">LogRecord</a></code> data area. <code>uData</code> should be one of the <code>WASimCommander::LogLevel</code> enum values. <code><a class="el" href="namespace_w_a_sim_commander_1_1_enums.html#a7311e9d8f917bbcbb202497114e5f2c5a6adf97f83acf6453d4a6a4b1070f3754" title="Disables logging.">LogLevel::None</a></code> disables logging, which is also the initial default for a newly connected <a class="el" href="namespace_w_a_sim_commander_1_1_client.html" title="WASimCommander::Client namespace. Defines/declares everything needed to interact with the WASimComman...">Client</a>. Additionally, the server-wide log levels can be set for the file and console loggers independently. To specify these levels, set <code>fData</code> to one of the <code>WASimCommander::LogFacility</code> enum values. The default of <code>0</code> assumes <code><a class="el" href="namespace_w_a_sim_commander_1_1_enums.html#af3131943610c59d71d8b69dd7b2cab97af8508f576cd3f742dfc268258dcdf0dd" title="Remote destination, eg. network transmission or a callback event.">LogFacility::Remote</a></code>. </p>
 </td></tr>
@@ -390,7 +392,7 @@ Variables</h2></td></tr>
 </td></tr>
 </table>
 
-<p class="definition">Definition at line <a class="el" href="enums__impl_8h_source.html#l00092">92</a> of file <a class="el" href="enums__impl_8h_source.html">enums_impl.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="enums__impl_8h_source.html#l00093">93</a> of file <a class="el" href="enums__impl_8h_source.html">enums_impl.h</a>.</p>
 
 </div>
 </div>
@@ -429,7 +431,7 @@ Variables</h2></td></tr>
 </td></tr>
 </table>
 
-<p class="definition">Definition at line <a class="el" href="enums__impl_8h_source.html#l00104">104</a> of file <a class="el" href="enums__impl_8h_source.html">enums_impl.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="enums__impl_8h_source.html#l00105">105</a> of file <a class="el" href="enums__impl_8h_source.html">enums_impl.h</a>.</p>
 
 </div>
 </div>
@@ -466,7 +468,7 @@ Variables</h2></td></tr>
 </td></tr>
 </table>
 
-<p class="definition">Definition at line <a class="el" href="enums__impl_8h_source.html#l00118">118</a> of file <a class="el" href="enums__impl_8h_source.html">enums_impl.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="enums__impl_8h_source.html#l00119">119</a> of file <a class="el" href="enums__impl_8h_source.html">enums_impl.h</a>.</p>
 
 </div>
 </div>
@@ -511,7 +513,7 @@ Variables</h2></td></tr>
 </td></tr>
 </table>
 
-<p class="definition">Definition at line <a class="el" href="enums__impl_8h_source.html#l00131">131</a> of file <a class="el" href="enums__impl_8h_source.html">enums_impl.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="enums__impl_8h_source.html#l00132">132</a> of file <a class="el" href="enums__impl_8h_source.html">enums_impl.h</a>.</p>
 
 </div>
 </div>
@@ -554,7 +556,7 @@ Variables</h2></td></tr>
 </td></tr>
 </table>
 
-<p class="definition">Definition at line <a class="el" href="enums__impl_8h_source.html#l00150">150</a> of file <a class="el" href="enums__impl_8h_source.html">enums_impl.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="enums__impl_8h_source.html#l00151">151</a> of file <a class="el" href="enums__impl_8h_source.html">enums_impl.h</a>.</p>
 
 </div>
 </div>
@@ -591,7 +593,7 @@ Variables</h2></td></tr>
 </td></tr>
 </table>
 
-<p class="definition">Definition at line <a class="el" href="enums__impl_8h_source.html#l00166">166</a> of file <a class="el" href="enums__impl_8h_source.html">enums_impl.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="enums__impl_8h_source.html#l00167">167</a> of file <a class="el" href="enums__impl_8h_source.html">enums_impl.h</a>.</p>
 
 </div>
 </div>
@@ -622,7 +624,7 @@ Variables</h2></td></tr>
 </div><!-- fragment -->
 <p><a class="el" href="namespace_w_a_sim_commander_1_1_enums.html#ae3b1cd5348286e86d8c64ce44734e039">Enums::CommandId</a> enum names. </p>
 
-<p class="definition">Definition at line <a class="el" href="enums__impl_8h_source.html#l00085">85</a> of file <a class="el" href="enums__impl_8h_source.html">enums_impl.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="enums__impl_8h_source.html#l00086">86</a> of file <a class="el" href="enums__impl_8h_source.html">enums_impl.h</a>.</p>
 
 </div>
 </div>
@@ -648,7 +650,7 @@ Variables</h2></td></tr>
 
 <p><a class="el" href="namespace_w_a_sim_commander_1_1_enums.html#ae50424beb90af18b8139f5a4f070e61b">Enums::RequestType</a> enum names. </p>
 
-<p class="definition">Definition at line <a class="el" href="enums__impl_8h_source.html#l00100">100</a> of file <a class="el" href="enums__impl_8h_source.html">enums_impl.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="enums__impl_8h_source.html#l00101">101</a> of file <a class="el" href="enums__impl_8h_source.html">enums_impl.h</a>.</p>
 
 </div>
 </div>
@@ -674,7 +676,7 @@ Variables</h2></td></tr>
 
 <p><a class="el" href="namespace_w_a_sim_commander_1_1_enums.html#ac056a41f7fdbf2fb2599ad86c3949922">Enums::CalcResultType</a> enum names. </p>
 
-<p class="definition">Definition at line <a class="el" href="enums__impl_8h_source.html#l00114">114</a> of file <a class="el" href="enums__impl_8h_source.html">enums_impl.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="enums__impl_8h_source.html#l00115">115</a> of file <a class="el" href="enums__impl_8h_source.html">enums_impl.h</a>.</p>
 
 </div>
 </div>
@@ -700,7 +702,7 @@ Variables</h2></td></tr>
 
 <p><a class="el" href="namespace_w_a_sim_commander_1_1_enums.html#a43b33b172f6f4b43947d3a6da9847044">Enums::UpdatePeriod</a> enum names. </p>
 
-<p class="definition">Definition at line <a class="el" href="enums__impl_8h_source.html#l00127">127</a> of file <a class="el" href="enums__impl_8h_source.html">enums_impl.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="enums__impl_8h_source.html#l00128">128</a> of file <a class="el" href="enums__impl_8h_source.html">enums_impl.h</a>.</p>
 
 </div>
 </div>
@@ -729,7 +731,7 @@ Variables</h2></td></tr>
 </div><!-- fragment -->
 <p><a class="el" href="namespace_w_a_sim_commander_1_1_enums.html#ab1b85706615bc0e57fa6d8d464bf8a3d">Enums::LookupItemType</a> enum names. </p>
 
-<p class="definition">Definition at line <a class="el" href="enums__impl_8h_source.html#l00144">144</a> of file <a class="el" href="enums__impl_8h_source.html">enums_impl.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="enums__impl_8h_source.html#l00145">145</a> of file <a class="el" href="enums__impl_8h_source.html">enums_impl.h</a>.</p>
 
 </div>
 </div>
@@ -755,7 +757,7 @@ Variables</h2></td></tr>
 
 <p><a class="el" href="namespace_w_a_sim_commander_1_1_enums.html#a7311e9d8f917bbcbb202497114e5f2c5">Enums::LogLevel</a> enum names. </p>
 
-<p class="definition">Definition at line <a class="el" href="enums__impl_8h_source.html#l00162">162</a> of file <a class="el" href="enums__impl_8h_source.html">enums_impl.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="enums__impl_8h_source.html#l00163">163</a> of file <a class="el" href="enums__impl_8h_source.html">enums_impl.h</a>.</p>
 
 </div>
 </div>
@@ -784,7 +786,7 @@ Variables</h2></td></tr>
 </div><!-- fragment -->
 <p><a class="el" href="namespace_w_a_sim_commander_1_1_enums.html#af3131943610c59d71d8b69dd7b2cab97">Enums::LogFacility</a> enum names. </p>
 
-<p class="definition">Definition at line <a class="el" href="enums__impl_8h_source.html#l00179">179</a> of file <a class="el" href="enums__impl_8h_source.html">enums_impl.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="enums__impl_8h_source.html#l00180">180</a> of file <a class="el" href="enums__impl_8h_source.html">enums_impl.h</a>.</p>
 
 </div>
 </div>
@@ -794,7 +796,7 @@ Variables</h2></td></tr>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="namespace_w_a_sim_commander.html">WASimCommander</a></li><li class="navelem"><a class="el" href="namespace_w_a_sim_commander_1_1_enums.html">Enums</a></li>
-    <li class="footer">Generated on Tue Jul 5 2022 16:00:16 for WASimCommander by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.4 </li>
+    <li class="footer">Generated on Mon Jul 11 2022 00:23:57 for WASimCommander by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.4 </li>
   </ul>
 </div>
 </body>
