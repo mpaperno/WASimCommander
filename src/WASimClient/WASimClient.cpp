@@ -665,23 +665,13 @@ class WASimClient::Private
 		}
 		// The connection response, if any, is written by the server into the "command response" client data area, CLI_DATA_ID_RESPONSE, processed in SIMCONNECT_RECV_ID_CLIENT_DATA
 
-		shared_ptr<condition_variable_any> cv = make_shared<condition_variable_any>();
-		Command response;
-		TrackedResponse *tr = enqueueTrackedResponse(clientId, weak_ptr(cv));
-		hr = waitCommandResponse(tr->token, &response, timeout);
-
-		if (hr == E_TIMEOUT) {
-			LOG_ERR << "Connection request timed out after " << timeout << "ms.";
+		// wait until server connects or times out or disconnectSimulator() is called.
+		if (!waitCondition([&]() { return !runDispatchLoop || serverConnected; }, timeout)) {
+			LOG_ERR << "Server connection timed out or refused after " << timeout << "ms.";
 			setStatus(ClientStatus::SimConnected);
 			return E_TIMEOUT;
 		}
-		if (response.commandId != CommandId::Ack || !serverConnected) {
-			LOG_WRN << "Server refused connection! Reason, if any: " << quoted(response.sData);
-			setStatus(ClientStatus::SimConnected);
-			return E_FAIL;
-		}
 
-		serverVersion = (uint32_t)response.fData;
 		LOG_INF << "Connected to " WSMCMND_PROJECT_NAME " server v" << STREAM_HEX8(serverVersion);
 		if (serverVersion != WSMCMND_VERSION)
 			LOG_WRN << "Server version does not match WASimClient version " << STREAM_HEX8(WSMCMND_VERSION);
@@ -1280,6 +1270,8 @@ class WASimClient::Private
 									// Connected response
 									case CommandId::Connect:
 										serverConnected = cmd->commandId == CommandId::Ack && cmd->token == clientId;
+										serverVersion = (uint32_t)cmd->fData;
+										checkTracking = false;
 										break;
 									default:
 										break;
