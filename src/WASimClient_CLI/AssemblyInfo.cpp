@@ -22,8 +22,8 @@ using namespace System::Security::Permissions;
 [assembly:AssemblyTrademarkAttribute(L"")];
 [assembly:AssemblyCultureAttribute(L"")];
 
-[assembly:AssemblyVersionAttribute(L"1.0.0.6")];
-[assembly:AssemblyFileVersionAttribute("1.0.0.6")];
-[assembly:AssemblyInformationalVersionAttribute("1.0.0.6-beta2")];
+[assembly:AssemblyVersionAttribute(L"1.0.0.7")];
+[assembly:AssemblyFileVersionAttribute("1.0.0.7")];
+[assembly:AssemblyInformationalVersionAttribute("1.0.0.7-beta3")];
 
 [assembly:ComVisible(false)];

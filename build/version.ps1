@@ -2,9 +2,9 @@
 $VER_MAJOR = 1
 $VER_MINOR = 0
 $VER_PATCH = 0
-$VER_BUILD = 6
+$VER_BUILD = 7
 $VER_COMIT = 0
-$VER_NAME  = "-beta2"
+$VER_NAME  = "-beta3"
 
 $PROJECT_NAME  = "WASimCommander"
 $CLIENT_NAME   = "WASimClient"

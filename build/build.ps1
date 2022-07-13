@@ -33,7 +33,7 @@ $PackagePath = "$DistPath\package"
 $ModulePath = "${SrcPath}\WASimModule\WASimModuleProject\WASimCommander-Module\WASimCommander-Module.xml"
 $ModuleDest = "${DistPath}\module"
 $ModulePackage = "${PackagePath}\module"
-$DocsDistroPath = "$RootPath\..\WASimCommander-project\gh-pages"
+$DocsDistroPath = "$RootPath\..\gh-pages"
 
 $testApps = @{
 	"$BuildPath\CS_BasicConsole\Release-$Platform\$Platform\Release\net6.0-windows" = "$PackagePath\bin\CS_BasicConsole";
