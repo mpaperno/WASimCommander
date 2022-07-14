@@ -11,11 +11,12 @@
 
 ## Remote access to the Microsoft Flight Simulator 2020 "Gauge API."
 
-
 **A WASM module-based Server and a full Client API combination.**
 
 This project is geared towards other MSFS developers/coders who need a convenient way to remotely access parts of the Simulator which are normally
 inaccessible via _SimConnect_, such as locally-defined aircraft variables or custom events.
+
+The Client API can be utilized natively from C++, or via .NET managed assembly from C#, Python, or other languages.
 
 The system also provides direct access to functions from within the Simulator environment and in many cases could be used as a simpler alternative
 to _SimConnect_ for basic functionality like reading/setting Simulation Variables or triggering Key Events. _SimConnect_ is still used as the network
@@ -33,7 +34,7 @@ some errant code... ;-)
 Since MS/Asobo have been, ahem, "slow" to add further remote access features to _SimConnect_ (or come up with some other method), this project is an attempt
 at establishing a "standard" or "common" way of doing so. At the least I hope it motivates _some_ kind of standards adoption.
 
-On a more practical note, I will be using it with the [MSFS Touch Portal Plugin](https://github.com/mpaperno/MSFSTouchPortalPlugin) which I'm currently maintaining.
+On a more practical note, I am using it with the [MSFS Touch Portal Plugin](https://github.com/mpaperno/MSFSTouchPortalPlugin) which I'm currently maintaining.
 
 -------------
 ### Features
@@ -109,7 +110,7 @@ _Watch_ -> _Custom_ -> _Releases_ this repo (button at top) or subscribe to the 
 -------------
 ### Documentation & Examples
 
-There are two basic `C++` and `C#` console-style tests/examples included in the [src/Testing](https://github.com/mpaperno/WASimCommander/tree/main/src/Testing) folder.
+There are three basic console-style tests/examples included for `C++`, `C#`, and `Python` in the [src/Testing](https://github.com/mpaperno/WASimCommander/tree/main/src/Testing) folder.
 If you like reading code, this is the place to start.
 
 API docuemntation generated from source comments is published here: https://mpaperno.github.io/WASimCommander/ <br/>

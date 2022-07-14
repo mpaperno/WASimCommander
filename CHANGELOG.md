@@ -1,5 +1,8 @@
 # WASimCommander - Change Log
 
+## [next version]
+* Added Python example.
+
 ## 1.0.0.7-beta3 (Jul-12-2022)
 ### WASimClient, WASimClient_CLI, WASimUI
 * Fixed WASimClient bug introduced in v1.0.0.6 that prevented Client from completing connection to Server on first attempt (but would work on the 2nd).

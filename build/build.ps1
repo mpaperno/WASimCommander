@@ -38,6 +38,7 @@ $DocsDistroPath = "$RootPath\..\gh-pages"
 $testApps = @{
 	"$BuildPath\CS_BasicConsole\Release-$Platform\$Platform\Release\net6.0-windows" = "$PackagePath\bin\CS_BasicConsole";
 	"$BuildPath\CPP_BasicConsole\Release-$Platform" = "$PackagePath\bin\CPP_BasicConsole"
+	"$SrcPath\Testing\Py_BasicConsole" = "$PackagePath\bin\Py_BasicConsole"
 }
 
 $buildAll = $Targets.Contains("all")
@@ -162,9 +163,12 @@ if ($LastExitCode -ge 8) { Write-Output($LastExitCode); Exit 1  }
 robocopy "$SrcPath\${APP_GUI_NAME}" "$PackagePath\bin\${APP_GUI_NAME}" LICENSE.* *.md $copyOptions
 if ($LastExitCode -ge 8) { Write-Output($LastExitCode); Exit 1  }
 
+# Required DLL files for Python example
+robocopy "$BuildPath\${CLIENT_NAME}_CLI\Release-$Platform" $PackagePath\bin\Py_BasicConsole *.dll *.ini $copyOptions
+
 # Test/demo app(s)
 $testApps.GetEnumerator() | ForEach-Object {
-	robocopy "$($_.Key)" "$($_.Value)" $copyOptions /XF *.log*
+	robocopy "$($_.Key)" "$($_.Value)" $copyOptions /XF *.log* *.*proj
 	if ($LastExitCode -ge 8) { Write-Output($LastExitCode); Exit 1  }
 }
 
