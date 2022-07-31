@@ -35,7 +35,6 @@ and are available at <http://www.gnu.org/licenses/>.
 #include <vector>
 #if SCRT_THREADSAFE
 #include <atomic>
-#include <shared_mutex>
 #endif
 
 #if defined(_MSFS_WASM)
@@ -177,9 +176,9 @@ INVOKE_SIMCONNECT(SimConnect_AddToClientDataDefinition, hSim, cddId, offset, szO
 			/// Streams formated information about the method invocation which triggered the request, if any is found, and the SimConnect error, if any.
 			friend inline std::ostream& operator<<(std::ostream& os, const RequestData &r) {
 				if (r.eException != SIMCONNECT_EXCEPTION_NONE)
-					os << "SimConnect exception: " << exceptionName(r.eException) << " for request: ";
+					os << "SimConnect exception in packet ID " << r.dwSendId << ": " << exceptionName(r.eException) << " for request: ";
 				if (r.sMethod.empty())
-					os << "Request record not found for SendId " << r.dwSendId;
+					os << "Request record not found.";
 				else
 					os << r.sMethod << '(' << r.ssArguments.str() << ')';
 				if (r.dwExceptionIndex && r.dwExceptionIndex <= r.argsCount)
