@@ -126,8 +126,6 @@ class WASimClient::Private
 		uint32_t dataId;  // our area and def ID
 		time_t lastUpdate = 0;
 		uint32_t dataSize;
-		bool sentToServer = false;
-		bool cdaCreated = false;
 		mutable shared_mutex m_dataMutex;
 		vector<uint8_t> data;
 
@@ -614,18 +612,6 @@ class WASimClient::Private
 		if (!waitCondition([&]() { return !runDispatchLoop; }, DISPATCH_LOOP_WAIT_TIME + 100))
 			LOG_CRT << "Dispatch loop thread still running!";
 
-#if 0
-		// reset data allocations (doesn't seem necessary)
-		if (totalDataAlloc && !onQuitEvent) {
-			unregisterAllDataRequestAreas();
-			SimConnectHelper::removeClientDataDefinition(hSim, CLI_DATA_REQUEST);
-			SimConnectHelper::removeClientDataDefinition(hSim, CLI_DATA_RESPONSE);
-			SimConnectHelper::removeClientDataDefinition(hSim, CLI_DATA_COMMAND);
-			if (logCDAcreated)
-				SimConnectHelper::removeClientDataDefinition(hSim, CLI_DATA_LOG);
-		}
-#endif
-
 		// reset flags/counters
 		simConnected = false;
 		logCDAcreated = false;
@@ -1011,8 +997,8 @@ class WASimClient::Private
 			}
 			else if (dataAllocChanged) {
 				// remove definition, ignore errors (they will be logged)
-				SimConnectHelper::removeClientDataDefinition(hSim, tr->dataId);
-				// add definition, and now do not ignore errors
+				deregisterDataRequestArea(tr);
+				// re-add definition, and now do not ignore errors
 				if FAILED(hr = SimConnectHelper::addClientDataDefinition(hSim, tr->dataId, tr->valueSize, max(tr->deltaEpsilon, 0.0f)))
 					return hr;
 			}
@@ -1023,6 +1009,19 @@ class WASimClient::Private
 		  (SIMCONNECT_CLIENT_DATA_ID)tr->dataId, (SIMCONNECT_DATA_REQUEST_ID)tr->requestId + SIMCONNECTID_LAST,
 		  (SIMCONNECT_CLIENT_DATA_DEFINITION_ID)tr->dataId, SIMCONNECT_CLIENT_DATA_PERIOD_ON_SET, (tr->deltaEpsilon < 0.0f ? 0UL : SIMCONNECT_CLIENT_DATA_REQUEST_FLAG_CHANGED), 0UL, 0UL, 0UL
 		);
+	}
+
+	// Note that this method does NOT acquire the requests mutex.
+	HRESULT deregisterDataRequestArea(const TrackedRequest * const tr)
+	{
+		// We need to first suspend updates for this request before removing it, otherwise it seems SimConnect will sometimes crash
+		INVOKE_SIMCONNECT(
+			RequestClientData, hSim,
+			(SIMCONNECT_CLIENT_DATA_ID)tr->dataId, (SIMCONNECT_DATA_REQUEST_ID)tr->requestId + SIMCONNECTID_LAST,
+			(SIMCONNECT_CLIENT_DATA_DEFINITION_ID)tr->dataId, SIMCONNECT_CLIENT_DATA_PERIOD_NEVER, 0UL, 0UL, 0UL, 0UL
+		);
+		// Now we can safely (we hope) remove the SimConnect definition.
+		return SimConnectHelper::removeClientDataDefinition(hSim, tr->dataId);
 	}
 
 	HRESULT addOrUpdateRequest(const DataRequest &req)
@@ -1075,7 +1074,6 @@ class WASimClient::Private
 			if SUCCEEDED(hr) {
 				// send the request and wait for Ack; Request may timeout or return a Nak.
 				hr = sendDataRequest(req);
-				tr->sentToServer = SUCCEEDED(hr);
 			}
 			if (FAILED(hr) && isNewRequest) {
 				// delete a new request if anything failed
@@ -1098,20 +1096,13 @@ class WASimClient::Private
 			return E_FAIL;
 		}
 
-		if (tr->sentToServer) {
-			if (isConnected()) {
-				if FAILED(writeDataRequest(DataRequest(requestId, 0, RequestType::None)))
-					LOG_WRN << "Server removal of request " << requestId << " failed or timed out, check log messages.";
-				if FAILED(SimConnectHelper::removeClientDataDefinition(hSim, tr->dataId))
-					LOG_WRN << "Failed to clear ClientDataDefinition in SimConnect, check log messages.";
-			}
-			else {
-				tr->requestType = RequestType::None;
-				LOG_DBG << "Queued Data Request ID " << requestId << " for removal.";
-				return S_OK;
-			}
-		}
 		unique_lock lock{mtxRequests};
+		if (isConnected()) {
+			if FAILED(deregisterDataRequestArea(tr))
+				LOG_WRN << "Failed to clear ClientDataDefinition in SimConnect, check log messages.";
+			if FAILED(writeDataRequest(DataRequest(requestId, 0, RequestType::None)))
+				LOG_WRN << "Server removal of request " << requestId << " failed or timed out, check log messages.";
+		}
 		requests.erase(requestId);
 		LOG_TRC << "Removed Data Request " << requestId;
 		return S_OK;
@@ -1123,17 +1114,11 @@ class WASimClient::Private
 	{
 		if (!isConnected())
 			return;
-		vector<uint32_t> removals {};
 		shared_lock lock(mtxRequests);
 		for (const auto & [_, tr] : requests) {
-			if (tr.requestType == RequestType::None)
-				removals.push_back(tr.requestId);
-			else
+			if (tr.requestType != RequestType::None)
 				writeDataRequest(tr);
 		}
-		lock.unlock();
-		for (const uint32_t &id : removals)
-			removeRequest(id);
 	}
 
 	// this only creates the SimConnect data definitions, not the server-side entries
@@ -1144,16 +1129,6 @@ class WASimClient::Private
 			return;
 		for (const auto & [_, tr]  : requests)
 			registerDataRequestArea(&tr, true);
-	}
-
-	// this only deletes the SimConnect data definitions, not the server-side entries
-	// called from disconnectSimulator()
-	void unregisterAllDataRequestAreas()
-	{
-		if (!checkInit())
-			return;
-		for (const auto & [_, tr]  : requests)
-			SimConnectHelper::removeClientDataDefinition(hSim, tr.dataId);
 	}
 
 #pragma endregion Data Requests
