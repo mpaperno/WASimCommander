@@ -26,6 +26,9 @@ and are available at <http://www.gnu.org/licenses/>.
 #pragma once
 
 #include <string>
+#ifndef _LIBCPP_HAS_NO_THREADS
+#  include <mutex>
+#endif
 
 #include "WASimCommander.h"
 #include "utilities.h"
@@ -36,6 +39,9 @@ namespace WASimCommander {
 		namespace SimConnectHelper {
 
 	static bool ENABLE_SIMCONNECT_REQUEST_TRACKING = false;  // this can be changed even at runtime
+#ifndef _LIBCPP_HAS_NO_THREADS
+	static std::mutex g_simConnectMutex;
+#endif
 
 	// The macro allows us to only pass the function name once to get both the string version and the actual callable.
 	// "SimConnect_" is automatically prepended to the callable version.
@@ -52,6 +58,9 @@ namespace WASimCommander {
 	template<typename... Args>
 	static HRESULT simConnectProxy(const char *fname, std::function<HRESULT(HANDLE, Args...)> f, HANDLE hSim, Args... args)
 	{
+#ifndef _LIBCPP_HAS_NO_THREADS
+		std::lock_guard lock(g_simConnectMutex);
+#endif
 		const HRESULT hr = std::bind(f, std::forward<HANDLE>(hSim), std::forward<Args>(args)...)();
 		if FAILED(hr)
 			LOG_ERR << "Error: " << fname << '(' << SimConnectRequestTracker::printArgs(args...) << ") failed with " << LOG_HR(hr);
