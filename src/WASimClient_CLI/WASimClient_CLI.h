@@ -82,24 +82,27 @@ namespace WASimCommander::CLI::Client
 		event ResponseDelegate ^ OnResponseReceived   DELEGATE_DECL(ResponseDelegate);
 		#undef DELEGATE_DECL
 
-		/// <summary> Construct a new client with the given ID. The ID should be unique among any other possible clients. </summary>
+		/// <summary> Construct a new client with the given ID. The ID must be unique among any other possible clients and cannot be zero. </summary>
 		/// See \refwcc{WASimClient::WASimClient()} for more details.
 		explicit WASimClient(UInt32 clientId);
 		/// <summary> Construct a new client with the given ID and with initial settings read from the file specified in `configFile` (.ini format, see default file for example). </summary>
-		/// The client ID should be unique among any other possible clients. See \refwcc{WASimClient::WASimClient()} for more details.
+		/// The client ID must be unique among any other possible clients and cannot be zero. See \refwcc{WASimClient::WASimClient()} for more details.
 		explicit WASimClient(UInt32 clientId, String ^configFile);
-		/// This class implements a Disposable type object and should be disposed-of appropriately.
-		/// Any open network connections are automatically closed upon destruction, though it is better to close them yourself before deleting the client
+		/// <summary> This class implements a Disposable type object and should be disposed-of appropriately.
+		/// Any open network connections are automatically closed upon destruction, though it is better to close them yourself before deleting the client. </summary>
 		~WASimClient();
 		!WASimClient();  ///< \private
 
 		// Status  -----------------------------------
 
 		ClientStatus status() { return (ClientStatus)m_client->status(); }
-
+		/// <summary> Returns true if connected to the Simulator (SimConnect). </summary>
 		bool isInitialized() { return m_client->isInitialized(); }
+		/// <summary> Returns true if connected to WASimModule server. </summary>
 		bool isConnected() { return m_client->isConnected(); }
+		/// <summary> Returns version number of the WASimClient. </summary>
 		uint32_t clientVersion() { return m_client->clientVersion(); }
+		/// <summary> Returns version number of the WASimModule server, if known. The version is populated after a successful Ping command or server connection. </summary>
 		uint32_t serverVersion() { return m_client->serverVersion(); }
 
 		// Network actions  -----------------------------------
