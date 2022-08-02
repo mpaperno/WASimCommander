@@ -35,7 +35,7 @@
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="Logo.png" title="WASimCommander - Remote access to the Microsoft Flight Simulator 2020 Gauge API."/></td>
   <td id="projectalign">
-   <div id="projectname"><!-- WASimCommander --><span id="projectnumber">&#160;v1.0.0.6-beta2</span>
+   <div id="projectname"><!-- WASimCommander --><span id="projectnumber">&#160;v1.0.0.8-rc1</span>
    </div>
   </td>
  </tr>
@@ -138,6 +138,10 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ac77871164ec9d82ec894f57fd245bdf2"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_w_a_sim_commander_1_1_c_l_i_1_1_structs_1_1_data_request.html#ac77871164ec9d82ec894f57fd245bdf2">DataRequest</a> (UInt32 requestId, CalcResultType resultType, String ^ calculatorCode, UInt32 valueSize, UpdatePeriod period, UInt32 interval, float deltaEpsilon)</td></tr>
 <tr class="memdesc:ac77871164ec9d82ec894f57fd245bdf2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs a calculator code request (<code>requestType = RequestType::Calculated</code>) with given update period, interval, and epsilon values..  <a href="struct_w_a_sim_commander_1_1_c_l_i_1_1_structs_1_1_data_request.html#ac77871164ec9d82ec894f57fd245bdf2">More...</a><br /></td></tr>
 <tr class="separator:ac77871164ec9d82ec894f57fd245bdf2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac375cb30973fef8b35f0ccc26c0085af"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_w_a_sim_commander_1_1_c_l_i_1_1_structs_1_1_data_request.html#ac375cb30973fef8b35f0ccc26c0085af">setNameOrCode</a> (String ^ nameOrCode)</td></tr>
+<tr class="separator:ac375cb30973fef8b35f0ccc26c0085af"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a90b77a1ce2ecd9e50098c09cb01decbf"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_w_a_sim_commander_1_1_c_l_i_1_1_structs_1_1_data_request.html#a90b77a1ce2ecd9e50098c09cb01decbf">setUnitName</a> (String ^ unitName)</td></tr>
+<tr class="separator:a90b77a1ce2ecd9e50098c09cb01decbf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2c17f26d273db9fd02e99dc75fdf7248"><td class="memItemLeft" align="right" valign="top">String ^&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_w_a_sim_commander_1_1_c_l_i_1_1_structs_1_1_data_request.html#a2c17f26d273db9fd02e99dc75fdf7248">ToString</a> () override</td></tr>
 <tr class="separator:a2c17f26d273db9fd02e99dc75fdf7248"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -171,7 +175,7 @@ Public Attributes</h2></td></tr>
 <dl class="section see"><dt>See also</dt><dd>WASimCommander:CommandId::Subscribe command. </dd></dl>
 <p >For full documentation of each field see <code><a class="el" href="struct_w_a_sim_commander_1_1_data_request.html" title="Structure for variable value subscription requests.">WASimCommander::DataRequest</a></code>. </p>
 
-<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00197">197</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00206">206</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="acc96e39498783b15181303689345dd0e" name="acc96e39498783b15181303689345dd0e"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#acc96e39498783b15181303689345dd0e">&#9670;&nbsp;</a></span>DataRequest() <span class="overload">[1/7]</span></h2>
@@ -196,7 +200,7 @@ Public Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00212">212</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00221">221</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
 
 </div>
 </div>
@@ -248,7 +252,7 @@ Public Attributes</h2></td></tr>
 
 <p>Constructs a request for a named variable (<code>requestType = RequestType::Named</code>) with default update period on every <code>UpdatePeriod.Tick</code>. </p>
 
-<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00214">214</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00223">223</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
 
 </div>
 </div>
@@ -318,7 +322,7 @@ Public Attributes</h2></td></tr>
 
 <p>Constructs a request for a named variable (<code>requestType = RequestType::Named</code>) with given update period, interval, and epsilon values. </p>
 
-<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00219">219</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00228">228</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
 
 </div>
 </div>
@@ -376,7 +380,7 @@ Public Attributes</h2></td></tr>
 
 <p>Constructs a request for a named Simulator Variable (<code>requestType = RequestType::Named</code> and &lsquo;varTypePrefix = 'A&rsquo;<code>) with default update period on every</code>UpdatePeriod.Tick`. </p>
 
-<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00224">224</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00233">233</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
 
 </div>
 </div>
@@ -452,7 +456,7 @@ Public Attributes</h2></td></tr>
 
 <p>Constructs a request for a named Simulator Variable (<code>requestType = RequestType::Named</code> and &lsquo;varTypePrefix = 'A&rsquo;`) with given update period, interval, and epsilon values. </p>
 
-<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00229">229</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00238">238</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
 
 </div>
 </div>
@@ -504,7 +508,7 @@ Public Attributes</h2></td></tr>
 
 <p>Constructs a calculator code request (<code>requestType = RequestType::Calculated</code>) with default update period on every <code>UpdatePeriod.Tick</code>. </p>
 
-<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00234">234</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00243">243</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
 
 </div>
 </div>
@@ -574,11 +578,67 @@ Public Attributes</h2></td></tr>
 
 <p>Constructs a calculator code request (<code>requestType = RequestType::Calculated</code>) with given update period, interval, and epsilon values.. </p>
 
-<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00239">239</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00248">248</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
 
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
+<a id="ac375cb30973fef8b35f0ccc26c0085af" name="ac375cb30973fef8b35f0ccc26c0085af"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac375cb30973fef8b35f0ccc26c0085af">&#9670;&nbsp;</a></span>setNameOrCode()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void WASimCommander::CLI::Structs::DataRequest::setNameOrCode </td>
+          <td>(</td>
+          <td class="paramtype">String ^&#160;</td>
+          <td class="paramname"><em>nameOrCode</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00253">253</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
+
+</div>
+</div>
+<a id="a90b77a1ce2ecd9e50098c09cb01decbf" name="a90b77a1ce2ecd9e50098c09cb01decbf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a90b77a1ce2ecd9e50098c09cb01decbf">&#9670;&nbsp;</a></span>setUnitName()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void WASimCommander::CLI::Structs::DataRequest::setUnitName </td>
+          <td>(</td>
+          <td class="paramtype">String ^&#160;</td>
+          <td class="paramname"><em>unitName</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00258">258</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
+
+</div>
+</div>
 <a id="a2c17f26d273db9fd02e99dc75fdf7248" name="a2c17f26d273db9fd02e99dc75fdf7248"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a2c17f26d273db9fd02e99dc75fdf7248">&#9670;&nbsp;</a></span>ToString()</h2>
 
@@ -602,7 +662,7 @@ Public Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00244">244</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00263">263</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
 
 </div>
 </div>
@@ -619,7 +679,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00200">200</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00209">209</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
 
 </div>
 </div>
@@ -635,7 +695,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00201">201</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00210">210</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
 
 </div>
 </div>
@@ -651,7 +711,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00202">202</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00211">211</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
 
 </div>
 </div>
@@ -667,7 +727,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00203">203</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00212">212</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
 
 </div>
 </div>
@@ -683,7 +743,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00204">204</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00213">213</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
 
 </div>
 </div>
@@ -699,7 +759,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00205">205</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00214">214</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
 
 </div>
 </div>
@@ -715,7 +775,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00206">206</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00215">215</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
 
 </div>
 </div>
@@ -731,7 +791,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00207">207</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00216">216</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
 
 </div>
 </div>
@@ -747,7 +807,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00208">208</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00217">217</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
 
 </div>
 </div>
@@ -763,7 +823,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00209">209</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00218">218</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
 
 </div>
 </div>
@@ -779,7 +839,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00210">210</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00219">219</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
 
 </div>
 </div>
@@ -792,7 +852,7 @@ Public Attributes</h2></td></tr>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="namespace_w_a_sim_commander.html">WASimCommander</a></li><li class="navelem"><a class="el" href="namespace_w_a_sim_commander_1_1_c_l_i.html">CLI</a></li><li class="navelem"><a class="el" href="namespace_w_a_sim_commander_1_1_c_l_i_1_1_structs.html">Structs</a></li><li class="navelem"><a class="el" href="struct_w_a_sim_commander_1_1_c_l_i_1_1_structs_1_1_data_request.html">DataRequest</a></li>
-    <li class="footer">Generated on Mon Jul 11 2022 00:23:56 for WASimCommander by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.4 </li>
+    <li class="footer">Generated on Tue Aug 2 2022 15:25:37 for WASimCommander by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.4 </li>
   </ul>
 </div>
 </body>

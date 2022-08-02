@@ -9,7 +9,7 @@ var searchData=
   ['wasimclient_2eh_6',['WASimClient.h',['../_w_a_sim_client_8h.html',1,'']]],
   ['wasimclient_5fcli_2eh_7',['WASimClient_CLI.h',['../_w_a_sim_client___c_l_i_8h.html',1,'']]],
   ['wasimcommander_8',['WASimCommander',['../index.html',1,'(Global Namespace)'],['../namespace_w_a_sim_commander.html',1,'WASimCommander']]],
-  ['wasimcommander_20_2d_20changes_20log_9',['WASimCommander - Changes Log',['../md__c_h_a_n_g_e_l_o_g.html',1,'']]],
+  ['wasimcommander_20_2d_20change_20log_9',['WASimCommander - Change Log',['../md__c_h_a_n_g_e_l_o_g.html',1,'']]],
   ['wasimcommander_2eh_10',['WASimCommander.h',['../_w_a_sim_commander_8h.html',1,'']]],
   ['wsmcmnd_5fcda_5fname_5fcommand_11',['WSMCMND_CDA_NAME_COMMAND',['../_w_a_sim_commander_8h.html#a9bab3461867d8453e2c2e0fbda6ab6f0',1,'WASimCommander.h']]],
   ['wsmcmnd_5fcda_5fname_5fdata_12',['WSMCMND_CDA_NAME_DATA',['../_w_a_sim_commander_8h.html#a76e472f59a2615e6590bc323636532b6',1,'WASimCommander.h']]],

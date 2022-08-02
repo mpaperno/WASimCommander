@@ -1,7 +1,7 @@
 var searchData=
 [
   ['clienteventdelegate_0',['ClientEventDelegate',['../class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#af8feec438c150af9b2771d99add9ebcb',1,'WASimCommander::CLI::Client::WASimClient']]],
-  ['clientversion_1',['clientVersion',['../class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a3896927262d7753a083f10d81c613120',1,'WASimCommander::Client::WASimClient']]],
+  ['clientversion_1',['clientVersion',['../class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a3896927262d7753a083f10d81c613120',1,'WASimCommander::Client::WASimClient::clientVersion()'],['../class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#acf2738dd35823fc1143a60ff5280c4ab',1,'WASimCommander::CLI::Client::WASimClient::clientVersion()']]],
   ['command_2',['Command',['../struct_w_a_sim_commander_1_1_command.html#a32f0237c8ce071b74735a48d1c58bf0a',1,'WASimCommander::Command']]],
   ['commandresultdelegate_3',['CommandResultDelegate',['../class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#ae4711e6cec5c543f4c28d7376f3d799f',1,'WASimCommander::CLI::Client::WASimClient']]],
   ['connectserver_4',['connectServer',['../class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a6dea7988fb87f798ab0dc4b4e2d8307a',1,'WASimCommander::Client::WASimClient']]],

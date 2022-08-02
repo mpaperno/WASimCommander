@@ -35,7 +35,7 @@
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="Logo.png" title="WASimCommander - Remote access to the Microsoft Flight Simulator 2020 Gauge API."/></td>
   <td id="projectalign">
-   <div id="projectname"><!-- WASimCommander --><span id="projectnumber">&#160;v1.0.0.6-beta2</span>
+   <div id="projectname"><!-- WASimCommander --><span id="projectnumber">&#160;v1.0.0.8-rc1</span>
    </div>
   </td>
  </tr>
@@ -147,6 +147,10 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ac77871164ec9d82ec894f57fd245bdf2 inherit pub_methods_struct_w_a_sim_commander_1_1_c_l_i_1_1_structs_1_1_data_request"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_w_a_sim_commander_1_1_c_l_i_1_1_structs_1_1_data_request.html#ac77871164ec9d82ec894f57fd245bdf2">DataRequest</a> (UInt32 requestId, CalcResultType resultType, String ^ calculatorCode, UInt32 valueSize, UpdatePeriod period, UInt32 interval, float deltaEpsilon)</td></tr>
 <tr class="memdesc:ac77871164ec9d82ec894f57fd245bdf2 inherit pub_methods_struct_w_a_sim_commander_1_1_c_l_i_1_1_structs_1_1_data_request"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs a calculator code request (<code>requestType = RequestType::Calculated</code>) with given update period, interval, and epsilon values..  <a href="struct_w_a_sim_commander_1_1_c_l_i_1_1_structs_1_1_data_request.html#ac77871164ec9d82ec894f57fd245bdf2">More...</a><br /></td></tr>
 <tr class="separator:ac77871164ec9d82ec894f57fd245bdf2 inherit pub_methods_struct_w_a_sim_commander_1_1_c_l_i_1_1_structs_1_1_data_request"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac375cb30973fef8b35f0ccc26c0085af inherit pub_methods_struct_w_a_sim_commander_1_1_c_l_i_1_1_structs_1_1_data_request"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_w_a_sim_commander_1_1_c_l_i_1_1_structs_1_1_data_request.html#ac375cb30973fef8b35f0ccc26c0085af">setNameOrCode</a> (String ^ nameOrCode)</td></tr>
+<tr class="separator:ac375cb30973fef8b35f0ccc26c0085af inherit pub_methods_struct_w_a_sim_commander_1_1_c_l_i_1_1_structs_1_1_data_request"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a90b77a1ce2ecd9e50098c09cb01decbf inherit pub_methods_struct_w_a_sim_commander_1_1_c_l_i_1_1_structs_1_1_data_request"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_w_a_sim_commander_1_1_c_l_i_1_1_structs_1_1_data_request.html#a90b77a1ce2ecd9e50098c09cb01decbf">setUnitName</a> (String ^ unitName)</td></tr>
+<tr class="separator:a90b77a1ce2ecd9e50098c09cb01decbf inherit pub_methods_struct_w_a_sim_commander_1_1_c_l_i_1_1_structs_1_1_data_request"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2c17f26d273db9fd02e99dc75fdf7248 inherit pub_methods_struct_w_a_sim_commander_1_1_c_l_i_1_1_structs_1_1_data_request"><td class="memItemLeft" align="right" valign="top">String ^&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_w_a_sim_commander_1_1_c_l_i_1_1_structs_1_1_data_request.html#a2c17f26d273db9fd02e99dc75fdf7248">ToString</a> () override</td></tr>
 <tr class="separator:a2c17f26d273db9fd02e99dc75fdf7248 inherit pub_methods_struct_w_a_sim_commander_1_1_c_l_i_1_1_structs_1_1_data_request"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -219,7 +223,7 @@ Public Attributes</h2></td></tr>
 <p >There are also implicit conversion operators for all numeric types and String. If conversion fails, these return a default-constructed instance, typically zero or an empty string.</p>
 <p >Also note that the size of the data array may or <em>may not</em> be the same as the inherited <code>DataRequest::valueSize</code> member, since that may contain special values for preset types. Always check the actual data array size (<code>data.Length</code>) if you need to know the storage requirements. </p>
 
-<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00296">296</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00315">315</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
 <a id="a451c1cc7b47f214598b1733527ba2eeb" name="a451c1cc7b47f214598b1733527ba2eeb"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a451c1cc7b47f214598b1733527ba2eeb">&#9670;&nbsp;</a></span>gcnew()</h2>
@@ -244,7 +248,7 @@ Public Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00307">307</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00326">326</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
 
 </div>
 </div>
@@ -274,7 +278,7 @@ Public Attributes</h2></td></tr>
 
 <p>Overload for String type results. This will simply load whatever bytes are in the <code>data</code> array into a String, and only returns <code>false</code> (and an empty String) if the data array is empty or starts with a null character byte (<code>0x00</code>). </p>
 
-<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00322">322</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00341">341</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
 
 </div>
 </div>
@@ -302,7 +306,7 @@ Public Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00334">334</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00353">353</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
 
 </div>
 </div>
@@ -330,7 +334,7 @@ Public Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00335">335</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00354">354</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
 
 </div>
 </div>
@@ -358,7 +362,7 @@ Public Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00336">336</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00355">355</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
 
 </div>
 </div>
@@ -386,7 +390,7 @@ Public Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00337">337</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00356">356</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
 
 </div>
 </div>
@@ -414,7 +418,7 @@ Public Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00338">338</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00357">357</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
 
 </div>
 </div>
@@ -442,7 +446,7 @@ Public Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00339">339</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00358">358</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
 
 </div>
 </div>
@@ -470,7 +474,7 @@ Public Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00340">340</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00359">359</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
 
 </div>
 </div>
@@ -498,7 +502,7 @@ Public Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00341">341</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00360">360</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
 
 </div>
 </div>
@@ -526,7 +530,7 @@ Public Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00342">342</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00361">361</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
 
 </div>
 </div>
@@ -554,7 +558,7 @@ Public Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00343">343</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00362">362</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
 
 </div>
 </div>
@@ -582,7 +586,7 @@ Public Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00344">344</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00363">363</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
 
 </div>
 </div>
@@ -609,7 +613,7 @@ Public Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00356">356</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00375">375</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
 
 </div>
 </div>
@@ -628,7 +632,7 @@ Public Attributes</h2></td></tr>
 
 <p>Timestamp of last data update in ms since epoch. </p>
 
-<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00299">299</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00318">318</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
 
 </div>
 </div>
@@ -646,7 +650,7 @@ Public Attributes</h2></td></tr>
 
 <p>Value data array. </p>
 
-<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00300">300</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00319">319</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
 
 </div>
 </div>
@@ -667,7 +671,7 @@ template&lt;typename T &gt; </div>
 <p>Tries to populate a value reference of the desired type and returns true or false depending on if the conversion was valid (meaning the size of requested type matches the data size). </p>
 <p >If the conversion fails, result is default-initialized. The requested type must be a <code>value</code> type (not reference) and be default-constructible, (eg. numerics, chars), or fixed-size arrays of such types. </p>
 
-<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00307">307</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00326">326</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
 
 </div>
 </div>
@@ -680,7 +684,7 @@ template&lt;typename T &gt; </div>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="namespace_w_a_sim_commander.html">WASimCommander</a></li><li class="navelem"><a class="el" href="namespace_w_a_sim_commander_1_1_c_l_i.html">CLI</a></li><li class="navelem"><a class="el" href="namespace_w_a_sim_commander_1_1_c_l_i_1_1_structs.html">Structs</a></li><li class="navelem"><a class="el" href="struct_w_a_sim_commander_1_1_c_l_i_1_1_structs_1_1_data_request_record.html">DataRequestRecord</a></li>
-    <li class="footer">Generated on Mon Jul 11 2022 00:23:56 for WASimCommander by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.4 </li>
+    <li class="footer">Generated on Tue Aug 2 2022 15:25:37 for WASimCommander by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.4 </li>
   </ul>
 </div>
 </body>
