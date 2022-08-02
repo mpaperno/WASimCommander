@@ -220,17 +220,17 @@ static const HRESULT E_TIMEOUT       = /*ERROR_TIMEOUT*/       1460L | (/*FACILI
 		/// \param clientId This ID must not be shared with any other Client accessing the Server.
 		///   The ID is also used as the client name by converting it to a 8-character hexadecimal string. For example 3235839725 = "C0DEFEED". Get creative.
 		///   The client name is used as a key component of data exchange with the simulator engine.
+		///   The ID cannot be zero, and server connections will fail if it is. It can also be set/changed after class creation using the `setClientId()` method, but before connecting to the server.
 		/// \param configFile Optionally provide the path to a configuration file for reading initial startup settings. By default the client will look for a `client_conf.ini` file in the current working directory.
 		///   The parameter value may include the file name (with extension), or be only a file system path, in which case the default file name of "client_conf.ini" will be appended.
 		explicit WASimClient(uint32_t clientId, const std::string &configFile = std::string());
 		/// Any open network connections are automatically closed upon destruction, though it is better to close them yourself before deleting the client.
 		~WASimClient();
 
-		ClientStatus status() const;  ///< Get current connection status of this client. \sa WASimCommander::Client::ClientStatus
-
 		/// \name Network actions, status, and settings
 		/// \{
 
+		ClientStatus status() const;  ///< Get current connection status of this client. \sa WASimCommander::Client::ClientStatus
 		bool isInitialized() const;   ///< Check if simulator network link is established. \sa connectSimulator()
 		bool isConnected() const;     ///< Check WASimCommander server connection status.  \sa connectServer()
 		uint32_t clientVersion() const;  ///< Return the current WASimClient version number. Version numbers are in "BCD" format:  `MAJOR << 24 | MINOR << 16 | PATCH << 8 | BUILD`, eg: `1.23.45.67 = 0x01234567`
@@ -241,7 +241,7 @@ static const HRESULT E_TIMEOUT       = /*ERROR_TIMEOUT*/       1460L | (/*FACILI
 		/// \return `S_OK` (0) - Success;\n
 		///  `E_FAIL` (0x80004005) - General failure (most likely simulator is not running);\n
 		///  `E_TIMEOUT` (0x800705B4) - Connection attempt timed out (simulator/network issue);\n
-		///  `E_INVALIDARG` (0x80070057) - The SimConnect.cfg file did not contain the default config index (see `networkConfigurationId()` ) ;
+		///  `E_INVALIDARG` (0x80070057) - The Client ID set in constructor is invalid (zero) or the SimConnect.cfg file did not contain the default config index (see `networkConfigurationId()` ) ;
 		/// \note This method blocks until either the Simulator responds or the timeout has expired.
 		/// \sa defaultTimeout(), setDefaultTimeout(), networkConfigurationId() setNetworkConfigurationId(), connectSimulator(int, uint32_t)
 		HRESULT connectSimulator(uint32_t timeout = 0);
@@ -251,7 +251,7 @@ static const HRESULT E_TIMEOUT       = /*ERROR_TIMEOUT*/       1460L | (/*FACILI
 		/// \return `S_OK` (0) - Success;\n
 		///  `E_FAIL` (0x80004005) - General failure (most likely simulator is not running);\n
 		///  `E_TIMEOUT` (0x800705B4) - Connection attempt timed out (simulator/network issue);\n
-		///  `E_INVALIDARG` (0x80070057) - The SimConnect.cfg file did not contain the config index requested in the `simConnectConfigId` parameter;
+		///  `E_INVALIDARG` (0x80070057) - The Client ID set in constructor is invalid (zero) or the SimConnect.cfg file did not contain the config index requested in the `simConnectConfigId` parameter;
 		/// \note This method blocks until either the Simulator responds or the timeout has expired. \sa connectSimulator(), defaultTimeout(), setDefaultTimeout()
 		HRESULT connectSimulator(int networkConfigId, uint32_t timeout = 0);
 		/// Shut down all network connections (and disconnect WASimCommander server if connected).
@@ -271,7 +271,7 @@ static const HRESULT E_TIMEOUT       = /*ERROR_TIMEOUT*/       1460L | (/*FACILI
 		/// \return `S_OK` (0) - Success.\n
 		///  `E_FAIL` (0x80004005) - General failure (most likely simulator is not running).\n
 		///  `E_TIMEOUT` (0x800705B4) - Connection attempt timed out (simulator/network issue or WASimCommander WASM module is not installed/running).\n
-		///  `E_INVALIDARG` (0x80070057) - The SimConnect.cfg file did not contain the default config index.
+		///  `E_INVALIDARG` (0x80070057) - The Client ID set in constructor is invalid (zero) or the SimConnect.cfg file did not contain the default config index.
 		/// \note This method blocks until either the Server responds or the timeout has expired. \sa defaultTimeout(), setDefaultTimeout()
 		HRESULT connectServer(uint32_t timeout = 0);
 		/// Disconnect from the WASimCommander server. This does _not_ close the Simulator network connection (use \c disconnectSimulator() to do that or both at once).

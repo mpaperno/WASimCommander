@@ -1419,7 +1419,12 @@ WASimClient::~WASimClient() {
 
 #pragma region Connections ----------------------------------------------
 
-HRESULT WASimClient::connectSimulator(uint32_t timeout) {
+HRESULT WASimClient::connectSimulator(uint32_t timeout)
+{
+	if (!d->clientId) {
+		LOG_ERR << "Client ID must be greater than zero.";
+		return E_INVALIDARG;
+	}
 	return d->connectSimulator(timeout);
 }
 
