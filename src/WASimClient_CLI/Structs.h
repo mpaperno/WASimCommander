@@ -145,8 +145,17 @@ namespace WASimCommander::CLI::Structs
 			char_array<STRSZ_CMD> sData;
 
 			Command() {}
-			explicit Command(CommandId id, uint32_t uData, String ^sData, double fData, int32_t token) :
-				token(token), uData(uData), fData(fData), commandId(id), sData{sData} { }
+			explicit Command(CommandId id) : commandId(id) { }
+			explicit Command(CommandId id, uint32_t uData) : uData(uData), commandId(id) { }
+			explicit Command(CommandId id, uint32_t uData, double fData) : uData(uData), fData(fData), commandId(id) { }
+			explicit Command(CommandId id, uint32_t uData, String ^sData) : uData(uData), fData(0.0), commandId(id), sData{sData} { }
+			explicit Command(CommandId id, uint32_t uData, String ^sData, double fData) : uData(uData), fData(fData), commandId(id), sData{sData} { }
+			explicit Command(CommandId id, uint32_t uData, String ^sData, double fData, int32_t token) : token(token), uData(uData), fData(fData), commandId(id), sData{sData} { }
+
+			void setStringData(String ^sData)
+			{
+				this->sData = char_array<STRSZ_CMD>(sData);
+			}
 
 			String ^ToString() override {
 				return String::Format("Command {{{0}; token: {1}; uData: {2}; fData: {3:F6}; sData: \"{4}\"}}", commandId, token, uData, fData, sData);
@@ -240,6 +249,16 @@ namespace WASimCommander::CLI::Structs
 				requestId(requestId), valueSize(valueSize), deltaEpsilon(deltaEpsilon), interval(interval), period(period),
 				requestType(RequestType::Calculated), calcResultType(resultType), nameOrCode(calculatorCode)
 			{	}
+
+			void setNameOrCode(String ^nameOrCode)
+			{
+				this->nameOrCode = char_array<STRSZ_REQ>(nameOrCode);
+			}
+
+			void setUnitName(String ^unitName)
+			{
+				this->unitName = char_array<STRSZ_UNIT>(unitName);
+			}
 
 			String ^ToString() override
 			{
