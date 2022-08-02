@@ -659,8 +659,8 @@ class WASimClient::Private
 		}
 
 		LOG_INF << "Connected to " WSMCMND_PROJECT_NAME " server v" << STREAM_HEX8(serverVersion);
-		if (serverVersion != WSMCMND_VERSION)
-			LOG_WRN << "Server version does not match WASimClient version " << STREAM_HEX8(WSMCMND_VERSION);
+		if ((serverVersion & 0xFF000000) != (WSMCMND_VERSION & 0xFF000000))
+			LOG_WRN << "Server major version does not match WASimClient version " << STREAM_HEX8(WSMCMND_VERSION);
 		setStatus(ClientStatus::Connected);
 
 		// clear any pending list request (unlikely)
