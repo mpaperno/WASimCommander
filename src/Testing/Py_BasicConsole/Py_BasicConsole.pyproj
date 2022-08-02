@@ -45,9 +45,10 @@
   <!-- Uncomment the CoreCompile target to enable the Build command in
        Visual Studio and specify your pre- and post-build commands in
        the BeforeBuild and AfterBuild targets below. -->
-  <!--<Target Name="CoreCompile" />-->
+  <!-- <Target Name="CoreCompile" /> -->
   <Target Name="BeforeBuild">
   </Target>
   <Target Name="AfterBuild">
+  	<!-- <Command>copy /Y $(SolutionDir)\build\WASimClient_CLI\Release-x64\*.dll $(ProjectDir)</Command> -->
   </Target>
 </Project>
