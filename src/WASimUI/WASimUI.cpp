@@ -683,7 +683,7 @@ WASimUI::WASimUI(QWidget *parent) :
 	ui.cbLogLevelFile->setProperties(d->client->logLevel(         LogFacility::File,    LogSource::Client), LogFacility::File,    LogSource::Client);
 	ui.cbLogLevelConsole->setProperties(d->client->logLevel(      LogFacility::Console, LogSource::Client), LogFacility::Console, LogSource::Client);
 	ui.cbLogLevelServer->setProperties(d->client->logLevel(       LogFacility::Remote,  LogSource::Server), LogFacility::Remote,  LogSource::Server);
-	ui.cbLogLevelServerFile->setProperties(                                                   (LogLevel)-1, LogFacility::File, LogSource::Server);     // unknown level at startup
+	ui.cbLogLevelServerFile->setProperties(                                                   (LogLevel)-1, LogFacility::File,    LogSource::Server);     // unknown level at startup
 	ui.cbLogLevelServerConsole->setProperties(                                                (LogLevel)-1, LogFacility::Console, LogSource::Server);  // unknown level at startup
 	// Since the LogLevelComboBox types store the facility and source properties (which we just set), we can use one event handler for all of them.
 	auto setLogLevel = [=](LogLevel level) {
@@ -1144,6 +1144,7 @@ void WASimUI::onClientEvent(const ClientEvent &ev)
 {
 	d->clientStatus = ev.status;
 	d->statWidget->setStatus(ev);
+	d->statWidget->setServerVersion(d->client->serverVersion());
 	d->initAct->setChecked(+ev.status & +ClientStatus::SimConnected);
 	d->initAct->setText(d->initAct->isChecked() ? tr("Disconnect Simulator") : tr("Connect to Simulator") );
 	d->connectAct->setChecked(+ev.status & +ClientStatus::Connected);

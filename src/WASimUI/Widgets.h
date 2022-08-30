@@ -57,8 +57,14 @@ public:
 		iconLabel = new QLabel(this);
 		iconLabel->setFixedSize(iconSize, iconSize);
 		textLabel = new QLabel(this);
+		QFont font = textLabel->font();
+		font.setPointSize(font.pointSize() + 2);
+		textLabel->setFont(font);
+		versionLabel = new QLabel(this);
+		versionLabel->setAlignment(Qt::AlignCenter);
 		lo->addWidget(iconLabel, 0);
 		lo->addWidget(textLabel, 1);
+		lo->addWidget(versionLabel, 0);
 
 		icon.addFile("fg=red/block.glyph", QSize(), QIcon::Disabled, QIcon::Off);               // Idle
 		icon.addFile("fg=blue/radio_button_off.glyph", QSize(), QIcon::Selected, QIcon::Off);   // SimConnected
@@ -66,6 +72,7 @@ public:
 		icon.addFile("fg=violet/hourglass_empty.glyph", QSize(), QIcon::Active, QIcon::Off);    // Initializing/Connecting/ShuttingDown
 
 		setStatus(ClientEvent{ClientEventType::None, ClientStatus::Idle, "Not Connected"});
+		versionLabel->setText(tr("Server\nv (unknown)"));
 
 		setToolTip(tr("<p>This area shows the current network connection status. There are two stages of connection -- to the simulator itself (SimConnect) and to the WASimCommander Server (module).</p>"));
 	}
@@ -91,11 +98,21 @@ public:
 		//	<< "s: 0x" << hex << +ev.status << "m:" << QString::fromStdString(ev.message);
 	}
 
+	void setServerVersion(quint32 version)
+	{
+		if (serverVersion != version) {
+			serverVersion = version;
+			versionLabel->setText(tr("Server\nv%1.%2.%3.%4").arg(version >> 24).arg((version >> 16) & 0xFF).arg((version >> 8) & 0xFF).arg(version & 0xFF));
+		}
+	}
+
 private:
 	QIcon icon;
 	QLabel *iconLabel;
 	QLabel *textLabel;
+	QLabel *versionLabel;
 	int iconSize;
+	quint32 serverVersion = 0;
 };
 
 
