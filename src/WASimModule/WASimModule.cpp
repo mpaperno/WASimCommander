@@ -1347,8 +1347,8 @@ void sendKeyEvent(const Client *c, const Command *const cmd)
 	if (!keyId && cmd->sData[0] > 0)
 		keyId = Utilities::getKeyEventId(cmd->sData);    // Intellicode erroneous error flag
 
-	if (keyId /* MAYBE: > KEY_ID_MIN */) {
-		send_key_event(keyId, (UINT32)cmd->fData);
+	if (keyId) {
+		trigger_key_event_EX1(keyId, (UINT32)cmd->fData);
 		sendAckNak(c, *cmd);
 		return;
 	}
