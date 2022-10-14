@@ -780,9 +780,12 @@ bool parseVariableString(const char varType, const char *data, ID &varId, ENUM &
 	if (!svUnit.empty()) {
 		// try to parse the string as a numeric ID
 		result = from_chars(svUnit.data(), svUnit.data() + svUnit.size(), unitId);
-		// if number conversion failed, look up variable id
-		if (result.ec != errc())
+		// if number conversion failed, look up unit id
+		if (result.ec != errc()) {
 			unitId = get_units_enum(string(svUnit).c_str());  // this may also fail but unit ID is not "critical" (caller can decide what to do)
+			if (unitId < 0)
+				LOG_WRN << "Could not resolve Unit ID from string " << quoted(data);
+		}
 	}
 	return true;
 }
@@ -1008,17 +1011,10 @@ void setVariable(const Client *c, const Command *const cmd)
 		return;
 	}
 
-	/* FIXME: https://devsupport.flightsimulator.com/questions/8604/env-wasm-set-named-variable-typed-value-not-found.html
-	if (unitId < 0)
-		LOG_WRN << "Could not resolve Unit ID for Set command from string " << quoted(data);
-
 	if (unitId > -1)
 		set_named_variable_typed_value(varId, value, unitId);
 	else
 		set_named_variable_value(varId, value);
-	*/
-	set_named_variable_value(varId, value);
-
 	sendAckNak(c, *cmd);
 }
 
