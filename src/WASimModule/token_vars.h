@@ -1312,6 +1312,8 @@ namespace WASimCommander {
 	{ "YOKE_POS_X_LINEAR", YOKE_POS_X_LINEAR },
 	{ "TACAN_DRIVES_NAV1", TACAN_DRIVES_NAV1 },
 	{ "RACE_LAST_LAP_TIME", RACE_LAST_LAP_TIME },
+	{ "CIRCUIT_NAVCOM4_ON", CIRCUIT_NAVCOM4_ON },
+	{ "BREAKER_NAVCOM4", BREAKER_NAVCOM4 },
 };
 
 		const nameToIdMap_t::const_iterator el = namesMap.find(name);
