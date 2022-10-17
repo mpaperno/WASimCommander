@@ -173,6 +173,16 @@ namespace WASimCommander::CLI::Client
 		RegisteredEvent ^registeredEvent(uint32_t eventId) { return gcnew RegisteredEvent(m_client->registeredEvent(eventId)); }
 		array<RegisteredEvent ^> ^registeredEvents();
 
+		// Simulator Key Events ------------------------------
+
+		HR sendKeyEvent(uint32_t keyEventId, [Optional] Nullable<uint32_t> v1, [Optional] Nullable<uint32_t> v2, [Optional] Nullable<uint32_t> v3, [Optional] Nullable<uint32_t> v4, [Optional] Nullable<uint32_t> v5) {
+			return (HR)m_client->sendKeyEvent(keyEventId, v1.GetValueOrDefault(0), v2.GetValueOrDefault(0), v3.GetValueOrDefault(0), v4.GetValueOrDefault(0), v5.GetValueOrDefault(0));
+		}
+
+		HR sendKeyEvent(String ^keyEventName, [Optional] Nullable<uint32_t> v1, [Optional] Nullable<uint32_t> v2, [Optional] Nullable<uint32_t> v3, [Optional] Nullable<uint32_t> v4, [Optional] Nullable<uint32_t> v5) {
+			return (HR)m_client->sendKeyEvent(marshal_as<std::string>(keyEventName), v1.GetValueOrDefault(0), v2.GetValueOrDefault(0), v3.GetValueOrDefault(0), v4.GetValueOrDefault(0), v5.GetValueOrDefault(0));
+		}
+
 		// Meta data retrieval --------------------------------
 
 		HR list(LookupItemType itemsType) { return (HR)m_client->list((WSE::LookupItemType)itemsType); }
