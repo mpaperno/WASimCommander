@@ -112,6 +112,7 @@ class WASimClient::Private
 		CLI_DATA_COMMAND,
 		CLI_DATA_RESPONSE,
 		CLI_DATA_REQUEST,
+		CLI_DATA_KEYEVENT,
 		CLI_DATA_LOG,
 		// SIMCONNECT_DATA_REQUEST_ID - requests for data updates
 		DATA_REQ_RESPONSE,   // command response data
@@ -253,6 +254,8 @@ class WASimClient::Private
 	responseMap_t reponses {};
 	requestMap_t requests {};
 	eventMap_t events {};
+	using eventNameCache_t = unordered_map<std::string, int32_t>;
+	eventNameCache_t keyEventNameCache {};
 
 #pragma endregion
 #pragma region  Callback handling templates  ----------------------------------------------
@@ -572,10 +575,9 @@ class WASimClient::Private
 			return hr;
 		}
 		// register CDA for writing data requests (this is read-only for the server)
-		if FAILED(hr = registerDataArea(CDA_NAME_DATA_PFX, CLI_DATA_REQUEST, CLI_DATA_REQUEST, sizeof(DataRequest), true)){
-			disconnectSimulator();
-			return hr;
-		}
+		registerDataArea(CDA_NAME_DATA_PFX, CLI_DATA_REQUEST, CLI_DATA_REQUEST, sizeof(DataRequest), true);
+		// register CDA for writing key events (this is read-only for the server)
+		registerDataArea(CDA_NAME_KEYEV_PFX, CLI_DATA_KEYEVENT, CLI_DATA_KEYEVENT, sizeof(KeyEvent), true);
 
 		// start listening on the response channel
 		if FAILED(hr = INVOKE_SIMCONNECT(
@@ -1184,6 +1186,22 @@ class WASimClient::Private
 	}
 
 #pragma endregion
+
+#pragma region Simulator Key Events -------------------------------------------
+
+	// Writes KeyEvent data to the corresponding CDA.
+	HRESULT writeKeyEvent(const KeyEvent &kev)
+	{
+		if (!isConnected()) {
+			LOG_ERR << "Server not connected, cannot send KeyEvent " << kev;
+			return E_NOT_CONNECTED;
+		}
+		LOG_DBG << "Sending Key Event: " << kev;
+		return INVOKE_SIMCONNECT(SetClientData, hSim, (SIMCONNECT_CLIENT_DATA_ID)CLI_DATA_KEYEVENT, (SIMCONNECT_CLIENT_DATA_DEFINITION_ID)CLI_DATA_KEYEVENT, SIMCONNECT_CLIENT_DATA_SET_FLAG_DEFAULT, 0UL, (DWORD)sizeof(KeyEvent), (void *)&kev);
+	}
+
+#pragma endregion
+
 #pragma region  SimConnect message processing  ----------------------------------------------
 
 	static void CALLBACK dispatchMessage(SIMCONNECT_RECV *pData, DWORD cbData, void *pContext) {
@@ -1587,7 +1605,7 @@ HRESULT WASimClient::setDataRequestsPaused(bool paused) const {
 
 #pragma endregion Data
 
-#pragma region Events ----------------------------------------------
+#pragma region Calculator Events ----------------------------------------------
 
 HRESULT WASimClient::registerEvent(const RegisteredEvent &eventData)
 {
@@ -1653,7 +1671,6 @@ RegisteredEvent WASimClient::registeredEvent(uint32_t eventId)
 	static const RegisteredEvent nullRecord { };
 	if (Private::TrackedEvent *ev = d->findTrackedEvent(eventId))
 		return RegisteredEvent(*ev);
-		//return static_cast<RegisteredEvent const &>(*ev);
 	LOG_ERR << "Event ID " << eventId << " not found.";
 	return nullRecord;
 }
@@ -1670,7 +1687,34 @@ vector<RegisteredEvent> WASimClient::registeredEvents() const
 	return ret;
 }
 
-#pragma endregion Events
+#pragma endregion Calculator Events
+
+#pragma region Key Events ----------------------------------------------
+
+HRESULT WASimClient::sendKeyEvent(uint32_t keyEventId, uint32_t v1, uint32_t v2, uint32_t v3, uint32_t v4, uint32_t v5) const
+{
+	return d->writeKeyEvent(KeyEvent(keyEventId, { v1, v2, v3, v4, v5 }, d->nextCmdToken++));
+}
+
+HRESULT WASimClient::sendKeyEvent(const std::string & keyEventName, uint32_t v1, uint32_t v2, uint32_t v3, uint32_t v4, uint32_t v5)
+{
+	int32_t keyId;
+	// check the cache first
+	const Private::eventNameCache_t::iterator pos = d->keyEventNameCache.find(keyEventName);
+	if (pos != d->keyEventNameCache.cend()) {
+		keyId = pos->second;
+	}
+	else {
+		// try a lookup
+		HRESULT hr;
+		if ((hr = lookup(LookupItemType::KeyEventId, keyEventName, &keyId)) != S_OK)
+			return hr == E_FAIL ? E_INVALIDARG : hr;
+		d->keyEventNameCache.insert(std::pair{keyEventName, keyId});
+	}
+	return sendKeyEvent((uint32_t)keyId, v1, v2, v3, v4, v5);
+}
+
+#pragma endregion Key Events
 
 #pragma region Meta Data ----------------------------------------------
 

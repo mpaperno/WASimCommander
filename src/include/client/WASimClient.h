@@ -416,6 +416,30 @@ static const HRESULT E_TIMEOUT       = /*ERROR_TIMEOUT*/       1460L | (/*FACILI
 		/// Returns a list of all registered events which have been added to the Client with `registerEvent()`. The list members are created by copy.
 		std::vector<RegisteredEvent> registeredEvents() const;
 
+		// Simulator Key Events --------------------------
+
+		/// Trigger a simulator Key Event by ID, with up to 5 optional values which are passed onto the event handler.
+		/// This is equivalent to the MSFS Gauge API function `trigger_key_event_EX1()` and similar to `SimConnect_TransmitClientEvent_EX1()` (MSFS SU10 and above).
+		/// \param keyEventId Numeric ID of the Event to trigger. These are found in the header file 'MSFS/Legacy/gauges.h'. Event names can be resolved to IDs using the `lookup()` method.
+		/// \param v1-v5 Optional values to pass to the event handler. Defaults are all zeros (same as for `trigger_key_event_EX1()`).
+		/// \return `S_OK` on success, `E_NOT_CONNECTED` if not connected to server, `E_TIMEOUT` on server communication failure, or `E_FAIL` on unexpected SimConnect error.
+		/// \note Server responds asynchronously with an Ack/Nak resonse to `CommandId::SendKey` command type; A Nak means the event ID is not valid.
+		/// \since v1.1.0
+		HRESULT sendKeyEvent(uint32_t keyEventId, uint32_t v1 = 0, uint32_t v2 = 0, uint32_t v3 = 0, uint32_t v4 = 0, uint32_t v5 = 0) const;
+
+		/// Trigger a simulator Key Event by name, with up to 5 optional values which are passed onto the event handler.
+		/// This is equivalent to the MSFS Gauge API function `trigger_key_event_EX1()` and similar to `SimConnect_TransmitClientEvent_EX1()` (MSFS SU10 and above).
+		///
+		/// Note that on first usage the event name is resolved to an ID (using the `lookup()` method) and the resulting ID (if valid) is cached for future uses.
+		/// The cache is kept as a simple `std::unordered_map` type, so if you have a better way to save the event IDs from `lookup()`, use that and call the `sendKeyEvent(uint32_t keyEventId, ...)` overload directly.
+		/// \param keyEventName Name of the Event to trigger. These are typically the same names found in MSFS Event IDs reference (and as lited in the header file 'MSFS/Legacy/gauges.h' but w/out the "KEY_" prefix).
+		/// \param v1-v5 Optional values to pass to the event handler. Defaults are all zeros (same as for `trigger_key_event_EX1()`).
+		/// \return `S_OK` on success, `E_INVALIDARG` if event name could not be resolved to an ID, `E_NOT_CONNECTED` if not connected to server, `E_TIMEOUT` on server communication failure, or `E_FAIL` on unexpected SimConnect error.
+		/// \note Server responds asynchronously with an Ack resonse to `CommandId::SendKey` command type.
+		/// \since v1.1.0
+		HRESULT sendKeyEvent(const std::string &keyEventName, uint32_t v1 = 0, uint32_t v2 = 0, uint32_t v3 = 0, uint32_t v4 = 0, uint32_t v5 = 0);
+
+
 		// Meta data retrieval --------------------------------
 
 		/// Send a request for a list update to the server. The results are delivered using the callback set in `setListResultsCallback()`.
