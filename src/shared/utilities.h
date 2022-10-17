@@ -76,7 +76,8 @@ namespace WASimCommander {
 	static const char CDA_NAME_CMD_PFX[]    = WSMCMND_COMMON_NAME_PREFIX WSMCMND_CDA_NAME_COMMAND ".";   // + 8 char client name
 	static const char CDA_NAME_RESP_PFX[]   = WSMCMND_COMMON_NAME_PREFIX WSMCMND_CDA_NAME_RESPONSE ".";  // + 8 char client name
 	static const char CDA_NAME_LOG_PFX[]    = WSMCMND_COMMON_NAME_PREFIX WSMCMND_CDA_NAME_LOG ".";       // + 8 char client name
-	static const char CDA_NAME_DATA_PFX[]   = WSMCMND_COMMON_NAME_PREFIX WSMCMND_CDA_NAME_DATA ".";      // + 8 char client name + "." + request ID (0-65535)
+	static const char CDA_NAME_DATA_PFX[]   = WSMCMND_COMMON_NAME_PREFIX WSMCMND_CDA_NAME_DATA ".";      // + 8 char client name [+ "." + request ID (0-65535)]
+	static const char CDA_NAME_KEYEV_PFX[]  = WSMCMND_COMMON_NAME_PREFIX WSMCMND_CDA_NAME_KEYEVENT ".";  // + 8 char client name
 
 	static bool isIndexedVariableType(const char type) {
 		static const std::vector<char> VAR_TYPES_INDEXED    = { 'A', 'L', 'T' };

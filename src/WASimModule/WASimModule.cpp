@@ -79,7 +79,7 @@ enum class ClientStatus : uint8_t
 
 enum class RecordType : uint8_t
 {
-	Unknown, CommandData, RequestData
+	Unknown, CommandData, RequestData, KeyEventData
 };
 #pragma endregion Enums
 
@@ -174,6 +174,7 @@ struct Client
 	DWORD cddID_response = 0;
 	DWORD cddID_request = 0;
 	DWORD cddID_log = 0;
+	DWORD cddID_keyEvent = 0;
 	// request and custom event tracking
 	requestMap_t requests {};
 	clientEventMap_t events {};
@@ -371,7 +372,7 @@ bool registerClientCommandDataAreas(const Client *c)
 
 bool registerClientRequestDataArea(const Client *c)
 {
-	// DataRequest area is  named "WASimCommander.Data.<client_name>; client can write to this.
+	// DataRequest area is  named "WASimCommander.Data.<client_name>"; client can write to this.
 	const string cdaName(CDA_NAME_DATA_PFX + c->name);
 	if FAILED(SimConnectHelper::registerDataArea(g_hSimConnect, cdaName, c->cddID_request, c->cddID_request, sizeof(DataRequest), false))
 		return false;
@@ -381,9 +382,21 @@ bool registerClientRequestDataArea(const Client *c)
 	return SUCCEEDED(INVOKE_SIMCONNECT(RequestClientData, g_hSimConnect, c->cddID_request, c->cddID_request, c->cddID_request, SIMCONNECT_CLIENT_DATA_PERIOD_ON_SET, 0UL, 0UL, 0UL, 0UL));
 }
 
+bool registerClientKeyEventDataArea(const Client *c)
+{
+	// DataRequest area is  named "WASimCommander.KeyEvent.<client_name>"; client can write to this.
+	const string cdaName(CDA_NAME_KEYEV_PFX + c->name);
+	if FAILED(SimConnectHelper::registerDataArea(g_hSimConnect, cdaName, c->cddID_keyEvent, c->cddID_keyEvent, sizeof(KeyEvent), false))
+		return false;
+	LOG_DBG << "Created CDA ID " << c->cddID_keyEvent << " named " << quoted(cdaName) << " of size " << sizeof(KeyEvent);
+
+	// Listen for key events
+	return SUCCEEDED(INVOKE_SIMCONNECT(RequestClientData, g_hSimConnect, c->cddID_keyEvent, c->cddID_keyEvent, c->cddID_keyEvent, SIMCONNECT_CLIENT_DATA_PERIOD_ON_SET, 0UL, 0UL, 0UL, 0UL));
+}
+
 bool registerClientLogDataArea(const Client *c)
 {
-	// Log area is  named "WASimCommander.Log.<client_name>; read-only for client
+	// Log area is  named "WASimCommander.Log.<client_name>"; read-only for client
 	const string cdaName(CDA_NAME_LOG_PFX + c->name);
 	if FAILED(SimConnectHelper::registerDataArea(g_hSimConnect, cdaName, c->cddID_log, c->cddID_log, sizeof(LogRecord), false))
 		return false;
@@ -393,7 +406,7 @@ bool registerClientLogDataArea(const Client *c)
 
 bool registerClientVariableDataArea(const Client *c, uint32_t areaId, uint32_t dataId, DWORD dataAreaSize, DWORD sizeOrType)
 {
-	// Individual variable value data areas are named "WASimCommander.Data.<client_name>.<areaId>; read-only for client
+	// Individual variable value data areas are named "WASimCommander.Data.<client_name>.<areaId>"; read-only for client
 	const string cdaName(CDA_NAME_DATA_PFX + c->name + '.' + to_string(areaId));
 	if FAILED(SimConnectHelper::registerDataArea(g_hSimConnect, cdaName, dataId, dataId, sizeOrType, false))
 		return false;
@@ -442,16 +455,20 @@ Client *getOrCreateClient(uint32_t clientId)
 	c.cddID_command = g_nextClienDataId++;
 	c.cddID_response = g_nextClienDataId++;
 	c.cddID_request = g_nextClienDataId++;
+	c.cddID_keyEvent = g_nextClienDataId++;
 
-	// register the command, response, and data request areas for this client with SimConnect; dispose client if that fails.
-	if (!registerClientCommandDataAreas(&c) || !registerClientRequestDataArea(&c))
-		return nullptr;
+	// register all data areas for this client with SimConnect
+	if (!registerClientCommandDataAreas(&c))
+		return nullptr;  // dispose client on failure
+	registerClientRequestDataArea(&c);
+	registerClientKeyEventDataArea(&c);
 
 	// move client record into map
 	Client *pC = &g_mClients.emplace(clientId, move(c)).first->second;
 	// save mappings of the command and request data IDs (which SimConnect sends us) to the client record; for lookup in message dispatch.
 	g_mDefinitionIds.emplace(piecewise_construct, forward_as_tuple(c.cddID_command), forward_as_tuple(RecordType::CommandData, pC));  // no try_emplace?
 	g_mDefinitionIds.emplace(piecewise_construct, forward_as_tuple(c.cddID_request), forward_as_tuple(RecordType::RequestData, pC));
+	g_mDefinitionIds.emplace(piecewise_construct, forward_as_tuple(c.cddID_keyEvent), forward_as_tuple(RecordType::KeyEventData, pC));
 
 	LOG_INF << "Created new Client with name " << pC->name << " from ID " << clientId;
 	return pC;
@@ -1355,6 +1372,16 @@ void sendKeyEvent(const Client *c, const Command *const cmd)
 	sendAckNak(c, *cmd, false, "Named Key Event not found.");
 }
 
+void sendKeyEvent(const Client *c, const KeyEvent *const kev)
+{
+	if (kev->eventId > KEY_NULL) {
+		trigger_key_event_EX1(kev->eventId, kev->values[0], kev->values[1], kev->values[2], kev->values[3], kev->values[4]);
+		sendAckNak(c, CommandId::SendKey, true, kev->token);
+		return;
+	}
+	sendAckNak(c, CommandId::SendKey, false, kev->token, "Invalid Key Event ID.");
+}
+
 #pragma endregion Command Handlers
 
 //----------------------------------------------------------------------------
@@ -1527,28 +1554,39 @@ void CALLBACK dispatchMessage(SIMCONNECT_RECV* pData, DWORD cbData, void*)
 			else if (!connectClient(c))  // assume client wants to re-connect if they're not already
 				break;  // unlikely
 
-
 			const size_t dataSize = (size_t)pData->dwSize + 4 - sizeof(SIMCONNECT_RECV_CLIENT_DATA);  // dwSize reports 4 bytes less than actual size of SIMCONNECT_RECV_CLIENT_DATA
-			if (dr->type == RecordType::CommandData) {
-				// be paranoid
-				if (dataSize != sizeof(Command)) {
-					LOG_CRT << "Invalid Command struct data size! Expected " << sizeof(Command) << " but got " << dataSize;
+			switch (dr->type) {
+				case RecordType::CommandData:
+					// dwData should be our Command struct, but be paranoid
+					if (dataSize != sizeof(Command)) {
+						LOG_CRT << "Invalid Command struct data size! Expected " << sizeof(Command) << " but got " << dataSize;
+						return;
+					}
+					processCommand(c, reinterpret_cast<const Command *const>(&data->dwData));
+					break;
+
+				case RecordType::KeyEventData:
+					// dwData should be our KeyEvent struct, but be paranoid
+					if (dataSize != sizeof(KeyEvent)) {
+						LOG_CRT << "Invalid KeyEvent struct data size! Expected " << sizeof(KeyEvent) << " but got " << dataSize;
+						return;
+					}
+					sendKeyEvent(c, reinterpret_cast<const KeyEvent *const>(&data->dwData));
+					break;
+
+				case RecordType::RequestData:
+					// dwData should be our DataRequest struct, but be paranoid
+					if (dataSize != sizeof(DataRequest)) {
+						LOG_CRT << "Invalid DataRequest struct data size! Expected " << sizeof(DataRequest) << " but got " << dataSize;
+						return;
+					}
+					if (addOrUpdateRequest(c, reinterpret_cast<const DataRequest *const>(&data->dwData)) && !g_triggersRegistered)
+						registerTriggerEvents();  // start update loop
+					break;
+
+				default:
+					LOG_ERR << "Unrecognized data record type: " << (int)dr->type << " in: " << LOG_SC_RCV_CLIENT_DATA(data);
 					return;
-				}
-				// dwData is our command struct
-				processCommand(c, reinterpret_cast<const Command *const>(&data->dwData));
-			}
-			else if (dr->type == RecordType::RequestData) {
-				// be paranoid
-				if (dataSize != sizeof(DataRequest)) {
-					LOG_CRT << "Invalid DataRequest struct data size! Expected " << sizeof(DataRequest) << " but got " << dataSize;
-					return;
-				}
-				if (addOrUpdateRequest(c, reinterpret_cast<const DataRequest *const>(&data->dwData)) && !g_triggersRegistered)
-					registerTriggerEvents();  // start update loop
-			}
-			else {
-				LOG_ERR << "Unrecognized data record type: " << (int)dr->type << " in: " << LOG_SC_RCV_CLIENT_DATA(data);
 			}
 			break;
 		}  // SIMCONNECT_RECV_ID_CLIENT_DATA
@@ -1658,48 +1696,3 @@ MSFS_CALLBACK void module_deinit(void)
 #pragma endregion Core
 
 }  // extern "C"
-
-/*
-void struct_info() {
-	const DataRequest s1(-1);
-	const DataRequest s2(-1);
-	DataRequest *ps1 = new DataRequest(-1);
-	DataRequest *ps2 = new DataRequest(-1);
-
-	LOG_DBG << "Size of DataRequest: " << sizeof(struct DataRequest);
-	LOG_DBG << "space between 2 stack structs: " << (long)(&s2) - (long)(&s1);
-	LOG_DBG << "space between 2 heap  structs: " << (long)ps2 - (long)ps1;
-
-	LOG_DBG << setw(18) << "Base address: "   <<                (void*)&s1;
-	LOG_DBG << setw(18) << "requestId: "      <<      (void*)&s1.requestId;
-	LOG_DBG << setw(18) << "valueSize: "      <<      (void*)&s1.valueSize;
-	LOG_DBG << setw(18) << "deltaEpsilon: "   <<   (void*)&s1.deltaEpsilon;
-	LOG_DBG << setw(18) << "interval: "       <<       (void*)&s1.interval;
-	LOG_DBG << setw(18) << "period: "         <<         (void*)&s1.period;
-	LOG_DBG << setw(18) << "requestType: "    <<    (void*)&s1.requestType;
-	LOG_DBG << setw(18) << "calcResultType: " << (void*)&s1.calcResultType;
-	LOG_DBG << setw(18) << "simVarIndex: "    <<    (void*)&s1.simVarIndex;
-	LOG_DBG << setw(18) << "varTypePrefix: "  <<  (void*)&s1.varTypePrefix;
-	LOG_DBG << setw(18) << "nameOrCode: "     <<  (void*)&s1.nameOrCode[0];
-	LOG_DBG << setw(18) << "unitName: "       <<    (void*)&s1.unitName[0];
-
-	delete ps1;
-	delete ps2;
-}
-// test output as of v1, 06-12-22:
-// Size of DataRequest: 1088
-// space between 2 stack structs: -1088
-// space between 2 heap  structs: 1104
-//     Base address: 0x23650
-//        requestId: 0x23650
-//        valueSize: 0x23654
-//     deltaEpsilon: 0x23658
-//         interval: 0x2365c
-//           period: 0x23660
-//      requestType: 0x23661
-//   calcResultType: 0x23662
-//      simVarIndex: 0x23662
-//    varTypePrefix: 0x23663
-//       nameOrCode: 0x23664
-//         unitName: 0x23a6b
-*/

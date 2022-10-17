@@ -37,9 +37,10 @@ and are available at <http://www.gnu.org/licenses/>.
 #define WSMCMND_COMMON_NAME_PREFIX  WSMCMND_PROJECT_NAME "."   ///< common prefix for all event and data area names
 #define WSMCMND_EVENT_NAME_CONNECT  "Connect"    ///< Initial connection event for all clients: "WASimCommander.Connect"
 #define WSMCMND_EVENT_NAME_PING     "Ping"       ///< Ping event for all clients ("WASimCommander.Ping") and prefix for response event ("WASimCommander.Ping.<client_name>")
-#define WSMCMND_CDA_NAME_COMMAND    "Command"    ///< Data area name prefix for `Command` and `DataRequest` data sent to Server: "WASimCommander.Command.<client_name>"
+#define WSMCMND_CDA_NAME_COMMAND    "Command"    ///< Data area name prefix for `Command` data sent to Server: "WASimCommander.Command.<client_name>"
 #define WSMCMND_CDA_NAME_RESPONSE   "Response"   ///< Data area name prefix for `Command` data sent to Client: "WASimCommander.Response.<client_name>"
-#define WSMCMND_CDA_NAME_DATA       "Data"       ///< Data area name prefix for data value updates sent to Client: "WASimCommander.Data.<client_name>.<request_id>"
+#define WSMCMND_CDA_NAME_DATA       "Data"       ///< Data area name prefix for `DataRequest` data sent to Server ("WASimCommander.Data.<client_name>") and data value updates sent to Client: "WASimCommander.Data.<client_name>.<request_id>"
+#define WSMCMND_CDA_NAME_KEYEVENT   "KeyEvent"   ///< Data area name prefix for `KeyEvent` data sent to Client: "WASimCommander.KeyEvent.<client_name>"  \since v1.1.0
 #define WSMCMND_CDA_NAME_LOG        "Log"        ///< Data area name prefix for `LogRecord` data sent to Client: "WASimCommander.Log.<client_name>"
 
 /// WASimCommander main namespace. Defines constants and structs used in Client-Server interactions. Many of these are needed for effective use of `WASimClient`,
@@ -96,7 +97,7 @@ namespace WASimCommander
 	/// Command data structure. The member contents depend on the command type as described in each command type of the `Enums::CommandId` enum documentation. \sa Enums::CommandId enum
 	struct WSMCMND_API Command
 	{
-		uint32_t token;                ///< A unique ID for this command instance. Echoed back by server in command responses. Optional use for Client implementations.
+		uint32_t token;                ///< A unique ID for this command instance. Echoed back by server in command responses. Optional use for client implementations.
 		uint32_t uData;                ///< DWORD command parameter value, meaning depends on the command being issued.
 		double fData;                  ///< double-precision floating point command parameter value, meaning depends on the command being issued.
 		WSE::CommandId commandId;      ///< What to do. \sa CommandId
@@ -202,6 +203,40 @@ namespace WASimCommander
 				return os << "; type: Named; name: " << std::quoted(r.nameOrCode) << "; unit: " << std::quoted(r.unitName) << "; varType: '" << r.varTypePrefix << "'; varIndex: " << r.simVarIndex << '}';
 			const char *typeName = (size_t)r.calcResultType < WSE::CalcResultTypeNames.size() ? WSE::CalcResultTypeNames.at((size_t)r.calcResultType) : "Invalid";
 			return os << "; type: Calculated; code: " << std::quoted(r.nameOrCode) << " resultType: " << typeName << '}';
+		}
+	};
+
+	/// Data structure for sending Key Events to the sim with up to 5 event values. Events are specified using numeric MSFS Event IDs (names can be resolved to IDs via `Lookup` command).
+	/// This supports the new functionality in MSFS SU10 with `trigger_key_event_EX1()` Gauge API function (similar to `SimConnect_TransmitClientEvent_EX1()`).
+	/// The server will respond with an Ack/Nak for a `SendKey` command, echoing the given `token`. For events with zero or one value, the `SendKey` command can be used instead.
+	/// \since v1.1.0  \sa Enums::CommandId::SendKey, Enums::CommandId::Lookup
+	struct WSMCMND_API KeyEvent
+	{
+		uint32_t eventId;              ///< The event ID to trigger. Value is one of `KEY_*` macro values in MSFS/Legacy/gauges.h. Event names can be resolved to IDs via `Lookup` command.
+		uint32_t values[5] = {0};      ///< Up to 5 values to pass to the event handler. All are optional, defaults are zero.
+		uint32_t token;                ///< A unique ID for this event trigger. Echoed back by server in command Ack/Nak responses. Optional use for client implementations.
+		uint32_t reserved;             ///< Padding for alignment, unused.
+		                               //  32/32 B (packed/unpacked), 8/16 B aligned
+
+		/// Default constructor with all parameters optional. The `values` initializer list may contain up to 5 members (any additional are ignored).
+		explicit KeyEvent(uint32_t eventId = 0, std::initializer_list<uint32_t> values = {}, uint32_t token = 0) :
+			eventId(eventId), token(token)
+		{
+			short i = 0;
+			for (const uint32_t v : values) {
+				this->values[i++] = v;
+				if (i > 4)
+					break;
+			}
+		}
+
+		/// `ostream` operator for logging purposes
+		friend inline std::ostream& operator<<(std::ostream& os, const KeyEvent &c)
+		{
+			os << "KeyEvent{eventId: " << c.eventId << "; token: " << c.token << ';';
+			for (short i=0; i < 5; ++i)
+				os << " v" << i << ": " << c.values[i] << ';';
+			return os << '}';
 		}
 	};
 
