@@ -93,8 +93,18 @@ public:
 		client->setLogCallback([=](const LogRecord &l, LogSource s) { emit q->logMessageReady(l, +s); });
 	}
 
+	bool checkConnected()
+	{
+		if (client->isConnected())
+			return true;
+		logUiMessage(tr("Server not connected."), CommandId::Nak);
+		return false;
+	}
+
 	void runCalcCode()
 	{
+		if (!checkConnected())
+			return;
 		if (ui->cbCalculatorCode->currentText().isEmpty()) {
 			logUiMessage(tr("Calculator string is empty."), CommandId::Exec);
 			return;
@@ -132,6 +142,8 @@ public:
 
 	void lookupItem()
 	{
+		if (!checkConnected())
+			return;
 		const QString &varName = ui->cbLookupName->currentText();
 		if (varName.isEmpty()) {
 			logUiMessage(tr("Lookup item name is empty."), CommandId::Lookup);
@@ -147,6 +159,8 @@ public:
 
 	void getLocalVar()
 	{
+		if (!checkConnected())
+			return;
 		const char vtype = ui->cbGetSetVarType->currentData().toChar().toLatin1();
 		const QString &varName = vtype == 'L' ? ui->cbLvars->currentText() : ui->cbVariableName->currentText();
 		if (varName.isEmpty()) {
@@ -185,12 +199,31 @@ public:
 		ui->cbValueSize->setCurrentData(+QMetaType::Double);
 	}
 
-	void sendCommandForm()
+	void sendKeyEventForm()
 	{
-		if (!client->isConnected()) {
-			logUiMessage(tr("Not connected to server, cannot send command."), CommandId::Nak);
+		if (!checkConnected())
+			return;
+		if (ui->cbKeyEvent->currentText().isEmpty())  {
+			logUiMessage(tr("Key Event Name/ID field is empty, nothing to send."), CommandId::Nak);
 			return;
 		}
+		bool ok;
+		quint32 keyId = ui->cbKeyEvent->currentText().toUInt(&ok);
+		if (ok) {
+			if (!keyId) {
+				logUiMessage(tr("Invalid Key Event ID."), CommandId::Nak);
+				return;
+			}
+			client->sendKeyEvent(keyId, (uint32_t)ui->sbKeyEvent_v1->value(), (uint32_t)ui->sbKeyEvent_v2->value(), (uint32_t)ui->sbKeyEvent_v3->value(), (uint32_t)ui->sbKeyEvent_v4->value(), (uint32_t)ui->sbKeyEvent_v5->value());
+			return;
+		}
+		client->sendKeyEvent(ui->cbKeyEvent->currentText().toStdString(), (uint32_t)ui->sbKeyEvent_v1->value(), (uint32_t)ui->sbKeyEvent_v2->value(), (uint32_t)ui->sbKeyEvent_v3->value(), (uint32_t)ui->sbKeyEvent_v4->value(), (uint32_t)ui->sbKeyEvent_v5->value());
+	}
+
+	void sendCommandForm()
+	{
+		if (!checkConnected())
+			return;
 		Command cmd((CommandId)ui->cbCommandId->currentData().toUInt(), ui->sbCmdUData->value(), qPrintable(ui->leCmdSData->text()), ui->sbCmdFData->value(), nextCmdToken++);
 		client->sendCommand(cmd);
 	}
@@ -332,10 +365,8 @@ public:
 
 	void updateSelectedRequests()
 	{
-		if (!client->isConnected()) {
-			logUiMessage("Server not connected, cannot request updates.", CommandId::Update);
+		if (!checkConnected())
 			return;
-		}
 		const QModelIndexList list = reqModel->flattenIndexList(ui->requestsView->selectionModel()->selectedIndexes());
 		for (const QModelIndex &idx : list)
 			client->updateDataRequest(reqModel->requestId(idx.row()));
@@ -448,10 +479,8 @@ public:
 
 	void transmitSelectedEvents()
 	{
-		if (!client->isConnected()) {
-			logUiMessage("Server not connected, cannot transmit event.", CommandId::Transmit);
+		if (!checkConnected())
 			return;
-		}
 		const QModelIndexList list = eventsModel->flattenIndexList(ui->eventsView->selectionModel()->selectedIndexes());
 		for (const QModelIndex &idx : list)
 			client->transmitEvent(eventsModel->eventId(idx.row()));
@@ -849,8 +878,15 @@ WASimUI::WASimUI(QWidget *parent) :
 	});
 
 
+	// Send Key Event action
+	QAction *sendKeyEventAct = new QAction(QIcon(QStringLiteral("send.glyph")), tr("Send Key Event"), this);
+	sendKeyEventAct->setToolTip(tr("Send the specified Key Event to the server."));
+	connect(sendKeyEventAct, &QAction::triggered, this, [this]() { d->sendKeyEventForm(); });
+	ui.btnKeyEventSend->setDefaultAction(sendKeyEventAct);
+
+
 	// Send Command action
-	QAction *sendCmdAct = new QAction(QIcon(QStringLiteral("send.glyph")), tr("Send Command"), this);
+	QAction *sendCmdAct = new QAction(QIcon(QStringLiteral("keyboard_command_key.glyph")), tr("Send Command"), this);
 	sendCmdAct->setToolTip(tr("Send the selected Command to the server."));
 	connect(sendCmdAct, &QAction::triggered, this, [this]() { d->sendCommandForm(); });
 	ui.btnCmdSend->setDefaultAction(sendCmdAct);
@@ -1133,7 +1169,7 @@ WASimUI::WASimUI(QWidget *parent) :
 	// show window
 	show();
 	// set up default window geometry.. because automatic isn't good enough
-	resize(1130, 940);
+	resize(1130, 960);
 	resizeDocks({ ui.dwLog }, { 270 }, Qt::Vertical);
 	// now restore any saved settings
 	d->readSettings();

@@ -7,8 +7,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1485</width>
-    <height>853</height>
+    <width>1545</width>
+    <height>858</height>
    </rect>
   </property>
   <property name="contextMenuPolicy">
@@ -871,7 +871,7 @@
      </widget>
     </item>
     <item row="4" column="0">
-     <widget class="QWidget" name="widget" native="true">
+     <widget class="QWidget" name="wCommand" native="true">
       <layout class="QGridLayout" name="gridLayout_8">
        <property name="leftMargin">
         <number>2</number>
@@ -939,7 +939,7 @@
        <item row="1" column="7">
         <widget class="QLineEdit" name="leCmdSData">
          <property name="toolTip">
-          <string>String data for command's `sData` member.</string>
+          <string>String value for command's `sData` member.</string>
          </property>
          <property name="maxLength">
           <number>512</number>
@@ -962,7 +962,7 @@
        <item row="1" column="3">
         <widget class="QSpinBox" name="sbCmdUData">
          <property name="toolTip">
-          <string>Integer data for command's `uData` field.</string>
+          <string>Integer value for command's `uData` field.</string>
          </property>
          <property name="minimum">
           <number>-999999999</number>
@@ -987,7 +987,7 @@
           </font>
          </property>
          <property name="toolTip">
-          <string>Look up the ID of a named variable or unit.</string>
+          <string>&lt;p&gt;Send any command to the WASimModule server.&lt;/p&gt;&lt;p&gt;(Familiarity with the WASimCommander API is necessary for this to be particularly useful.)&lt;/p&gt;</string>
          </property>
          <property name="text">
           <string>Command</string>
@@ -1497,6 +1497,200 @@
       </layout>
      </widget>
     </item>
+    <item row="3" column="0">
+     <widget class="QWidget" name="wKeyEvent" native="true">
+      <layout class="QGridLayout" name="gridLayout_9">
+       <property name="leftMargin">
+        <number>2</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>2</number>
+       </property>
+       <property name="bottomMargin">
+        <number>2</number>
+       </property>
+       <property name="verticalSpacing">
+        <number>5</number>
+       </property>
+       <item row="1" column="6">
+        <widget class="QSpinBox" name="sbKeyEvent_v4">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="toolTip">
+          <string>Integer data for fourth event value.</string>
+         </property>
+         <property name="minimum">
+          <number>-999999999</number>
+         </property>
+         <property name="maximum">
+          <number>999999999</number>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="2">
+        <widget class="QLabel" name="lblKeyEventValues">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string>Values:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="5">
+        <widget class="QSpinBox" name="sbKeyEvent_v3">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="toolTip">
+          <string>Integer data for third event value.</string>
+         </property>
+         <property name="minimum">
+          <number>-999999999</number>
+         </property>
+         <property name="maximum">
+          <number>999999999</number>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="3">
+        <widget class="QSpinBox" name="sbKeyEvent_v1">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="toolTip">
+          <string>Integer data for first event value.</string>
+         </property>
+         <property name="minimum">
+          <number>-999999999</number>
+         </property>
+         <property name="maximum">
+          <number>999999999</number>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="8">
+        <widget class="QToolButton" name="btnKeyEventSend">
+         <property name="text">
+          <string>Send</string>
+         </property>
+         <property name="toolButtonStyle">
+          <enum>Qt::ToolButtonIconOnly</enum>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="4">
+        <widget class="QSpinBox" name="sbKeyEvent_v2">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="toolTip">
+          <string>Integer data for second event value.</string>
+         </property>
+         <property name="minimum">
+          <number>-999999999</number>
+         </property>
+         <property name="maximum">
+          <number>999999999</number>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="lblKeyEvent">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="font">
+          <font>
+           <family>Segoe UI</family>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="toolTip">
+          <string>Send a Key Event to the simulator with up to 5 optional values.</string>
+         </property>
+         <property name="text">
+          <string>Trigger Key Event</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0" colspan="9">
+        <widget class="Line" name="line_3">
+         <property name="frameShadow">
+          <enum>QFrame::Plain</enum>
+         </property>
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="WASimUiNS::DeletableItemsComboBox" name="cbKeyEvent">
+         <property name="focusPolicy">
+          <enum>Qt::ClickFocus</enum>
+         </property>
+         <property name="toolTip">
+          <string>Event ID or Name or send. Names are listed in MSFS Event IDs reference, IDs can be found using the Lookup command.</string>
+         </property>
+         <property name="editable">
+          <bool>true</bool>
+         </property>
+         <property name="maxVisibleItems">
+          <number>25</number>
+         </property>
+         <property name="insertPolicy">
+          <enum>QComboBox::InsertAtTop</enum>
+         </property>
+         <property name="placeholderText" stdset="0">
+          <string>Name or ID</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="7">
+        <widget class="QSpinBox" name="sbKeyEvent_v5">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="toolTip">
+          <string>Integer data for fifth event value.</string>
+         </property>
+         <property name="minimum">
+          <number>-999999999</number>
+         </property>
+         <property name="maximum">
+          <number>999999999</number>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
    </layout>
   </widget>
   <widget class="QDockWidget" name="dwRequests">
@@ -1752,6 +1946,7 @@
        <property name="font">
         <font>
          <family>Courier New</family>
+         <pointsize>9</pointsize>
         </font>
        </property>
        <property name="toolTip">

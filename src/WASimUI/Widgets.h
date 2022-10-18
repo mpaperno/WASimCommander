@@ -273,7 +273,7 @@ public:
 		addItem(tr("H: HTML"),     'H');
 		//addItem(tr("I: Instr."),   'I');  // only for gauge modules
 		addItem(tr("K: Key"),      'K');
-		addItem(tr("L: Local *"),  'L');
+		addItem(tr("L: Local"),    'L');
 		addItem(tr("M: Mouse"),    'M');
 		//addItem(tr("O: Comp."),    'O');  // only for gauge modules
 		//addItem(tr("R: Resource"), 'R');  // strings only, can't be read with "Get" command or set at all
@@ -288,6 +288,7 @@ public:
 class DeletableItemsComboBox : public DataComboBox
 {
 	Q_OBJECT
+	Q_PROPERTY(QString placeholderText READ placeholderText WRITE setPlaceholderText)
 public:
 	DeletableItemsComboBox(QWidget *p = nullptr) : DataComboBox(p)
 	{
@@ -349,6 +350,14 @@ public:
 			model()->sort(0);
 		if (currIdx == -1)
 			setCurrentIndex(currIdx);
+	}
+
+	QString placeholderText() const { return lineEdit() ? lineEdit()->placeholderText() : ""; }
+
+	void setPlaceholderText(const QString &text)
+	{
+		if (lineEdit())
+			lineEdit()->setPlaceholderText(text);
 	}
 
 };
