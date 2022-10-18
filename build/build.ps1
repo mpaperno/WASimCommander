@@ -1,20 +1,18 @@
 # valid -Targets are "all", "version", "source", "module", "package", "docs"
 # add "no-<target>" to exclude a target when building "all"
 # -Projects <list> to build individual projects only (eg. "WASimModule" or "Testing/CS_BasicConsole")
-# -Configuration <config>[,<config>]  (Debug/Debug-DLL/Release/Release-DLL)
+# -Configuration <config>[,<config>]  (Debug/Debug-DLL/Release/Release-DLL/Release-NetFW)
 # -BuildType <type>[,<type>]   (Clean/Build/Rebuild)
 
 [CmdletBinding(PositionalBinding=$false)]
 Param(
   [string[]]$Targets = "all",
   [string]$RootPath = "..",
-  [string[]]$Configuration = @("Debug", "Release-DLL", "Release"),
+  [string[]]$Configuration = @("Debug", "Release-DLL", "Release-NetFW", "Release"),
   [string]$Platform = "x64",
   [string[]]$Projects = "all",
   [string]$BuildType = "Clean,Rebuild",
   [switch]$Clean = $false,
-  [string]$MsvcVer = "v142",
-  [string]$MsvcName = "2019",
 	[string]$ZipUtil = "${Env:ProgramFiles}\7-Zip\7z.exe",
 	[string]$Doxygen = "D:\Programs\doxygen\bin\doxygen.exe"
 )
@@ -30,6 +28,7 @@ $BuildPath = "$SrcPath\build"
 $DocsPath = "$RootPath\docs"
 $DistPath = "$RootPath\dist"
 $PackagePath = "$DistPath\package"
+$LibPath = "$PackagePath\lib"
 $ModulePath = "${SrcPath}\WASimModule\WASimModuleProject\WASimCommander-Module\WASimCommander-Module.xml"
 $ModuleDest = "${DistPath}\module"
 $ModulePackage = "${PackagePath}\module"
@@ -122,33 +121,42 @@ if (-not $build.package) {
 
 Write-Output ("Copying files to $PackagePath ...")
 
-$libPath = "$PackagePath\lib\MSVS-${MsvcName}"
-$libStatic = "${libPath}\static"
-$libDynamic = "${libPath}\dynamic"
-$libManaged = "${libPath}\managed"
-
 # include folder
 robocopy "$SrcPath\include" "$PackagePath\include" $copyOptions /XF .* *.in
 if ($LastExitCode -ge 8) { Write-Output($LastExitCode); Exit 1  }
 
 # C++ libs
+$cppLibPath = "${LibPath}\MSVS-2019"
+$libStatic = "${cppLibPath}\static"
+$libDynamic = "${cppLibPath}\dynamic"
+
+# static, release and debug
 robocopy "$BuildPath\${CLIENT_NAME}\Release-$Platform" "$libStatic" $copyOptions
 if ($LastExitCode -ge 8) { Write-Output($LastExitCode); Exit 1  }
 robocopy "$BuildPath\${CLIENT_NAME}\Debug-$Platform" "$libStatic" $copyOptions /XF *.ini
 if ($LastExitCode -ge 8) { Write-Output($LastExitCode); Exit 1  }
+# dynamic, release and debug
 robocopy "$BuildPath\${CLIENT_NAME}\Release-DLL-$Platform" "$libDynamic" $copyOptions
 if ($LastExitCode -ge 8) { Write-Output($LastExitCode); Exit 1  }
 robocopy "$BuildPath\${CLIENT_NAME}\Debug-DLL-$Platform" "$libDynamic" $copyOptions /XF *.ini
 if ($LastExitCode -ge 8) { Write-Output($LastExitCode); Exit 1  }
+# license and readme
+robocopy "$SrcPath\${CLIENT_NAME}" "$cppLibPath" *.txt *.md $copyOptions
+if ($LastExitCode -ge 8) { Write-Output($LastExitCode); Exit 1  }
 
 # Managed DLL
-robocopy "$BuildPath\${CLIENT_NAME}_CLI\Release-$Platform" "$libManaged" *.dll *.xml *.ini $copyOptions
-if ($LastExitCode -ge 8) { Write-Output($LastExitCode); Exit 1  }
-robocopy "$BuildPath\${CLIENT_NAME}_CLI\Debug-$Platform" "$libManaged" *.dll $copyOptions
-if ($LastExitCode -ge 8) { Write-Output($LastExitCode); Exit 1  }
+$csLibPath = "${LibPath}\MSVS-2022\managed"
+$libNetN = "${csLibPath}\net6"
+$libNetFw = "${csLibPath}\netFw4"
 
-# libs licence and readme
-robocopy "$SrcPath\${CLIENT_NAME}" "$PackagePath\lib" *.txt *.md $copyOptions
+# .NET 6
+robocopy "$BuildPath\${CLIENT_NAME}_CLI\Release-$Platform" "$libNetN" *.dll *.pdb *.xml *.ini $copyOptions
+if ($LastExitCode -ge 8) { Write-Output($LastExitCode); Exit 1  }
+# .NET Framework
+robocopy "$BuildPath\${CLIENT_NAME}_CLI\Release-netfw-$Platform" "$libNetFw" *.dll *.pdb *.xml *.ini $copyOptions
+if ($LastExitCode -ge 8) { Write-Output($LastExitCode); Exit 1  }
+# license and readme
+robocopy "$SrcPath\${CLIENT_NAME}_CLI" "$csLibPath" *.txt *.md $copyOptions
 if ($LastExitCode -ge 8) { Write-Output($LastExitCode); Exit 1  }
 
 # Module
