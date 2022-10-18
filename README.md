@@ -65,7 +65,8 @@ On a more practical note, I am using it with the [MSFS Touch Portal Plugin](http
     - Registered events can be executed "natively" via _WASim API_ by simply sending a short command with the saved event ID.
     - Saved events can also be named and executed via standard SimConnect commands `SimConnect_MapClientEventToSimEvent(id, "event_name")` and `SimConnect_TransmitClientEvent(id)`.
     - Event names can be completely custom (including a `.` (period) as per SimConnect convention), or derive from the connected Client's name (to ensure uniqueness).
-- **Send Simulator "Key Events"** directly by ID (instead of going through the SimConnect mapping process or executing calculator code). Much more efficient than the other methods.
+- **Send Simulator "Key Events"** directly by ID or name (instead of going through the SimConnect mapping process or executing calculator code). Much more efficient than the other methods.
+    - **New in v1.1.0:** Send Key Events with up to 5 values (like the new `SimConnect_TransmitClientEvent_EX1()`).
 - **Remote Logging**: Log messages (errors, warnings, debug, etc) can optionally be sent to the Client, with specific minimum level (eg. only warnings and errros).
 - **Ping** the Server to check that the WASM module is installed and running before trying to connect or use its features.
 
@@ -165,15 +166,6 @@ Use [Discussions](https://github.com/mpaperno/WASimCommander/discussions) for an
 
 Most flight simulator forums seem fairly strict about _not_ using their site to provide product support. So please use GitHub,
 unless you're absolutely sure no rules would be broken or toes stepped upon otherwise.
-
--------------
-### Known Issues
-
-- Setting a Local Variable value with the `Set` command ignores any Unit specifier. This is due to a bug in the MSFS WASM library
-  preventing the corresponding _Gauge API_ function `set_named_variable_typed_value()` from being exported. 
-  See bug report at [devsupport.flightsimulator.com](https://devsupport.flightsimulator.com/questions/8604/env-wasm-set-named-variable-typed-value-not-found.html) 
-
-  You can stil use a unit specifier with L vars in calculaotor code. Though I've yet to find an instance where it makes any difference.
 
 -------------
 ### Credits

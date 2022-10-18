@@ -1,5 +1,34 @@
 # WASimCommander - Change Log
 
+## 1.1.0.0 (TBD)
+Updates for MSFS 2020 SU10 changes and new features.
+
+### WASimModule
+* Added new feature to trigger simulator Key Events with multiple value parameters (Gauge API `trigger_key_event_EX1()`).
+* Removed ability to get or set Local type variables with Unit specifiers (turns out MSFS hasn't supported this from the start).
+* Added Key Event lookup names for new KEY_PROP_FORCE_BETA_* events.
+* Added Token variable name lookups for CIRCUIT_NAVCOM4_ON and BREAKER_NAVCOM4.
+* Remove usage of deprecated `send_key_event()` for `SendKey` command in favor of `trigger_key_event_EX1()`.
+
+### WASimClient
+* Added `sendKeyEvent()` methods for sending simulator Key Events with up to 5 values, either by event ID or by name.
+* Unit type specifiers for getting/setting Local variables are ignored (no longer sent to the server even if provided in the method call).
+
+### WASimClient_CLI
+* Added `sendKeyEvent()` methods (see above).
+* Re-targeted for VS2022, VC v143 and .NET 6.0.
+* Added .NET Framework target.
+
+### WASimUI
+* Added new form for sending Key Events with up to 5 value parameters.
+* Added connected WASimModule (server) version number display.
+* Fixed that the calculation result display text field could not be cleared.
+
+---
+## 1.0.0.9 (unreleased)
+* No changes from 1.0.0.8-rc1.
+
+---
 ## 1.0.0.8-rc1 (2-Aug-2022)
 ### WASimClient (and dependents)
 * Fix possible SimConnect exception (Sim crash) when removing data request subscriptions. Seemed to only happen occasionally and when SimConnect was under load from other clients.
