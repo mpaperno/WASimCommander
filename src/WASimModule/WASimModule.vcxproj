@@ -65,7 +65,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_MSFS_WASM;_STRING_H_CPLUSPLUS_98_CONFORMANCE_;_WCHAR_H_CPLUSPLUS_98_CONFORMANCE_;_LIBCPP_NO_EXCEPTIONS;_LIBCPP_HAS_NO_THREADS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;__wasi__;_MSFS_WASM;_STRING_H_CPLUSPLUS_98_CONFORMANCE_;_WCHAR_H_CPLUSPLUS_98_CONFORMANCE_;_LIBCPP_NO_EXCEPTIONS;_LIBCPP_HAS_NO_THREADS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>
       </AdditionalIncludeDirectories>
@@ -74,7 +74,6 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <SupportJustMyCode />
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <CallingConvention>StdCall</CallingConvention>
       <AdditionalOptions>-Wno-ignored-attributes -Wno-macro-redefined -Wno-unused-function -Wno-c++17-extensions /Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
@@ -94,7 +93,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_MSFS_WASM;_STRING_H_CPLUSPLUS_98_CONFORMANCE_;_WCHAR_H_CPLUSPLUS_98_CONFORMANCE_;_LIBCPP_NO_EXCEPTIONS;_LIBCPP_HAS_NO_THREADS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;__wasi__;_MSFS_WASM;_STRING_H_CPLUSPLUS_98_CONFORMANCE_;_WCHAR_H_CPLUSPLUS_98_CONFORMANCE_;_LIBCPP_NO_EXCEPTIONS;_LIBCPP_HAS_NO_THREADS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>
       </AdditionalIncludeDirectories>
@@ -102,8 +101,7 @@
       <ExceptionHandling>false</ExceptionHandling>
       <DebugInformationFormat />
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <CallingConvention>StdCall</CallingConvention>
-      <AdditionalOptions>-Wno-ignored-attributes -Wno-macro-redefined -Wno-unused-function -Wno-c++17-extensions /Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>-Wno-ignored-attributes -Wno-macro-redefined -Wno-unused-function -Wno-c++17-extensions /Zc:__cplusplus /clang:-O1 %(AdditionalOptions)</AdditionalOptions>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
     <Link>
