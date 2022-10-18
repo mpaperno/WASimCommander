@@ -85,7 +85,7 @@ namespace WASimCommander {
 	}
 
 	static bool isUnitBasedVariableType(const char type) {
-		static const std::vector<char> VAR_TYPES_UNIT_BASED = { 'A', 'C', 'E', 'L', 'P' };
+		static const std::vector<char> VAR_TYPES_UNIT_BASED = { 'A', 'C', 'E', 'P' };
 		return find(VAR_TYPES_UNIT_BASED.cbegin(), VAR_TYPES_UNIT_BASED.cend(), type) != VAR_TYPES_UNIT_BASED.cend();
 	}
 

@@ -634,10 +634,7 @@ bool getNamedVariableValue(char varType, calcResult_t &result)
 		case 'L':
 			if (result.varId < 0)
 				return false;
-			if (result.unitId > -1)
-				result.setF(get_named_variable_typed_value(result.varId, result.unitId));
-			else
-				result.setF(get_named_variable_value(result.varId));
+			result.setF(get_named_variable_value(result.varId));
 			break;
 
 		case 'A':
@@ -756,33 +753,34 @@ int getVariableId(char varType, const char *name, bool createLocal = false)
 
 // Parse a command string to find a variable name/unit/index and populates the respective reference params.
 // Lookups are done on var names, depending on varType, and unit strings, to attempt conversion to IDs.
-// Used by setVariable() and getVariable()
-bool parseVariableString(const char varType, const char *data, ID &varId, ENUM &unitId, uint8_t &varIndex, bool createLocal = false, string *varName = nullptr)
+// Used by setVariable() and getVariable(). Only handles A/L/T var types (not needed for others).
+bool parseVariableString(const char varType, const char *data, ID &varId, bool createLocal, ENUM *unitId = nullptr, uint8_t *varIndex = nullptr, string *varName = nullptr)
 {
 	string_view svVar(data, strlen(data)), svUnit{};
 
-	if (varType != 'T') {
+	if (varType == 'A') {
 		// Check for unit type after variable name/id and comma
 		const size_t idx = svVar.find(',');
 		if (idx != string::npos) {
 			svUnit = svVar.substr(idx + 1);
 			svVar.remove_suffix(svVar.size() - idx);
 		}
+		// check for index value at end of SimVar name/ID
+		if (svVar.size() > 3) {
+			const string_view &svIndex = svVar.substr(svVar.size() - 3);
+			const size_t idx = svIndex.find(':');
+			if (idx != string::npos) {
+				// strtoul returns zero if conversion fails, which works fine since zero is not a valid simvar index
+				if (varIndex)
+					*varIndex = strtoul(svIndex.data() + idx + 1, nullptr, 10);
+				svVar.remove_suffix(3 - idx);
+			}
+		}
 	}
 	// empty variable name/id is invalid
 	if (svVar.empty())
 		return false;
 
-	// check for index value at end of SimVar name/ID
-	if (varType == 'A' && svVar.size() > 3) {
-		const string_view &svIndex = svVar.substr(svVar.size() - 3);
-		const size_t idx = svIndex.find(':');
-		if (idx != string::npos) {
-			// strtoul returns zero if conversion fails, which works fine since zero is not a valid simvar index
-			varIndex = strtoul(svIndex.data() + idx + 1, nullptr, 10);
-			svVar.remove_suffix(3 - idx);
-		}
-	}
 	if (varName)
 		*varName = string(svVar);
 	// Try to parse the remaining var name string as a numeric ID
@@ -794,13 +792,13 @@ bool parseVariableString(const char varType, const char *data, ID &varId, ENUM &
 	if (varId < 0)
 		return false;
 	// check for unit specification
-	if (!svUnit.empty()) {
+	if (unitId && !svUnit.empty()) {
 		// try to parse the string as a numeric ID
-		result = from_chars(svUnit.data(), svUnit.data() + svUnit.size(), unitId);
+		result = from_chars(svUnit.data(), svUnit.data() + svUnit.size(), *unitId);
 		// if number conversion failed, look up unit id
 		if (result.ec != errc()) {
-			unitId = get_units_enum(string(svUnit).c_str());  // this may also fail but unit ID is not "critical" (caller can decide what to do)
-			if (unitId < 0)
+			*unitId = get_units_enum(string(svUnit).c_str());  // this may also fail but unit ID is not "critical" (caller can decide what to do)
+			if (*unitId < 0)
 				LOG_WRN << "Could not resolve Unit ID from string " << quoted(data);
 		}
 	}
@@ -983,7 +981,7 @@ void getVariable(const Client *c, const Command *const cmd)
 	ENUM unitId{-1};
 	uint8_t varIndex{0};
 	string varName;
-	if (!parseVariableString(varType, data, varId, unitId, varIndex, (cmd->commandId == CommandId::GetCreate), &varName)) {
+	if (!parseVariableString(varType, data, varId, (cmd->commandId == CommandId::GetCreate), &unitId, &varIndex, &varName)) {
 		logAndNak(c, *cmd, ostringstream() << "Could not resolve Variable ID for Get command from string " << quoted(data));
 		return;
 	}
@@ -1021,17 +1019,11 @@ void setVariable(const Client *c, const Command *const cmd)
 	}
 
 	ID varId{-1};
-	ENUM unitId{-1};
-	uint8_t varIndex{0};
-	if (!parseVariableString(varType, data, varId, unitId, varIndex, (cmd->commandId == CommandId::SetCreate))) {
+	if (!parseVariableString(varType, data, varId, (cmd->commandId == CommandId::SetCreate))) {
 		logAndNak(c, *cmd, ostringstream() << "Could not resolve Variable ID for Set command from string " << quoted(data));
 		return;
 	}
-
-	if (unitId > -1)
-		set_named_variable_typed_value(varId, value, unitId);
-	else
-		set_named_variable_value(varId, value);
+	set_named_variable_value(varId, value);
 	sendAckNak(c, *cmd);
 }
 
@@ -1135,8 +1127,7 @@ bool addOrUpdateRequest(Client *c, const DataRequest *const req)
 	}
 
 	// setup response Command for Ack/Nak
-	Command resp(CommandId::Subscribe);
-	resp.token = req->requestId;
+	const Command resp(CommandId::Subscribe, 0, nullptr, .0, req->requestId);
 
 	// check for empty name/code
 	if (req->nameOrCode[0] == '\0') {
@@ -1212,9 +1203,9 @@ bool addOrUpdateRequest(Client *c, const DataRequest *const req)
 	else if (tr->calcResultType != CalcResultType::Formatted && tr->calcBytecode.empty()) {
 		// assume the command has changed and re-compile
 		PCSTRINGZ pCompiled = nullptr;
-		UINT32 pCompiledSize = STRSZ_REQ;
+		UINT32 pCompiledSize = 0;
 		const bool ok = gauge_calculator_code_precompile(&pCompiled, &pCompiledSize, tr->nameOrCode);
-		if (ok && pCompiled && pCompiledSize > 0 && pCompiledSize < STRSZ_REQ) {
+		if (ok && pCompiled && pCompiledSize > 0) {
 			tr->calcBytecode = string(pCompiled, pCompiledSize);
 			// DO NOT try to log the compiled code as a string -- it's byte code now and may crash the logger
 			LOG_DBG << "Got compiled calculator string with size " << pCompiledSize << ": " << Utilities::byteArrayToHex(pCompiled, pCompiledSize);
