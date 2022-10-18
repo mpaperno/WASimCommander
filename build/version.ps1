@@ -1,10 +1,10 @@
 
 $VER_MAJOR = 1
-$VER_MINOR = 0
+$VER_MINOR = 1
 $VER_PATCH = 0
-$VER_BUILD = 8
+$VER_BUILD = 0
 $VER_COMIT = 0
-$VER_NAME  = "-rc1"
+$VER_NAME  = ""
 
 $PROJECT_NAME  = "WASimCommander"
 $CLIENT_NAME   = "WASimClient"
