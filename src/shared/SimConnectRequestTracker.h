@@ -246,21 +246,35 @@ INVOKE_SIMCONNECT(SimConnect_AddToClientDataDefinition, hSim, cddId, offset, szO
 			}
 		}
 
-		/// Try to find and return a request record for the given dwSendId. If no record is found, returns a reference to a static instance which is empty (no method or argument details)
-		/// except for the dwSendID and exception/index (if passed in to this method).
+		/// Try to find and return a request record for the given dwSendId. If no record is found or the cache is disabled entirely, then it returns
+		/// a reference to a static instance (which has no method or argument details) populated with the given `dwSendID`, `ex`, and `idx` parameters.
+		/// \param dwSendId The `dwSendId` to look up, typically from the `SIMCONNECT_RECV_EXCEPTION.dwSendId` struct member.
+		/// \param ex SimeConnect exception ID, typically from the `SIMCONNECT_RECV_EXCEPTION.dwException` member. This is stored in the returned RequestRecord,
+		///        and is resolved to a string name (with `exceptionName()`) for display with the `RequestData.toString()` or stream operator methods.
+		/// \param idx SimeConnect exception parameter index, typically from the `SIMCONNECT_RECV_EXCEPTION.dwIndex` member.
+		///        This is stored in the returned RequestRecord and is displayed in the `RequestData.toString()` or stream operator method outputs.
+		/// \note The returned reference should stay in scope unless the cache is shrunk (and that index gets deleted). However the data could change
+		///       at any point if the cache storage slot is reused for a new request. Or, in the cases where a reference to a static instance is returned,
+		///       the next `getRequestRecord()` call will overwrite the static data from the previous call.
+		///       All this to say: **do not store the reference.**
 		RequestData const & getRequestRecord(uint32_t dwSendId, /*SIMCONNECT_EXCEPTION*/ uint32_t ex = SIMCONNECT_EXCEPTION_NONE, uint32_t idx = 0)
 		{
 			static RequestData nullReq{ -1 };
-			RequestData *d = &nullReq;
-			d->dwSendId = dwSendId;  // default in case not found
+			RequestData *d = nullptr;
 			if (!m_dataResizing && m_maxRecords)  {
 				// start at 10 records back from current index since it is more likely that the sendId error relates to a recent request than an old one
 				int i = (m_maxRecords + m_dataIndex - std::min<uint32_t>(10UL, m_maxRecords)) % m_maxRecords,
 					e = i;
 				for (bool first = true; i != e || first; i = (i + 1) % m_maxRecords, first = false) {
-					if (m_data[i].dwSendId == dwSendId)
+					if (m_data[i].dwSendId == dwSendId) {
 						d = &m_data.at(i);
+						break;
+					}
 				}
+			}
+			if (!d) {
+				d = &nullReq;
+				d->dwSendId = dwSendId;
 			}
 			d->eException = (SIMCONNECT_EXCEPTION)ex;
 			d->dwExceptionIndex = idx;
