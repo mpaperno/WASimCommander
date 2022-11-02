@@ -35,7 +35,7 @@
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="Logo.png" title="WASimCommander - Remote access to the Microsoft Flight Simulator 2020 Gauge API."/></td>
   <td id="projectalign">
-   <div id="projectname"><!-- WASimCommander --><span id="projectnumber">&#160;v1.0.0.8-rc1</span>
+   <div id="projectname"><!-- WASimCommander --><span id="projectnumber">&#160;v1.1.0.0</span>
    </div>
   </td>
  </tr>
@@ -154,7 +154,10 @@ Remote Capabilities</h4>
 <li>Event names can be completely custom (including a <code>.</code> (period) as per SimConnect convention), or derive from the connected Client's name (to ensure uniqueness).</li>
 </ul>
 </li>
-<li><b>Send Simulator "Key Events"</b> directly by ID (instead of going through the SimConnect mapping process or executing calculator code). Much more efficient than the other methods.</li>
+<li><b>Send Simulator "Key Events"</b> directly by ID or name (instead of going through the SimConnect mapping process or executing calculator code). Much more efficient than the other methods.<ul>
+<li><b>New in v1.1.0:</b> Send Key Events with up to 5 values (like the new <code>SimConnect_TransmitClientEvent_EX1()</code>).</li>
+</ul>
+</li>
 <li><b>Remote Logging</b>: Log messages (errors, warnings, debug, etc) can optionally be sent to the Client, with specific minimum level (eg. only warnings and errros).</li>
 <li><b>Ping</b> the Server to check that the WASM module is installed and running before trying to connect or use its features.</li>
 </ul>
@@ -228,14 +231,6 @@ Issues, Support, Suggestions, Discussion</h3>
 <p >Most flight simulator forums seem fairly strict about <em>not</em> using their site to provide product support. So please use GitHub, unless you're absolutely sure no rules would be broken or toes stepped upon otherwise.</p>
 <hr  />
  <h3><a class="anchor" id="autotoc_md19"></a>
-Known Issues</h3>
-<ul>
-<li><p class="startli">Setting a Local Variable value with the <code>Set</code> command ignores any Unit specifier. This is due to a bug in the MSFS WASM library preventing the corresponding <em>Gauge API</em> function <code>set_named_variable_typed_value()</code> from being exported. See bug report at <a href="https://devsupport.flightsimulator.com/questions/8604/env-wasm-set-named-variable-typed-value-not-found.html" target="_blank">devsupport.flightsimulator.com</a></p>
-<p class="startli">You can stil use a unit specifier with L vars in calculaotor code. Though I've yet to find an instance where it makes any difference.</p>
-</li>
-</ul>
-<hr  />
- <h3><a class="anchor" id="autotoc_md21"></a>
 Credits</h3>
 <p >This project is written, tested, and documented by myself, Maxim (Max) Paperno.<br  />
  <a href="https://github.com/mpaperno/">https://github.com/mpaperno/</a></p>
@@ -248,17 +243,17 @@ Credits</h3>
 <li><a href="https://material.io/" target="_blank">Material Icons</a> - Google, Apache License v2.0.</li>
 </ul>
 <hr  />
- <h3><a class="anchor" id="autotoc_md23"></a>
+ <h3><a class="anchor" id="autotoc_md21"></a>
 Copyright, License, and Disclaimer</h3>
 <p ><a class="el" href="namespace_w_a_sim_commander.html" title="WASimCommander main namespace. Defines constants and structs used in Client-Server interactions....">WASimCommander</a> Project <br  />
  COPYRIGHT: Maxim Paperno; All Rights Reserved.</p>
-<h4><a class="anchor" id="autotoc_md24"></a>
+<h4><a class="anchor" id="autotoc_md22"></a>
 API Library and Client Components</h4>
 <p >Dual licensed under the terms of either the GNU General Public License (<b>GPL</b>) or the GNU Lesser General Public License (<b>LGPL</b>), as published by the Free Software Foundation, either <b>version 3</b> of the Licenses, or (at your option) any later version.</p>
-<h4><a class="anchor" id="autotoc_md25"></a>
+<h4><a class="anchor" id="autotoc_md23"></a>
 WASM Module Server and GUI Components</h4>
 <p >Licensed under the terms of the GNU General Public License (<b>GPL</b>) as published by the Free Software Foundation, either <b>version 3</b> of the License, or (at your option) any later version.</p>
-<h4><a class="anchor" id="autotoc_md26"></a>
+<h4><a class="anchor" id="autotoc_md24"></a>
 General</h4>
 <p >This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.</p>
 <p >Copies of the GNU GPL and LGPL are included with this project and are available at <a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>.</p>
@@ -270,7 +265,7 @@ General</h4>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Tue Aug 2 2022 15:25:37 for WASimCommander by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.4 </li>
+    <li class="footer">Generated on Tue Nov 1 2022 23:28:07 for WASimCommander by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.4 </li>
   </ul>
 </div>
 </body>

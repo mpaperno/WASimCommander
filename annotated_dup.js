@@ -27,6 +27,7 @@ var annotated_dup =
       ] ],
       [ "Command", "struct_w_a_sim_commander_1_1_command.html", "struct_w_a_sim_commander_1_1_command" ],
       [ "DataRequest", "struct_w_a_sim_commander_1_1_data_request.html", "struct_w_a_sim_commander_1_1_data_request" ],
+      [ "KeyEvent", "struct_w_a_sim_commander_1_1_key_event.html", "struct_w_a_sim_commander_1_1_key_event" ],
       [ "LogRecord", "struct_w_a_sim_commander_1_1_log_record.html", "struct_w_a_sim_commander_1_1_log_record" ]
     ] ]
 ];

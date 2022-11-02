@@ -20,5 +20,6 @@ var hierarchy =
     [ "WASimCommander::DataRequest", "struct_w_a_sim_commander_1_1_data_request.html", [
       [ "WASimCommander::Client::DataRequestRecord", "struct_w_a_sim_commander_1_1_client_1_1_data_request_record.html", null ]
     ] ],
+    [ "WASimCommander::KeyEvent", "struct_w_a_sim_commander_1_1_key_event.html", null ],
     [ "WASimCommander::LogRecord", "struct_w_a_sim_commander_1_1_log_record.html", null ]
 ];

@@ -35,7 +35,7 @@
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="Logo.png" title="WASimCommander - Remote access to the Microsoft Flight Simulator 2020 Gauge API."/></td>
   <td id="projectalign">
-   <div id="projectname"><!-- WASimCommander --><span id="projectnumber">&#160;v1.0.0.8-rc1</span>
+   <div id="projectname"><!-- WASimCommander --><span id="projectnumber">&#160;v1.1.0.0</span>
    </div>
   </td>
  </tr>
@@ -130,6 +130,9 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_w_a_sim_commander_1_1_data_request.html">WASimCommander::DataRequest</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Structure for variable value subscription requests.  <a href="struct_w_a_sim_commander_1_1_data_request.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_w_a_sim_commander_1_1_key_event.html">WASimCommander::KeyEvent</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Data structure for sending Key Events to the sim with up to 5 event values. Events are specified using numeric MSFS Event IDs (names can be resolved to IDs via <code>Lookup</code> command). This supports the new functionality in MSFS SU10 with <code>trigger_key_event_EX1()</code> Gauge API function (similar to <code>SimConnect_TransmitClientEvent_EX1()</code>). The server will respond with an Ack/Nak for a <code>SendKey</code> command, echoing the given <code>token</code>. For events with zero or one value, the <code>SendKey</code> command can be used instead.  <a href="struct_w_a_sim_commander_1_1_key_event.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_w_a_sim_commander_1_1_log_record.html">WASimCommander::LogRecord</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Log record structure.  <a href="struct_w_a_sim_commander_1_1_log_record.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -152,14 +155,17 @@ Macros</h2></td></tr>
 <tr class="memdesc:a4005fac2bae29ad31aa938c002d434c3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Ping event for all clients ("WASimCommander.Ping") and prefix for response event ("WASimCommander.Ping.&lt;client_name&gt;")  <a href="_w_a_sim_commander_8h.html#a4005fac2bae29ad31aa938c002d434c3">More...</a><br /></td></tr>
 <tr class="separator:a4005fac2bae29ad31aa938c002d434c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9bab3461867d8453e2c2e0fbda6ab6f0"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_w_a_sim_commander_8h.html#a9bab3461867d8453e2c2e0fbda6ab6f0">WSMCMND_CDA_NAME_COMMAND</a>&#160;&#160;&#160;&quot;Command&quot;</td></tr>
-<tr class="memdesc:a9bab3461867d8453e2c2e0fbda6ab6f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Data area name prefix for <code>Command</code> and <code>DataRequest</code> data sent to Server: "WASimCommander.Command.&lt;client_name&gt;".  <a href="_w_a_sim_commander_8h.html#a9bab3461867d8453e2c2e0fbda6ab6f0">More...</a><br /></td></tr>
+<tr class="memdesc:a9bab3461867d8453e2c2e0fbda6ab6f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Data area name prefix for <code>Command</code> data sent to Server: "WASimCommander.Command.&lt;client_name&gt;".  <a href="_w_a_sim_commander_8h.html#a9bab3461867d8453e2c2e0fbda6ab6f0">More...</a><br /></td></tr>
 <tr class="separator:a9bab3461867d8453e2c2e0fbda6ab6f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa0bf71afa50fd2972a06fa064e79ca08"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_w_a_sim_commander_8h.html#aa0bf71afa50fd2972a06fa064e79ca08">WSMCMND_CDA_NAME_RESPONSE</a>&#160;&#160;&#160;&quot;Response&quot;</td></tr>
 <tr class="memdesc:aa0bf71afa50fd2972a06fa064e79ca08"><td class="mdescLeft">&#160;</td><td class="mdescRight">Data area name prefix for <code>Command</code> data sent to Client: "WASimCommander.Response.&lt;client_name&gt;".  <a href="_w_a_sim_commander_8h.html#aa0bf71afa50fd2972a06fa064e79ca08">More...</a><br /></td></tr>
 <tr class="separator:aa0bf71afa50fd2972a06fa064e79ca08"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a76e472f59a2615e6590bc323636532b6"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_w_a_sim_commander_8h.html#a76e472f59a2615e6590bc323636532b6">WSMCMND_CDA_NAME_DATA</a>&#160;&#160;&#160;&quot;Data&quot;</td></tr>
-<tr class="memdesc:a76e472f59a2615e6590bc323636532b6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Data area name prefix for data value updates sent to Client: "WASimCommander.Data.&lt;client_name&gt;.&lt;request_id&gt;".  <a href="_w_a_sim_commander_8h.html#a76e472f59a2615e6590bc323636532b6">More...</a><br /></td></tr>
+<tr class="memdesc:a76e472f59a2615e6590bc323636532b6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Data area name prefix for <code>DataRequest</code> data sent to Server ("WASimCommander.Data.&lt;client_name&gt;") and data value updates sent to Client: "WASimCommander.Data.&lt;client_name&gt;.&lt;request_id&gt;".  <a href="_w_a_sim_commander_8h.html#a76e472f59a2615e6590bc323636532b6">More...</a><br /></td></tr>
 <tr class="separator:a76e472f59a2615e6590bc323636532b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acec5093d12b821e8e53963af9c4287f0"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_w_a_sim_commander_8h.html#acec5093d12b821e8e53963af9c4287f0">WSMCMND_CDA_NAME_KEYEVENT</a>&#160;&#160;&#160;&quot;KeyEvent&quot;</td></tr>
+<tr class="memdesc:acec5093d12b821e8e53963af9c4287f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Data area name prefix for <code>KeyEvent</code> data sent to Client: "WASimCommander.KeyEvent.&lt;client_name&gt;".  <a href="_w_a_sim_commander_8h.html#acec5093d12b821e8e53963af9c4287f0">More...</a><br /></td></tr>
+<tr class="separator:acec5093d12b821e8e53963af9c4287f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8a2bfc96e79930310664e89f4145f58a"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_w_a_sim_commander_8h.html#a8a2bfc96e79930310664e89f4145f58a">WSMCMND_CDA_NAME_LOG</a>&#160;&#160;&#160;&quot;Log&quot;</td></tr>
 <tr class="memdesc:a8a2bfc96e79930310664e89f4145f58a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Data area name prefix for <code>LogRecord</code> data sent to Client: "WASimCommander.Log.&lt;client_name&gt;".  <a href="_w_a_sim_commander_8h.html#a8a2bfc96e79930310664e89f4145f58a">More...</a><br /></td></tr>
 <tr class="separator:a8a2bfc96e79930310664e89f4145f58a"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -280,7 +286,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Data area name prefix for <code>Command</code> and <code>DataRequest</code> data sent to Server: "WASimCommander.Command.&lt;client_name&gt;". </p>
+<p>Data area name prefix for <code>Command</code> data sent to Server: "WASimCommander.Command.&lt;client_name&gt;". </p>
 
 <p class="definition">Definition at line <a class="el" href="_w_a_sim_commander_8h_source.html#l00040">40</a> of file <a class="el" href="_w_a_sim_commander_8h_source.html">WASimCommander.h</a>.</p>
 
@@ -316,9 +322,28 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Data area name prefix for data value updates sent to Client: "WASimCommander.Data.&lt;client_name&gt;.&lt;request_id&gt;". </p>
+<p>Data area name prefix for <code>DataRequest</code> data sent to Server ("WASimCommander.Data.&lt;client_name&gt;") and data value updates sent to Client: "WASimCommander.Data.&lt;client_name&gt;.&lt;request_id&gt;". </p>
 
 <p class="definition">Definition at line <a class="el" href="_w_a_sim_commander_8h_source.html#l00042">42</a> of file <a class="el" href="_w_a_sim_commander_8h_source.html">WASimCommander.h</a>.</p>
+
+</div>
+</div>
+<a id="acec5093d12b821e8e53963af9c4287f0" name="acec5093d12b821e8e53963af9c4287f0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acec5093d12b821e8e53963af9c4287f0">&#9670;&nbsp;</a></span>WSMCMND_CDA_NAME_KEYEVENT</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define WSMCMND_CDA_NAME_KEYEVENT&#160;&#160;&#160;&quot;KeyEvent&quot;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Data area name prefix for <code>KeyEvent</code> data sent to Client: "WASimCommander.KeyEvent.&lt;client_name&gt;". </p>
+<dl class="section since"><dt>Since</dt><dd>v1.1.0 </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_commander_8h_source.html#l00043">43</a> of file <a class="el" href="_w_a_sim_commander_8h_source.html">WASimCommander.h</a>.</p>
 
 </div>
 </div>
@@ -336,7 +361,7 @@ Variables</h2></td></tr>
 
 <p>Data area name prefix for <code>LogRecord</code> data sent to Client: "WASimCommander.Log.&lt;client_name&gt;". </p>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_commander_8h_source.html#l00043">43</a> of file <a class="el" href="_w_a_sim_commander_8h_source.html">WASimCommander.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_commander_8h_source.html#l00044">44</a> of file <a class="el" href="_w_a_sim_commander_8h_source.html">WASimCommander.h</a>.</p>
 
 </div>
 </div>
@@ -352,7 +377,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_commander_8h_source.html#l00089">89</a> of file <a class="el" href="_w_a_sim_commander_8h_source.html">WASimCommander.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_commander_8h_source.html#l00090">90</a> of file <a class="el" href="_w_a_sim_commander_8h_source.html">WASimCommander.h</a>.</p>
 
 </div>
 </div>
@@ -362,7 +387,7 @@ Variables</h2></td></tr>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dir_b0856f6b0d80ccb263b2f415c91f9e17.html">include</a></li><li class="navelem"><a class="el" href="_w_a_sim_commander_8h.html">WASimCommander.h</a></li>
-    <li class="footer">Generated on Tue Aug 2 2022 15:25:37 for WASimCommander by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.4 </li>
+    <li class="footer">Generated on Tue Nov 1 2022 23:28:07 for WASimCommander by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.4 </li>
   </ul>
 </div>
 </body>

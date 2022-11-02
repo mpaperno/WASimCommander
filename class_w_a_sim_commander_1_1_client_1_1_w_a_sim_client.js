@@ -35,6 +35,8 @@ var class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client =
     [ "transmitEvent", "class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a79df757ffd7e9c5d3a984475b79eeccc", null ],
     [ "registeredEvent", "class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a180ebb86590c10e461fa842b5020739f", null ],
     [ "registeredEvents", "class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#afbedbb0c36870041106648f184e083f4", null ],
+    [ "sendKeyEvent", "class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#adf5b8df4cb657fefaa97f97b0ebea42c", null ],
+    [ "sendKeyEvent", "class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#ab105921f6ba732ac7650b057ce4e06c0", null ],
     [ "list", "class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#ae34ec025c8965441cd9a178e8dac734e", null ],
     [ "lookup", "class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a602e0e104484dce8d22e572b3803e567", null ],
     [ "sendCommand", "class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a6bc18c8f4c2c06b3b32475903f5ecec3", null ],

@@ -35,7 +35,7 @@
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="Logo.png" title="WASimCommander - Remote access to the Microsoft Flight Simulator 2020 Gauge API."/></td>
   <td id="projectalign">
-   <div id="projectname"><!-- WASimCommander --><span id="projectnumber">&#160;v1.0.0.8-rc1</span>
+   <div id="projectname"><!-- WASimCommander --><span id="projectnumber">&#160;v1.1.0.0</span>
    </div>
   </td>
  </tr>
@@ -133,7 +133,8 @@ $(document).ready(function(){initNavTree('annotated.html',''); initResizable(); 
 <tr id="row_0_1_5_" class="even"><td class="entry"><span style="width:48px;display:inline-block;">&#160;</span><span class="icona"><span class="icon">C</span></span><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html" target="_self">WASimClient</a></td><td class="desc"><a class="el" href="namespace_w_a_sim_commander.html" title="WASimCommander main namespace. Defines constants and structs used in Client-Server interactions....">WASimCommander</a> <a class="el" href="namespace_w_a_sim_commander_1_1_client.html" title="WASimCommander::Client namespace. Defines/declares everything needed to interact with the WASimComman...">Client</a> implementation. Handles all aspects of communication with the <a class="el" href="namespace_w_a_sim_commander.html" title="WASimCommander main namespace. Defines constants and structs used in Client-Server interactions....">WASimCommander</a> Server WASM module </td></tr>
 <tr id="row_0_2_"><td class="entry"><span style="width:32px;display:inline-block;">&#160;</span><span class="icona"><span class="icon">C</span></span><a class="el" href="struct_w_a_sim_commander_1_1_command.html" target="_self">Command</a></td><td class="desc"><a class="el" href="struct_w_a_sim_commander_1_1_command.html" title="Command data structure. The member contents depend on the command type as described in each command t...">Command</a> data structure. The member contents depend on the command type as described in each command type of the <code><a class="el" href="namespace_w_a_sim_commander_1_1_enums.html#ae3b1cd5348286e86d8c64ce44734e039" title="Commands for client-server interaction. Both sides can send commands via dedicated channels by writin...">Enums::CommandId</a></code> enum documentation </td></tr>
 <tr id="row_0_3_" class="even"><td class="entry"><span style="width:32px;display:inline-block;">&#160;</span><span class="icona"><span class="icon">C</span></span><a class="el" href="struct_w_a_sim_commander_1_1_data_request.html" target="_self">DataRequest</a></td><td class="desc">Structure for variable value subscription requests </td></tr>
-<tr id="row_0_4_"><td class="entry"><span style="width:32px;display:inline-block;">&#160;</span><span class="icona"><span class="icon">C</span></span><a class="el" href="struct_w_a_sim_commander_1_1_log_record.html" target="_self">LogRecord</a></td><td class="desc">Log record structure </td></tr>
+<tr id="row_0_4_"><td class="entry"><span style="width:32px;display:inline-block;">&#160;</span><span class="icona"><span class="icon">C</span></span><a class="el" href="struct_w_a_sim_commander_1_1_key_event.html" target="_self">KeyEvent</a></td><td class="desc">Data structure for sending Key Events to the sim with up to 5 event values. Events are specified using numeric MSFS Event IDs (names can be resolved to IDs via <code>Lookup</code> command). This supports the new functionality in MSFS SU10 with <code>trigger_key_event_EX1()</code> Gauge API function (similar to <code>SimConnect_TransmitClientEvent_EX1()</code>). The server will respond with an Ack/Nak for a <code>SendKey</code> command, echoing the given <code>token</code>. For events with zero or one value, the <code>SendKey</code> command can be used instead </td></tr>
+<tr id="row_0_5_" class="even"><td class="entry"><span style="width:32px;display:inline-block;">&#160;</span><span class="icona"><span class="icon">C</span></span><a class="el" href="struct_w_a_sim_commander_1_1_log_record.html" target="_self">LogRecord</a></td><td class="desc">Log record structure </td></tr>
 </table>
 </div><!-- directory -->
 </div><!-- contents -->
@@ -141,7 +142,7 @@ $(document).ready(function(){initNavTree('annotated.html',''); initResizable(); 
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Tue Aug 2 2022 15:25:37 for WASimCommander by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.4 </li>
+    <li class="footer">Generated on Tue Nov 1 2022 23:28:07 for WASimCommander by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.4 </li>
   </ul>
 </div>
 </body>

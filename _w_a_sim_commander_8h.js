@@ -2,6 +2,7 @@ var _w_a_sim_commander_8h =
 [
     [ "WASimCommander::Command", "struct_w_a_sim_commander_1_1_command.html", "struct_w_a_sim_commander_1_1_command" ],
     [ "WASimCommander::DataRequest", "struct_w_a_sim_commander_1_1_data_request.html", "struct_w_a_sim_commander_1_1_data_request" ],
+    [ "WASimCommander::KeyEvent", "struct_w_a_sim_commander_1_1_key_event.html", "struct_w_a_sim_commander_1_1_key_event" ],
     [ "WASimCommander::LogRecord", "struct_w_a_sim_commander_1_1_log_record.html", "struct_w_a_sim_commander_1_1_log_record" ],
     [ "WSMCMND_COMMON_NAME_PREFIX", "_w_a_sim_commander_8h.html#a6499d80406a7e858c8b2e5fbe26c2fa6", null ],
     [ "WSMCMND_EVENT_NAME_CONNECT", "_w_a_sim_commander_8h.html#a00674443fce6b24546dfc03f249f09dc", null ],
@@ -9,6 +10,7 @@ var _w_a_sim_commander_8h =
     [ "WSMCMND_CDA_NAME_COMMAND", "_w_a_sim_commander_8h.html#a9bab3461867d8453e2c2e0fbda6ab6f0", null ],
     [ "WSMCMND_CDA_NAME_RESPONSE", "_w_a_sim_commander_8h.html#aa0bf71afa50fd2972a06fa064e79ca08", null ],
     [ "WSMCMND_CDA_NAME_DATA", "_w_a_sim_commander_8h.html#a76e472f59a2615e6590bc323636532b6", null ],
+    [ "WSMCMND_CDA_NAME_KEYEVENT", "_w_a_sim_commander_8h.html#acec5093d12b821e8e53963af9c4287f0", null ],
     [ "WSMCMND_CDA_NAME_LOG", "_w_a_sim_commander_8h.html#a8a2bfc96e79930310664e89f4145f58a", null ],
     [ "STRSZ_CMD", "_w_a_sim_commander_8h.html#ac284312c438e79345d3ccb1bbdc2e327", null ],
     [ "STRSZ_REQ", "_w_a_sim_commander_8h.html#a84f75f0850267ae220de5e318b3579eb", null ],

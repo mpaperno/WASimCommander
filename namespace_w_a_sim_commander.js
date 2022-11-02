@@ -78,6 +78,7 @@ var namespace_w_a_sim_commander =
     ] ],
     [ "Command", "struct_w_a_sim_commander_1_1_command.html", "struct_w_a_sim_commander_1_1_command" ],
     [ "DataRequest", "struct_w_a_sim_commander_1_1_data_request.html", "struct_w_a_sim_commander_1_1_data_request" ],
+    [ "KeyEvent", "struct_w_a_sim_commander_1_1_key_event.html", "struct_w_a_sim_commander_1_1_key_event" ],
     [ "LogRecord", "struct_w_a_sim_commander_1_1_log_record.html", "struct_w_a_sim_commander_1_1_log_record" ],
     [ "STRSZ_CMD", "namespace_w_a_sim_commander.html#ac284312c438e79345d3ccb1bbdc2e327", null ],
     [ "STRSZ_REQ", "namespace_w_a_sim_commander.html#a84f75f0850267ae220de5e318b3579eb", null ],

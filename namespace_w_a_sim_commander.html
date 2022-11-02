@@ -35,7 +35,7 @@
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="Logo.png" title="WASimCommander - Remote access to the Microsoft Flight Simulator 2020 Gauge API."/></td>
   <td id="projectalign">
-   <div id="projectname"><!-- WASimCommander --><span id="projectnumber">&#160;v1.0.0.8-rc1</span>
+   <div id="projectname"><!-- WASimCommander --><span id="projectnumber">&#160;v1.1.0.0</span>
    </div>
   </td>
  </tr>
@@ -135,6 +135,9 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_w_a_sim_commander_1_1_data_request.html">DataRequest</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Structure for variable value subscription requests.  <a href="struct_w_a_sim_commander_1_1_data_request.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_w_a_sim_commander_1_1_key_event.html">KeyEvent</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Data structure for sending Key Events to the sim with up to 5 event values. Events are specified using numeric MSFS Event IDs (names can be resolved to IDs via <code>Lookup</code> command). This supports the new functionality in MSFS SU10 with <code>trigger_key_event_EX1()</code> Gauge API function (similar to <code>SimConnect_TransmitClientEvent_EX1()</code>). The server will respond with an Ack/Nak for a <code>SendKey</code> command, echoing the given <code>token</code>. For events with zero or one value, the <code>SendKey</code> command can be used instead.  <a href="struct_w_a_sim_commander_1_1_key_event.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_w_a_sim_commander_1_1_log_record.html">LogRecord</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Log record structure.  <a href="struct_w_a_sim_commander_1_1_log_record.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -211,7 +214,7 @@ Variables</h2></td></tr>
 
 <p>Maximum size of <a class="el" href="struct_w_a_sim_commander_1_1_command.html#a44c16d6a79ea4838fbd089faf4c69d6d">Command::sData</a> member. Size optimizes alignment of <code><a class="el" href="struct_w_a_sim_commander_1_1_command.html" title="Command data structure. The member contents depend on the command type as described in each command t...">Command</a></code> struct. </p>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_commander_8h_source.html#l00055">55</a> of file <a class="el" href="_w_a_sim_commander_8h_source.html">WASimCommander.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_commander_8h_source.html#l00056">56</a> of file <a class="el" href="_w_a_sim_commander_8h_source.html">WASimCommander.h</a>.</p>
 
 </div>
 </div>
@@ -238,7 +241,7 @@ Variables</h2></td></tr>
 <p>Maximum size for request calculator string or variable name. Size optimizes alignment of <code><a class="el" href="struct_w_a_sim_commander_1_1_data_request.html" title="Structure for variable value subscription requests.">DataRequest</a></code> struct. </p>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="struct_w_a_sim_commander_1_1_data_request.html#ab43b0b59bb30e13a8e9552bd8a142acd">DataRequest::nameOrCode</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_commander_8h_source.html#l00056">56</a> of file <a class="el" href="_w_a_sim_commander_8h_source.html">WASimCommander.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_commander_8h_source.html#l00057">57</a> of file <a class="el" href="_w_a_sim_commander_8h_source.html">WASimCommander.h</a>.</p>
 
 </div>
 </div>
@@ -265,7 +268,7 @@ Variables</h2></td></tr>
 <p>Maximum Unit name size. Size is of longest known unit name + 1. </p>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="struct_w_a_sim_commander_1_1_data_request.html#a47569a8295e1f5179f56d854403cd461">DataRequest::unitName</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_commander_8h_source.html#l00057">57</a> of file <a class="el" href="_w_a_sim_commander_8h_source.html">WASimCommander.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_commander_8h_source.html#l00058">58</a> of file <a class="el" href="_w_a_sim_commander_8h_source.html">WASimCommander.h</a>.</p>
 
 </div>
 </div>
@@ -291,7 +294,7 @@ Variables</h2></td></tr>
 
 <p>Size of log entry message in <a class="el" href="struct_w_a_sim_commander_1_1_log_record.html#aeb620e56a1df92fc2dfc9306331eec0e">LogRecord::message</a>. Size optimizes alignment of <code><a class="el" href="struct_w_a_sim_commander_1_1_log_record.html" title="Log record structure.">LogRecord</a></code> struct. </p>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_commander_8h_source.html#l00058">58</a> of file <a class="el" href="_w_a_sim_commander_8h_source.html">WASimCommander.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_commander_8h_source.html#l00059">59</a> of file <a class="el" href="_w_a_sim_commander_8h_source.html">WASimCommander.h</a>.</p>
 
 </div>
 </div>
@@ -317,7 +320,7 @@ Variables</h2></td></tr>
 
 <p>Maximum size of custom event name in <a class="el" href="namespace_w_a_sim_commander_1_1_enums.html#ae3b1cd5348286e86d8c64ce44734e039a0ba7583639a274c434bbe6ef797115a4">CommandId::Register</a> command. </p>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_commander_8h_source.html#l00059">59</a> of file <a class="el" href="_w_a_sim_commander_8h_source.html">WASimCommander.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_commander_8h_source.html#l00060">60</a> of file <a class="el" href="_w_a_sim_commander_8h_source.html">WASimCommander.h</a>.</p>
 
 </div>
 </div>
@@ -343,7 +346,7 @@ Variables</h2></td></tr>
 
 <p>Minimum update period for data Requests in milliseconds. Also dictates rate of some other client-specific processing on server (WASM module) side. 25ms = 40Hz. </p>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_commander_8h_source.html#l00064">64</a> of file <a class="el" href="_w_a_sim_commander_8h_source.html">WASimCommander.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_commander_8h_source.html#l00065">65</a> of file <a class="el" href="_w_a_sim_commander_8h_source.html">WASimCommander.h</a>.</p>
 
 </div>
 </div>
@@ -369,7 +372,7 @@ Variables</h2></td></tr>
 
 <p>Number of seconds after which a non-responsive client is considered disconnected. <a class="el" href="namespace_w_a_sim_commander_1_1_client.html" title="WASimCommander::Client namespace. Defines/declares everything needed to interact with the WASimComman...">Client</a> must respond to heartbeat pings from the server if not otherwise transmitting anything within this timeout period. </p>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_commander_8h_source.html#l00065">65</a> of file <a class="el" href="_w_a_sim_commander_8h_source.html">WASimCommander.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_commander_8h_source.html#l00066">66</a> of file <a class="el" href="_w_a_sim_commander_8h_source.html">WASimCommander.h</a>.</p>
 
 </div>
 </div>
@@ -395,7 +398,7 @@ Variables</h2></td></tr>
 
 <p>8-bit integer number (signed or unsigned) </p>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_commander_8h_source.html#l00071">71</a> of file <a class="el" href="_w_a_sim_commander_8h_source.html">WASimCommander.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_commander_8h_source.html#l00072">72</a> of file <a class="el" href="_w_a_sim_commander_8h_source.html">WASimCommander.h</a>.</p>
 
 </div>
 </div>
@@ -421,7 +424,7 @@ Variables</h2></td></tr>
 
 <p>16-bit integer number (signed or unsigned) </p>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_commander_8h_source.html#l00072">72</a> of file <a class="el" href="_w_a_sim_commander_8h_source.html">WASimCommander.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_commander_8h_source.html#l00073">73</a> of file <a class="el" href="_w_a_sim_commander_8h_source.html">WASimCommander.h</a>.</p>
 
 </div>
 </div>
@@ -447,7 +450,7 @@ Variables</h2></td></tr>
 
 <p>32-bit integer number (signed or unsigned) </p>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_commander_8h_source.html#l00073">73</a> of file <a class="el" href="_w_a_sim_commander_8h_source.html">WASimCommander.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_commander_8h_source.html#l00074">74</a> of file <a class="el" href="_w_a_sim_commander_8h_source.html">WASimCommander.h</a>.</p>
 
 </div>
 </div>
@@ -473,7 +476,7 @@ Variables</h2></td></tr>
 
 <p>64-bit integer number (signed or unsigned) </p>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_commander_8h_source.html#l00074">74</a> of file <a class="el" href="_w_a_sim_commander_8h_source.html">WASimCommander.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_commander_8h_source.html#l00075">75</a> of file <a class="el" href="_w_a_sim_commander_8h_source.html">WASimCommander.h</a>.</p>
 
 </div>
 </div>
@@ -499,7 +502,7 @@ Variables</h2></td></tr>
 
 <p>32-bit floating-point number </p>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_commander_8h_source.html#l00075">75</a> of file <a class="el" href="_w_a_sim_commander_8h_source.html">WASimCommander.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_commander_8h_source.html#l00076">76</a> of file <a class="el" href="_w_a_sim_commander_8h_source.html">WASimCommander.h</a>.</p>
 
 </div>
 </div>
@@ -525,7 +528,7 @@ Variables</h2></td></tr>
 
 <p>64-bit floating-point number </p>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_commander_8h_source.html#l00076">76</a> of file <a class="el" href="_w_a_sim_commander_8h_source.html">WASimCommander.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_commander_8h_source.html#l00077">77</a> of file <a class="el" href="_w_a_sim_commander_8h_source.html">WASimCommander.h</a>.</p>
 
 </div>
 </div>
@@ -535,7 +538,7 @@ Variables</h2></td></tr>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="namespace_w_a_sim_commander.html">WASimCommander</a></li>
-    <li class="footer">Generated on Tue Aug 2 2022 15:25:37 for WASimCommander by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.4 </li>
+    <li class="footer">Generated on Tue Nov 1 2022 23:28:07 for WASimCommander by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.4 </li>
   </ul>
 </div>
 </body>
