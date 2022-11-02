@@ -8,7 +8,7 @@
 Param(
   [string[]]$Targets = "all",
   [string]$RootPath = "..",
-  [string[]]$Configuration = @("Debug", "Release-DLL", "Release-NetFW", "Release"),
+  [string[]]$Configuration = @("Debug", "Release-DLL", "Release-net6", "Release-netfw", "Release"),
   [string]$Platform = "x64",
   [string[]]$Projects = "all",
   [string]$BuildType = "Clean,Rebuild",
@@ -126,9 +126,9 @@ robocopy "$SrcPath\include" "$PackagePath\include" $copyOptions /XF .* *.in
 if ($LastExitCode -ge 8) { Write-Output($LastExitCode); Exit 1  }
 
 # C++ libs
-$cppLibPath = "${LibPath}\MSVS-2019"
-$libStatic = "${cppLibPath}\static"
-$libDynamic = "${cppLibPath}\dynamic"
+$msvcVersion = "msvc142"
+$libStatic = "${LibPath}\static\${msvcVersion}"
+$libDynamic = "${LibPath}\dynamic\${msvcVersion}"
 
 # static, release and debug
 robocopy "$BuildPath\${CLIENT_NAME}\Release-$Platform" "$libStatic" $copyOptions
@@ -141,26 +141,28 @@ if ($LastExitCode -ge 8) { Write-Output($LastExitCode); Exit 1  }
 robocopy "$BuildPath\${CLIENT_NAME}\Debug-DLL-$Platform" "$libDynamic" $copyOptions /XF *.ini
 if ($LastExitCode -ge 8) { Write-Output($LastExitCode); Exit 1  }
 # license and readme
-robocopy "$SrcPath\${CLIENT_NAME}" "$cppLibPath" *.txt *.md $copyOptions
+robocopy "$SrcPath\${CLIENT_NAME}" "$libStatic" LICENSE.txt LICENSE.GPL.txt *.md $copyOptions
+robocopy "$SrcPath\${CLIENT_NAME}" "$libDynamic" *.txt *.md $copyOptions
 if ($LastExitCode -ge 8) { Write-Output($LastExitCode); Exit 1  }
 
 # Managed DLL
-$csLibPath = "${LibPath}\MSVS-2022\managed"
-$libNetN = "${csLibPath}\net6"
-$libNetFw = "${csLibPath}\netFw4"
+$csLibPath = "${LibPath}\managed"
 
+# .NET 5 (default Release build)
+robocopy "$BuildPath\${CLIENT_NAME}_CLI\Release-$Platform" "${csLibPath}\net5" *.dll *.pdb *.xml *.ini $copyOptions
+if ($LastExitCode -ge 8) { Write-Output($LastExitCode); Exit 1  }
 # .NET 6
-robocopy "$BuildPath\${CLIENT_NAME}_CLI\Release-$Platform" "$libNetN" *.dll *.pdb *.xml *.ini $copyOptions
+robocopy "$BuildPath\${CLIENT_NAME}_CLI\Release-net6-$Platform" "${csLibPath}\net6" *.dll *.pdb *.xml *.ini $copyOptions
 if ($LastExitCode -ge 8) { Write-Output($LastExitCode); Exit 1  }
 # .NET Framework
-robocopy "$BuildPath\${CLIENT_NAME}_CLI\Release-netfw-$Platform" "$libNetFw" *.dll *.pdb *.xml *.ini $copyOptions
+robocopy "$BuildPath\${CLIENT_NAME}_CLI\Release-netfw-$Platform" "${csLibPath}\net46" *.dll *.pdb *.xml *.ini $copyOptions
 if ($LastExitCode -ge 8) { Write-Output($LastExitCode); Exit 1  }
 # license and readme
 robocopy "$SrcPath\${CLIENT_NAME}_CLI" "$csLibPath" *.txt *.md $copyOptions
 if ($LastExitCode -ge 8) { Write-Output($LastExitCode); Exit 1  }
 
 # Module
-robocopy "$ModuleDest\Packages" "$ModulePackage" $copyOptions
+robocopy "$ModuleDest\Packages" "$ModulePackage" $copyOptions /XF .git*
 if ($LastExitCode -ge 8) { Write-Output($LastExitCode); Exit 1  }
 robocopy "$SrcPath\${SERVER_NAME}" "$ModulePackage" *.txt *.md $copyOptions
 if ($LastExitCode -ge 8) { Write-Output($LastExitCode); Exit 1  }
@@ -171,14 +173,13 @@ if ($LastExitCode -ge 8) { Write-Output($LastExitCode); Exit 1  }
 robocopy "$SrcPath\${APP_GUI_NAME}" "$PackagePath\bin\${APP_GUI_NAME}" LICENSE.* *.md $copyOptions
 if ($LastExitCode -ge 8) { Write-Output($LastExitCode); Exit 1  }
 
-# Required DLL files for Python example
-robocopy "$BuildPath\${CLIENT_NAME}_CLI\Release-$Platform" $PackagePath\bin\Py_BasicConsole *.dll *.ini $copyOptions
-
 # Test/demo app(s)
 $testApps.GetEnumerator() | ForEach-Object {
 	robocopy "$($_.Key)" "$($_.Value)" $copyOptions /XF *.log* *.*proj
 	if ($LastExitCode -ge 8) { Write-Output($LastExitCode); Exit 1  }
 }
+# Required DLL files for Python example
+robocopy "$BuildPath\${CLIENT_NAME}_CLI\Release-$Platform" $PackagePath\bin\Py_BasicConsole *.dll *.ini $copyOptions
 
 # docs
 robocopy "$DocsPath\html" "$PackagePath\docs\reference" $copyOptions

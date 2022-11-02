@@ -5,7 +5,10 @@
 This directory contains the implementation of a Client-side library for all aspects of communication with the WASimCommander Server component (`WASimModule`).
 
 It is designed to be integrated as either a static or dynamic library into other software. 
-To encourage adaptation, it is dual licensed under the terms of the GPL or LGPL (see LICENSE.txt for details).
+To encourage adaptation, it is dual licensed under the terms of the GPL (dynamic or static linking) 
+or LGPL (dynamic linking). 
+
+See corresponding LICENSE.txt for licensing details.
 
 ### Building Note
 
