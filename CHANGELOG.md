@@ -1,7 +1,7 @@
 # WASimCommander - Change Log
 
-## 1.1.0.0 (TBD)
-Updates for MSFS 2020 SU10 changes and new features.
+## 1.1.0.0 (2-Nov-2022)
+Updates for MSFS 2020 SU10 changes and new event trigger API for sending multiple values.
 
 ### WASimModule
 * Added new feature to trigger simulator Key Events with multiple value parameters (Gauge API `trigger_key_event_EX1()`).
@@ -9,6 +9,8 @@ Updates for MSFS 2020 SU10 changes and new features.
 * Added Key Event lookup names for new KEY_PROP_FORCE_BETA_* events.
 * Added Token variable name lookups for CIRCUIT_NAVCOM4_ON and BREAKER_NAVCOM4.
 * Remove usage of deprecated `send_key_event()` for `SendKey` command in favor of `trigger_key_event_EX1()`.
+* Module is now built with `/clang:-O1` optimization level (the newly-recommended `O3` level revealed a nasty MSFS memory corruption bug which 
+  should be fixed in SU11; I will have an update after SU11 release).
 
 ### WASimClient
 * Added `sendKeyEvent()` methods for sending simulator Key Events with up to 5 values, either by event ID or by name.
@@ -16,16 +18,19 @@ Updates for MSFS 2020 SU10 changes and new features.
 
 ### WASimClient_CLI
 * Added `sendKeyEvent()` methods (see above).
-* Re-targeted for VS2022, VC v143 and .NET 6.0.
-* Added .NET Framework target.
+* Added .NET Framework 4.6 and .NET 6.0 targets/builds (pre-built DLLs added to SDK distribution).
+* Re-targeted project for VS2022, MSVC v143.
 
 ### WASimUI
 * Added new form for sending Key Events with up to 5 value parameters.
 * Added connected WASimModule (server) version number display.
 * Fixed that the calculation result display text field could not be cleared.
 
+### Shared Components
+* Minor optimization fix in SimConnect exception reporting module during lookup of a cached request record (for logging exception details).
+
 ---
-## 1.0.0.9 (unreleased)
+## 1.0.0.9 (unpublished)
 * No changes from 1.0.0.8-rc1.
 
 ---
