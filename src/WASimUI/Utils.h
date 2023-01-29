@@ -65,10 +65,11 @@ public:
 	explicit RoundedMessageBox(QWidget *parent = nullptr) :
 		QMessageBox(parent)
 	{
+		setObjectName("RoundedMessageBox");
 		setWindowFlags(windowFlags() | Qt::FramelessWindowHint | Qt::WindowSystemMenuHint);
-		//setAttribute(Qt::WA_TranslucentBackground);
+		setAttribute(Qt::WA_TranslucentBackground);
 		setStyleSheet(QStringLiteral(
-			"RoundedMessageBox { "
+			"#RoundedMessageBox { "
 				"border-radius: 12px; "
 				"border: 2px solid palette(shadow); "
 				"background: palette(base); "
