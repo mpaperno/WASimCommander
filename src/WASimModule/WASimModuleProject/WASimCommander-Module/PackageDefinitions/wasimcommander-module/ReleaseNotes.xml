@@ -1,0 +1,14 @@
+<ReleaseNote Version="1.0.0" Date="2022-7-4">Initial release! v1.0.0.5-beta1</ReleaseNote>
+<ReleaseNote Version="1.0.1" Date="2022-7-11">v1.0.0.6-beta2
+* Fixed that Formatted type calculation
+results cannot be pre-compiled.
+* Event loop is paused when last client
+disconnects.</ReleaseNote>
+<ReleaseNote Version="1.1.0" Date="2022-10-13">v1.1.0.0
+* Minor updates for SU10: Updated lookup lists of Token vars
+and Key events; Use new trigger_key_event_EX1().
+* Rebuilt using /O1 optimization flag.</ReleaseNote>
+<ReleaseNote Version="1.1.1" Date="2023-01-30">WASimCommander v1.1.1.0
+* Updated lookup lists of Key events for SU11/SDK0.20.5.0.
+* Rebuilt using /O3 optimization flag as per new
+documentation recommendations and since fixes in SU11.</ReleaseNote>
