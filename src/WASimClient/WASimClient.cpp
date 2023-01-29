@@ -322,9 +322,16 @@ class WASimClient::Private
 		const char *fn = "client_conf.ini";
 		filesystem::path cfgFile(cwd /+ fn);
 		if (!config.empty()) {
-			cfgFile = config;
-			if (!cfgFile.has_extension())
-				cfgFile /= fn;
+			error_code ec;
+			filesystem::file_status fs = filesystem::status(config, ec);
+			if (!ec && filesystem::exists(fs)) {
+				cfgFile = config;
+				if (filesystem::is_directory(fs))
+					cfgFile /= fn;
+			}
+			else {
+				cerr << "Config file/path '" << config << "' not found or not accessible. Using default config location " << cwd << endl;;
+			}
 		}
 		// Read initial config from file
 		ifstream is(cfgFile);
