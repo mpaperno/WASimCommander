@@ -8,7 +8,7 @@
 Param(
   [string[]]$Targets = "all",
   [string]$RootPath = "..",
-  [string[]]$Configuration = @("Debug", "Release-DLL", "Release-net6", "Release-netfw", "Release"),
+  [string[]]$Configuration = @("Debug", "Debug-DLL", "Release-DLL", "Release-net6", "Release-netfw", "Release"),
   [string]$Platform = "x64",
   [string[]]$Projects = "all",
   [string]$BuildType = "Clean,Rebuild",
