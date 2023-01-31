@@ -1,5 +1,23 @@
 # WASimCommander - Change Log
 
+## 1.1.1.0 (31-Jan-2023)
+Patch update for MSFS SU11/SDK 0.20.5.0.
+
+### WASimModule
+* Added 73 Key Event lookup names from latest MSFS SDK v0.20.5.0.
+* Added 55 Key Event lookup name aliases for published SimConnect Event IDs for which the KEY_* macro names do not match (result of my MSFS SDK Docs import project).
+* KEY_PROP_FORCE_BETA_* Key Event IDs (from last update) were updated again to reflect SDK v0.20.5.0 values.
+* Release version is now built using `clang:-O3` level optimization since MSFS memory corruption issue confirmed fixed.
+
+### WASimClient and WASimClient_CLI
+* Improved detection of configuration file parameter (`config`) in class constructor being a file or directory, which also validates existence.
+
+### WASimUI
+* Improved visual separation of forms by function type (Variables, Lookup, etc).
+* Added/improved some of the tool-tip documentation notes for each core function (hover on section title).
+* Fixed "About" dialog box transparency issue.
+
+---
 ## 1.1.0.0 (2-Nov-2022)
 Updates for MSFS 2020 SU10 changes and new event trigger API for sending multiple values.
 
