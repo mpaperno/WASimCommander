@@ -49,29 +49,34 @@ var NAVTREE =
       ] ]
     ] ],
     [ "WASimCommander - Change Log", "md__c_h_a_n_g_e_l_o_g.html", [
-      [ "1.1.0.0 (2-Nov-2022)", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md26", [
+      [ "1.1.1.0 (31-Jan-2023)", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md26", [
         [ "WASimModule", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md27", null ],
-        [ "WASimClient", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md28", null ],
-        [ "WASimClient_CLI", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md29", null ],
-        [ "WASimUI", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md30", null ],
-        [ "Shared Components", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md31", null ]
+        [ "WASimClient and WASimClient_CLI", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md28", null ],
+        [ "WASimUI", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md29", null ]
       ] ],
-      [ "1.0.0.9 (unpublished)", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md33", null ],
-      [ "1.0.0.8-rc1 (2-Aug-2022)", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md35", [
-        [ "WASimClient (and dependents)", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md36", null ],
-        [ "WASIMClient_CLI", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md37", null ],
-        [ "General", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md38", null ]
+      [ "1.1.0.0 (2-Nov-2022)", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md31", [
+        [ "WASimModule", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md32", null ],
+        [ "WASimClient", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md33", null ],
+        [ "WASimClient_CLI", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md34", null ],
+        [ "WASimUI", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md35", null ],
+        [ "Shared Components", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md36", null ]
       ] ],
-      [ "1.0.0.7-beta3 (12-Jul-2022)", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md40", [
-        [ "WASimClient, WASimClient_CLI, WASimUI", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md41", null ]
+      [ "1.0.0.9 (unpublished)", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md38", null ],
+      [ "1.0.0.8-rc1 (2-Aug-2022)", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md40", [
+        [ "WASimClient (and dependents)", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md41", null ],
+        [ "WASIMClient_CLI", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md42", null ],
+        [ "General", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md43", null ]
       ] ],
-      [ "1.0.0.6-beta2 (11-Jul-2022)", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md43", [
-        [ "WASimModule", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md44", null ],
-        [ "WASimClient", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md45", null ],
-        [ "WASimClient_CLI", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md46", null ],
-        [ "WASimUI", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md47", null ]
+      [ "1.0.0.7-beta3 (12-Jul-2022)", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md45", [
+        [ "WASimClient, WASimClient_CLI, WASimUI", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md46", null ]
       ] ],
-      [ "1.0.0.5-beta1 (04-Jul-2022)", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md49", null ]
+      [ "1.0.0.6-beta2 (11-Jul-2022)", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md48", [
+        [ "WASimModule", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md49", null ],
+        [ "WASimClient", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md50", null ],
+        [ "WASimClient_CLI", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md51", null ],
+        [ "WASimUI", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md52", null ]
+      ] ],
+      [ "1.0.0.5-beta1 (04-Jul-2022)", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md54", null ]
     ] ],
     [ "LICENSE.txt", "_l_i_c_e_n_s_e_8txt.html", null ],
     [ "LICENSE.GPL.txt", "_l_i_c_e_n_s_e_8_g_p_l_8txt.html", null ],
@@ -112,8 +117,8 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "_assembly_info_8cpp_source.html",
-"md__c_h_a_n_g_e_l_o_g.html#autotoc_md30",
-"struct_w_a_sim_commander_1_1_client_1_1_variable_request.html#a55b374f1467c165079b3a80693eee45d"
+"md__c_h_a_n_g_e_l_o_g.html#autotoc_md31",
+"struct_w_a_sim_commander_1_1_client_1_1_variable_request.html#a43420204e136c7a6fc3a890040dbdac5"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';
