@@ -108,6 +108,8 @@ Over in the [Releases](https://github.com/mpaperno/WASimCommander/releases) ther
 
 _Watch_ -> _Custom_ -> _Releases_ this repo (button at top) or subscribe to the [ATOM feed](https://github.com/mpaperno/WASimCommander/releases.atom) for release notifications.
 
+Update announcements are also posted on my Discord server's [WASimCommander release announcement channel](https://discord.gg/StbmZ2ZgsF).
+
 -------------
 ### Documentation & Examples
 
@@ -163,6 +165,9 @@ The GitHub repository is the primary source of all these things. You know what t
 Use the [Issues](https://github.com/mpaperno/WASimCommander/issues) feature for bug reports and concise feature suggestions.
 
 Use [Discussions](https://github.com/mpaperno/WASimCommander/discussions) for any other topic.
+
+There is also a [Discord support forum](https://discord.gg/QhUDFX6Kun) on my server, 
+along with [release announcement](https://discord.gg/StbmZ2ZgsF) and [general chat](https://discord.gg/meWyE4dcAt) channels.
 
 Most flight simulator forums seem fairly strict about _not_ using their site to provide product support. So please use GitHub,
 unless you're absolutely sure no rules would be broken or toes stepped upon otherwise.
