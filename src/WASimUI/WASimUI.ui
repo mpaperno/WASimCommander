@@ -858,7 +858,7 @@ Submitted requests will appear in the &quot;Data Requests&quot; window. Double-c
       <property name="title">
        <string>Variables</string>
       </property>
-      <layout class="QGridLayout" name="gridLayout_6" columnstretch="0,0,0,0,0,0,0,0">
+      <layout class="QGridLayout" name="gridLayout_6" columnstretch="0,1,0,0,0,0,0,0">
        <property name="leftMargin">
         <number>4</number>
        </property>
