@@ -1335,7 +1335,7 @@ Submitted requests will appear in the &quot;Data Requests&quot; window. Double-c
 &lt;p&gt;Calculator code which returns a result can be copied to Data Requests and turned into a recurring query.  Code which performs some kind of action can be turned into a Registered Event which can later be triggered by name or ID.  In either of these cases, the code will be pre-compiled into a more efficient format on the server so that subsequent evaluation will be more efficient.&lt;/p&gt;</string>
       </property>
       <property name="title">
-       <string>Calculator Event</string>
+       <string>Evaluate Calculator Code</string>
       </property>
       <layout class="QGridLayout" name="gridLayout_4">
        <property name="leftMargin">
