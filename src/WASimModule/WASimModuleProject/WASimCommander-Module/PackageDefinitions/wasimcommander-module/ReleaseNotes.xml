@@ -4,7 +4,7 @@
 results cannot be pre-compiled.
 * Event loop is paused when last client
 disconnects.</ReleaseNote>
-<ReleaseNote Version="1.1.0" Date="2022-10-13">v1.1.0.0
+<ReleaseNote Version="1.1.0" Date="2022-10-13">WASimCommander v1.1.0.0
 * Minor updates for SU10: Updated lookup lists of Token vars
 and Key events; Use new trigger_key_event_EX1().
 * Rebuilt using /O1 optimization flag.</ReleaseNote>
@@ -12,3 +12,5 @@ and Key events; Use new trigger_key_event_EX1().
 * Updated lookup lists of Key events for SU11/SDK0.20.5.0.
 * Rebuilt using /O3 optimization flag as per new
 documentation recommendations and since fixes in SU11.</ReleaseNote>
+<ReleaseNote Version="1.1.2" Date="2023-02-05">WASimCommander v1.1.2.0
+* Fixed KEY event alias for "AUTORUDDER_TOGGLE" -> KEY_AUTOCOORD_TOGGLE.</ReleaseNote>

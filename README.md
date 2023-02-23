@@ -1,6 +1,7 @@
 [![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/mpaperno/WASimCommander?include_prereleases)](https://github.com/mpaperno/WASimCommander/releases)
 [![GPLv3 License](https://img.shields.io/badge/license-GPLv3-blue.svg)](LICENSE.GPL.txt)
 [![LGPGv3 License](https://img.shields.io/badge/license-LGPLv3-blue.svg)](LICENSE.LGPL.txt)
+[![Discord](https://img.shields.io/static/v1?style=flat&color=7289DA&&labelColor=7289DA&message=Discord%20Chat&label=&logo=discord&logoColor=white)](https://discord.gg/meWyE4dcAt)
 
 
 # WASimCommander

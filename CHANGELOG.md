@@ -1,5 +1,15 @@
 # WASimCommander - Change Log
 
+## 1.1.2.0 (23-Feb-2023)
+
+### WASimModule
+* Fixed KEY event alias for "AUTORUDDER_TOGGLE" -> KEY_AUTOCOORD_TOGGLE.
+
+### WASimUI
+* Fixed layout issue in "Variables" form which made the name selector/entry field too narrow.
+* Renamed form group "Calculator Event" to "Evaluate Calculator Code".
+
+---
 ## 1.1.1.0 (31-Jan-2023)
 Patch update for MSFS SU11/SDK 0.20.5.0.
 

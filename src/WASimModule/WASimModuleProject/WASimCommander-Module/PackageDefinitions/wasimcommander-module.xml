@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<AssetPackage ReleaseNotes="PackageDefinitions\wasimcommander-module\ReleaseNotes.xml" Version="1.1.1">
+<AssetPackage ReleaseNotes="PackageDefinitions\wasimcommander-module\ReleaseNotes.xml" Version="1.1.2">
 	<ItemSettings>
 		<ContentType>MISC</ContentType>
 		<Title>WASimCommander WASM Module</Title>
