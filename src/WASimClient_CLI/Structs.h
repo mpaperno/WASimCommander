@@ -446,7 +446,7 @@ namespace WASimCommander::CLI::Structs
 				listType{(LookupItemType)r.listType}, result(r.result), list{gcnew ListCollectionType((int)r.list.size()) }
 			{
 				for (const auto &pr : r.list)
-					list->Add(pr.first, gcnew String(pr.second.c_str()));
+					list->TryAdd(pr.first, gcnew String(pr.second.c_str()));
 			}
 	};
 
