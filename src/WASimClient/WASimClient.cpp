@@ -1387,8 +1387,6 @@ class WASimClient::Private
 						serverVersion = data->dwData;
 						serverLastSeen = Clock::now();
 						LOG_DBG << "Got ping response at " << Utilities::timePointToString(serverLastSeen.load()) << " with version " << STREAM_HEX8(serverVersion);
-						if (serverVersion != WSMCMND_VERSION)
-							LOG_WRN << "Server version " << STREAM_HEX8(serverVersion) << " does not match WASimClient version " << STREAM_HEX8(WSMCMND_VERSION);
 						break;
 
 					default:
