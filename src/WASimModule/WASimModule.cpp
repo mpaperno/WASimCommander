@@ -1077,17 +1077,45 @@ bool updateRequestValue(const Client *c, TrackedRequest *tr, bool compareCheck =
 		// double
 		case 0:
 			// convert the value if necessary for proper binary representation
-			if (tr->dataSize == sizeof(float))
-				data = &(f32 = (float)res.fVal);
-			else if (tr->valueSize == DATA_TYPE_INT64)  // better way?
-				data = &(i64 = (int64_t)res.fVal);
-			else
-				data = &res.fVal;
+			switch (tr->valueSize) {
+				// ordered most to least likely
+				case DATA_TYPE_DOUBLE:
+				case sizeof(double):
+					data = &res.fVal;
+					break;
+				case DATA_TYPE_FLOAT:
+				case sizeof(float):
+					data = &(f32 = (float)res.fVal);
+					break;
+				case DATA_TYPE_INT32:
+				case 3:
+					data = &(res.iVal = (int32_t)res.fVal);
+					break;
+				case DATA_TYPE_INT8:
+				case 1:
+					data = &(res.iVal = (int8_t)res.fVal);
+					break;
+				case DATA_TYPE_INT16:
+				case 2:
+					data = &(res.iVal = (int16_t)res.fVal);
+					break;
+				case DATA_TYPE_INT64:
+					// the widest integer any gauge API function returns is 48b (for token/MODULE_VAR) so 53b precision is OK here
+					data = &(i64 = (int64_t)res.fVal);
+					break;
+				default:
+					data = &res.fVal;
+					break;
+			}
 			break;
 		// int32
-		case 1: data = &res.iVal; break;
+		case 1:
+			data = &res.iVal;
+			break;
 		// string
-		case 2: data = (void *)res.sVal.data(); break;
+		case 2:
+			data = (void *)res.sVal.data();
+			break;
 	}
 
 	if (compareCheck && tr->compareCheck && !memcmp(data, tr->data.data(), tr->dataSize)) {
