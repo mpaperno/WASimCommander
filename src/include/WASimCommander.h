@@ -128,18 +128,18 @@ namespace WASimCommander
 	{
 		uint32_t requestId;                  ///< Unique ID for the request, subsequent use of this ID overwrites any previous request definition (but size may not grow).
 		uint32_t valueSize;                  ///< Byte size of stored value; can also be one of the predefined DATA_TYPE_* constants. \sa WASimCommander::DATA_TYPE_INT8, etc
-		float deltaEpsilon = 0.0f;           ///< Minimum change in numeric value required to trigger an update. The default of `0.0` is to send updates only if the value changes, but even on the smallest changes.
+		float deltaEpsilon;                  ///< Minimum change in numeric value required to trigger an update. The default of `0.0` is to send updates only if the value changes, but even on the smallest changes.
 		                                     ///  Setting this to some positive value can be especially useful for high-precision floating-point numbers which may fluctuate within an insignifcant range,
 		                                     ///  but may be used with any numeric value (for integer value types, only the integer part of the epsilon value is considered).
 		                                     ///  Conversely, to send data updates _every time_ the value is read, and skip any comparison check altogether, set this to a negative value like `-1.0`.
 		                                     ///< \note For the positive epsilon settings to work, the `valueSize` must be set to one of the predefined `DATA_TYPE_*` constants.
-		uint32_t interval = 0;               ///< How many `UpdatePeriod` period's should elapse between checks. eg. 500ms or 10 ticks.
+		uint32_t interval;                   ///< How many `UpdatePeriod` period's should elapse between checks. eg. 500ms or 10 ticks.
 		                                     ///  Zero means to check at every `period`, `1` means every other `period`, etc.
 		WSE::UpdatePeriod period;            ///< How often to read/calculate this value.
 		WSE::RequestType requestType;        ///< Named variable or calculated value.
 		WSE::CalcResultType calcResultType;  ///< Expected calculator result type.
 		uint8_t simVarIndex;                 ///< Some SimVars require an index for access, default is 0.
-		char varTypePrefix = 'L';            ///< Variable type prefix for named variables. Types: 'L' (local), 'A' (SimVar) and 'T' (Token, not an actual GaugeAPI prefix) are checked using respecitive GaugeAPI methods.
+		char varTypePrefix;                  ///< Variable type prefix for named variables. Types: 'L' (local), 'A' (SimVar) and 'T' (Token, not an actual GaugeAPI prefix) are checked using respecitive GaugeAPI methods.
 		char nameOrCode[STRSZ_REQ] = {0};    ///< Variable name or full calculator string.
 		char unitName[STRSZ_UNIT] = {0};     ///< Unit name for named variables (optional to override variable's default units). Only 'L' and 'A' variable types support unit specifiers.
 		                                     //  1088/1088 B (packed/unpacked), 8/16 B aligned
@@ -152,9 +152,14 @@ namespace WASimCommander
 			WSE::CalcResultType calcResultType = WSE::CalcResultType::Double,
 			WSE::UpdatePeriod   period = WSE::UpdatePeriod::Tick,
 			const char *        nameOrCode = nullptr,
-			const char *        unitName = nullptr
-		)
-			: requestId(requestId), valueSize(valueSize), period(period), requestType(requestType), calcResultType(calcResultType)
+			const char *        unitName = nullptr,
+			char                varTypePrefix = 'L',
+			float               deltaEpsilon = 0.0f,
+			uint8_t             interval = 0,
+			uint8_t             simVarIndex = 0
+		) :
+			requestId(requestId), valueSize(valueSize), deltaEpsilon(deltaEpsilon), interval(interval), period(period),
+			requestType(requestType), calcResultType(calcResultType), simVarIndex(simVarIndex), varTypePrefix(varTypePrefix)
 		{
 			if (nameOrCode)
 				setNameOrCode(nameOrCode);
@@ -165,29 +170,18 @@ namespace WASimCommander
 		/// Constructs a request for a named variable (`requestType = RequestType::Named`) with optional update period, interval, and epsilon values.
 		explicit DataRequest(uint32_t requestId, char variableType, const char *variableName, uint32_t valueSize,
 		                     WSE::UpdatePeriod period = WSE::UpdatePeriod::Tick, uint32_t interval = 0, float deltaEpsilon = 0.0f) :
-			requestId(requestId), valueSize(valueSize), deltaEpsilon(deltaEpsilon), interval(interval), period(period),  requestType(WSE::RequestType::Named), varTypePrefix(variableType)
-		{
-			if (variableName)
-				setNameOrCode(variableName);
-		}
+			DataRequest(requestId, valueSize, WSE::RequestType::Named, WSE::CalcResultType::None, period, variableName, nullptr, variableType, deltaEpsilon, interval)
+		{ }
 		/// Constructs a request for a named Simulator Variable (`requestType = RequestType::Named` and `varTypePrefix = 'A'`) with optional update period, interval, and epsilon values.
 		explicit DataRequest(uint32_t requestId, const char *simVarName, const char *unitName, uint8_t simVarIndex, uint32_t valueSize,
 		                     WSE::UpdatePeriod period = WSE::UpdatePeriod::Tick, uint32_t interval = 0, float deltaEpsilon = 0.0f) :
-			requestId(requestId), valueSize(valueSize), deltaEpsilon(deltaEpsilon), interval(interval), period(period), requestType(WSE::RequestType::Named), simVarIndex(simVarIndex), varTypePrefix('A')
-		{
-			if (simVarName)
-				setNameOrCode(simVarName);
-			if (unitName)
-				setUnitName(unitName);
-		}
+			DataRequest(requestId, valueSize, WSE::RequestType::Named, WSE::CalcResultType::None, period, simVarName, unitName, 'A', deltaEpsilon, interval, simVarIndex)
+		{ }
 		/// Constructs a calculator code request (`requestType = RequestType::Calculated`) with optional update period, interval, and epsilon values.
 		explicit DataRequest(uint32_t requestId, WSE::CalcResultType resultType, const char *calculatorCode, uint32_t valueSize,
 		                     WSE::UpdatePeriod period = WSE::UpdatePeriod::Tick, uint32_t interval = 0, float deltaEpsilon = 0.0f) :
-			requestId(requestId), valueSize(valueSize), deltaEpsilon(deltaEpsilon), interval(interval), period(period), requestType(WSE::RequestType::Calculated), calcResultType(resultType)
-		{
-			if (calculatorCode)
-				setNameOrCode(calculatorCode);
-		}
+			DataRequest(requestId, valueSize, WSE::RequestType::Calculated, resultType, period, calculatorCode, nullptr, 'Q', deltaEpsilon, interval)
+		{ }
 
 		void setNameOrCode(const char *name) { setCharArrayValue(nameOrCode, STRSZ_REQ, name); }  ///< Set the `nameOrCode` member using a const char array.
 		void setUnitName(const char *name) { setCharArrayValue(unitName, STRSZ_UNIT, name); }     ///< Set the `unitName` member using a const char array.
