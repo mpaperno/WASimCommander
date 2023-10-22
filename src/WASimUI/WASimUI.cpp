@@ -532,6 +532,7 @@ public:
 		QSettings set;
 		set.setValue(QStringLiteral("mainWindowGeo"), q->saveGeometry());
 		set.setValue(QStringLiteral("mainWindowState"), q->saveState());
+		set.setValue(QStringLiteral("requestsViewHeaderState"), ui->requestsView->horizontalHeader()->saveState());
 		set.setValue(QStringLiteral("eventsViewHeaderState"), ui->eventsView->horizontalHeader()->saveState());
 		set.setValue(QStringLiteral("logViewHeaderState"), ui->logView->horizontalHeader()->saveState());
 
@@ -553,6 +554,8 @@ public:
 			q->restoreGeometry(set.value(QStringLiteral("mainWindowGeo")).toByteArray());
 		if (set.contains(QStringLiteral("mainWindowState")))
 			q->restoreState(set.value(QStringLiteral("mainWindowState")).toByteArray());
+		if (set.contains(QStringLiteral("requestsViewHeaderState")))
+			ui->requestsView->horizontalHeader()->restoreState(set.value(QStringLiteral("requestsViewHeaderState")).toByteArray());
 		if (set.contains(QStringLiteral("eventsViewHeaderState")))
 			ui->eventsView->horizontalHeader()->restoreState(set.value(QStringLiteral("eventsViewHeaderState")).toByteArray());
 		if (set.contains(QStringLiteral("logViewHeaderState")))
@@ -649,8 +652,20 @@ WASimUI::WASimUI(QWidget *parent) :
 
 	// Set up the Requests table view
 	ui.requestsView->setModel(d->reqModel);
-	ui.requestsView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+	ui.requestsView->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
 	ui.requestsView->horizontalHeader()->setSectionsMovable(true);
+	ui.requestsView->horizontalHeader()->resizeSection(RequestsModel::COL_ID, 40);
+	ui.requestsView->horizontalHeader()->resizeSection(RequestsModel::COL_TYPE, 65);
+	ui.requestsView->horizontalHeader()->resizeSection(RequestsModel::COL_RES_TYPE, 55);
+	ui.requestsView->horizontalHeader()->resizeSection(RequestsModel::COL_NAME, 265);
+	ui.requestsView->horizontalHeader()->resizeSection(RequestsModel::COL_IDX, 30);
+	ui.requestsView->horizontalHeader()->resizeSection(RequestsModel::COL_UNIT, 55);
+	ui.requestsView->horizontalHeader()->resizeSection(RequestsModel::COL_SIZE, 85);
+	ui.requestsView->horizontalHeader()->resizeSection(RequestsModel::COL_PERIOD, 60);
+	ui.requestsView->horizontalHeader()->resizeSection(RequestsModel::COL_INTERVAL, 40);
+	ui.requestsView->horizontalHeader()->resizeSection(RequestsModel::COL_EPSILON, 60);
+	ui.requestsView->horizontalHeader()->resizeSection(RequestsModel::COL_VALUE, 70);
+	ui.requestsView->horizontalHeader()->resizeSection(RequestsModel::COL_TIMESATMP, 70);
 	// connect double click action to populate the request editor form
 	connect(ui.requestsView, &QTableView::doubleClicked, this, [this](const QModelIndex &idx) { d->populateRequestForm(idx); });
 

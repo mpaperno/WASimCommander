@@ -174,11 +174,11 @@ class Utils
 					break;
 				case QMetaType::Char:
 				case QMetaType::SChar:
-					v.setValue(qint8(res));
+					v.setValue(qint16((int8_t)res));  // upcast for printing
 					break;
 				case QMetaType::UChar:
 				case QMetaType::Bool:
-					v.setValue(quint8(res));
+					v.setValue(quint16((uint8_t)res));  // upcast for printing
 					break;
 				case QMetaType::Short:
 					v.setValue(qint16(res));

@@ -47,18 +47,17 @@ struct RequestRecord : public WASimCommander::Client::DataRequestRecord
 	uint32_t interval;
 	UpdatePeriod period;
 	RequestType requestType;
-	union {
-		CalcResultType calcResultType;
-		uint8_t simVarIndex;
-	};
+	CalcResultType calcResultType;
+	uint8_t simVarIndex;
 	char varTypePrefix;
 	char nameOrCode[STRSZ_REQ];
 	char unitName[STRSZ_UNIT];
 	// From DataRequestRecord
 	time_t lastUpdate;
-	uint32_t dataSize;
+	std::vector<uint8_t> data;
 	*/
 	int metaType = QMetaType::UnknownType;
+	QVariantMap properties {};
 
 	using DataRequestRecord::DataRequestRecord;
 
@@ -134,14 +133,14 @@ class RequestsModel : public QStandardItemModel
 private:
 	Q_OBJECT
 
-	enum Roles { DataRole = Qt::UserRole + 1, MetaTypeRole };
 
 public:
+	enum Roles { DataRole = Qt::UserRole + 1, MetaTypeRole, IdStringRole, PropertiesRole };
 	enum Columns {
-		COL_ID,   COL_TYPE,   COL_RES_TYPE,       COL_NAME,           COL_SIZE,   COL_UNIT,   COL_IDX,   COL_PERIOD,   COL_INTERVAL, COL_EPSILON, COL_VALUE,   COL_TIMESATMP,   COL_ENUM_END
+		COL_ID,   COL_TYPE,   COL_RES_TYPE,  COL_NAME,           COL_IDX,   COL_UNIT,   COL_SIZE,   COL_PERIOD,   COL_INTERVAL, COL_EPSILON, COL_VALUE,   COL_TIMESATMP,   COL_ENUM_END
 	};
 	const QStringList columnNames = {
-		tr("ID"), tr("Type"), tr("Res/Var Type"), tr("Name or Code"), tr("Size"), tr("Unit"), tr("Idx"), tr("Period"), tr("Intvl"),   tr("ΔΕ"),   tr("Value"), tr("Last Updt.")
+		tr("ID"), tr("Type"), tr("Res/Var"), tr("Name or Code"), tr("Idx"), tr("Unit"), tr("Size"), tr("Period"), tr("Intvl"),   tr("ΔΕ"),   tr("Value"), tr("Last Updt.")
 	};
 
 	RequestsModel(QObject *parent = nullptr) :
@@ -171,12 +170,14 @@ public:
 		QVariant v = Utils::convertValueToType(dataType, res);
 		item(row, COL_VALUE)->setText(v.toString());
 		item(row, COL_VALUE)->setData(v);
+		item(row, COL_VALUE)->setToolTip(item(row, COL_VALUE)->text());
 
 		// update timestamp column
 		const auto ts = QDateTime::fromMSecsSinceEpoch(res.lastUpdate);
 		const auto lastts = item(row, COL_TIMESATMP)->data().toULongLong();
 		const uint64_t tsDelta = lastts ? res.lastUpdate - lastts : 0;
 		item(row, COL_TIMESATMP)->setText(QString("%1 (%2)").arg(ts.toString("hh:mm:ss.zzz")).arg(tsDelta));
+		item(row, COL_TIMESATMP)->setToolTip(item(row, COL_TIMESATMP)->text());
 		item(row, COL_TIMESATMP)->setData(res.lastUpdate);
 		qDebug() << "Saved result" << v << "for request ID" << res.requestId << "ts" << res.lastUpdate << "size" << res.data.size() << "type" << (QMetaType::Type)dataType << "data : " << QByteArray((const char *)res.data.data(), res.data.size()).toHex(':');
 	}
@@ -204,6 +205,7 @@ public:
 		req.setUnitName(item(row, COL_UNIT)->data(DataRole).toByteArray().constData());
 
 		req.metaType = item(row, COL_ID)->data(MetaTypeRole).toInt();
+		req.properties = item(row, COL_ID)->data(PropertiesRole).toMap();
 
 		//std::cout << req << std::endl;
 		return req;
@@ -219,9 +221,12 @@ public:
 		setItem(row, COL_ID, new QStandardItem(QString("%1").arg(req.requestId)));
 		item(row, COL_ID)->setData(req.requestId, DataRole);
 		item(row, COL_ID)->setData(req.metaType, MetaTypeRole);
+		item(row, COL_ID)->setData(req.properties, PropertiesRole);
+		item(row, COL_ID)->setData(req.properties.value("id"), IdStringRole);  // for search
 
 		setItem(row, COL_TYPE, new QStandardItem(WSEnums::RequestTypeNames[+req.requestType]));
 		item(row, COL_TYPE)->setData(+req.requestType);
+		item(row, COL_TYPE)->setToolTip(item(row, COL_TYPE)->text());
 
 		if (req.requestType == WSEnums::RequestType::Calculated) {
 			setItem(row, COL_RES_TYPE, new QStandardItem(WSEnums::CalcResultTypeNames[+req.calcResultType]));
@@ -249,6 +254,8 @@ public:
 				item(row, COL_IDX)->setEnabled(false);
 			}
 		}
+		item(row, COL_RES_TYPE)->setToolTip(item(row, COL_RES_TYPE)->text());
+		item(row, COL_UNIT)->setToolTip(item(row, COL_UNIT)->text());
 		item(row, COL_UNIT)->setData(QString(req.unitName));
 
 		if (req.metaType == QMetaType::UnknownType)
@@ -258,21 +265,26 @@ public:
 		else
 			setItem(row, COL_SIZE, new QStandardItem(QString("%1 (%2 B)").arg(QString(QMetaType::typeName(req.metaType)).replace("q", "")).arg(QMetaType::sizeOf(req.metaType))));
 		item(row, COL_SIZE)->setData(req.valueSize);
+		item(row, COL_SIZE)->setToolTip(item(row, COL_SIZE)->text());
 
 		setItem(row, COL_PERIOD, new QStandardItem(WSEnums::UpdatePeriodNames[+req.period]));
+		item(row, COL_PERIOD)->setToolTip(item(row, COL_PERIOD)->text());
 		item(row, COL_PERIOD)->setData(+req.period);
 
 		setItem(row, COL_NAME, new QStandardItem(QString(req.nameOrCode)));
+		item(row, COL_NAME)->setToolTip(item(row, COL_NAME)->text());
+
 		setItem(row, COL_INTERVAL, new QStandardItem(QString("%1").arg(req.interval)));
 
 		if (req.metaType > QMetaType::UnknownType && req.metaType < QMetaType::User) {
-			setItem(row, COL_EPSILON, new QStandardItem(QString("%1").arg(req.deltaEpsilon, 0, 'f', 7)));
+			setItem(row, COL_EPSILON, new QStandardItem(QString::number(req.deltaEpsilon)));
 		}
 		else  {
 			setItem(row, COL_EPSILON, new QStandardItem(tr("N/A")));
 			item(row, COL_EPSILON)->setEnabled(false);
 		}
 		item(row, COL_EPSILON)->setData(req.deltaEpsilon);
+		item(row, COL_EPSILON)->setToolTip(item(row, COL_EPSILON)->text());
 
 		if (newRow) {
 			setItem(row, COL_VALUE, new QStandardItem("???"));
@@ -288,7 +300,6 @@ public:
 		const int row = findRequestRow(requestId);
 		if (row > -1)
 			removeRow(row);
-		qDebug() << requestId << row;
 	}
 
 	void removeRequests(const QList<uint32_t> requestIds)
