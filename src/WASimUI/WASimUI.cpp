@@ -196,7 +196,7 @@ public:
 		ui->cbNameOrCode->setCurrentText(vtype == 'L' ? ui->cbLvars->currentText() : ui->cbVariableName->currentText());
 		ui->cbVariableType->setCurrentData(vtype);
 		ui->cbUnitName->setCurrentText(ui->cbSetVarUnitName->currentText());
-		ui->cbValueSize->setCurrentData(+QMetaType::Double);
+		ui->cbValueSize->setCurrentData(Utils::unitToMetaType(ui->cbUnitName->currentText()));
 	}
 
 	void sendKeyEventForm()
@@ -240,6 +240,10 @@ public:
 		//ui->lblUnit->setVisible(!isCalc);
 		//ui->cbUnitName->setVisible(!isCalc);
 		toggleRequestVariableType();
+		if (isCalc)
+			ui->cbValueSize->setCurrentData(Utils::calcResultTypeToMetaType(CalcResultType(ui->cbRequestCalcResultType->currentData().toUInt())));
+		else
+			ui->cbValueSize->setCurrentData(Utils::unitToMetaType(ui->cbUnitName->currentText()));
 	}
 
 	void toggleRequestVariableType()
@@ -289,7 +293,6 @@ public:
 		req.setNameOrCode(qPrintable(ui->cbNameOrCode->currentText()));
 		req.setUnitName(qPrintable(ui->cbUnitName->currentText()));
 
-		int metaType = QMetaType::UnknownType;
 		if (ui->cbValueSize->currentData().isValid())
 			req.valueSize = Utils::metaTypeToSimType(req.metaType = ui->cbValueSize->currentData().toInt());
 		else
@@ -330,10 +333,6 @@ public:
 			ui->cbUnitName->setCurrentText(req.unitName);
 			ui->sbSimVarIndex->setValue(req.simVarIndex);
 		}
-		if (req.metaType == QMetaType::UnknownType)
-			ui->cbValueSize->setCurrentText(QString("%1").arg(req.valueSize));
-		else
-			ui->cbValueSize->setCurrentData(req.metaType);
 		ui->cbNameOrCode->setCurrentText(req.nameOrCode);
 		ui->cbPeriod->setCurrentData(+req.period);
 		ui->sbInterval->setValue(req.interval);
@@ -690,6 +689,10 @@ WASimUI::WASimUI(QWidget *parent) :
 	connect(ui.bgrpRequestType, QOverload<int, bool>::of(&QButtonGroup::buttonToggled), this, [this](int,bool) { d->toggleRequestType(); });
 	// show/hide SimVar index spin box based on type of variable selected
 	connect(ui.cbVariableType, &DataComboBox::currentDataChanged, this, [this](const QVariant&) { d->toggleRequestVariableType(); });
+	// Connect the data request unit type selector to choose a default result size
+	connect(ui.cbUnitName, &DataComboBox::currentTextChanged, this, [this](const QString &data) {
+		ui.cbValueSize->setCurrentData(Utils::unitToMetaType(data));
+	});
 	// Connect the data request calc result type selector to choose a default result size
 	connect(ui.cbRequestCalcResultType, &DataComboBox::currentDataChanged, this, [this](const QVariant &data) {
 		ui.cbValueSize->setCurrentData(Utils::calcResultTypeToMetaType(CalcResultType(data.toUInt())));

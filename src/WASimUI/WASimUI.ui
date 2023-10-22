@@ -392,6 +392,80 @@ Submitted requests will appear in the &quot;Data Requests&quot; window. Double-c
           </widget>
          </item>
          <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_7">
+           <property name="spacing">
+            <number>4</number>
+           </property>
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="QLabel" name="lblIndex">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="text">
+              <string>Idx:</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QSpinBox" name="sbSimVarIndex">
+             <property name="toolTip">
+              <string>SimVar Index (if any, zero is blank)</string>
+             </property>
+             <property name="wrapping">
+              <bool>true</bool>
+             </property>
+             <property name="specialValueText">
+              <string notr="true"/>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="lblUnit">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="text">
+              <string>Unit:</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="WASimUiNS::UnitTypeComboBox" name="cbUnitName">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="toolTip">
+              <string>Optional Unit Name for Named Variables&lt;p&gt;(Save items by pressing Enter, Remove by right-clicking on them while the list is open.)&lt;/p&gt;</string>
+             </property>
+             <property name="editable">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
           <layout class="QHBoxLayout" name="horizontalLayout_15">
            <property name="spacing">
             <number>4</number>
@@ -449,80 +523,6 @@ Submitted requests will appear in the &quot;Data Requests&quot; window. Double-c
             <bool>true</bool>
            </property>
           </widget>
-         </item>
-         <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_7">
-           <property name="spacing">
-            <number>4</number>
-           </property>
-           <property name="leftMargin">
-            <number>0</number>
-           </property>
-           <property name="topMargin">
-            <number>0</number>
-           </property>
-           <property name="rightMargin">
-            <number>0</number>
-           </property>
-           <property name="bottomMargin">
-            <number>0</number>
-           </property>
-           <item>
-            <widget class="QLabel" name="lblUnit">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="text">
-              <string>Unit:</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="WASimUiNS::UnitTypeComboBox" name="cbUnitName">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="toolTip">
-              <string>Optional Unit Name for Named Variables&lt;p&gt;(Save items by pressing Enter, Remove by right-clicking on them while the list is open.)&lt;/p&gt;</string>
-             </property>
-             <property name="editable">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLabel" name="lblIndex">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="text">
-              <string>Idx:</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QSpinBox" name="sbSimVarIndex">
-             <property name="toolTip">
-              <string>SimVar Index (if any, zero is blank)</string>
-             </property>
-             <property name="wrapping">
-              <bool>true</bool>
-             </property>
-             <property name="specialValueText">
-              <string notr="true"/>
-             </property>
-            </widget>
-           </item>
-          </layout>
          </item>
         </layout>
        </item>
@@ -631,7 +631,7 @@ Submitted requests will appear in the &quot;Data Requests&quot; window. Double-c
          <property name="insertPolicy">
           <enum>QComboBox::InsertAtTop</enum>
          </property>
-         <property name="placeholderText">
+         <property name="placeholderText" stdset="0">
           <string>Name or ID</string>
          </property>
         </widget>
@@ -947,6 +947,7 @@ Submitted requests will appear in the &quot;Data Requests&quot; window. Double-c
               </property>
               <property name="font">
                <font>
+                <weight>75</weight>
                 <bold>true</bold>
                </font>
               </property>
@@ -1018,6 +1019,7 @@ Submitted requests will appear in the &quot;Data Requests&quot; window. Double-c
               </property>
               <property name="font">
                <font>
+                <weight>75</weight>
                 <bold>true</bold>
                </font>
               </property>
@@ -1204,6 +1206,7 @@ Submitted requests will appear in the &quot;Data Requests&quot; window. Double-c
          </property>
          <property name="font">
           <font>
+           <weight>75</weight>
            <bold>true</bold>
           </font>
          </property>
@@ -1222,6 +1225,7 @@ Submitted requests will appear in the &quot;Data Requests&quot; window. Double-c
          </property>
          <property name="font">
           <font>
+           <weight>75</weight>
            <bold>true</bold>
           </font>
          </property>
@@ -1635,6 +1639,7 @@ Submitted requests will appear in the &quot;Data Requests&quot; window. Double-c
          </property>
          <property name="font">
           <font>
+           <weight>75</weight>
            <bold>true</bold>
           </font>
          </property>
