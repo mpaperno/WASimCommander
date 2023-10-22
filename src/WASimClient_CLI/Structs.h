@@ -250,16 +250,19 @@ namespace WASimCommander::CLI::Structs
 				requestType(RequestType::Calculated), calcResultType(resultType), nameOrCode(calculatorCode)
 			{	}
 
+			/// <summary>Set the `nameOrCode` member using a `string` type value. </summary>
 			void setNameOrCode(String ^nameOrCode)
 			{
 				this->nameOrCode = char_array<STRSZ_REQ>(nameOrCode);
 			}
 
+			/// <summary>Set the `unitName` member using a `string` type value. </summary>
 			void setUnitName(String ^unitName)
 			{
 				this->unitName = char_array<STRSZ_UNIT>(unitName);
 			}
 
+			/// <summary>Serializes this `DataRequest` to a string for debugging purposes.</summary>
 			String ^ToString() override
 			{
 				String ^str = String::Format(
@@ -319,11 +322,14 @@ namespace WASimCommander::CLI::Structs
 			array<Byte> ^data {};   ///< Value data array.
 
 
-			/// <summary> Tries to populate a value reference of the desired type and returns true or false
+			/// <summary> Tries to populate a value reference of the desired type `T` and returns true or false
 			/// depending on if the conversion was valid (meaning the size of requested type matches the data size). </summary>
 			/// If the conversion fails, result is default-initialized.
-			/// The requested type must be a `value` type (not reference) and be default-constructible, (eg. numerics, chars), or fixed-size arrays of such types.
-			generic<typename T> where T : value class, gcnew()
+			/// The requested type (`T`) must be a `value` type (not reference) and be default-constructible, (eg. numerics, chars), or fixed-size arrays of such types.
+			generic<typename T>
+#if !DOXYGEN
+			where T : value class, gcnew()
+#endif
 			inline bool tryConvert([Out] T %result)
 			{
 				if (data->Length == (int)sizeof(T)) {
@@ -349,7 +355,8 @@ namespace WASimCommander::CLI::Structs
 				return true;
 			}
 
-			// Implicit conversion operators for various types
+			/// \name Implicit conversion operators for various types.
+			/// \{
 			inline static operator double(DataRequestRecord ^dr) { return dr->toType<double>(); }
 			inline static operator float(DataRequestRecord ^dr) { return dr->toType<float>(); }
 			inline static operator int64_t(DataRequestRecord ^dr) { return dr->toType<int64_t>(); }
@@ -361,6 +368,7 @@ namespace WASimCommander::CLI::Structs
 			inline static operator int8_t(DataRequestRecord ^dr) { return dr->toType<int8_t>(); }
 			inline static operator uint8_t(DataRequestRecord ^dr) { return dr->toType<uint8_t>(); }
 			inline static operator String ^(DataRequestRecord ^dr) { return dr->toType<String ^>(); }
+			/// \}
 
 			// can't get generic to work
 			//generic<typename T> where T : value class, gcnew()
@@ -372,6 +380,8 @@ namespace WASimCommander::CLI::Structs
 			//	return ret;
 			//}
 
+			/// <summary>Serializes this `DataRequestRecord` to string for debugging purposes.</summary>
+			/// To return the request's _value_ as a string, see `tryConvert()` or the `String ^()` operator. \sa DataRequest::ToString()
 			String ^ToString() override {
 				return String::Format(
 					"{0}; DataRequestRecord {{Last Update: {1}; Data: {2}}}",
