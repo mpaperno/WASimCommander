@@ -215,7 +215,7 @@ struct calcResult_t
 	string sVal;
 	void setF(const FLOAT64 val) { fVal = val; resultSize = sizeof(FLOAT64); resultMemberIndex = 0; }
 	void setI(const SINT32  val) { iVal = val; resultSize = sizeof(SINT32); resultMemberIndex = 1; }
-	void setS(const string &&val) { sVal = move(val); sVal.resize(strSize); resultSize = strSize; resultMemberIndex = 2; }
+	void setS(const string &&val) { sVal = std::move(val); sVal.resize(strSize); resultSize = strSize; resultMemberIndex = 2; }
 };
 
 typedef map<uint32_t, Client> clientMap_t;
@@ -464,7 +464,7 @@ Client *getOrCreateClient(uint32_t clientId)
 	registerClientKeyEventDataArea(&c);
 
 	// move client record into map
-	Client *pC = &g_mClients.emplace(clientId, move(c)).first->second;
+	Client *pC = &g_mClients.emplace(clientId, std::move(c)).first->second;
 	// save mappings of the command and request data IDs (which SimConnect sends us) to the client record; for lookup in message dispatch.
 	g_mDefinitionIds.emplace(piecewise_construct, forward_as_tuple(c.cddID_command), forward_as_tuple(RecordType::CommandData, pC));  // no try_emplace?
 	g_mDefinitionIds.emplace(piecewise_construct, forward_as_tuple(c.cddID_request), forward_as_tuple(RecordType::RequestData, pC));
@@ -1199,7 +1199,7 @@ bool addOrUpdateRequest(Client *c, const DataRequest *const req)
 	}
 	// calculated value, update compiled string if needed
 	// NOTE: compiling code for format_calculator_string() doesn't seem to work as advertised in the docs, see:
-	//   https://devsupport.flightsimulator.com/questions/9513/gauge-calculator-code-precompile-with-code-meant-f.html
+	//   https://devsupport.flightsimulator.com/t/gauge-calculator-code-precompile-with-code-meant-for-format-calculator-string-reports-format-errors/4457
 	else if (tr->calcResultType != CalcResultType::Formatted && tr->calcBytecode.empty()) {
 		// assume the command has changed and re-compile
 		PCSTRINGZ pCompiled = nullptr;
