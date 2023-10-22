@@ -55,6 +55,13 @@ class WASimUIPrivate
 {
 	friend class WASimUI;
 	Q_DECLARE_TR_FUNCTIONS(WASimUI)
+
+	struct FormWidget {
+		QString name;
+		QWidget *w;
+		QAction *a;
+	};
+
 public:
 	WASimUI *q;
 	Ui::WASimUIClass *ui;
@@ -69,6 +76,7 @@ public:
 	QString lastRequestsFile;
 	QString lastEventsFile;
 	uint32_t nextCmdToken = 0x0000FFFF;
+	QVector<FormWidget> formWidgets { };
 
 	WASimUIPrivate(WASimUI *q) : q(q), ui(&q->ui),
 		reqModel(new RequestsModel(q)),
@@ -536,6 +544,11 @@ public:
 		set.setValue(QStringLiteral("eventsViewHeaderState"), ui->eventsView->horizontalHeader()->saveState());
 		set.setValue(QStringLiteral("logViewHeaderState"), ui->logView->horizontalHeader()->saveState());
 
+		set.beginGroup(QStringLiteral("Widgets"));
+		for (const FormWidget &vw : qAsConst(formWidgets))
+			set.setValue(vw.name, vw.a->isChecked());
+		set.endGroup();
+
 		set.setValue(QStringLiteral("useDarkTheme"), Utils::isDarkStyle());
 		set.setValue(QStringLiteral("lastRequestsFile"), lastRequestsFile);
 		set.setValue(QStringLiteral("lastEventsFile"), lastEventsFile);
@@ -560,6 +573,11 @@ public:
 			ui->eventsView->horizontalHeader()->restoreState(set.value(QStringLiteral("eventsViewHeaderState")).toByteArray());
 		if (set.contains(QStringLiteral("logViewHeaderState")))
 			ui->logView->horizontalHeader()->restoreState(set.value(QStringLiteral("logViewHeaderState")).toByteArray());
+
+		set.beginGroup(QStringLiteral("Widgets"));
+		for (const FormWidget &vw : qAsConst(formWidgets))
+			vw.a->setChecked(set.value(vw.name, vw.a->isChecked()).toBool());
+		set.endGroup();
 
 		const QString defaultFileLoc = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
 		lastRequestsFile = set.value(QStringLiteral("lastRequestsFile"), defaultFileLoc + QStringLiteral("/WASimUI-requests.ini")).toString();
@@ -1114,7 +1132,7 @@ WASimUI::WASimUI(QWidget *parent) :
 
 	QIcon wordWrapIcon(QStringLiteral("wrap_text.glyph"));
 	wordWrapIcon.addFile(QStringLiteral("notes.glyph"), QSize(), QIcon::Normal, QIcon::On);
-	QAction *wordWrapLogWindowAct = new QAction(wordWrapIcon, tr("Word Wrap"), this);
+	QAction *wordWrapLogWindowAct = new QAction(wordWrapIcon, tr("Log Word Wrap"), this);
 	wordWrapLogWindowAct->setToolTip(tr("Toggle word wrapping of the log window."));
 	wordWrapLogWindowAct->setCheckable(true);
 	wordWrapLogWindowAct->setChecked(true);
@@ -1137,6 +1155,23 @@ WASimUI::WASimUI(QWidget *parent) :
 
 	QAction *viewAct = new QAction(QIcon(QStringLiteral("grid_view.glyph")), tr("View"), this);
 	QMenu *viewMenu = new QMenu(tr("View"), this);
+
+#define WIDGET_VIEW_TOGGLE_ACTION(T, W, V)  {\
+		QAction *act = new QAction(tr("Show %1 Form").arg(T), this); \
+		act->setCheckable(true); act->setChecked(V); \
+		W->addAction(act); W->setWindowTitle(T); W->setVisible(V);  \
+		connect(act, &QAction::toggled, W, &QWidget::setVisible); \
+		d->formWidgets.append({T, W, act}); \
+		viewMenu->addAction(act); \
+	}
+	WIDGET_VIEW_TOGGLE_ACTION(tr("Calculator Code"), ui.wCalcForm, true);
+	WIDGET_VIEW_TOGGLE_ACTION(tr("Variables"), ui.wVariables, true);
+	WIDGET_VIEW_TOGGLE_ACTION(tr("Lookup"), ui.wDataLookup, true);
+	WIDGET_VIEW_TOGGLE_ACTION(tr("Key Events"), ui.wKeyEvent, true);
+	WIDGET_VIEW_TOGGLE_ACTION(tr("API Command"), ui.wCommand, false);
+	WIDGET_VIEW_TOGGLE_ACTION(tr("Data Request Editor"), ui.wRequestForm, true);
+#undef WIDGET_VIEW_TOGGLE_ACTION
+
 	viewMenu->addActions({ ui.dwRequests->toggleViewAction(), ui.dwEventsList->toggleViewAction(), ui.dwLog->toggleViewAction() });
 	viewAct->setMenu(viewMenu);
 
