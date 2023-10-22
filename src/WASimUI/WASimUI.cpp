@@ -1197,6 +1197,7 @@ void WASimUI::onListResults(const ListResult &list)
 	ui.cbLvars->clear();
 	for (const auto &pair : list.list)
 		ui.cbLvars->addItem(QString::fromStdString(pair.second), pair.first);
+	ui.cbLvars->model()->sort(0);
 }
 
 void WASimUI::closeEvent(QCloseEvent *ev)

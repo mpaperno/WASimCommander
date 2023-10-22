@@ -267,7 +267,7 @@ public:
 		setToolTip(tr("Named variable type. Types marked with a * use Unit specifiers."));
 
 		addItem(tr("A: SimVar *"), 'A');
-		addItem(tr("B: Input"),    'B');
+		//addItem(tr("B: Input"),    'B');  // only for gauge modules
 		addItem(tr("C: GPS *"),    'C');
 		addItem(tr("E: Env. *"),   'E');
 		addItem(tr("H: HTML"),     'H');
@@ -430,6 +430,7 @@ public:
 		addItem(QStringLiteral("psi"), i++);
 		addItem(QStringLiteral("radians"), i++);
 		addItem(QStringLiteral("rpm"), i++);
+		addItem(QStringLiteral("seconds"), i++);
 		addItem(QStringLiteral("string"), i++);
 		addItem(QStringLiteral("volts"), i++);
 		addItem(QStringLiteral("Watts"), i++);
