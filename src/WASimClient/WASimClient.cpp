@@ -1248,7 +1248,8 @@ class WASimClient::Private
 			case SIMCONNECT_RECV_ID_CLIENT_DATA: {
 				SIMCONNECT_RECV_CLIENT_DATA* data = (SIMCONNECT_RECV_CLIENT_DATA*)pData;
 				LOG_TRC << LOG_SC_RCV_CLIENT_DATA(data);
-				const size_t dataSize = (size_t)pData->dwSize + 4 - sizeof(SIMCONNECT_RECV_CLIENT_DATA);  // dwSize reports 4 bytes less than actual size of SIMCONNECT_RECV_CLIENT_DATA
+				// dwSize always under-reports by 4 bytes when sizeof(SIMCONNECT_RECV_CLIENT_DATA) is subtracted, and the minimum reported size is 4 bytes even for 0-3 bytes of actual data.
+				const size_t dataSize = (size_t)pData->dwSize + 4 - sizeof(SIMCONNECT_RECV_CLIENT_DATA);
 				switch (data->dwRequestID)
 				{
 					case DATA_REQ_RESPONSE: {
@@ -1355,12 +1356,11 @@ class WASimClient::Private
 								LOG_WRN << "DataRequest ID " << data->dwRequestID - SIMCONNECTID_LAST << " not found in tracked requests.";
 								return;
 							}
-							// be paranoid
-							if (dataSize != tr->dataSize) {
+							// be paranoid; note that the reported pData->dwSize is never less than 4 bytes.
+							if (dataSize < tr->dataSize) {
 								LOG_CRT << "Invalid data result size! Expected " << tr->dataSize << " but got " << dataSize;
 								return;
 							}
-							//unique_lock lock(mtxRequests);
 							unique_lock datalock(tr->m_dataMutex);
 							memcpy(tr->data.data(), (void*)&data->dwData, tr->dataSize);
 							tr->lastUpdate = chrono::duration_cast<chrono::milliseconds>(chrono::system_clock::now().time_since_epoch()).count();
