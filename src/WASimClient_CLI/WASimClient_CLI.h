@@ -171,17 +171,37 @@ namespace WASimCommander::CLI::Client
 		}
 		/// See \refwccc{getLocalVariable()}
 		HR getLocalVariable(String ^variableName, [Out] double %pfResult) { return getVariable(gcnew VariableRequest(variableName), pfResult); }
+		/// See \refwccc{getLocalVariable()}
+		HR getLocalVariable(String ^variableName, String ^unitName, [Out] double %pfResult) { return getVariable(gcnew VariableRequest(variableName, false, unitName), pfResult); }
+		/// \sa \refwccc{getOrCreateLocalVariable()}
+		HR getOrCreateLocalVariable(String ^variableName, double defaultValue, [Out] double %pfResult) {
+			pin_ptr<double> pf = &pfResult;
+			return  (HR)m_client->getOrCreateLocalVariable(marshal_as<std::string>(variableName), pf, defaultValue);
+		}
+		/// \sa \refwccc{getOrCreateLocalVariable()}
+		HR getOrCreateLocalVariable(String ^variableName, String ^unitName, double defaultValue, [Out] double %pfResult) {
+			pin_ptr<double> pf = &pfResult;
+			return  (HR)m_client->getOrCreateLocalVariable(marshal_as<std::string>(variableName), pf, defaultValue, marshal_as<std::string>(unitName));
+		}
 
 		/// See \refwccc{setVariable()}
 		HR setVariable(VariableRequest ^var, const double value) { return (HR)m_client->setVariable(var, value); }
 		/// See \refwccc{setLocalVariable()}
 		HR setLocalVariable(String ^variableName, const double value) { return (HR)m_client->setLocalVariable(marshal_as<std::string>(variableName), value); }
+		HR setLocalVariable(String ^variableName, String ^unitName, const double value) {
+			return (HR)m_client->setLocalVariable(marshal_as<std::string>(variableName), value, marshal_as<std::string>(unitName));
+		}
 		/// See \refwccc{setOrCreateLocalVariable()}
 		HR setOrCreateLocalVariable(String ^variableName, const double value) { return (HR)m_client->setOrCreateLocalVariable(marshal_as<std::string>(variableName), value); }
+		/// See \refwccc{setOrCreateLocalVariable()}
+		HR setOrCreateLocalVariable(String ^variableName, String ^unitName, const double value) {
+			return (HR)m_client->setOrCreateLocalVariable(marshal_as<std::string>(variableName), value, marshal_as<std::string>(unitName));
+		}
 
 		// Data subscriptions -------------------------------
 
-		HR saveDataRequest(DataRequest ^request) { return (HR)m_client->saveDataRequest(request); }  ///< See \refwccc{saveDataRequest()}
+		HR saveDataRequest(DataRequest ^request) { return (HR)m_client->saveDataRequest(request); }  ///< See \refwccc{saveDataRequest()} as used with `async = false`
+		HR saveDataRequestAsync(DataRequest ^request) { return (HR)m_client->saveDataRequest(request, true); }  ///< See \refwccc{saveDataRequest()} as used with `async = true`
 		HR removeDataRequest(const uint32_t requestId) { return (HR)m_client->removeDataRequest(requestId); }  ///< See \refwccc{removeDataRequest()}
 		HR updateDataRequest(uint32_t requestId) { return (HR)m_client->updateDataRequest(requestId); }  ///< See \refwccc{updateDataRequest()}
 

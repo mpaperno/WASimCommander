@@ -504,6 +504,7 @@ namespace WASimCommander::CLI::Structs
 			int variableId { -1 };
 			int unitId { -1 };
 			Byte simVarIndex { 0 };
+			bool createLVar = false;
 
 			VariableRequest() {}
 			/// <summary> Construct a variable request for specified variable type ('A', 'L', etc) and variable name. </summary>
@@ -527,6 +528,14 @@ namespace WASimCommander::CLI::Structs
 			/// <summary> Construct a variable request a Local variable ('L') with the specified name. </summary>
 			explicit VariableRequest(String ^localVariableName) :
 				variableType{'L'}, variableName{localVariableName} { }
+			/// <summary> Construct a variable request for a Local ('L') variable with the specified name. </summary>
+			/// `createVariable` will create the L var on the simulator if it doesn't exist yet (for "Get" as well as "Set" commands). An optional unit name can also be provided.
+			explicit VariableRequest(String ^localVariableName, bool createVariable) :
+				variableType{'L'}, variableName{localVariableName}, createLVar{createVariable} { }
+			/// <summary> Construct a variable request for a Local ('L') variable with the specified name. </summary>
+			/// `createVariable` will create the L var on the simulator if it doesn't exist yet (for "Get" as well as "Set" commands). An unit name can also be provided with this overload.
+			explicit VariableRequest(String ^localVariableName, bool createVariable, String ^unitName) :
+				variableType{'L'}, variableName{localVariableName}, unitName{unitName}, createLVar{createVariable} { }
 			/// <summary> Construct a variable request a Local variable ('L') with the specified numeric ID. </summary>
 			explicit VariableRequest(int localVariableId) :
 				variableType{'L'}, variableId{localVariableId} { }
@@ -542,7 +551,7 @@ namespace WASimCommander::CLI::Structs
 			inline operator WASimCommander::Client::VariableRequest()
 			{
 				marshal_context mc;
-				WASimCommander::Client::VariableRequest r((char)variableType, mc.marshal_as<std::string>(variableName), mc.marshal_as<std::string>(unitName), simVarIndex);
+				WASimCommander::Client::VariableRequest r((char)variableType, mc.marshal_as<std::string>(variableName), mc.marshal_as<std::string>(unitName), simVarIndex, createLVar);
 				r.variableId = variableId;
 				r.unitId = unitId;
 				return r;
