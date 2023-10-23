@@ -373,10 +373,15 @@ static const HRESULT E_TIMEOUT       = /*ERROR_TIMEOUT*/       1460L | (/*FACILI
 
 		/// Add a new `WASimCommander::DataRequest` or update an existing one with the same `DataRequest::requestId`. If the client is not currently connected to the server, the request is queued until the next connection is established.
 		/// \param request The `WASimCommander::DataRequest` structure to process. See `WASimCommander::DataRequest` documentation for details of the structure members.
-		/// \return `S_OK` on success, `E_INVALIDARG` if there is a problem with the `DataRequest` contents; If currently connected to the server, may also return `E_FAIL` if the server returned `Nak` response, or `E_TIMEOUT` on general server communication failure.
-		/// \note If currently connected to the server, this method will block until either the Server responds or the timeout has expired (see `defaultTimeout()`).
+		/// \param async `true` to wait for a response from the server before returning, or `false` (default) to wait for an `Ack`/`Nak` response. See return values and the Note below for more details.
+		/// \return `S_OK` on success, `E_INVALIDARG` if there is a problem with the `DataRequest` contents. \n
+		/// If currently connected to the server and `async` is `false`, may also return `E_FAIL` if the server returned `Nak` response, or `E_TIMEOUT` on general server communication failure.
+		/// \note If currently connected to the server and the `async` param is `false`, this method will block until either the Server responds or the timeout has expired (see `defaultTimeout()`).
+		/// \par Tracking async calls
+		/// To track the status of an async request, set a callback function with `setCommandResultCallback()`. The server should respond with an \refwce{CommandId::Ack} or \refwce{CommandId::Nak}
+		/// \refwc{Command} where the `uData` value is \refwce{CommandId::Subscribe} and the \refwc{Command::token} will be the `requestId` value from the given `request` struct.
 		/// \sa  \refwc{DataRequest} \refwce{CommandId::Subscribe}, removeDataRequest(), updateDataRequest()
-		HRESULT saveDataRequest(const DataRequest &request);
+		HRESULT saveDataRequest(const DataRequest &request, bool async = false);
 		/// Remove a previously-added `DataRequest`. This clears the subscription and any tracking/meta data from both server and client sides.
 		/// Using this method is effectively the same as calling `dataRequest()` with a `DataRequest` of type `RequestType::None`.
 		/// \param requestId ID of the request to remove.

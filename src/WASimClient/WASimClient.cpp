@@ -971,14 +971,14 @@ class WASimClient::Private
 
 	// Writes DataRequest data to the corresponding CDA and waits for an Ack/Nak from server.
 	// If the DataRequest::requestType == None, the request will be deleted by the server and the response wait is skipped.
-	HRESULT sendDataRequest(const DataRequest &req)
+	HRESULT sendDataRequest(const DataRequest &req, bool async)
 	{
 		HRESULT hr;
 		if FAILED(hr = writeDataRequest(req))
 			return hr;
 
 		// check if just deleting an existing request and don't wait around for that response
-		if (req.requestType == RequestType::None)
+		if (async || req.requestType == RequestType::None)
 			return hr;
 
 		shared_ptr<condition_variable_any> cv = make_shared<condition_variable_any>();
@@ -1033,7 +1033,7 @@ class WASimClient::Private
 		return SimConnectHelper::removeClientDataDefinition(hSim, tr->dataId);
 	}
 
-	HRESULT addOrUpdateRequest(const DataRequest &req)
+	HRESULT addOrUpdateRequest(const DataRequest &req, bool async)
 	{
 		if (req.requestType == RequestType::None)
 			return removeRequest(req.requestId);
@@ -1082,7 +1082,7 @@ class WASimClient::Private
 				hr = registerDataRequestArea(tr, isNewRequest, dataAllocationChanged);
 			if SUCCEEDED(hr) {
 				// send the request and wait for Ack; Request may timeout or return a Nak.
-				hr = sendDataRequest(req);
+				hr = sendDataRequest(req, async);
 			}
 			if (FAILED(hr) && isNewRequest) {
 				// delete a new request if anything failed
@@ -1557,8 +1557,8 @@ HRESULT WASimClient::setOrCreateLocalVariable(const std::string &variableName, c
 
 #pragma region Data Requests ----------------------------------------------
 
-HRESULT WASimClient::saveDataRequest(const DataRequest &request) {
-	return d->addOrUpdateRequest(request);
+HRESULT WASimClient::saveDataRequest(const DataRequest &request, bool async) {
+	return d->addOrUpdateRequest(request, async);
 }
 
 HRESULT WASimClient::removeDataRequest(const uint32_t requestId) {
