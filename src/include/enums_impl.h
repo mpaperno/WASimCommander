@@ -52,13 +52,16 @@ namespace WSMCMND_ENUM_NAMESPACE
 		              ///  For example, a SimVar: ```uData = 'A'; sData = "PROP BETA:2,degrees";``` \n
 		              ///  Other variables types can also be requested ('B', 'E', 'M', etc) but such requests are simply converted to a calculator string and processed as an `Exec` type command (using an `Exec` command directly may be more efficient).\n
 		              ///  Result is returned with the `Ack` response in `fData` as a double-precision value. In case of failure a `Nak` is returned with possible error message in `sData`.
-		GetCreate,    ///< Same as `Get` but creates the variable if it doesn't already exist (with `register_named_variable()` _Gauge API_). The returned value will be `0.0` (see `SetCreate` to assign a default value and `Lookup` to check if a variable exists).
-		              ///  **This only works with `L` (local) type variables.**
+		GetCreate,    ///< Same as `Get` but creates a local 'L' variable if it doesn't already exist (with `register_named_variable()` _Gauge API_). Use `Lookup` command to check if a variable exists.
+		              ///  \n **Since v1.2:** If a variable is created, the value provided in `fData` will be used as the initial value of the variable, and will be returned as the result
+		              /// (essentially providing a default value in this case). Previous versions would _not_ set a value (or unit type) on the variable after creating it and would return the default of `0.0`. \n
+		              ///  **Creating variables only works with `L` (local) types.** Since v1.2, for all other types this command will be handled the same as `Get`. Previous versions would return a `Nak`.
 		Set,          ///< Set a named local variable with optional unit type. `uData` is a char of the variable type, with default of 'L' for local vars.
 		              ///  `sData` is the variable name or numeric ID (for local vars only), optionally followed by comma (`,`) and unit name (or numeric unit ID for local vars) (**no spaces**). The value to set is passed in `fData` member.\n
 		              ///  For example, a SimVar: ```uData = 'A'; sData = "PROP RPM:2,rpm"; fData = 2200;```\n
 		              ///  Other variables types can also be set this way ('A', 'H", 'K', etc) but such requests are simply converted to a calculator string and processed as an `Exec` type command (using an `Exec` command directly may be slightly more efficient).
-		SetCreate,    ///< Same as `Set` but creates the variable first if it doesn't already exist (with `register_named_variable()` _Gauge API_). Use the `Lookup` command to check if a variable exists. **This only works with `L` (local) type variables.**
+		SetCreate,    ///< Same as `Set` but creates a local 'L' variable if it doesn't already exist (with `register_named_variable()` _Gauge API_). Use the `Lookup` command to check if a variable exists. \n
+		              ///  **Creating variables only works with `L` (local) types.** Since v1.2, for all other types this command will be handled the same as `Get`. Previous versions would return a `Nak`.
 		Exec,         ///< Run calculator code contained in `sData` with `WASimCommander::CalcResultType` in `uData`. Result, if any, is returned with the `Ack` response, numeric types in `fData` and strings in `sData`.
 		              ///  (Due to the way the _Gauge API_ calculator function works, a string result is typically also returned even when only a numeric result is requested.)\n\n
 		              ///  In case of failure a `Nak` is returned with possible error message in `sData`. Note however that the _Gauge API_ functions often happily return a "success" status even when the actual thing you're trying to do fails. The only feedback

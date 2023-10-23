@@ -757,7 +757,7 @@ int getVariableId(char varType, const char *name, bool createLocal = false)
 // Parse a command string to find a variable name/unit/index and populates the respective reference params.
 // Lookups are done on var names, depending on varType, and unit strings, to attempt conversion to IDs.
 // Used by setVariable() and getVariable(). Only handles A/L/T var types (not needed for others).
-bool parseVariableString(const char varType, const char *data, ID &varId, bool createLocal, ENUM *unitId = nullptr, uint8_t *varIndex = nullptr, string *varName = nullptr)
+bool parseVariableString(const char varType, const char *data, ID &varId, bool createLocal, ENUM *unitId = nullptr, uint8_t *varIndex = nullptr, string *varName = nullptr, bool *existed = nullptr)
 {
 	string_view svVar(data, strlen(data)), svUnit{};
 
@@ -784,13 +784,23 @@ bool parseVariableString(const char varType, const char *data, ID &varId, bool c
 	if (svVar.empty())
 		return false;
 
-	if (varName)
-		*varName = string(svVar);
 	// Try to parse the remaining var name string as a numeric ID
 	auto result = from_chars(svVar.data(), svVar.data() + svVar.size(), varId);
 	// if number conversion failed, look up variable id
-	if (result.ec != errc())
-		varId = getVariableId(varType, string(svVar).c_str(), createLocal);
+	if (result.ec != errc()) {
+		const std::string vname(svVar);
+		if (createLocal && !!existed) {
+			varId = check_named_variable(vname.c_str());
+			*existed = varId > -1;
+			if (!*existed)
+				varId = register_named_variable(vname.c_str());
+		}
+		else {
+			varId = getVariableId(varType, vname.c_str(), createLocal);
+		}
+		if (!!varName)
+			*varName = vname;
+	}
 	// failed to find a numeric id, whole input was invalid
 	if (varId < 0)
 		return false;
@@ -970,29 +980,39 @@ void getVariable(const Client *c, const Command *const cmd)
 	const char varType = char(cmd->uData);
 	const char *data = cmd->sData;
 	LOG_TRC << "getVariable(" << varType << ", " << quoted(data) << ") for client " << c->name;
-	if (cmd->commandId == CommandId::GetCreate && varType != 'L')  {
-		logAndNak(c, *cmd, ostringstream() << "The GetCreate command only supports the 'L' variable type.");
-		return;
-	}
+
 	// Anything besides L/A/T type vars just gets converted to calc code.
 	if (!Utilities::isIndexedVariableType(varType)) {
 		const ostringstream codeStr = ostringstream() << "(" << varType << ':' << data << ')';
 		const Command execCmd(cmd->commandId, +CalcResultType::Double, codeStr.str().c_str(), 0.0, cmd->token);
 		return execCalculatorCode(c, &execCmd);
 	}
+
 	ID varId{-1};
 	ENUM unitId{-1};
 	uint8_t varIndex{0};
 	string varName;
-	if (!parseVariableString(varType, data, varId, (cmd->commandId == CommandId::GetCreate), &unitId, &varIndex, &varName)) {
+	bool existed = true;
+	if (!parseVariableString(varType, data, varId, (cmd->commandId == CommandId::GetCreate && varType == 'L'), &unitId, &varIndex, &varName, &existed)) {
 		logAndNak(c, *cmd, ostringstream() << "Could not resolve Variable ID for Get command from string " << quoted(data));
+		return;
+	}
+
+	// !existed can only happen for an L var if we just created it. In that case it has a default value and unit type (0.0, number).
+	if (!existed) {
+		if (unitId > -1)
+			set_named_variable_typed_value(varId, cmd->fData, unitId);
+		else if (cmd->fData != 0.0)
+			set_named_variable_value(varId, cmd->fData);
+		sendResponse(c, Command(CommandId::Ack, (uint32_t)CommandId::GetCreate, nullptr, cmd->fData, cmd->token));
+		LOG_DBG << "getVariable(" << quoted(data) << ") created new variable for client " << c->name;
 		return;
 	}
 
 	calcResult_t res = calcResult_t { CalcResultType::Double, STRSZ_CMD, varId, unitId, varIndex, varName.c_str() };
 	if (!getNamedVariableValue(varType, res))
 		return logAndNak(c, *cmd, ostringstream() << "getNamedVariableValue() returned error result for code " << quoted(data));
-	Command resp(CommandId::Ack, (uint32_t)CommandId::Get);
+	Command resp(CommandId::Ack, (uint32_t)cmd->commandId);
 	resp.token = cmd->token;
 	switch (res.resultMemberIndex) {
 		case 0: resp.fData = res.fVal; break;
@@ -1010,10 +1030,7 @@ void setVariable(const Client *c, const Command *const cmd)
 	const char *data = cmd->sData;
 	const double value = cmd->fData;
 	LOG_TRC << "setVariable(" << varType << ", " << quoted(data) << ", " << value << ") for client " << c->name;
-	if (cmd->commandId == CommandId::SetCreate && varType != 'L')  {
-		logAndNak(c, *cmd, ostringstream() << "The SetCreate command only supports the 'L' variable type.");
-		return;
-	}
+
 	// Anything besides an L var just gets converted to calc code.
 	if (varType != 'L') {
 		const ostringstream codeStr = ostringstream() << fixed << setprecision(7) << value << " (>" << varType << ':' << data << ')';
