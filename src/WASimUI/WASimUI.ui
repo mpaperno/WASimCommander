@@ -80,7 +80,7 @@ Submitted requests will appear in the &quot;Data Requests&quot; window. Double-c
         <number>6</number>
        </property>
        <item row="2" column="0" colspan="2">
-        <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="0,1,0,1,0,1,1,0,0">
+        <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="0,1,0,1,0,1,1,0,0,0">
          <item>
           <widget class="QLabel" name="label_2">
            <property name="sizePolicy">
@@ -177,6 +177,22 @@ Submitted requests will appear in the &quot;Data Requests&quot; window. Double-c
             </size>
            </property>
           </spacer>
+         </item>
+         <item>
+          <widget class="ActionPushButton" name="pbClearRequest">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="toolTip">
+            <string>Add new request record from current form entries.</string>
+           </property>
+           <property name="text">
+            <string>Clear</string>
+           </property>
+          </widget>
          </item>
          <item>
           <widget class="ActionPushButton" name="pbUpdateRequest">
@@ -1710,7 +1726,7 @@ Submitted requests will appear in the &quot;Data Requests&quot; window. Double-c
    <attribute name="dockWidgetArea">
     <number>8</number>
    </attribute>
-   <widget class="QWidget" name="dockWidgetContents">
+   <widget class="QWidget" name="wRequests">
     <property name="sizePolicy">
      <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
       <horstretch>0</horstretch>
@@ -1916,7 +1932,7 @@ Submitted requests will appear in the &quot;Data Requests&quot; window. Double-c
    <attribute name="dockWidgetArea">
     <number>8</number>
    </attribute>
-   <widget class="QWidget" name="dockWidgetContents_2">
+   <widget class="QWidget" name="wLogWindow">
     <property name="sizePolicy">
      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
       <horstretch>0</horstretch>
@@ -2029,7 +2045,7 @@ Submitted requests will appear in the &quot;Data Requests&quot; window. Double-c
           </sizepolicy>
          </property>
          <property name="text">
-          <string>Callback:</string>
+          <string>Log Window:</string>
          </property>
         </widget>
        </item>
@@ -2234,7 +2250,7 @@ Submitted requests will appear in the &quot;Data Requests&quot; window. Double-c
           </sizepolicy>
          </property>
          <property name="toolTip">
-          <string>Set Server Callback Log Level</string>
+          <string>Set Server Callback Log Level (output directed to this log window).</string>
          </property>
         </widget>
        </item>
@@ -2286,7 +2302,7 @@ Submitted requests will appear in the &quot;Data Requests&quot; window. Double-c
           </sizepolicy>
          </property>
          <property name="toolTip">
-          <string>Set Client Callback Log Level</string>
+          <string>Set Client Callback Log Level (output directed to this log window)</string>
          </property>
         </widget>
        </item>
@@ -2348,7 +2364,7 @@ Submitted requests will appear in the &quot;Data Requests&quot; window. Double-c
           </sizepolicy>
          </property>
          <property name="text">
-          <string>Callback:</string>
+          <string>Log Window:</string>
          </property>
         </widget>
        </item>
@@ -2399,7 +2415,7 @@ Submitted requests will appear in the &quot;Data Requests&quot; window. Double-c
    <attribute name="dockWidgetArea">
     <number>2</number>
    </attribute>
-   <widget class="QWidget" name="dockWidgetContents_3">
+   <widget class="QWidget" name="wEventsList">
     <property name="sizePolicy">
      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
       <horstretch>0</horstretch>

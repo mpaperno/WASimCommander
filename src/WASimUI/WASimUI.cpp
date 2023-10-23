@@ -371,6 +371,18 @@ public:
 		ui->dsbDeltaEpsilon->setValue(req.deltaEpsilon);
 	}
 
+	void clearRequestForm()
+	{
+		setRequestFormId(-1);
+		ui->cbNameOrCode->setCurrentText("");
+		ui->cbUnitName->setCurrentText("");
+		ui->cbValueSize->setCurrentText("");
+		ui->sbSimVarIndex->setValue(0);
+		ui->cbPeriod->setCurrentData(+UpdatePeriod::Tick);
+		ui->sbInterval->setValue(0);
+		ui->dsbDeltaEpsilon->setValue(0.0);
+	}
+
 	void removeRequests(const QModelIndexList &list)
 	{
 		for (const QModelIndex &idx : list) {
@@ -768,25 +780,14 @@ WASimUI::WASimUI(QWidget *parent) :
 	// connect the Data Request save/add buttons
 	connect(ui.pbAddRequest, &QPushButton::clicked, this, [this]() { d->handleRequestForm(false); });
 	connect(ui.pbUpdateRequest, &QPushButton::clicked, this, [this]() { d->handleRequestForm(true); });
+	connect(ui.pbClearRequest, &QPushButton::clicked, this, [this]() { d->clearRequestForm(); });
 
-	// Set and connect Log Level combo boxes for Client and Server logging levels
-	ui.cbLogLevelCallback->setProperties(d->client->logLevel(     LogFacility::Remote,  LogSource::Client), LogFacility::Remote,  LogSource::Client);
-	ui.cbLogLevelFile->setProperties(d->client->logLevel(         LogFacility::File,    LogSource::Client), LogFacility::File,    LogSource::Client);
-	ui.cbLogLevelConsole->setProperties(d->client->logLevel(      LogFacility::Console, LogSource::Client), LogFacility::Console, LogSource::Client);
-	ui.cbLogLevelServer->setProperties(d->client->logLevel(       LogFacility::Remote,  LogSource::Server), LogFacility::Remote,  LogSource::Server);
-	ui.cbLogLevelServerFile->setProperties(                                                   (LogLevel)-1, LogFacility::File,    LogSource::Server);     // unknown level at startup
-	ui.cbLogLevelServerConsole->setProperties(                                                (LogLevel)-1, LogFacility::Console, LogSource::Server);  // unknown level at startup
-	// Since the LogLevelComboBox types store the facility and source properties (which we just set), we can use one event handler for all of them.
-	auto setLogLevel = [=](LogLevel level) {
-		if (LogLevelComboBox *cb = qobject_cast<LogLevelComboBox*>(sender()))
-			d->client->setLogLevel(level, cb->facility(), cb->source());
-	};
-	connect(ui.cbLogLevelCallback,      &LogLevelComboBox::levelChanged, this, setLogLevel);
-	connect(ui.cbLogLevelFile,          &LogLevelComboBox::levelChanged, this, setLogLevel);
-	connect(ui.cbLogLevelConsole,       &LogLevelComboBox::levelChanged, this, setLogLevel);
-	connect(ui.cbLogLevelServer,        &LogLevelComboBox::levelChanged, this, setLogLevel);
-	connect(ui.cbLogLevelServerFile,    &LogLevelComboBox::levelChanged, this, setLogLevel);
-	connect(ui.cbLogLevelServerConsole, &LogLevelComboBox::levelChanged, this, setLogLevel);
+	// connect to requests model row removed to check if the current editor needs to be reset, otherwise the "Save" button stays active and re-adds a deleted request.
+	connect(d->reqModel, &RequestsModel::rowsRemoved, this, [this](const QModelIndex &, int first, int last) {
+		const int current = ui.wRequestForm->property("requestId").toInt();
+		if (current >= first && current <= last)
+			d->setRequestFormId(-1);
+	});
 
 	// Connect our own signals for client callback handling in a thread-safe manner, marshaling back to GUI thread as needed.
 	// The "signal" methods are "emitted" by the Client as callbacks, registered in Private::setupClient().
@@ -881,12 +882,6 @@ WASimUI::WASimUI(QWidget *parent) :
 	connect(reloadLVarsAct, &QAction::triggered, this, [this]() { d->refreshLVars(); });
 	ui.btnList->setDefaultAction(reloadLVarsAct);
 
-	// Lookup a variable/unit ID
-	QAction *lookupItemAct = new QAction(QIcon(QStringLiteral("search.glyph")), tr("Lookup"), this);
-	lookupItemAct->setToolTip(tr("Query server for ID of named item (Lookup command)."));
-	connect(lookupItemAct, &QAction::triggered, this, [this]() { d->lookupItem(); });
-	ui.btnVarLookup->setDefaultAction(lookupItemAct);
-
 	// Get local variable value
 	QAction *getVarAct = new QAction(QIcon(QStringLiteral("rotate=180/send.glyph")), tr("Get Variable"), this);
 	getVarAct->setToolTip(tr("Get Variable Value."));
@@ -942,6 +937,13 @@ WASimUI::WASimUI(QWidget *parent) :
 		updateLocalVarsFormState(QString());
 	});
 
+	// Other forms
+
+	// Lookup action
+	QAction *lookupItemAct = new QAction(QIcon(QStringLiteral("search.glyph")), tr("Lookup"), this);
+	lookupItemAct->setToolTip(tr("Query server for ID of named item (Lookup command)."));
+	connect(lookupItemAct, &QAction::triggered, this, [this]() { d->lookupItem(); });
+	ui.btnVarLookup->setDefaultAction(lookupItemAct);
 
 	// Send Key Event action
 	QAction *sendKeyEventAct = new QAction(QIcon(QStringLiteral("send.glyph")), tr("Send Key Event"), this);
@@ -1089,6 +1091,25 @@ WASimUI::WASimUI(QWidget *parent) :
 
 
 	// Logging window actions
+
+	// Set and connect Log Level combo boxes for Client and Server logging levels
+	ui.cbLogLevelCallback->setProperties(d->client->logLevel(     LogFacility::Remote,  LogSource::Client), LogFacility::Remote,  LogSource::Client);
+	ui.cbLogLevelFile->setProperties(d->client->logLevel(         LogFacility::File,    LogSource::Client), LogFacility::File,    LogSource::Client);
+	ui.cbLogLevelConsole->setProperties(d->client->logLevel(      LogFacility::Console, LogSource::Client), LogFacility::Console, LogSource::Client);
+	ui.cbLogLevelServer->setProperties(d->client->logLevel(       LogFacility::Remote,  LogSource::Server), LogFacility::Remote,  LogSource::Server);
+	ui.cbLogLevelServerFile->setProperties(                                                   (LogLevel)-1, LogFacility::File,    LogSource::Server);  // unknown level at startup
+	ui.cbLogLevelServerConsole->setProperties(                                                (LogLevel)-1, LogFacility::Console, LogSource::Server);  // unknown level at startup
+	// Since the LogLevelComboBox types store the facility and source properties (which we just set), we can use one event handler for all of them.
+	auto setLogLevel = [=](LogLevel level) {
+		if (LogLevelComboBox *cb = qobject_cast<LogLevelComboBox*>(sender()))
+			d->client->setLogLevel(level, cb->facility(), cb->source());
+	};
+	connect(ui.cbLogLevelCallback,      &LogLevelComboBox::levelChanged, this, setLogLevel);
+	connect(ui.cbLogLevelFile,          &LogLevelComboBox::levelChanged, this, setLogLevel);
+	connect(ui.cbLogLevelConsole,       &LogLevelComboBox::levelChanged, this, setLogLevel);
+	connect(ui.cbLogLevelServer,        &LogLevelComboBox::levelChanged, this, setLogLevel);
+	connect(ui.cbLogLevelServerFile,    &LogLevelComboBox::levelChanged, this, setLogLevel);
+	connect(ui.cbLogLevelServerConsole, &LogLevelComboBox::levelChanged, this, setLogLevel);
 
 	QAction *filterErrorsAct = new QAction(QIcon(Utils::iconNameForLogLevel(LogLevel::Error)), tr("Toggle Errors"), this);
 	filterErrorsAct->setToolTip(tr("Toggle visibility of Error-level log messages."));
