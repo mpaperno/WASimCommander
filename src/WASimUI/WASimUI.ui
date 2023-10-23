@@ -48,6 +48,9 @@
     </property>
     <item row="6" column="0">
      <widget class="QGroupBox" name="wRequestForm">
+      <property name="contextMenuPolicy">
+       <enum>Qt::ActionsContextMenu</enum>
+      </property>
       <property name="toolTip">
        <string>&lt;p&gt;Request Submission Form&lt;/p&gt;
 &lt;p&gt;Use this form to submit new or modified data requests to the WASimModule server.
@@ -547,6 +550,9 @@ Submitted requests will appear in the &quot;Data Requests&quot; window. Double-c
     </item>
     <item row="4" column="0">
      <widget class="QGroupBox" name="wKeyEvent">
+      <property name="contextMenuPolicy">
+       <enum>Qt::ActionsContextMenu</enum>
+      </property>
       <property name="toolTip">
        <string>&lt;p&gt;Form for triggering Key events with up to 5 data values. Events can be specified by name or ID.&lt;/p</string>
       </property>
@@ -730,6 +736,9 @@ Submitted requests will appear in the &quot;Data Requests&quot; window. Double-c
     </item>
     <item row="5" column="0">
      <widget class="QGroupBox" name="wCommand">
+      <property name="contextMenuPolicy">
+       <enum>Qt::ActionsContextMenu</enum>
+      </property>
       <property name="toolTip">
        <string>&lt;p&gt;This form allows sending any arbitrary command to the WASimModule. This is for testing low-level API functions, not generally useful in most cases. Refer to API documentation for details.&lt;/p&gt;</string>
       </property>
@@ -867,6 +876,9 @@ Submitted requests will appear in the &quot;Data Requests&quot; window. Double-c
     </item>
     <item row="2" column="0">
      <widget class="QGroupBox" name="wVariables">
+      <property name="contextMenuPolicy">
+       <enum>Qt::ActionsContextMenu</enum>
+      </property>
       <property name="toolTip">
        <string>&lt;p&gt;This form is for working with all types of variables. It can be used to get current values and also set values (on variables which allow that). The form adapts to the type of variable selected.&lt;/p&gt;
 &lt;p&gt;Variable definitions from this form can be copied to the Data Requests form and converted to a recurring data query.&lt;/p&gt;</string>
@@ -1360,6 +1372,9 @@ Submitted requests will appear in the &quot;Data Requests&quot; window. Double-c
         <verstretch>0</verstretch>
        </sizepolicy>
       </property>
+      <property name="contextMenuPolicy">
+       <enum>Qt::ActionsContextMenu</enum>
+      </property>
       <property name="toolTip">
        <string>&lt;p&gt;This form is for evaluating RPN &quot;calculator code&quot; on the simulator via WASimModule. Evaluated code may or may not return a result of various types.&lt;/p&gt;
 &lt;p&gt;Calculator code which returns a result can be copied to Data Requests and turned into a recurring query.  Code which performs some kind of action can be turned into a Registered Event which can later be triggered by name or ID.  In either of these cases, the code will be pre-compiled into a more efficient format on the server so that subsequent evaluation will be more efficient.&lt;/p&gt;</string>
@@ -1581,6 +1596,9 @@ Submitted requests will appear in the &quot;Data Requests&quot; window. Double-c
     </item>
     <item row="3" column="0">
      <widget class="QGroupBox" name="wDataLookup">
+      <property name="contextMenuPolicy">
+       <enum>Qt::ActionsContextMenu</enum>
+      </property>
       <property name="toolTip">
        <string>&lt;p&gt;This form allows performing various meta data retrival functions, for example to get numeric IDs of named variables/events, or to check for their existence.&lt;/p&gt;</string>
       </property>
@@ -1732,6 +1750,9 @@ Submitted requests will appear in the &quot;Data Requests&quot; window. Double-c
       <horstretch>0</horstretch>
       <verstretch>1</verstretch>
      </sizepolicy>
+    </property>
+    <property name="contextMenuPolicy">
+     <enum>Qt::ActionsContextMenu</enum>
     </property>
     <layout class="QGridLayout" name="gridLayout_3">
      <property name="leftMargin">
@@ -1938,6 +1959,9 @@ Submitted requests will appear in the &quot;Data Requests&quot; window. Double-c
       <horstretch>0</horstretch>
       <verstretch>3</verstretch>
      </sizepolicy>
+    </property>
+    <property name="contextMenuPolicy">
+     <enum>Qt::ActionsContextMenu</enum>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout">
      <property name="spacing">
