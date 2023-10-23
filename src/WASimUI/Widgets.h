@@ -264,7 +264,7 @@ class VariableTypeComboBox : public DataComboBox
 public:
 	VariableTypeComboBox(QWidget *p = nullptr) : DataComboBox(p)
 	{
-		setToolTip(tr("Named variable type. Types marked with a * use Unit specifiers."));
+		setToolTip(tr("Named variable type. Types marked with a * use Unit specifiers. Most 'L' vars will ignore the Unit (default is 'number')."));
 
 		addItem(tr("A: SimVar *"), 'A');
 		//addItem(tr("B: Input"),    'B');  // only for gauge modules
@@ -273,7 +273,7 @@ public:
 		addItem(tr("H: HTML"),     'H');
 		//addItem(tr("I: Instr."),   'I');  // only for gauge modules
 		addItem(tr("K: Key"),      'K');
-		addItem(tr("L: Local"),    'L');
+		addItem(tr("L: Local *"),  'L');
 		addItem(tr("M: Mouse"),    'M');
 		//addItem(tr("O: Comp."),    'O');  // only for gauge modules
 		//addItem(tr("R: Resource"), 'R');  // strings only, can't be read with "Get" command or set at all

@@ -165,7 +165,7 @@ public:
 			ui->leLookupResult->setText(tr("Lookup failed."));
 	}
 
-	void getLocalVar()
+	void getLocalVar(bool create = false)
 	{
 		if (!checkConnected())
 			return;
@@ -176,14 +176,19 @@ public:
 			return;
 		}
 		double result;
-		const HRESULT hr = client->getVariable(VariableRequest(vtype, varName.toStdString(), ui->cbSetVarUnitName->currentText().toStdString(), ui->sbGetSetSimVarIndex->value()), &result);
+		HRESULT hr;
+		if (vtype == 'L' && create)
+			hr = client->getOrCreateLocalVariable(varName.toStdString(), &result, ui->dsbSetVarValue->value(), ui->cbSetVarUnitName->currentText().toStdString());
+		else
+			hr = client->getVariable(VariableRequest(vtype, varName.toStdString(), ui->cbSetVarUnitName->currentText().toStdString(), ui->sbGetSetSimVarIndex->value()), &result);
 		if (hr == S_OK)
 			ui->leVarResult->setText(QString("%1").arg(result, 0, 'f', 7));
 		else
 			ui->leVarResult->setText(QString("Error: 0x%1").arg((quint32)hr, 8, 16, QChar('0')));
 	}
 
-	void setLocalVar(bool create = false) {
+	void setLocalVar(bool create = false)
+	{
 		const char vtype = ui->cbGetSetVarType->currentData().toChar().toLatin1();
 		const QString &varName = vtype == 'L' ? ui->cbLvars->currentText() : ui->cbVariableName->currentText();
 		if (varName.isEmpty()) {
@@ -191,9 +196,25 @@ public:
 			return;
 		}
 		if (vtype == 'L' && create)
-			client->setOrCreateLocalVariable(varName.toStdString(), ui->dsbSetVarValue->value());
+			client->setOrCreateLocalVariable(varName.toStdString(), ui->dsbSetVarValue->value(), ui->cbSetVarUnitName->currentText().toStdString());
 		else
 			client->setVariable(VariableRequest(vtype, varName.toStdString(), ui->cbSetVarUnitName->currentText().toStdString(), ui->sbGetSetSimVarIndex->value()), ui->dsbSetVarValue->value());
+	}
+
+	void toggleSetGetVariableType()
+	{
+		const QChar vtype = ui->cbGetSetVarType->currentData().toChar();
+		bool isLocal = vtype == 'L';
+		ui->wLocalVarsForm->setVisible(isLocal);
+		ui->wOtherVarsForm->setVisible(!isLocal);
+		ui->wGetSetSimVarIndex->setVisible(!isLocal && vtype == 'A');  // sim var index box visible only for... simvars!
+		ui->btnSetCreate->setVisible(isLocal);
+		ui->btnGetCreate->setVisible(isLocal);
+		bool hasUnit = ui->cbGetSetVarType->currentText().contains('*');
+		ui->cbSetVarUnitName->setVisible(hasUnit);
+		ui->lblSetVarUnit->setVisible(hasUnit);
+		if (isLocal)
+			ui->cbSetVarUnitName->setCurrentText("");
 	}
 
 	void copyLocalVarToRequest()
@@ -256,13 +277,16 @@ public:
 
 	void toggleRequestVariableType()
 	{
+		const QChar type = ui->cbVariableType->currentData().toChar();
 		bool isCalc = ui->rbRequestType_Calculated->isChecked();
-		bool needIdx = !isCalc && ui->cbVariableType->currentData().toChar() == 'A';
+		bool needIdx = !isCalc && type == 'A';
 		ui->lblIndex->setVisible(needIdx);
 		ui->sbSimVarIndex->setVisible(needIdx);
 		bool hasUnit = !isCalc && ui->cbVariableType->currentText().contains('*');
 		ui->lblUnit->setVisible(hasUnit);
 		ui->cbUnitName->setVisible(hasUnit);
+		if (type == 'L')
+			ui->cbUnitName->setCurrentText("");
 	}
 
 	void setRequestFormId(uint32_t id)
@@ -716,8 +740,10 @@ WASimUI::WASimUI(QWidget *parent) :
 	ui.wRequestForm->setProperty("requestId", -1);
 	ui.wCalcForm->setProperty("eventId", -1);
 
-	// Update the Data Request form UI based on default type.
+	// Update the Data Request form UI based on default types.
 	d->toggleRequestType();
+	d->toggleRequestVariableType();
+
 	// Connect the request type radio buttons to toggle the UI.
 	connect(ui.bgrpRequestType, QOverload<int, bool>::of(&QButtonGroup::buttonToggled), this, [this](int,bool) { d->toggleRequestType(); });
 	// show/hide SimVar index spin box based on type of variable selected
@@ -847,6 +873,8 @@ WASimUI::WASimUI(QWidget *parent) :
 
 	// Variables section actions
 
+	d->toggleSetGetVariableType();
+
 	// Request Local Vars list
 	QAction *reloadLVarsAct = new QAction(QIcon(QStringLiteral("autorenew.glyph")), tr("Reload L.Vars"), this);
 	reloadLVarsAct->setToolTip(tr("Reload Local Variables"));
@@ -874,11 +902,18 @@ WASimUI::WASimUI(QWidget *parent) :
 	ui.btnSetVar->setDefaultAction(setVarAct);
 
 	// Set or Create local variable
-	QAction *setCreateVarAct = new QAction(QIcon(QStringLiteral("overlay=\\align=AlignRight\\scale=.95\\fg=#17dde8\\add/send.glyph")), tr("Set/Create Variable"), this);
+	QAction *setCreateVarAct = new QAction(QIcon(QStringLiteral("overlay=\\align=AlignRight\\fg=#17dd29\\add/send.glyph")), tr("Set/Create Variable"), this);
 	setCreateVarAct->setToolTip(tr("Set Or Create Local Variable."));
 	setCreateVarAct->setDisabled(true);
 	connect(setCreateVarAct, &QAction::triggered, this, [this]() { d->setLocalVar(true); });
 	ui.btnSetCreate->setDefaultAction(setCreateVarAct);
+
+	// Get or Create local variable
+	QAction *getCreateVarAct = new QAction(QIcon(QStringLiteral("overlay=\\align=AlignLeft\\fg=#17dd29\\add/rotate=180/send.glyph")), tr("Get/Create Variable"), this);
+	getCreateVarAct->setToolTip(tr("Get Or Create Local Variable. The specified value and unit will be used as defaults if the variable is created."));
+	getCreateVarAct->setDisabled(true);
+	connect(getCreateVarAct, &QAction::triggered, this, [this]() { d->getLocalVar(true); });
+	ui.btnGetCreate->setDefaultAction(getCreateVarAct);
 
 	// Copy LVar as new Data Request
 	QAction *copyVarAct = new QAction(QIcon(QStringLiteral("move_to_inbox.glyph")), tr("Copy to Data Request"), this);
@@ -888,12 +923,13 @@ WASimUI::WASimUI(QWidget *parent) :
 	ui.btnCopyLVarToRequest->setDefaultAction(copyVarAct);
 
 	auto updateLocalVarsFormState = [=](const QString &) {
-		const bool en = (ui.wLocalVarsForm->isVisible() && !ui.cbLvars->currentText().isEmpty()) ||
-			(ui.wOtherVarsForm->isVisible() && !ui.cbVariableName->currentText().isEmpty());
+		const bool isLocal = ui.wLocalVarsForm->isVisible();
+		const bool en = !(isLocal ? ui.cbLvars->currentText().isEmpty() : ui.cbVariableName->currentText().isEmpty());
 		getVarAct->setEnabled(en);
 		setVarAct->setEnabled(en);
-		setCreateVarAct->setEnabled(en);
 		copyVarAct->setEnabled(en);
+		setCreateVarAct->setEnabled(en && isLocal);
+		getCreateVarAct->setEnabled(en && isLocal);
 	};
 
 	// Connect variable selector to enable/disable relevant actions
@@ -901,15 +937,8 @@ WASimUI::WASimUI(QWidget *parent) :
 	connect(ui.cbVariableName, &QComboBox::currentTextChanged, this, updateLocalVarsFormState);
 
 	// connect to variable type combo box to switch between views for local vars vs. everything else
-	connect(ui.cbGetSetVarType, &DataComboBox::currentDataChanged, this, [=](const QVariant &vtype) {
-		bool isLocal = vtype.toChar() == 'L';
-		ui.wLocalVarsForm->setVisible(isLocal);
-		ui.wOtherVarsForm->setVisible(!isLocal);
-		ui.wGetSetSimVarIndex->setVisible(!isLocal && vtype.toChar() == 'A');  // sim var index box visible only for... simvars!
-		ui.btnSetCreate->setVisible(isLocal);
-		bool hasUnit = ui.cbGetSetVarType->currentText().contains('*');
-		ui.cbSetVarUnitName->setVisible(hasUnit);
-		ui.lblSetVarUnit->setVisible(hasUnit);
+	connect(ui.cbGetSetVarType, &DataComboBox::currentDataChanged, this, [=](const QVariant &) {
+		d->toggleSetGetVariableType();
 		updateLocalVarsFormState(QString());
 	});
 
