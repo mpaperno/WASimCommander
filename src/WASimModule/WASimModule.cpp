@@ -634,7 +634,10 @@ bool getNamedVariableValue(char varType, calcResult_t &result)
 		case 'L':
 			if (result.varId < 0)
 				return false;
-			result.setF(get_named_variable_value(result.varId));
+			if (result.unitId > -1)
+				result.setF(get_named_variable_typed_value(result.varId, result.unitId));
+			else
+				result.setF(get_named_variable_value(result.varId));
 			break;
 
 		case 'A':
@@ -758,7 +761,7 @@ bool parseVariableString(const char varType, const char *data, ID &varId, bool c
 {
 	string_view svVar(data, strlen(data)), svUnit{};
 
-	if (varType == 'A') {
+	if (varType != 'T') {
 		// Check for unit type after variable name/id and comma
 		const size_t idx = svVar.find(',');
 		if (idx != string::npos) {
@@ -766,12 +769,12 @@ bool parseVariableString(const char varType, const char *data, ID &varId, bool c
 			svVar.remove_suffix(svVar.size() - idx);
 		}
 		// check for index value at end of SimVar name/ID
-		if (svVar.size() > 3) {
+		if (varType == 'A' && svVar.size() > 3) {
 			const string_view &svIndex = svVar.substr(svVar.size() - 3);
 			const size_t idx = svIndex.find(':');
 			if (idx != string::npos) {
 				// strtoul returns zero if conversion fails, which works fine since zero is not a valid simvar index
-				if (varIndex)
+				if (!!varIndex)
 					*varIndex = strtoul(svIndex.data() + idx + 1, nullptr, 10);
 				svVar.remove_suffix(3 - idx);
 			}
@@ -792,7 +795,7 @@ bool parseVariableString(const char varType, const char *data, ID &varId, bool c
 	if (varId < 0)
 		return false;
 	// check for unit specification
-	if (unitId && !svUnit.empty()) {
+	if (!!unitId && !svUnit.empty()) {
 		// try to parse the string as a numeric ID
 		result = from_chars(svUnit.data(), svUnit.data() + svUnit.size(), *unitId);
 		// if number conversion failed, look up unit id
@@ -1019,11 +1022,16 @@ void setVariable(const Client *c, const Command *const cmd)
 	}
 
 	ID varId{-1};
-	if (!parseVariableString(varType, data, varId, (cmd->commandId == CommandId::SetCreate))) {
+	ENUM unitId{-1};
+	if (!parseVariableString(varType, data, varId, (cmd->commandId == CommandId::SetCreate), &unitId)) {
 		logAndNak(c, *cmd, ostringstream() << "Could not resolve Variable ID for Set command from string " << quoted(data));
 		return;
 	}
-	set_named_variable_value(varId, value);
+
+	if (unitId > -1)
+		set_named_variable_typed_value(varId, value, unitId);
+	else
+		set_named_variable_value(varId, value);
 	sendAckNak(c, *cmd);
 }
 
