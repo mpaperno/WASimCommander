@@ -154,11 +154,12 @@ static const HRESULT E_TIMEOUT       = /*ERROR_TIMEOUT*/       1460L | (/*FACILI
 		                               ///  The unit name is ignored for all other variable types, and the `unitId` field is preferred if it is greater than -1.
 		int variableId = -1;           ///< Numeric ID of the variable to get/set. Overrides the `variableName` field if greater than -1. Only 'A', 'L', 'T' variable types can be referenced by numeric IDs.
 		int unitId = -1;               ///< Numeric ID of the Unit type to use in the get/set command. Overrides the `unitName` field if greater than -1. See usage notes for `unitName` about applicable variable types.
-		uint8_t simVarIndex = 0;        ///< Optional index number for SimVars ('A') which require them. If using named variables, yhe index can also be included in the variable name string (after a colon `:`, as would be used in a calculator string).
+		uint8_t simVarIndex = 0;       ///< Optional index number for SimVars ('A') which require them. If using named variables, yhe index can also be included in the variable name string (after a colon `:`, as would be used in a calculator string).
+		bool createLVar = false;       ///< This flag indicates that the L var should be created if it doesn't already exist in the simulator. This applies for both "Set" and "Get" commands.
 
-		/// Default constructor, with optional parameters for variable type, name, unit name and SimVar index.
-		explicit VariableRequest(char variableType = 'L', const std::string &variableName = std::string(), const std::string &unitName = std::string(), uint8_t simVarIndex = 0) :
-			variableType{variableType}, variableName{variableName}, unitName{unitName}, simVarIndex(simVarIndex) { }
+		/// Default constructor, with optional parameters for variable type, name, unit name, SimVar index and `createLVar` flag.
+		explicit VariableRequest(char variableType = 'L', const std::string &variableName = std::string(), const std::string &unitName = std::string(), uint8_t simVarIndex = 0, bool createVariable = false) :
+			variableType{variableType}, variableName{variableName}, unitName{unitName}, simVarIndex(simVarIndex), createLVar{createVariable} { }
 		/// Construct a variable request using numeric variable and (optionally) unit IDs, and optional SimVar index.
 		explicit VariableRequest(char variableType, int variableId, int unitId = -1, uint8_t simVarIndex = 0) :
 			variableType{variableType}, variableId{variableId}, unitId{unitId}, simVarIndex(simVarIndex) { }
@@ -168,9 +169,10 @@ static const HRESULT E_TIMEOUT       = /*ERROR_TIMEOUT*/       1460L | (/*FACILI
 		/// Construct a variable request for a Simulator Variable ('A') using numeric variable and unit IDs, with optional index parameter.
 		explicit VariableRequest(int simVarId, int unitId, uint8_t simVarIndex = 0) :
 			variableType{'A'}, variableId{simVarId}, unitId{unitId}, simVarIndex(simVarIndex) { }
-		/// Construct a variable request for a Local variable ('L') with the given name.
-		explicit VariableRequest(const std::string &localVarName) :
-			variableType{'L'}, variableName{localVarName} { }
+		/// Construct a variable request for a Local variable ('L') with the given name. `createVariable` will create the L var on the simulator if it doesn't exist yet
+		/// (for "Get" as well as "Set" commands). An optional unit name can also be provided.
+		explicit VariableRequest(const std::string &localVarName, bool createVariable = false, const std::string &unitName = std::string()) :
+			variableType{'L'}, variableName{localVarName}, unitName{unitName}, createLVar{createVariable} { }
 		/// Construct a variable request for a Local variable ('L') with the given numeric ID.
 		explicit VariableRequest(int localVarId) :
 			variableType{'L'}, variableId{localVarId} { }
@@ -304,8 +306,10 @@ static const HRESULT E_TIMEOUT       = /*ERROR_TIMEOUT*/       1460L | (/*FACILI
 		///                   if a numeric result is requested, the string result will also be populated).
 		/// \param pfResult A pointer to an initialized variable of `double` to store the result into if `resultType` is `Enums::CalcResultType::Double` or `Enums::CalcResultType::Integer`.
 		/// \param psResult A string pointer to store the string result into. The string version is typically populated even for numeric type requests, but definitely for `Enums::CalcResultType::String` or `Enums::CalcResultType::Formatted` type requests.
-		/// \return `S_OK` on success, `E_FAIL` if the server returned Nak response, `E_NOT_CONNECTED` if not connected to server, or `E_TIMEOUT` on general server communication failure.
-		/// \note This method blocks until either the Server responds or the timeout has expired.
+		/// \return `S_OK` on success, `E_NOT_CONNECTED` if not connected to server; \n
+		/// If a result is expected, may also return `E_FAIL` if the server returned Nak response, or `E_TIMEOUT` on general server communication failure.
+		/// \note _If_ a result is expected (`resultType` != `Enums::CalcResultType::None`) then this method blocks until either the Server responds or the timeout has expired (see `defaultTimeout()`).
+		/// To request calculated results in a non-blocking fashion, use a data request instead.
 		///
 		/// If you need to execute the same code multiple times, it would be more efficient to save the code as either a data request (for code returning values) or a registered event (for code not returning values).
 		/// The advantage is that in those cases the calculator string is pre-compiled to byte code and saved once, then each invocation of the _Gauge API_ calculator functions uses the more efficient byte code version.
@@ -325,12 +329,21 @@ static const HRESULT E_TIMEOUT       = /*ERROR_TIMEOUT*/       1460L | (/*FACILI
 		/// \note This method blocks until either the Server responds or the timeout has expired.
 		/// \sa \refwcc{VariableRequest}, \refwce{CommandId::Get},  defaultTimeout(), setDefaultTimeout()
 		HRESULT getVariable(const VariableRequest &variable, double *pfResult);
-		/// A convenience version of <tt>getVariable(VariableRequest('L', variableName), pfResult)</tt>. See `getVariable()` for details.
+		/// A convenience version of `getVariable(VariableRequest(variableName, false, unitName), pfResult)`. See `getVariable()` and `VariableRequest` for details.
 		/// \param variableName Name of the local variable.
 		/// \param pfResult Pointer to a double precision variable to hold the result.
+		/// \param unitName Optional unit specifier to use. Most Local vars do not specify a unit and default to a generic "number" type.
 		/// \return `S_OK` on success, `E_INVALIDARG` on parameter validation errors, `E_NOT_CONNECTED` if not connected to server, `E_TIMEOUT` on server communication failure, or `E_FAIL` if server returns a Nak response.
 		/// \note This method blocks until either the Server responds or the timeout has expired. \sa defaultTimeout(), setDefaultTimeout()
-		HRESULT getLocalVariable(const std::string &variableName, double *pfResult);
+		HRESULT getLocalVariable(const std::string &variableName, double *pfResult, const std::string &unitName = std::string());
+		/// Gets the value of a local variable just like `getLocalVariable()` but will also create the variable on the simulator if it doesn't already exist.
+		/// \param variableName Name of the local variable.
+		/// \param pfResult Pointer to a double precision variable to hold the result.
+		/// \param defaultValue The L var will be created on the simulator if it doesn't exist yet using this initial value (and this same value will be returned in `pfResult`).
+		/// \param unitName Optional unit specifier to use. Most Local vars do not specify a unit and default to a generic "number" type.
+		/// \return `S_OK` on success, `E_INVALIDARG` on parameter validation errors, `E_NOT_CONNECTED` if not connected to server, `E_TIMEOUT` on server communication failure, or `E_FAIL` if server returns a Nak response.
+		/// \note This method blocks until either the Server responds or the timeout has expired. \sa defaultTimeout(), setDefaultTimeout()
+		HRESULT getOrCreateLocalVariable(const std::string &variableName, double *pfResult, double defaultValue = 0.0, const std::string &unitName = std::string());
 
 		/// Set a Variable value by name, with optional named unit type. Although any settable variable type can set this way, it is primarily useful for local (`L`) variables which can be set via dedicated _Gauge API_ functions
 		/// (`set_named_variable_value()` and `set_named_variable_typed_value()`). Other variables types can also be set this way ('A', 'H", 'K', etc) but such requests are simply converted to a calculator string and
@@ -340,19 +353,21 @@ static const HRESULT E_TIMEOUT       = /*ERROR_TIMEOUT*/       1460L | (/*FACILI
 		/// \return `S_OK` on success, `E_INVALIDARG` on parameter validation errors, `E_NOT_CONNECTED` if not connected to server, or `E_FAIL` on general failure (unlikely).
 		/// \sa \refwce{CommandId::Set}
 		HRESULT setVariable(const VariableRequest &variable, const double value);
-		/// A convenience version of `setVariable(VariableRequest('L', variableName), value)`. See `setVariable()` for details.
+		/// A convenience version of `setVariable()` for Local variable types. Equivalent to `setVariable(VariableRequest(variableName, false, unitName), value)`. See `setVariable()` and `VariableRequest` for details.
 		/// \param variableName Name of the local variable.
 		/// \param value The value to set.
+		/// \param unitName Optional unit specifier to use. Most Local vars do not specify a unit and default to a generic "number" type.
 		/// \return `S_OK` on success, `E_INVALIDARG` on parameter validation errors, `E_NOT_CONNECTED` if not connected to server, or `E_FAIL` on general failure (unlikely).
-		HRESULT setLocalVariable(const std::string &variableName, const double value);
+		HRESULT setLocalVariable(const std::string &variableName, const double value, const std::string &unitName = std::string());
 		/// Set a Local Variable value by variable name, creating it first if it does not already exist. This first calls the `register_named_variable()` _Gauge API_ function to get the ID from the name,
-		/// which creates the variable if it doesn't exist. The returned ID (new or existing) is then used to set the value. Unit type cannot be specified when creating/using custom local variables in this fashion.
-		/// Use the `lookup()` method to check for the existence of a variable name.
+		/// which creates the variable if it doesn't exist. The returned ID (new or existing) is then used to set the value. Use the `lookup()` method to check for the existence of a variable name.
+		/// Equivalent to `setVariable(VariableRequest(variableName, true, unitName), value)`. See `setVariable()` and `VariableRequest` for details.
 		/// \param variableName Name of the local variable.
 		/// \param value The value to set. Becomes the intial value if the variable is created.
+		/// \param unitName Optional unit specifier to use. Most Local vars do not specify a unit and default to a generic "number" type.
 		/// \return `S_OK` on success, `E_INVALIDARG` on parameter validation errors, `E_NOT_CONNECTED` if not connected to server, or `E_FAIL` on general failure (unlikely).
 		/// \sa \refwcc{VariableRequest}, \refwce{CommandId::SetCreate}
-		HRESULT setOrCreateLocalVariable(const std::string &variableName, const double value);
+		HRESULT setOrCreateLocalVariable(const std::string &variableName, const double value, const std::string &unitName = std::string());
 
 		// Data subscriptions -------------------------------
 

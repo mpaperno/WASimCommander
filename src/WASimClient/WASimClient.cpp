@@ -911,7 +911,7 @@ class WASimClient::Private
 		return sValue;
 	}
 
-	HRESULT getVariable(const VariableRequest &v, double *result)
+	HRESULT getVariable(const VariableRequest &v, double *result, double dflt = 0.0)
 	{
 		const string sValue = buildVariableCommandString(v, false);
 		if (sValue.empty() || sValue.length() >= STRSZ_CMD)
@@ -919,7 +919,7 @@ class WASimClient::Private
 
 		HRESULT hr;
 		Command response;
-		if FAILED(hr = sendCommandWithResponse(Command(CommandId::Get, v.variableType, sValue.c_str()), &response))
+		if FAILED(hr = sendCommandWithResponse(Command(v.createLVar && v.variableType == 'L' ? CommandId::GetCreate : CommandId::Get, v.variableType, sValue.c_str(), dflt), &response))
 			return hr;
 		if (response.commandId != CommandId::Ack) {
 			LOG_WRN << "Get Variable request for " << quoted(sValue) << " returned Nak response. Reason, if any: " << quoted(response.sData);
@@ -930,12 +930,12 @@ class WASimClient::Private
 		return S_OK;
 	}
 
-	HRESULT setVariable(const VariableRequest &v, const double value, bool create = false)
+	HRESULT setVariable(const VariableRequest &v, const double value)
 	{
 		const string sValue = buildVariableCommandString(v, true);
 		if (sValue.empty() || sValue.length() >= STRSZ_CMD)
 			return E_INVALIDARG;
-		return sendServerCommand(Command(create ? CommandId::SetCreate : CommandId::Set, v.variableType, sValue.c_str(), value));
+		return sendServerCommand(Command(v.createLVar && v.variableType == 'L' ? CommandId::SetCreate : CommandId::Set, v.variableType, sValue.c_str(), value));
 	}
 
 #pragma endregion
@@ -1533,21 +1533,24 @@ HRESULT WASimClient::getVariable(const VariableRequest & variable, double * pfRe
 	return d->getVariable(variable, pfResult);
 }
 
-HRESULT WASimClient::getLocalVariable(const std::string &variableName, double * pfResult) {
-	return d->getVariable(VariableRequest('L', variableName), pfResult);
+HRESULT WASimClient::getLocalVariable(const std::string &variableName, double *pfResult, const std::string &unitName) {
+	return d->getVariable(VariableRequest(variableName, false, unitName), pfResult);
 }
 
+HRESULT WASimClient::getOrCreateLocalVariable(const std::string &variableName, double *pfResult, double defaultValue, const std::string &unitName) {
+	return d->getVariable(VariableRequest(variableName, true, unitName), pfResult, defaultValue);
+}
 
 HRESULT WASimClient::setVariable(const VariableRequest & variable, const double value) {
 	return d->setVariable(variable, value);
 }
 
-HRESULT WASimClient::setLocalVariable(const std::string &variableName, const double value) {
-	return d->setVariable(VariableRequest('L', variableName), value, false);
+HRESULT WASimClient::setLocalVariable(const std::string &variableName, const double value, const std::string &unitName) {
+	return d->setVariable(VariableRequest(variableName, false, unitName), value);
 }
 
-HRESULT WASimClient::setOrCreateLocalVariable(const std::string &variableName, const double value) {
-	return d->setVariable(VariableRequest('L', variableName), value, true);
+HRESULT WASimClient::setOrCreateLocalVariable(const std::string &variableName, const double value, const std::string &unitName) {
+	return d->setVariable(VariableRequest(variableName, true, unitName), value);
 }
 
 #pragma endregion
