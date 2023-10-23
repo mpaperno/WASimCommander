@@ -816,37 +816,26 @@ WASimUI::WASimUI(QWidget *parent) :
 	connect(pingAct, &QAction::triggered, this, [this]() { d->client->pingServer(); });
 
 
+#define MAKE_ACTION(ACT, TTL, TT, ICN, BTN, W, M) \
+	QAction *ACT = new QAction(QIcon(QStringLiteral(##ICN)), TTL, this); \
+	ACT->setToolTip(TT); ui.##BTN->setDefaultAction(ACT); ui.##W->addAction(ACT);  \
+	connect(ACT, &QAction::triggered, this, [this]() { d->##M; })
+
+#define MAKE_ACTION_D(ACT, TTL, TT, ICN, BTN, W, M)       MAKE_ACTION(ACT, TTL, TT, ICN, BTN, W, M); ACT->setDisabled(true)
+#define MAKE_ACTION_IT(ACT, TTL, TT, IT, ICN, BTN, W, M)  MAKE_ACTION_D(ACT, TTL, TT, ICN, BTN, W, M); ACT->setIconText(IT)
+
 	// Calculator code actions
 
 	// Exec calculator code
-	QAction *execCalcAct = new QAction(QIcon(QStringLiteral("IcoMoon-Free/calculator.glyph")), tr("Execute Calculator Code"), this);
-	execCalcAct->setToolTip(tr("Execute Calculator Code"));
-	execCalcAct->setDisabled(true);
-	connect(execCalcAct, &QAction::triggered, this, [this]() { d->runCalcCode(); });
-	ui.btnCalc->setDefaultAction(execCalcAct);
-
+	MAKE_ACTION_D(execCalcAct, tr("Execute Calculator Code"), tr("Execute Calculator Code."), "IcoMoon-Free/calculator.glyph", btnCalc, wCalcForm, runCalcCode());
 	// Register calculator code event
-	QAction *regEventAct = new QAction(QIcon(QStringLiteral("control_point.glyph")), tr("Register Event"), this);
-	regEventAct->setToolTip(tr("Register this calculator code as a new Event."));
-	regEventAct->setDisabled(true);
-	connect(regEventAct, &QAction::triggered, this, [this]() { d->registerEvent(false); });
-	ui.btnAddEvent->setDefaultAction(regEventAct);
-
+	MAKE_ACTION_D(regEventAct, tr("Register Event"), tr("Register this calculator code as a new Event."), "control_point.glyph", btnAddEvent, wCalcForm, registerEvent(false));
 	// Save edited calculator code event
-	QAction *saveEventAct = new QAction(QIcon(QStringLiteral("edit.glyph")), tr("Update Event"), this);
-	saveEventAct->setToolTip(tr("Update existing event with new calculator code (name cannot be changed)."));
-	connect(saveEventAct, &QAction::triggered, this, [this]() { d->registerEvent(true); });
-	saveEventAct->setDisabled(true);
-	ui.btnUpdateEvent->setDefaultAction(saveEventAct);
-	ui.btnUpdateEvent->setVisible(false);
-
+	MAKE_ACTION_D(saveEventAct, tr("Update Event"), tr("Update existing event with new calculator code (name cannot be changed)."), "edit.glyph", btnUpdateEvent, wCalcForm, registerEvent(true));
 	// Copy calculator code as new Data Request
-	QAction *copyCalcAct = new QAction(QIcon(QStringLiteral("move_to_inbox.glyph")), tr("Copy to Data Request"), this);
-	copyCalcAct->setToolTip(tr("Copy Calculator Code to new Data Request"));
-	copyCalcAct->setDisabled(true);
-	connect(copyCalcAct, &QAction::triggered, this, [this]() { d->copyCalcCodeToRequest(); });
-	ui.btnCopyCalcToRequest->setDefaultAction(copyCalcAct);
+	MAKE_ACTION_D(copyCalcAct, tr("Copy to Data Request"), tr("Copy Calculator Code to new Data Request."), "move_to_inbox.glyph", btnCopyCalcToRequest, wCalcForm, copyCalcCodeToRequest());
 
+	ui.btnUpdateEvent->setVisible(false);
 	// Connect variable selector to enable/disable relevant actions
 	connect(ui.cbCalculatorCode, &QComboBox::currentTextChanged, this, [=](const QString &txt) {
 		const bool en = !txt.isEmpty();
@@ -856,51 +845,24 @@ WASimUI::WASimUI(QWidget *parent) :
 		copyCalcAct->setEnabled(en);
 	});
 
-
 	// Variables section actions
 
 	d->toggleSetGetVariableType();
 
 	// Request Local Vars list
-	QAction *reloadLVarsAct = new QAction(QIcon(QStringLiteral("autorenew.glyph")), tr("Reload L.Vars"), this);
-	reloadLVarsAct->setToolTip(tr("Reload Local Variables"));
-	connect(reloadLVarsAct, &QAction::triggered, this, [this]() { d->refreshLVars(); });
-	ui.btnList->setDefaultAction(reloadLVarsAct);
-
+	MAKE_ACTION(reloadLVarsAct, tr("Reload L.Vars"), tr("Reload Local Variables."), "autorenew.glyph", btnList, wVariables, refreshLVars());
 	// Get local variable value
-	QAction *getVarAct = new QAction(QIcon(QStringLiteral("rotate=180/send.glyph")), tr("Get Variable"), this);
-	getVarAct->setToolTip(tr("Get Variable Value."));
-	getVarAct->setDisabled(true);
-	connect(getVarAct, &QAction::triggered, this, [this]() { d->getLocalVar(); });
-	ui.btnGetVar->setDefaultAction(getVarAct);
-
+	MAKE_ACTION_D(getVarAct, tr("Get Variable"), tr("Get Variable Value."), "rotate=180/send.glyph", btnGetVar, wVariables, getLocalVar());
 	// Set variable value
-	QAction *setVarAct = new QAction(QIcon(QStringLiteral("send.glyph")), tr("Set Variable"), this);
-	setVarAct->setToolTip(tr("Set Variable Value."));
-	setVarAct->setDisabled(true);
-	connect(setVarAct, &QAction::triggered, this, [this]() { d->setLocalVar(); });
-	ui.btnSetVar->setDefaultAction(setVarAct);
-
+	MAKE_ACTION_D(setVarAct, tr("Set Variable"), tr("Set Variable Value."), "send.glyph", btnSetVar, wVariables, setLocalVar());
 	// Set or Create local variable
-	QAction *setCreateVarAct = new QAction(QIcon(QStringLiteral("overlay=\\align=AlignRight\\fg=#17dd29\\add/send.glyph")), tr("Set/Create Variable"), this);
-	setCreateVarAct->setToolTip(tr("Set Or Create Local Variable."));
-	setCreateVarAct->setDisabled(true);
-	connect(setCreateVarAct, &QAction::triggered, this, [this]() { d->setLocalVar(true); });
-	ui.btnSetCreate->setDefaultAction(setCreateVarAct);
-
+	MAKE_ACTION_D(setCreateVarAct, tr("Set/Create Variable"), tr("Set Or Create Local Variable."), "overlay=\\align=AlignRight\\fg=#17dd29\\add/send.glyph", btnSetCreate, wVariables, setLocalVar(true));
 	// Get or Create local variable
-	QAction *getCreateVarAct = new QAction(QIcon(QStringLiteral("overlay=\\align=AlignLeft\\fg=#17dd29\\add/rotate=180/send.glyph")), tr("Get/Create Variable"), this);
-	getCreateVarAct->setToolTip(tr("Get Or Create Local Variable. The specified value and unit will be used as defaults if the variable is created."));
-	getCreateVarAct->setDisabled(true);
-	connect(getCreateVarAct, &QAction::triggered, this, [this]() { d->getLocalVar(true); });
-	ui.btnGetCreate->setDefaultAction(getCreateVarAct);
-
+	MAKE_ACTION_D(getCreateVarAct, tr("Get/Create Variable"),
+	              tr("Get Or Create Local Variable. The specified value and unit will be used as defaults if the variable is created."),
+	              "overlay=\\align=AlignLeft\\fg=#17dd29\\add/rotate=180/send.glyph", btnGetCreate, wVariables, getLocalVar(true));
 	// Copy LVar as new Data Request
-	QAction *copyVarAct = new QAction(QIcon(QStringLiteral("move_to_inbox.glyph")), tr("Copy to Data Request"), this);
-	copyVarAct->setToolTip(tr("Copy Variable to new Data Request"));
-	copyVarAct->setDisabled(true);
-	connect(copyVarAct, &QAction::triggered, this, [this]() { d->copyLocalVarToRequest(); });
-	ui.btnCopyLVarToRequest->setDefaultAction(copyVarAct);
+	MAKE_ACTION_D(copyVarAct, tr("Copy to Data Request"), tr("Copy Variable to new Data Request."), "move_to_inbox.glyph", btnCopyLVarToRequest, wVariables, copyLocalVarToRequest());
 
 	auto updateLocalVarsFormState = [=](const QString &) {
 		const bool isLocal = ui.wLocalVarsForm->isVisible();
@@ -925,42 +887,18 @@ WASimUI::WASimUI(QWidget *parent) :
 	// Other forms
 
 	// Lookup action
-	QAction *lookupItemAct = new QAction(QIcon(QStringLiteral("search.glyph")), tr("Lookup"), this);
-	lookupItemAct->setToolTip(tr("Query server for ID of named item (Lookup command)."));
-	connect(lookupItemAct, &QAction::triggered, this, [this]() { d->lookupItem(); });
-	ui.btnVarLookup->setDefaultAction(lookupItemAct);
-
+	MAKE_ACTION(lookupItemAct, tr("Lookup"), tr("Query server for ID of named item (Lookup command)."), "search.glyph", btnVarLookup, wDataLookup, lookupItem());
 	// Send Key Event action
-	QAction *sendKeyEventAct = new QAction(QIcon(QStringLiteral("send.glyph")), tr("Send Key Event"), this);
-	sendKeyEventAct->setToolTip(tr("Send the specified Key Event to the server."));
-	connect(sendKeyEventAct, &QAction::triggered, this, [this]() { d->sendKeyEventForm(); });
-	ui.btnKeyEventSend->setDefaultAction(sendKeyEventAct);
-
-
+	MAKE_ACTION(sendKeyEventAct, tr("Send Key Event"), tr("Send the specified Key Event to the server."), "send.glyph", btnKeyEventSend, wKeyEvent, sendKeyEventForm());
 	// Send Command action
-	QAction *sendCmdAct = new QAction(QIcon(QStringLiteral("keyboard_command_key.glyph")), tr("Send Command"), this);
-	sendCmdAct->setToolTip(tr("Send the selected Command to the server."));
-	connect(sendCmdAct, &QAction::triggered, this, [this]() { d->sendCommandForm(); });
-	ui.btnCmdSend->setDefaultAction(sendCmdAct);
-
+	MAKE_ACTION(sendCmdAct, tr("Send Command"), tr("Send the selected Command to the server."), "keyboard_command_key.glyph", btnCmdSend, wCommand, sendCommandForm());
 
 	// Requests model view actions
 
 	// Remove selected Data Request(s) from item model/view
-	QAction *removeRequestsAct = new QAction(QIcon(QStringLiteral("delete_forever.glyph")), tr("Remove Selected Data Request(s)"), this);
-	removeRequestsAct->setIconText(tr("Remove"));
-	removeRequestsAct->setToolTip(tr("Delete the selected Data Request(s)."));
-	removeRequestsAct->setDisabled(true);
-	ui.pbReqestsRemove->setDefaultAction(removeRequestsAct);
-	connect(removeRequestsAct, &QAction::triggered, this, [this]() { d->removeSelectedRequests(); });
-
+	MAKE_ACTION_IT(removeRequestsAct, tr("Remove Selected Data Request(s)"), tr("Delete the selected Data Request(s)."), tr("Remove"), "delete_forever.glyph", pbReqestsRemove, wRequests, removeSelectedRequests());
 	// Update data of selected Data Request(s) in item model/view
-	QAction *updateRequestsAct = new QAction(QIcon(QStringLiteral("refresh.glyph")), tr("Update Selected Data Request(s)"), this);
-	updateRequestsAct->setIconText(tr("Update"));
-	updateRequestsAct->setToolTip(tr("Request data update on selected Data Request(s)."));
-	updateRequestsAct->setDisabled(true);
-	ui.pbReqestsUpdate->setDefaultAction(updateRequestsAct);
-	connect(updateRequestsAct, &QAction::triggered, this, [this]() { d->updateSelectedRequests(); });
+	MAKE_ACTION_IT(updateRequestsAct, tr("Update Selected Data Request(s)"), tr("Request data update on selected Data Request(s)."), tr("Update"), "refresh.glyph", pbReqestsUpdate, wRequests, updateSelectedRequests());
 
 	// Connect to table view selection model to en/disable the remove/update actions when selection changes.
 	connect(ui.requestsView->selectionModel(), &QItemSelectionModel::selectionChanged, this, [=](const QItemSelection &sel, const QItemSelection &) {
@@ -978,6 +916,8 @@ WASimUI::WASimUI(QWidget *parent) :
 	pauseRequestsAct->setCheckable(true);
 	pauseRequestsAct->setDisabled(true);
 	ui.pbReqestsPause->setDefaultAction(pauseRequestsAct);
+	ui.wRequests->addAction(pauseRequestsAct);
+
 	connect(pauseRequestsAct, &QAction::triggered, this, [=](bool chk) {
 		static const QIcon dataResumeIcon(QStringLiteral("play_arrow.glyph"));
 		d->client->setDataRequestsPaused(chk);
@@ -1002,6 +942,8 @@ WASimUI::WASimUI(QWidget *parent) :
 	QAction *loadReplaceAct = loadRequestsMenu->addAction(QIcon(QStringLiteral("view_list.glyph")), tr("Replace Existing"));
 	QAction *loadAppendAct = loadRequestsMenu->addAction(QIcon(QStringLiteral("playlist_add.glyph")), tr("Append to Existing"));
 	ui.pbReqestsLoad->setDefaultAction(loadRequestsAct);
+	ui.wRequests->addAction(loadRequestsAct);
+
 	connect(loadReplaceAct, &QAction::triggered, this, [this]() { d->loadRequests(true); });
 	connect(loadAppendAct, &QAction::triggered, this, [this]() { d->loadRequests(false); });
 	connect(loadRequestsAct, &QAction::triggered, this, [=]() { if (!loadRequestsAct->menu()) d->loadRequests(true); });
@@ -1022,20 +964,9 @@ WASimUI::WASimUI(QWidget *parent) :
 	// Registered calculator events model view actions
 
 	// Remove selected Data Request(s) from item model/view
-	QAction *removeEventsAct = new QAction(QIcon(QStringLiteral("delete_forever.glyph")), tr("Remove Selected Event(s)"), this);
-	removeEventsAct->setIconText(tr("Remove"));
-	removeEventsAct->setToolTip(tr("Delete the selected Event(s)."));
-	removeEventsAct->setDisabled(true);
-	ui.pbEventsRemove->setDefaultAction(removeEventsAct);
-	connect(removeEventsAct, &QAction::triggered, this, [this]() { d->removeSelectedEvents(); });
-
+	MAKE_ACTION_IT(removeEventsAct, tr("Remove Selected Event(s)"), tr("Delete the selected Event(s)."), tr("Remove"), "delete_forever.glyph", pbEventsRemove, wEventsList, removeSelectedEvents());
 	// Update data of selected Data Request(s) in item model/view
-	QAction *updateEventsAct = new QAction(QIcon(QStringLiteral("rotate=180/play_for_work.glyph")), tr("Transmit Selected Event(s)"), this);
-	updateEventsAct->setIconText(tr("Transmit"));
-	updateEventsAct->setToolTip(tr("Trigger selected Event(s)."));
-	updateEventsAct->setDisabled(true);
-	ui.pbEventsTransmit->setDefaultAction(updateEventsAct);
-	connect(updateEventsAct, &QAction::triggered, this, [this]() { d->transmitSelectedEvents(); });
+	MAKE_ACTION_IT(updateEventsAct, tr("Transmit Selected Event(s)"), tr("Trigger the selected Event(s)."), tr("Transmit"), "rotate=180/play_for_work.glyph", pbEventsTransmit, wEventsList, transmitSelectedEvents());
 
 	// Connect to table view selection model to en/disable the remove/update actions when selection changes.
 	connect(ui.eventsView->selectionModel(), &QItemSelectionModel::selectionChanged, this, [=](const QItemSelection &sel, const QItemSelection &) {
@@ -1044,12 +975,7 @@ WASimUI::WASimUI(QWidget *parent) :
 	});
 
 	// Save current Events to a file
-	QAction *saveEventsAct = new QAction(QIcon(QStringLiteral("save.glyph")), tr("Save Events"), this);
-	saveEventsAct->setIconText(tr("Save"));
-	saveEventsAct->setToolTip(tr("Save current Events list to file."));
-	saveEventsAct->setDisabled(true);
-	ui.pbEventsSave->setDefaultAction(saveEventsAct);
-	connect(saveEventsAct, &QAction::triggered, this, [this]() { d->saveEvents(); });
+	MAKE_ACTION_IT(saveEventsAct, tr("Save Events"), tr("Save current Events list to file."), tr("Save"), "save.glyph", pbEventsSave, wEventsList, saveEvents());
 
 	// Load Events from a file. This is actually two actions: load and append to existing records + load and replace existing records.
 	QAction *loadEventsAct = new QAction(QIcon(QStringLiteral("folder_open.glyph")), tr("Load Events"), this);
@@ -1059,6 +985,8 @@ WASimUI::WASimUI(QWidget *parent) :
 	QAction *replaceEventsAct = loadEventsMenu->addAction(QIcon(QStringLiteral("view_list.glyph")), tr("Replace Existing"));
 	QAction *appendEventsAct = loadEventsMenu->addAction(QIcon(QStringLiteral("playlist_add.glyph")), tr("Append to Existing"));
 	ui.pbEventsLoad->setDefaultAction(loadEventsAct);
+	ui.wEventsList->addAction(loadEventsAct);
+
 	connect(replaceEventsAct, &QAction::triggered, this, [this]() { d->loadEvents(true); });
 	connect(appendEventsAct, &QAction::triggered, this, [this]() { d->loadEvents(false); });
 	connect(loadEventsAct, &QAction::triggered, this, [=]() { if (!loadEventsAct->menu()) d->loadEvents(true); });
@@ -1074,6 +1002,9 @@ WASimUI::WASimUI(QWidget *parent) :
 		saveEventsAct->setEnabled(rows > 0);
 	}, Qt::QueuedConnection);
 
+#undef MAKE_ACTION_IT
+#undef MAKE_ACTION_D
+#undef MAKE_ACTION
 
 	// Other UI-related actions
 
