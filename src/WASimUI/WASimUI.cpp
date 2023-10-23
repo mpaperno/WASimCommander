@@ -24,21 +24,22 @@ and is also available at <http://www.gnu.org/licenses/>.
 #include <QDebug>
 #include <QDesktopServices>
 #include <QFileDialog>
+#include <QItemSelectionModel>
 #include <QMenu>
 #include <QMetaType>
 #include <QPushButton>
 #include <QResizeEvent>
 #include <QScrollBar>
-#include <QItemSelectionModel>
 #include <QSettings>
 #include <QStandardPaths>
 #include <QString>
 #include <QToolBar>
 
 #include "WASimUI.h"
-#include "RequestsModel.h"
+
 #include "EventsModel.h"
-#include "LogRecordsModel.h"
+#include "LogConsole.h"
+#include "RequestsModel.h"
 #include "Utils.h"
 #include "Widgets.h"
 
@@ -69,7 +70,6 @@ public:
 	StatusWidget *statWidget;
 	RequestsModel *reqModel;
 	EventsModel *eventsModel;
-	LogRecordsModel *logModel;
 	QAction *initAct = nullptr;
 	QAction *connectAct = nullptr;
 	ClientStatus clientStatus = ClientStatus::Idle;
@@ -81,7 +81,6 @@ public:
 	WASimUIPrivate(WASimUI *q) : q(q), ui(&q->ui),
 		reqModel(new RequestsModel(q)),
 		eventsModel(new EventsModel(q)),
-		logModel(new LogRecordsModel(q)),
 		statWidget(new StatusWidget(q)),
 		client(new WASimClient(0xDEADBEEF))
 	{
@@ -98,7 +97,6 @@ public:
 		client->setCommandResultCallback(&WASimUI::commandResultReady, q);
 		client->setDataCallback(&WASimUI::dataResultReady, q);
 		client->setListResultsCallback(&WASimUI::listResults, q);
-		client->setLogCallback([=](const LogRecord &l, LogSource s) { emit q->logMessageReady(l, +s); });
 	}
 
 	bool checkConnected()
@@ -562,8 +560,7 @@ public:
 
 	void logUiMessage(const QString &msg, CommandId cmd = CommandId::None, LogLevel level = LogLevel::Error)
 	{
-		LogRecord l(level, qPrintable(msg));
-		emit q->logMessageReady(l, +LogRecordsModel::LogSource::UI);
+		ui->wLogWindow->logMessage(+level, msg);
 		if (cmd != CommandId::None)
 			emit q->commandResultReady(Command(level == LogLevel::Error ? CommandId::Nak : CommandId::Ack, +cmd, qPrintable(msg)));
 	}
@@ -578,7 +575,8 @@ public:
 		set.setValue(QStringLiteral("mainWindowState"), q->saveState());
 		set.setValue(QStringLiteral("requestsViewHeaderState"), ui->requestsView->horizontalHeader()->saveState());
 		set.setValue(QStringLiteral("eventsViewHeaderState"), ui->eventsView->horizontalHeader()->saveState());
-		set.setValue(QStringLiteral("logViewHeaderState"), ui->logView->horizontalHeader()->saveState());
+
+		ui->wLogWindow->saveSettings(set);
 
 		set.beginGroup(QStringLiteral("Widgets"));
 		for (const FormWidget &vw : qAsConst(formWidgets))
@@ -607,8 +605,8 @@ public:
 			ui->requestsView->horizontalHeader()->restoreState(set.value(QStringLiteral("requestsViewHeaderState")).toByteArray());
 		if (set.contains(QStringLiteral("eventsViewHeaderState")))
 			ui->eventsView->horizontalHeader()->restoreState(set.value(QStringLiteral("eventsViewHeaderState")).toByteArray());
-		if (set.contains(QStringLiteral("logViewHeaderState")))
-			ui->logView->horizontalHeader()->restoreState(set.value(QStringLiteral("logViewHeaderState")).toByteArray());
+
+		ui->wLogWindow->loadSettings(set);
 
 		set.beginGroup(QStringLiteral("Widgets"));
 		for (const FormWidget &vw : qAsConst(formWidgets))
@@ -733,16 +731,7 @@ WASimUI::WASimUI(QWidget *parent) :
 	connect(ui.eventsView, &QTableView::doubleClicked, this, [this](const QModelIndex &idx) { d->populateEventForm(idx); });
 
 	// Set up the Log table view
-	ui.logView->setModel(d->logModel);
-	ui.logView->sortByColumn(LogRecordsModel::COL_TS, Qt::AscendingOrder);
-	//ui.logView->horizontalHeader()->setSortIndicator(LogRecordsModel::COL_TS, Qt::AscendingOrder);
-	ui.logView->horizontalHeader()->setSortIndicatorShown(false);
-	ui.logView->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
-	ui.logView->horizontalHeader()->setSectionsMovable(true);
-	ui.logView->horizontalHeader()->resizeSection(LogRecordsModel::COL_LEVEL, 70);
-	ui.logView->horizontalHeader()->resizeSection(LogRecordsModel::COL_TS, 110);
-	ui.logView->horizontalHeader()->resizeSection(LogRecordsModel::COL_SOURCE, 20);
-	ui.logView->horizontalHeader()->setToolTip(tr("Severity Level | Timestamp | Source | Message"));
+	ui.wLogWindow->setClient(d->client);
 
 	// Set initial state of Variables form, Local var type is default.
 	ui.wOtherVarsForm->setVisible(false);
@@ -795,10 +784,6 @@ WASimUI::WASimUI(QWidget *parent) :
 	connect(this, &WASimUI::listResults, this, &WASimUI::onListResults, Qt::QueuedConnection);
 	// Data updates can go right to the requests model.
 	connect(this, &WASimUI::dataResultReady, d->reqModel, &RequestsModel::setRequestValue, Qt::QueuedConnection);
-	// Log messages can go right to the log records model. Log messages may arrive at any time, possibly from different threads,
-	// so placing them into a model allow proper sorting (and filtering).
-	connect(this, &WASimUI::logMessageReady, d->logModel, &LogRecordsModel::addRecord, Qt::QueuedConnection);
-	d->logUiMessage("Hello!", CommandId::Ack, LogLevel::Info);
 
 	// Set up actions for triggering various events. Actions are typically mapped to UI elements like buttons and menu items and can be reused in multiple places.
 
@@ -1090,117 +1075,6 @@ WASimUI::WASimUI(QWidget *parent) :
 	}, Qt::QueuedConnection);
 
 
-	// Logging window actions
-
-	// Set and connect Log Level combo boxes for Client and Server logging levels
-	ui.cbLogLevelCallback->setProperties(d->client->logLevel(     LogFacility::Remote,  LogSource::Client), LogFacility::Remote,  LogSource::Client);
-	ui.cbLogLevelFile->setProperties(d->client->logLevel(         LogFacility::File,    LogSource::Client), LogFacility::File,    LogSource::Client);
-	ui.cbLogLevelConsole->setProperties(d->client->logLevel(      LogFacility::Console, LogSource::Client), LogFacility::Console, LogSource::Client);
-	ui.cbLogLevelServer->setProperties(d->client->logLevel(       LogFacility::Remote,  LogSource::Server), LogFacility::Remote,  LogSource::Server);
-	ui.cbLogLevelServerFile->setProperties(                                                   (LogLevel)-1, LogFacility::File,    LogSource::Server);  // unknown level at startup
-	ui.cbLogLevelServerConsole->setProperties(                                                (LogLevel)-1, LogFacility::Console, LogSource::Server);  // unknown level at startup
-	// Since the LogLevelComboBox types store the facility and source properties (which we just set), we can use one event handler for all of them.
-	auto setLogLevel = [=](LogLevel level) {
-		if (LogLevelComboBox *cb = qobject_cast<LogLevelComboBox*>(sender()))
-			d->client->setLogLevel(level, cb->facility(), cb->source());
-	};
-	connect(ui.cbLogLevelCallback,      &LogLevelComboBox::levelChanged, this, setLogLevel);
-	connect(ui.cbLogLevelFile,          &LogLevelComboBox::levelChanged, this, setLogLevel);
-	connect(ui.cbLogLevelConsole,       &LogLevelComboBox::levelChanged, this, setLogLevel);
-	connect(ui.cbLogLevelServer,        &LogLevelComboBox::levelChanged, this, setLogLevel);
-	connect(ui.cbLogLevelServerFile,    &LogLevelComboBox::levelChanged, this, setLogLevel);
-	connect(ui.cbLogLevelServerConsole, &LogLevelComboBox::levelChanged, this, setLogLevel);
-
-	QAction *filterErrorsAct = new QAction(QIcon(Utils::iconNameForLogLevel(LogLevel::Error)), tr("Toggle Errors"), this);
-	filterErrorsAct->setToolTip(tr("Toggle visibility of Error-level log messages."));
-	filterErrorsAct->setCheckable(true);
-	filterErrorsAct->setChecked(true);
-	ui.btnLogFilt_ERR->setDefaultAction(filterErrorsAct);
-	connect(filterErrorsAct, &QAction::triggered, this, [this](bool en) { d->logModel->setLevelFilter(LogLevel::Error, !en); });
-
-	QAction *filterWarningsAct = new QAction(QIcon(Utils::iconNameForLogLevel(LogLevel::Warning)), tr("Toggle Warnings"), this);
-	filterWarningsAct->setToolTip(tr("Toggle visibility of Warning-level log messages."));
-	filterWarningsAct->setCheckable(true);
-	filterWarningsAct->setChecked(true);
-	ui.btnLogFilt_WRN->setDefaultAction(filterWarningsAct);
-	connect(filterWarningsAct, &QAction::triggered, this, [this](bool en) { d->logModel->setLevelFilter(LogLevel::Warning, !en); });
-
-	QAction *filterInfoAct = new QAction(QIcon(Utils::iconNameForLogLevel(LogLevel::Info)), tr("Toggle Info"), this);
-	filterInfoAct->setToolTip(tr("Toggle visibility of Information-level log messages."));
-	filterInfoAct->setCheckable(true);
-	filterInfoAct->setChecked(true);
-	ui.btnLogFilt_INF->setDefaultAction(filterInfoAct);
-	connect(filterInfoAct, &QAction::triggered, this, [this](bool en) { d->logModel->setLevelFilter(LogLevel::Info, !en); });
-
-	QAction *filterDebugAct = new QAction(QIcon(Utils::iconNameForLogLevel(LogLevel::Debug)), tr("Toggle Debug"), this);
-	filterDebugAct->setToolTip(tr("Toggle visibility of Debug-level log messages."));
-	filterDebugAct->setCheckable(true);
-	filterDebugAct->setChecked(true);
-	ui.btnLogFilt_DBG->setDefaultAction(filterDebugAct);
-	connect(filterDebugAct, &QAction::triggered, this, [this](bool en) { d->logModel->setLevelFilter(LogLevel::Debug, !en); });
-
-	QAction *filterTraceAct = new QAction(QIcon(Utils::iconNameForLogLevel(LogLevel::Trace)), tr("Toggle Traces"), this);
-	filterTraceAct->setToolTip(tr("Toggle visibility of Trace-level log messages."));
-	filterTraceAct->setCheckable(true);
-	filterTraceAct->setChecked(true);
-	ui.btnLogFilt_TRC->setDefaultAction(filterTraceAct);
-	connect(filterTraceAct, &QAction::triggered, this, [this](bool en) { d->logModel->setLevelFilter(LogLevel::Trace, !en); });
-
-	QAction *filterServerAct = new QAction(QIcon(Utils::iconNameForLogSource(+LogSource::Server)), tr("Toggle Server Records"), this);
-	filterServerAct->setToolTip(tr("Toggle visibility of log messages from Server."));
-	filterServerAct->setCheckable(true);
-	filterServerAct->setChecked(true);
-	ui.btnLogFilt_Server->setDefaultAction(filterServerAct);
-	connect(filterServerAct, &QAction::triggered, this, [this](bool en) { d->logModel->setSourceFilter(+LogSource::Server, !en); });
-
-	QAction *filterClientAct = new QAction(QIcon(Utils::iconNameForLogSource(+LogSource::Client)), tr("Toggle Client Records"), this);
-	filterClientAct->setToolTip(tr("Toggle visibility of log messages from Client."));
-	filterClientAct->setCheckable(true);
-	filterClientAct->setChecked(true);
-	ui.btnLogFilt_Client->setDefaultAction(filterClientAct);
-	connect(filterClientAct, &QAction::triggered, this, [this](bool en) { d->logModel->setSourceFilter(+LogSource::Client, !en); });
-
-	QAction *filterUILogAct = new QAction(QIcon(Utils::iconNameForLogSource(+LogRecordsModel::LogSource::UI)), tr("Toggle UI Records"), this);
-	filterUILogAct->setToolTip(tr("Toggle visibility of log messages from this UI."));
-	filterUILogAct->setCheckable(true);
-	filterUILogAct->setChecked(true);
-	ui.btnLogFilt_UI->setDefaultAction(filterUILogAct);
-	connect(filterUILogAct, &QAction::triggered, this, [this](bool en) { d->logModel->setSourceFilter(+LogRecordsModel::LogSource::UI, !en); });
-
-	QIcon logPauseIcon(QStringLiteral("pause.glyph"));
-	logPauseIcon.addFile(QStringLiteral("play_arrow.glyph"), QSize(), QIcon::Normal, QIcon::On);
-	QAction *pauseLogScrollAct = new QAction(logPauseIcon, tr("Pause Log Scroll"), this);
-	pauseLogScrollAct->setToolTip(tr("<p>Toggle scrolling of the log window. Scrolling can also be paused by selecting a log entry row.</p>"));
-	pauseLogScrollAct->setCheckable(true);
-	ui.btnLogPause->setDefaultAction(pauseLogScrollAct);
-	connect(pauseLogScrollAct, &QAction::triggered, this, [this](bool en) { if (!en) ui.logView->selectionModel()->clear(); });  // clear log view selection on "un-pause"
-
-	QAction *clearLogWindowAct = new QAction(QIcon(QStringLiteral("delete.glyph")), tr("Clear Log Window"), this);
-	clearLogWindowAct->setToolTip(tr("Clear the log window."));
-	ui.btnLogClear->setDefaultAction(clearLogWindowAct);
-	connect(clearLogWindowAct, &QAction::triggered, this, [this]() { d->logModel->clear(); });
-
-	QIcon wordWrapIcon(QStringLiteral("wrap_text.glyph"));
-	wordWrapIcon.addFile(QStringLiteral("notes.glyph"), QSize(), QIcon::Normal, QIcon::On);
-	QAction *wordWrapLogWindowAct = new QAction(wordWrapIcon, tr("Log Word Wrap"), this);
-	wordWrapLogWindowAct->setToolTip(tr("Toggle word wrapping of the log window."));
-	wordWrapLogWindowAct->setCheckable(true);
-	wordWrapLogWindowAct->setChecked(true);
-	ui.btnLogWordWrap->setDefaultAction(wordWrapLogWindowAct);
-	connect(wordWrapLogWindowAct, &QAction::toggled, this, [this](bool chk) { ui.logView->setWordWrap(chk); ui.logView->resizeRowsToContents(); });
-
-	// connect the log model record added signal to make sure last record remains in view, unless scroll lock is enabled
-	connect(d->logModel, &LogRecordsModel::recordAdded, this, [=](const QModelIndex &i) {
-		// make sure log view scroll to bottom on insertions, unless a row is selected or scroll pause is set.
-		ui.logView->resizeRowToContents(i.row());
-		if (!pauseLogScrollAct->isChecked() && !ui.logView->selectionModel()->hasSelection())
-			ui.logView->scrollToBottom(/*i, QAbstractItemView::PositionAtBottom*/);
-	});
-	// connect log viewer selection model to show pause button active while there is a selection
-	connect(ui.logView->selectionModel(), &QItemSelectionModel::selectionChanged, this, [=](const QItemSelection &sel, const QItemSelection&) {
-		pauseLogScrollAct->setChecked(!sel.isEmpty());
-	});
-
 	// Other UI-related actions
 
 	QAction *viewAct = new QAction(QIcon(QStringLiteral("grid_view.glyph")), tr("View"), this);
@@ -1240,9 +1114,6 @@ WASimUI::WASimUI(QWidget *parent) :
 	// add all actions to this widget, for context menu and shortcut handling
 	addActions({
 		d->initAct, pingAct, d->connectAct,
-		Utils::separatorAction(this), removeRequestsAct, updateRequestsAct, saveRequestsAct, loadRequestsAct,
-		Utils::separatorAction(this), removeEventsAct, updateEventsAct, saveEventsAct, loadEventsAct,
-		Utils::separatorAction(this), pauseLogScrollAct, clearLogWindowAct, wordWrapLogWindowAct,
 		Utils::separatorAction(this), viewAct, styleAct, aboutAct, projectLinkAct
 	});
 
@@ -1277,6 +1148,9 @@ WASimUI::WASimUI(QWidget *parent) :
 	// now restore any saved settings
 	d->readSettings();
 	styleAct->setChecked(Utils::isDarkStyle());
+
+	// Say Hi!
+	d->logUiMessage("Hello!", CommandId::Ack, LogLevel::Info);
 }
 
 void WASimUI::onClientEvent(const ClientEvent &ev)

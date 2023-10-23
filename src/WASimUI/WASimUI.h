@@ -37,7 +37,6 @@ signals:
 	void commandResultReady(const WASimCommander::Command &c);
 	void listResults(const WASimCommander::Client::ListResult &list);
 	void dataResultReady(const WASimCommander::Client::DataRequestRecord &r);
-	void logMessageReady(const WASimCommander::LogRecord &r, quint8 src);
 
 protected:
 	void closeEvent(QCloseEvent *) override;
