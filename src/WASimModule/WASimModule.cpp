@@ -513,7 +513,9 @@ Client *connectClient(uint32_t id)
 	return connectClient(getOrCreateClient(id));
 }
 
-void checkTriggerEventNeeded();  // forward, in Utility Functions just below
+// forwards, in Utility Functions just below
+void checkTriggerEventNeeded();
+void resumeTriggerEvent();
 
 // marks client as disconnected or timed out and clears any saved requests/events
 void disconnectClient(Client *c, ClientStatus newStatus = ClientStatus::Disconnected)
@@ -555,6 +557,23 @@ void disableAllClients()
 		it.second.status = ClientStatus::Disconnected;
 }
 
+std::string setSuspendClientDataUpdates(Client *c, bool suspend)
+{
+	if (c->pauseDataUpdates == suspend)
+		return suspend ? "Data Subscriptions already paused" : "Data Subscriptions already active";
+
+	if (suspend) {
+		c->pauseDataUpdates = true;
+		checkTriggerEventNeeded();
+		return "Data Subscription updates suspended";
+	}
+
+	c->pauseDataUpdates = false;
+	if (!g_triggersRegistered && c->requests.size())
+		resumeTriggerEvent();
+	return "Data Subscription updates resumed";
+}
+
 // callback for logfault IdProxyHandler log handler
 void CALLBACK clientLogHandler(const uint32_t id, const logfault::Message &msg)
 {
@@ -590,19 +609,19 @@ bool setClientLogLevel(Client *c, LogLevel level)
 //----------------------------------------------------------------------------
 
 // this runs once we have any requests to keep updated which essentially starts the tick() processing.
-void registerTriggerEvents()
+void resumeTriggerEvent()
 {
 	// use "Frame" event as trigger for our tick() loop
-	if FAILED(INVOKE_SIMCONNECT(SubscribeToSystemEvent, g_hSimConnect, (SIMCONNECT_CLIENT_EVENT_ID)EVENT_FRAME, "Frame"))
+	if FAILED(INVOKE_SIMCONNECT(SetSystemEventState, g_hSimConnect, (SIMCONNECT_CLIENT_EVENT_ID)EVENT_FRAME, SIMCONNECT_STATE_ON))
 		return;
 	g_triggersRegistered = true;
 	LOG_INF << "DataRequest data update processing started.";
 }
 
 // and here is the opposite... if all clients disconnect we can stop the ticker loop.
-void unregisterTriggerEvents()
+void pauseTriggerEvent()
 {
-	if FAILED(INVOKE_SIMCONNECT(UnsubscribeFromSystemEvent, g_hSimConnect, (SIMCONNECT_CLIENT_EVENT_ID)EVENT_FRAME))
+	if FAILED(INVOKE_SIMCONNECT(SetSystemEventState, g_hSimConnect, (SIMCONNECT_CLIENT_EVENT_ID)EVENT_FRAME, SIMCONNECT_STATE_OFF))
 		return;
 	g_triggersRegistered = false;
 	LOG_INF << "DataRequest update processing stopped.";
@@ -614,10 +633,11 @@ void unregisterTriggerEvents()
 void checkTriggerEventNeeded()
 {
 	for (const clientMap_t::value_type &it : g_mClients) {
-		if (it.second.status == ClientStatus::Connected)
+		const Client &c = it.second;
+		if (c.status == ClientStatus::Connected && !c.pauseDataUpdates && c.requests.size())
 			return;
 	}
-	unregisterTriggerEvents();
+	pauseTriggerEvent();
 }
 
 bool execCalculatorCode(const char *code, calcResult_t &result, bool precompiled = false)
@@ -1196,19 +1216,19 @@ bool removeRequest(Client *c, const uint32_t requestId)
 	c->requests.erase(tr->requestId);
 	LOG_DBG << "Deleted DataRequest ID " << requestId;
 	sendAckNak(c, CommandId::Subscribe, true, requestId);
+	if (g_triggersRegistered && !c->requests.size())
+		checkTriggerEventNeeded();  // check if anyone is still connected
 	return true;
 }
 
-// returns true if request has been scheduled *and* will require regular updates (period > UpdatePeriod::Once)
+// returns true if request has been scheduled or removed
 bool addOrUpdateRequest(Client *c, const DataRequest *const req)
 {
 	LOG_DBG << "Got DataRequest from Client " << c->name << ": " << *req;
 
 	// request type of "None" actually means to delete an existing request
-	if (req->requestType == RequestType::None) {
-		removeRequest(c, req->requestId);
-		return false;   // no updates needed
-	}
+	if (req->requestType == RequestType::None)
+		return removeRequest(c, req->requestId);
 
 	// setup response Command for Ack/Nak
 	const Command resp(CommandId::Subscribe, 0, nullptr, .0, req->requestId);
@@ -1316,7 +1336,9 @@ bool addOrUpdateRequest(Client *c, const DataRequest *const req)
 		updateRequestValue(c, tr, false);
 
 	LOG_DBG << (isNewRequest ? "Added " : "Updated ") << *tr;
-	return (tr->period > UpdatePeriod::Once);
+	if (!g_triggersRegistered && tr->period > UpdatePeriod::Once && !c->pauseDataUpdates)
+		resumeTriggerEvent();  // start update loop
+	return true;
 }
 #pragma endregion  Data Requests
 
@@ -1479,9 +1501,9 @@ void tick()
 	g_tpNextTick = now + milliseconds(TICK_PERIOD_MS);
 
 	for (clientMap_t::value_type &cp : g_mClients) {
-		if (cp.second.status != ClientStatus::Connected)
-			continue;
 		Client &c = cp.second;
+		if (c.status != ClientStatus::Connected || c.pauseDataUpdates)
+			continue;
 		// check for timeout
 		if (now >= c.nextTimeout) {
 			disconnectClient(&c, "Client connection timed out.", ClientStatus::TimedOut);
@@ -1492,8 +1514,7 @@ void tick()
 			c.nextHearbeat = now + seconds(CONN_HEARTBEAT_SEC);
 			sendPing(&c);
 		}
-		if (c.pauseDataUpdates)
-			continue;
+		// process data requests
 		for (requestMap_t::value_type &rp : c.requests) {
 			TrackedRequest &r = rp.second;
 			// check if update needed
@@ -1547,8 +1568,7 @@ void processCommand(Client *c, const Command *const cmd)
 			break;
 
 		case CommandId::Subscribe:
-			c->pauseDataUpdates = !cmd->uData;
-			ackMsg = c->pauseDataUpdates ? "Data Subscription updates suspended" : "Data Subscription updates resumed";
+			ackMsg = setSuspendClientDataUpdates(c, !cmd->uData);
 			break;
 
 		case CommandId::Update:
@@ -1633,8 +1653,8 @@ void CALLBACK dispatchMessage(SIMCONNECT_RECV* pData, DWORD cbData, void*)
 			}
 			if (c->status == ClientStatus::Connected)
 				updateClientTimeout(c);  // update heartbeat timer
-			else if (!connectClient(c))  // assume client wants to re-connect if they're not already
-				break;  // unlikely
+			else
+				connectClient(c);        // assume client wants to re-connect if they're not already
 
 			const size_t dataSize = (size_t)pData->dwSize + 4 - sizeof(SIMCONNECT_RECV_CLIENT_DATA);  // dwSize reports 4 bytes less than actual size of SIMCONNECT_RECV_CLIENT_DATA
 			switch (dr->type) {
@@ -1748,6 +1768,13 @@ MSFS_CALLBACK void module_init(void)
 		return;   // not much we can do w/out the connection event trigger
 	// register incoming Ping event and add to notification group (this is technically not "critical" to operation so do not exit on error here
 	SimConnectHelper::newClientEvent(g_hSimConnect, CLI_EVENT_PING, string(EVENT_NAME_PING, strlen(EVENT_NAME_PING)), GROUP_DEFAULT);
+
+	// use "Frame" event as trigger for our tick() loop
+	if FAILED(hr = SimConnect_SubscribeToSystemEvent(g_hSimConnect, (SIMCONNECT_CLIENT_EVENT_ID)EVENT_FRAME, "Frame")) {
+		LOG_CRT << "SimConnect_SubscribeToSystemEvent failed with " << LOG_HR(hr);;
+		return;
+	}
+	pauseTriggerEvent();  // pause frame updates for now
 
 	// Go
 	if FAILED(hr = SimConnect_CallDispatch(g_hSimConnect, dispatchMessage, nullptr)) {
