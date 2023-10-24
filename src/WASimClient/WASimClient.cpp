@@ -911,7 +911,7 @@ class WASimClient::Private
 		return sValue;
 	}
 
-	HRESULT getVariable(const VariableRequest &v, double *result, double dflt = 0.0)
+	HRESULT getVariable(const VariableRequest &v, double *result, std::string *sResult = nullptr, double dflt = 0.0)
 	{
 		const string sValue = buildVariableCommandString(v, false);
 		if (sValue.empty() || sValue.length() >= STRSZ_CMD)
@@ -927,6 +927,8 @@ class WASimClient::Private
 		}
 		if (result)
 			*result = response.fData;
+		if (sResult)
+			*sResult = response.sData;
 		return S_OK;
 	}
 
@@ -1524,13 +1526,13 @@ HRESULT WASimClient::executeCalculatorCode(const std::string &code, CalcResultTy
 
 #pragma region Variable accessors ----------------------------------------------
 
-HRESULT WASimClient::getVariable(const VariableRequest & variable, double * pfResult)
+HRESULT WASimClient::getVariable(const VariableRequest & variable, double * pfResult, std::string *psResult)
 {
 	if (variable.variableId > -1 && !Utilities::isIndexedVariableType(variable.variableType)) {
 		LOG_ERR << "Cannot get variable type '" << variable.variableType << "' by index.";
 		return E_INVALIDARG;
 	}
-	return d->getVariable(variable, pfResult);
+	return d->getVariable(variable, pfResult, psResult);
 }
 
 HRESULT WASimClient::getLocalVariable(const std::string &variableName, double *pfResult, const std::string &unitName) {
@@ -1538,7 +1540,7 @@ HRESULT WASimClient::getLocalVariable(const std::string &variableName, double *p
 }
 
 HRESULT WASimClient::getOrCreateLocalVariable(const std::string &variableName, double *pfResult, double defaultValue, const std::string &unitName) {
-	return d->getVariable(VariableRequest(variableName, true, unitName), pfResult, defaultValue);
+	return d->getVariable(VariableRequest(variableName, true, unitName), pfResult, nullptr, defaultValue);
 }
 
 HRESULT WASimClient::setVariable(const VariableRequest & variable, const double value) {
