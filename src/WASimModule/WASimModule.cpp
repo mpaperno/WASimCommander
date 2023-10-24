@@ -641,7 +641,7 @@ bool getNamedVariableValue(char varType, calcResult_t &result)
 			break;
 
 		case 'A':
-			if (result.varId < 0)
+			if (result.varId < 0 || result.unitId < 0)
 				return false;
 			result.setF(aircraft_varget(result.varId, result.unitId, result.varIndex));
 			break;
@@ -1009,9 +1009,14 @@ void getVariable(const Client *c, const Command *const cmd)
 		return;
 	}
 
+	if (unitId < 0 && varType == 'A') {
+		logAndNak(c, *cmd, ostringstream() << "Could not resolve Unit ID for Get command from string " << quoted(data));
+		return;
+	}
+
 	calcResult_t res = calcResult_t { CalcResultType::Double, STRSZ_CMD, varId, unitId, varIndex, varName.c_str() };
 	if (!getNamedVariableValue(varType, res))
-		return logAndNak(c, *cmd, ostringstream() << "getNamedVariableValue() returned error result for code " << quoted(data));
+		return logAndNak(c, *cmd, ostringstream() << "getNamedVariableValue() returned error result for variable: " << quoted(data));
 	Command resp(CommandId::Ack, (uint32_t)cmd->commandId);
 	resp.token = cmd->token;
 	switch (res.resultMemberIndex) {
@@ -1019,7 +1024,7 @@ void getVariable(const Client *c, const Command *const cmd)
 		case 1: resp.fData = res.iVal; break;
 		case 2: resp.setStringData(res.sVal.c_str()); break;
 		default:
-			return logAndNak(c, *cmd, ostringstream() << "getNamedVariableValue() returned invalid result index " << res.resultMemberIndex);
+			return logAndNak(c, *cmd, ostringstream() << "getNamedVariableValue() for " << quoted(data) << " returned invalid result index: " << res.resultMemberIndex);
 	}
 	sendResponse(c, resp);
 }
@@ -1184,7 +1189,7 @@ bool addOrUpdateRequest(Client *c, const DataRequest *const req)
 
 	// check for empty name/code
 	if (req->nameOrCode[0] == '\0') {
-		logAndNak(c, resp, ostringstream() << "Error in DataRequest ID: " << req->requestId << "; Parameter 'nameOrCode' cannot be empty.");
+		logAndNak(c, resp, ostringstream() << "Error in DataRequest ID " << req->requestId << ": Parameter 'nameOrCode' cannot be empty.");
 		return false;
 	}
 
@@ -1198,29 +1203,29 @@ bool addOrUpdateRequest(Client *c, const DataRequest *const req)
 		const SIMCONNECT_CLIENT_DATA_DEFINITION_ID newDataId = g_nextClienDataId++;
 		// create a new data area and add definition
 		if (!registerClientVariableDataArea(c, req->requestId, newDataId, actualValSize, req->valueSize)) {
-			logAndNak(c, resp, ostringstream() << "Failed to create ClientDataDefinition, check log messages.");
+			logAndNak(c, resp, ostringstream()  << "Error in DataRequest ID " << req->requestId << ": Failed to create ClientDataDefinition, check log messages.");
 			return false;
 		}
-
+		// this may change the request from a named to a calculated type for vars/string types which don't have native gauge API access functions.
 		tr = &c->requests.emplace(piecewise_construct, forward_as_tuple(req->requestId), forward_as_tuple(*req, newDataId)).first->second;  // no try_emplace?
 	}
 	else {
 		// Existing request
 
 		if (actualValSize > tr->dataSize) {
-			logAndNak(c, resp, ostringstream() << "Value size cannot be increased after request is created.");
+			logAndNak(c, resp, ostringstream() << "Error in DataRequest ID " << req->requestId << ": Value size cannot be increased after request is created.");
 			return false;
 		}
 		// recreate data definition if necessary
 		if (actualValSize != tr->dataSize) {
 			// remove definition
 			if FAILED(SimConnectHelper::removeClientDataDefinition(g_hSimConnect, tr->dataId)) {
-				logAndNak(c, resp, ostringstream() << "Failed to clear ClientDataDefinition, check log messages.");
+				logAndNak(c, resp, ostringstream() << "Error in DataRequest ID " << req->requestId << ": Failed to clear ClientDataDefinition, check log messages.");
 				return false;
 			}
 			// add definition
 			if FAILED(SimConnectHelper::addClientDataDefinition(g_hSimConnect, tr->dataId, req->valueSize)) {
-				logAndNak(c, resp, ostringstream() << "Failed to create ClientDataDefinition, check log messages.");
+				logAndNak(c, resp, ostringstream() << "Error in DataRequest ID " << req->requestId << ": Failed to create ClientDataDefinition, check log messages.");
 				return false;
 			}
 		}
@@ -1235,10 +1240,10 @@ bool addOrUpdateRequest(Client *c, const DataRequest *const req)
 			tr->variableId = getVariableId(tr->varTypePrefix, tr->nameOrCode);
 			if (tr->variableId < 0) {
 				if (tr->varTypePrefix == 'T') {
-					LOG_WRN << "Token variable named " << quoted(tr->nameOrCode) << " was not found. Will fall back to initialize_var_by_name().";
+					LOG_WRN << "Warning in DataRequest ID " << req->requestId << ": Token variable named " << quoted(tr->nameOrCode) << " was not found. Will fall back to initialize_var_by_name().";
 				}
 				else {
-					LOG_WRN << "Variable named " << quoted(tr->nameOrCode) << " was not found, disabling updates.";
+					LOG_ERR << "Error in DataRequest ID " << req->requestId << ": Variable named " << quoted(tr->nameOrCode) << " was not found, disabling updates.";
 					tr->period = UpdatePeriod::Never;
 				}
 			}
@@ -1246,8 +1251,16 @@ bool addOrUpdateRequest(Client *c, const DataRequest *const req)
 		// look up unit ID if we don't have one already
 		if (tr->unitId < 0 && tr->unitName[0] != '\0') {
 			tr->unitId = get_units_enum(tr->unitName);
-			if (tr->unitId < 0)
-				LOG_WRN << "Unit named " << quoted(tr->unitName) << " was not found.";
+			if (tr->unitId < 0) {
+				if (tr->varTypePrefix == 'A') {
+					LOG_ERR << "Error in DataRequest ID " << req->requestId << ": Unit named " << quoted(tr->unitName) << " was not found, disabling updates.";
+					tr->period = UpdatePeriod::Never;
+				}
+				// maybe an L var... unit is not technically required.
+				else {
+					LOG_WRN << "Warning in DataRequest ID " << req->requestId << ": Unit named " << quoted(tr->unitName) << " was not found, no unit type will be used.";
+				}
+			}
 		}
 	}
 	// calculated value, update compiled string if needed
@@ -1265,7 +1278,7 @@ bool addOrUpdateRequest(Client *c, const DataRequest *const req)
 		}
 		else {
 			LOG_WRN << "Calculator string compilation failed. gauge_calculator_code_precompile() returned: " << boolalpha << ok
-				<< "; size: " << pCompiledSize << "; Result null? " << (pCompiled == nullptr) << "; Original code : " << quoted(tr->nameOrCode);
+				<< " for request ID " << tr->requestId << ". Size: " << pCompiledSize << "; Result null ? " << (pCompiled == nullptr) << "; Original code : " << quoted(tr->nameOrCode);
 		}
 	}
 	// make sure any ms interval is >= our minimum tick time
