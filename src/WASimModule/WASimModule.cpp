@@ -131,11 +131,23 @@ struct TrackedRequest : DataRequest
 
 	void checkRequestType()
 	{
-		// Anything besides L/A/T type vars just gets converted to calc code.
-		if (requestType == RequestType::Named && variableId < 0 && !Utilities::isIndexedVariableType(varTypePrefix)) {
-			const ostringstream codeStr = ostringstream() << "(" << varTypePrefix << ':' << nameOrCode << ')';
+		// Anything besides L/A/T type vars just gets converted to calc code, as well as any A vars with "string" unit type.
+		bool isString = false;
+		if (requestType == RequestType::Named && variableId < 0 &&
+				(!Utilities::isIndexedVariableType(varTypePrefix) || (isString = (unitId < 0 && varTypePrefix == 'A' && !strcasecmp(unitName, "string"))))
+		) {
+			ostringstream codeStr = ostringstream() << '(' << varTypePrefix << ':' << nameOrCode;
+			if (unitName[0] != '\0')
+				codeStr << ',' << unitName;
+			codeStr << ')';
 			setNameOrCode(codeStr.str().c_str());
 			requestType = RequestType::Calculated;
+			if (isString)
+				calcResultType = CalcResultType::String;
+			else if (valueSize > DATA_TYPE_INT64 || valueSize < 4)
+				calcResultType = CalcResultType::Integer;
+			else
+				calcResultType = CalcResultType::Double;
 		}
 	}
 
@@ -981,10 +993,13 @@ void getVariable(const Client *c, const Command *const cmd)
 	const char *data = cmd->sData;
 	LOG_TRC << "getVariable(" << varType << ", " << quoted(data) << ") for client " << c->name;
 
-	// Anything besides L/A/T type vars just gets converted to calc code.
-	if (!Utilities::isIndexedVariableType(varType)) {
+	// Anything besides L/A/T type vars just gets converted to calc code. Also if a "string" type unit A var is requested.
+	size_t datalen;
+	bool isString = false;
+	if (!Utilities::isIndexedVariableType(varType) || (isString = varType == 'A' && (datalen = strlen(data)) > 6 && !strcasecmp(data + datalen-6, "string"))) {
 		const ostringstream codeStr = ostringstream() << "(" << varType << ':' << data << ')';
-		const Command execCmd(cmd->commandId, +CalcResultType::Double, codeStr.str().c_str(), 0.0, cmd->token);
+		CalcResultType ctype = isString ? CalcResultType::String : CalcResultType::Double;
+		const Command execCmd(cmd->commandId, +ctype, codeStr.str().c_str(), 0.0, cmd->token);
 		return execCalculatorCode(c, &execCmd);
 	}
 
