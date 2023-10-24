@@ -134,8 +134,11 @@ public:
 		lo->setContentsMargins(8, 1, 10, 2);
 		iconLabel = new QLabel(this);
 		iconLabel->setFixedSize(iconSize, iconSize);
+		tsLabel = new QLabel(this);
+		tsLabel->setForegroundRole(QPalette::Link);
 		textLabel = new QLabel(this);
 		lo->addWidget(iconLabel, 0);
+		lo->addWidget(tsLabel, 0);
 		lo->addWidget(textLabel, 1);
 
 		icon.addFile("fg=green/thumb_up.glyph", QSize(), QIcon::Normal, QIcon::Off);
@@ -154,11 +157,13 @@ public:
 		const QIcon::Mode icnMode = resp.commandId == WSEnums::CommandId::Ack ? QIcon::Mode::Normal :  QIcon::Mode::Active;
 		iconLabel->setPixmap(icon.pixmap(iconSize, icnMode));
 		textLabel->setText(msg + details);
+		tsLabel->setText(QTime::currentTime().toString("[hh:mm:ss.zzz]"));
 	}
 
 private:
 	QIcon icon;
 	QLabel *iconLabel;
+	QLabel *tsLabel;
 	QLabel *textLabel;
 	int iconSize;
 };
