@@ -164,25 +164,24 @@ namespace WASimCommander::CLI::Client
 
 		// Variables accessors ------------------------------
 
-		/// See \refwccc{getVariable()}
-		HR getVariable(VariableRequest ^var, [Out] double %pfResult) {
-			pin_ptr<double> pf = &pfResult;
-			return  (HR)m_client->getVariable(var, pf);
-		}
+		/// <summary> Get the value of a variable with a numeric result type. This is the most typical use case since most variable types are numeric. </summary> \sa \refwccc{getVariable()}
+		HR getVariable(VariableRequest ^var, [Out] double %pfResult);
+		/// <summary> Get the value of a variable with a string result type. The request is executed as calculator code since that is the only way to get string results. </summary>
+		/// Note that only some 'A', 'C', and 'T' type variables can have a string value type in the first place. \sa \refwccc{getVariable()}
+		HR getVariable(VariableRequest ^var, [Out] String^ %psResult);
+		/// <summary> Get the value of a variable with _either_ a numeric or string result based on the unit type of the requested variable. </summary>
+		/// The request is executed as calculator code since that is the only way to get string results. Unlike `executeCalculatorCode()`, this method will not return a string representation of a numeric value.
+		/// Note that only some 'A', 'C', and 'T' type variables can have a string value type in the first place. \sa \refwccc{getVariable()}
+		HR getVariable(VariableRequest ^var, [Out] double %pfResult, [Out] String^ %psResult);  ///< See \refwccc{getVariable()}
+
 		/// See \refwccc{getLocalVariable()}
 		HR getLocalVariable(String ^variableName, [Out] double %pfResult) { return getVariable(gcnew VariableRequest(variableName), pfResult); }
 		/// See \refwccc{getLocalVariable()}
 		HR getLocalVariable(String ^variableName, String ^unitName, [Out] double %pfResult) { return getVariable(gcnew VariableRequest(variableName, false, unitName), pfResult); }
 		/// \sa \refwccc{getOrCreateLocalVariable()}
-		HR getOrCreateLocalVariable(String ^variableName, double defaultValue, [Out] double %pfResult) {
-			pin_ptr<double> pf = &pfResult;
-			return  (HR)m_client->getOrCreateLocalVariable(marshal_as<std::string>(variableName), pf, defaultValue);
-		}
+		HR getOrCreateLocalVariable(String ^variableName, double defaultValue, [Out] double %pfResult);
 		/// \sa \refwccc{getOrCreateLocalVariable()}
-		HR getOrCreateLocalVariable(String ^variableName, String ^unitName, double defaultValue, [Out] double %pfResult) {
-			pin_ptr<double> pf = &pfResult;
-			return  (HR)m_client->getOrCreateLocalVariable(marshal_as<std::string>(variableName), pf, defaultValue, marshal_as<std::string>(unitName));
-		}
+		HR getOrCreateLocalVariable(String ^variableName, String ^unitName, double defaultValue, [Out] double %pfResult);
 
 		/// See \refwccc{setVariable()}
 		HR setVariable(VariableRequest ^var, const double value) { return (HR)m_client->setVariable(var, value); }
