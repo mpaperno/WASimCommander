@@ -249,7 +249,6 @@ steady_clock::time_point g_tpNextTick { steady_clock::now() };
 SIMCONNECT_CLIENT_EVENT_ID g_nextClientEventId = SIMCONNECTID_LAST;
 SIMCONNECT_CLIENT_DATA_DEFINITION_ID g_nextClienDataId = SIMCONNECTID_LAST;
 bool g_triggersRegistered = false;
-bool g_simConnectQuitEvent = false;
 #pragma endregion Globals
 
 //----------------------------------------------------------------------------
@@ -258,6 +257,8 @@ bool g_simConnectQuitEvent = false;
 
 bool sendResponse(const Client *c, const Command &cmd)
 {
+	if (c->status != ClientStatus::Connected)
+		return false;
 	LOG_TRC << "Sending command to " << c->name << ": " << cmd;
 	return INVOKE_SIMCONNECT(
 		SetClientData, g_hSimConnect,
@@ -291,6 +292,8 @@ bool sendPing(const Client *c) {
 
 bool sendLogRecord(const Client *c, const LogRecord &log)
 {
+	if (c->status != ClientStatus::Connected)
+		return false;
 	//if (c->logLevel < LogLevel::Trace) LOG_TRC << "Sending LogRecord to " << c->name << ": " << log;
 	return INVOKE_SIMCONNECT(
 		SetClientData, g_hSimConnect,
@@ -302,6 +305,8 @@ bool sendLogRecord(const Client *c, const LogRecord &log)
 
 bool writeRequestData(const Client *c, const TrackedRequest *tr, void *data)
 {
+	if (c->status != ClientStatus::Connected)
+		return false;
 	LOG_TRC << "Writing request ID " << tr->requestId << " data for " << c->name << " to CDA / CDD ID " << tr->dataId << " of size " << tr->dataSize;
 	return INVOKE_SIMCONNECT(
 		SetClientData, g_hSimConnect,
@@ -542,6 +547,12 @@ void disconnectAllClients(const char *message = nullptr)
 {
 	for (auto &it : g_mClients)
 		disconnectClient(&it.second, message, ClientStatus::Disconnected);
+}
+
+void disableAllClients()
+{
+	for (auto &it : g_mClients)
+		it.second.status = ClientStatus::Disconnected;
 }
 
 // callback for logfault IdProxyHandler log handler
@@ -1554,8 +1565,7 @@ void processCommand(Client *c, const Command *const cmd)
 
 		case CommandId::Disconnect:
 			disconnectClient(c);
-			ackMsg = "Disconnected by Client command.";
-			break;
+			return;
 
 		case CommandId::Ping:      // just ACK the ping
 		case CommandId::Connect:   // client was already re-connected or we wouldn't be here, just ACK
@@ -1652,8 +1662,7 @@ void CALLBACK dispatchMessage(SIMCONNECT_RECV* pData, DWORD cbData, void*)
 						LOG_CRT << "Invalid DataRequest struct data size! Expected " << sizeof(DataRequest) << " but got " << dataSize;
 						return;
 					}
-					if (addOrUpdateRequest(c, reinterpret_cast<const DataRequest *const>(&data->dwData)) && !g_triggersRegistered)
-						registerTriggerEvents();  // start update loop
+					addOrUpdateRequest(c, reinterpret_cast<const DataRequest *const>(&data->dwData));
 					break;
 
 				default:
@@ -1671,8 +1680,9 @@ void CALLBACK dispatchMessage(SIMCONNECT_RECV* pData, DWORD cbData, void*)
 			SimConnectHelper::logSimVersion(pData);
 			break;
 
+		// This doesn't seem to ever actually happen... but I guess it may just start to one day  ¯\_(ツ)_/¯
 		case SIMCONNECT_RECV_ID_QUIT:
-			g_simConnectQuitEvent = true;
+			disableAllClients();
 			LOG_DBG << "Received quit command from SimConnect.";
 			break;
 
@@ -1750,18 +1760,11 @@ MSFS_CALLBACK void module_init(void)
 
 MSFS_CALLBACK void module_deinit(void)
 {
+	// don't send out any more data at this point (especially logs!) as it may prevent the simulator from exiting (new in SU13, yay!)
+	disableAllClients();
 	LOG_INF << "Stopping " WSMCMND_PROJECT_NAME " " WSMCMND_SERVER_NAME;
-
-	if (g_hSimConnect != INVALID_HANDLE_VALUE) {
-		// Unloading of module would typically only happen when simulator quits, except during development and manual project rebuild.
-		// The below code is just for that occasion. Normally any connected Clients should detect shutdown via the SimConnect Close event.
-		if (!g_simConnectQuitEvent) {
-			// Disconnect any clients (does not seem to actually send any data... SimConnect context destroyed?)
-			LOG_DBG << "SimConnect apparently didn't send Quit message... disconnecting any clients.";
-			disconnectAllClients("Server is shutting down.");
-		}
+	if (g_hSimConnect != INVALID_HANDLE_VALUE)
 		SimConnect_Close(g_hSimConnect);
-	}
 	g_hSimConnect = INVALID_HANDLE_VALUE;
 }
 
