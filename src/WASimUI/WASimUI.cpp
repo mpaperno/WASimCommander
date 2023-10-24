@@ -174,15 +174,21 @@ public:
 			return;
 		}
 		double result;
+		std::string sRes;
 		HRESULT hr;
 		if (vtype == 'L' && create)
 			hr = client->getOrCreateLocalVariable(varName.toStdString(), &result, ui->dsbSetVarValue->value(), ui->cbSetVarUnitName->currentText().toStdString());
 		else
-			hr = client->getVariable(VariableRequest(vtype, varName.toStdString(), ui->cbSetVarUnitName->currentText().toStdString(), ui->sbGetSetSimVarIndex->value()), &result);
-		if (hr == S_OK)
-			ui->leVarResult->setText(QString("%1").arg(result, 0, 'f', 7));
-		else
-			ui->leVarResult->setText(QString("Error: 0x%1").arg((quint32)hr, 8, 16, QChar('0')));
+			hr = client->getVariable(VariableRequest(vtype, varName.toStdString(), ui->cbSetVarUnitName->currentText().toStdString(), ui->sbGetSetSimVarIndex->value()), &result, &sRes);
+		if (hr == S_OK) {
+			if (ui->cbSetVarUnitName->currentText() == QLatin1Literal("string"))
+				ui->leVarResult->setText(sRes.empty() ? tr("Result returned empty string") : QString::fromStdString(sRes));
+			else
+				ui->leVarResult->setText(QString::number(result));
+			return;
+		}
+		ui->leVarResult->setText(QString("Error: 0x%1").arg((quint32)hr, 8, 16, QChar('0')));
+		logUiMessage(tr("Variable request failed."), CommandId::Get);
 	}
 
 	void setLocalVar(bool create = false)
