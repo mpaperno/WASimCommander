@@ -411,7 +411,10 @@ static const HRESULT E_TIMEOUT       = /*ERROR_TIMEOUT*/       1460L | (/*FACILI
 
 		/// Enables or disables all data request subscription updates at the same time. Use this to temporarily suspend value update checks when they are not needed, but may be again in the future.
 		/// This is a lot more efficient than disconnecting and re-connecting to the server, since all the data requests need to be re-created upon every new connection (similar to SimConnect itself).
-		/// \return `S_OK` on success, `E_NOT_CONNECTED` if not connected to server.
+		/// \since{v1.2}
+		/// This method can be called while not connected to the server. In this case the setting is saved and sent to the server upon next connection, before sending any data request subscriptions.
+		/// This way updates could be suspended upon initial connection, then re-enabled when the data is actually needed.
+		/// \return `S_OK` on success; If currently connected to the server, may also return `E_TIMEOUT` on general server communication failure.
 		HRESULT setDataRequestsPaused(bool paused) const;
 
 		// Custom Event registration --------------------------

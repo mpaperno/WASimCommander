@@ -234,6 +234,7 @@ class WASimClient::Private
 	atomic_bool simConnected = false;
 	atomic_bool serverConnected = false;
 	atomic_bool logCDAcreated = false;
+	atomic_bool requestsPaused = false;
 
 	HANDLE hSim = nullptr;
 	HANDLE hSimEvent = nullptr;
@@ -676,6 +677,8 @@ class WASimClient::Private
 		listResult.reset();
 		// make sure server knows our desired log level and set up data area/request if needed
 		updateServerLogLevel();
+		// set update status of data requests before adding any, in case we don't actually want results yet
+		sendServerCommand(Command(CommandId::Subscribe, (requestsPaused ? 0 : 1)));
 		// (re-)register (or delete) any saved DataRequests
 		registerAllDataRequests();
 		// same with calculator events
@@ -1610,7 +1613,14 @@ vector<uint32_t> WASimClient::dataRequestIdsList() const
 }
 
 HRESULT WASimClient::setDataRequestsPaused(bool paused) const {
-	return d_const->sendServerCommand(Command(CommandId::Subscribe, (paused ? 0 : 1)));
+	if (isConnected()) {
+		HRESULT hr = d_const->sendServerCommand(Command(CommandId::Subscribe, (paused ? 0 : 1)));
+		if SUCCEEDED(hr)
+			d->requestsPaused = paused;
+		return hr;
+	}
+	d->requestsPaused = paused;
+	return S_OK;
 }
 
 #pragma endregion Data
