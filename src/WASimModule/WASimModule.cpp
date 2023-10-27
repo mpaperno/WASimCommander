@@ -557,23 +557,6 @@ void disableAllClients()
 		it.second.status = ClientStatus::Disconnected;
 }
 
-std::string setSuspendClientDataUpdates(Client *c, bool suspend)
-{
-	if (c->pauseDataUpdates == suspend)
-		return suspend ? "Data Subscriptions already paused" : "Data Subscriptions already active";
-
-	if (suspend) {
-		c->pauseDataUpdates = true;
-		checkTriggerEventNeeded();
-		return "Data Subscription updates suspended";
-	}
-
-	c->pauseDataUpdates = false;
-	if (!g_triggersRegistered && c->requests.size())
-		resumeTriggerEvent();
-	return "Data Subscription updates resumed";
-}
-
 // callback for logfault IdProxyHandler log handler
 void CALLBACK clientLogHandler(const uint32_t id, const logfault::Message &msg)
 {
@@ -1327,19 +1310,57 @@ bool addOrUpdateRequest(Client *c, const DataRequest *const req)
 				<< " for request ID " << tr->requestId << ". Size: " << pCompiledSize << "; Result null ? " << (pCompiled == nullptr) << "; Original code : " << quoted(tr->nameOrCode);
 		}
 	}
-	// make sure any ms interval is >= our minimum tick time
-	if (tr->period == UpdatePeriod::Millisecond)
-		tr->interval = max((time_t)tr->interval, TICK_PERIOD_MS);
 
 	sendAckNak(c, resp, true);
-	if (tr->period != UpdatePeriod::Never)
-		updateRequestValue(c, tr, false);
+
+	if (tr->period != UpdatePeriod::Never) {
+		// make sure any ms interval is >= our minimum tick time
+		if (tr->period == UpdatePeriod::Millisecond && tr->interval < TICK_PERIOD_MS)
+			tr->interval = TICK_PERIOD_MS;
+		// If updates are not paused then send the value now; this takes care of "Once" type requests as well.
+		if (!c->pauseDataUpdates)
+			updateRequestValue(c, tr, false);
+		// If they're paused and this is a "Once" type request, use the interval as a flag to indicate that an update
+		// is pending for this request, which is then handled in setSuspendClientDataUpdates(false) below to send the value.
+		else if (tr->period == UpdatePeriod::Once)
+			tr->interval = 1;
+	}
 
 	LOG_DBG << (isNewRequest ? "Added " : "Updated ") << *tr;
 	if (!g_triggersRegistered && tr->period > UpdatePeriod::Once && !c->pauseDataUpdates)
 		resumeTriggerEvent();  // start update loop
 	return true;
 }
+
+std::string setSuspendClientDataUpdates(Client *c, bool suspend)
+{
+	if (c->pauseDataUpdates == suspend)
+		return suspend ? "Data Subscriptions already paused" : "Data Subscriptions already active";
+
+	if (suspend) {
+		c->pauseDataUpdates = true;
+		checkTriggerEventNeeded();
+		return "Data Subscription updates suspended";
+	}
+
+	// Check for any "Once" type requests which are still pending and send them.
+	// While we're at it we can also check if there are any data updates which need scheduling.
+	bool resume = false;
+	for (requestMap_t::value_type &rp : c->requests) {
+		if (rp.second.period >= UpdatePeriod::Tick) {
+			resume = true;
+		}
+		else if (rp.second.period == UpdatePeriod::Once && rp.second.interval == 1) {
+			rp.second.interval = 0;
+			updateRequestValue(c, &rp.second);
+		}
+	}
+	c->pauseDataUpdates = false;
+	if (resume && !g_triggersRegistered)
+		resumeTriggerEvent();
+	return "Data Subscription updates resumed";
+}
+
 #pragma endregion  Data Requests
 
 #pragma region  Registered Calculator Events  ----------------------------------------------
