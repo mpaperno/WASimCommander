@@ -581,8 +581,7 @@ public:
 		set.setValue(QStringLiteral("mainWindowState"), q->saveState());
 		set.setValue(QStringLiteral("requestsViewHeaderState"), ui->requestsView->horizontalHeader()->saveState());
 		set.setValue(QStringLiteral("eventsViewHeaderState"), ui->eventsView->horizontalHeader()->saveState());
-
-		ui->wLogWindow->saveSettings(set);
+		ui->wLogWindow->saveSettings();
 
 		set.beginGroup(QStringLiteral("Widgets"));
 		for (const FormWidget &vw : qAsConst(formWidgets))
@@ -612,7 +611,7 @@ public:
 		if (set.contains(QStringLiteral("eventsViewHeaderState")))
 			ui->eventsView->horizontalHeader()->restoreState(set.value(QStringLiteral("eventsViewHeaderState")).toByteArray());
 
-		ui->wLogWindow->loadSettings(set);
+		ui->wLogWindow->loadSettings();
 
 		set.beginGroup(QStringLiteral("Widgets"));
 		for (const FormWidget &vw : qAsConst(formWidgets))

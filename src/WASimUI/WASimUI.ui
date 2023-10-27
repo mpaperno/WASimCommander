@@ -1953,7 +1953,7 @@ Submitted requests will appear in the &quot;Data Requests&quot; window. Double-c
    <attribute name="dockWidgetArea">
     <number>8</number>
    </attribute>
-   <widget class="LogConsole" name="wLogWindow">
+   <widget class="WASimUiNS::LogConsole" name="wLogWindow">
     <property name="sizePolicy">
      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
       <horstretch>0</horstretch>
@@ -2205,7 +2205,7 @@ Submitted requests will appear in the &quot;Data Requests&quot; window. Double-c
    <header>Widgets.h</header>
   </customwidget>
   <customwidget>
-   <class>LogConsole</class>
+   <class>WASimUiNS::LogConsole</class>
    <extends>QWidget</extends>
    <header>LogConsole.h</header>
    <container>1</container>

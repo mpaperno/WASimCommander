@@ -1,3 +1,22 @@
+/*
+This file is part of the WASimCommander project.
+https://github.com/mpaperno/WASimCommander
+
+COPYRIGHT: (c) Maxim Paperno; All Rights Reserved.
+
+This file may be used under the terms of the GNU General Public License (GPL)
+as published by the Free Software Foundation, either version 3 of the Licenses,
+or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+A copy of the GNU GPL is included with this project
+and is also available at <http://www.gnu.org/licenses/>.
+*/
+
 #include "LogConsole.h"
 
 #include "Utils.h"
@@ -113,7 +132,7 @@ LogConsole::LogConsole(QWidget *parent)
 	});
 	// connect log viewer selection model to show pause button active while there is a selection
 	connect(ui.logView->selectionModel(), &QItemSelectionModel::selectionChanged, this, [=](const QItemSelection &sel, const QItemSelection&) {
-		pauseLogScrollAct->setChecked(!sel.isEmpty());
+		pauseLogScrollAct->setChecked(ui.logView->selectionModel()->hasSelection());
 	});
 
 }
@@ -136,15 +155,17 @@ void LogConsole::setClient(WASimCommander::Client::WASimClient *c) {
 
 LogRecordsModel *LogConsole::getModel() const { return logModel; }
 
-void LogConsole::saveSettings(QSettings &set) const
+void LogConsole::saveSettings() const
 {
+	QSettings set;
 	set.beginGroup(objectName());
 	set.setValue(QStringLiteral("logViewHeaderState"), ui.logView->horizontalHeader()->saveState());
 	set.endGroup();
 }
 
-void LogConsole::loadSettings(QSettings &set)
+void LogConsole::loadSettings()
 {
+	QSettings set;
 	set.beginGroup(objectName());
 	if (set.contains(QStringLiteral("logViewHeaderState")))
 		ui.logView->horizontalHeader()->restoreState(set.value(QStringLiteral("logViewHeaderState")).toByteArray());
