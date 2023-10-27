@@ -315,7 +315,7 @@ public:
 		});
 	}
 
-	void setClearButtonEnabled(bool enabled) { lineEdit()->setClearButtonEnabled(enabled); }
+	void setClearButtonEnabled(bool enabled = true) { if (lineEdit()) lineEdit()->setClearButtonEnabled(enabled); }
 
 	const QStringList editedItems() const
 	{
