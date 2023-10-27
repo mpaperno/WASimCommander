@@ -511,7 +511,7 @@ public:
 	}
 
 	void removeSelectedEvents() {
-		removeEvents(eventsModel->flattenIndexList(ui->eventsView->selectionModel()->selectedIndexes()));
+		removeEvents(ui->eventsView->selectionModel()->selectedRows(EventsModel::COL_ID));
 	}
 
 	void removeAllEvents() {
@@ -528,7 +528,7 @@ public:
 	{
 		if (!checkConnected())
 			return;
-		const QModelIndexList list = eventsModel->flattenIndexList(ui->eventsView->selectionModel()->selectedIndexes());
+		const QModelIndexList list = ui->eventsView->selectionModel()->selectedRows(EventsModel::COL_ID);
 		for (const QModelIndex &idx : list)
 			client->transmitEvent(eventsModel->eventId(idx.row()));
 	}
