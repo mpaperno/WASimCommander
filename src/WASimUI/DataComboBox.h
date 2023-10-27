@@ -82,8 +82,24 @@ class DataComboBox: public QComboBox
 		}
 
 		//! Add items with corresponding data from \a items map, using the specified \a role. If \a role is \c -1 (default) then the \p defaultRole is used.
-		void addItems(const QMap<QString, QVariant> &items, int role = -1)
+		void addItems(const QMap<QString, QVariant> &items, int role = -1) {
+			addItems(items.keys(), items.values(), role);
+		}
+
+		//! Add items with names from \a texts, with corresponding data from \a datas list, using the specified \a role. If \a role is \c -1 (default) then the \p defaultRole is used.
+		void addItems(const QStringList &texts, const QStringList &datas, int role = -1)
 		{
+			if (role < 0)
+				role = m_role;
+			const int c = count();
+			for (int i=0; i < texts.count(); ++i) {
+				addItem(texts.at(i));
+				setItemData(i + c, datas.value(i, texts.at(i)), role);
+			}
+		}
+
+		//! Add items with corresponding data from \a items map, using the specified \a role. If \a role is \c -1 (default) then the \p defaultRole is used.
+		void addItems(const QMap<QString, QString> &items, int role = -1) {
 			addItems(items.keys(), items.values(), role);
 		}
 
