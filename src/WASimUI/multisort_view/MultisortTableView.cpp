@@ -42,7 +42,7 @@ MultisortTableView::MultisortTableView ( QWidget *parent ) :
     // Default icons
 		setSortIcons(QIcon(QStringLiteral("scale=1.5/arrow_drop_up.glyph")), QIcon(QStringLiteral("scale=1.5/arrow_drop_down.glyph")));
     horizontalHeader()->setDefaultAlignment( Qt::AlignHCenter | Qt::AlignTop );
-		HeaderProxyStyle *proxy = new HeaderProxyStyle(QApplication::style());
+		HeaderProxyStyle *proxy = new HeaderProxyStyle("Fusion");
 		proxy->setParent(horizontalHeader());
 		horizontalHeader()->setStyle(proxy);
 		horizontalHeader()->setSortIndicatorShown(false);

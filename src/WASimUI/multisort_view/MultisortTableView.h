@@ -7,7 +7,6 @@
 
 class AlphanumSortProxyModel;
 class QIcon;
-class HeaderProxyStyle;
 
 class MultisortTableView : public QTableView
 {

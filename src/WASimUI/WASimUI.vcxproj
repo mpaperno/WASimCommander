@@ -260,10 +260,15 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <QtRcc Include="WASimUI.qrc" />
+    <QtUic Include="LogConsole.ui" />
     <QtUic Include="RequestsExport.ui" />
     <QtUic Include="WASimUI.ui" />
     <QtMoc Include="WASimUI.h" />
     <ClCompile Include="ActionPushButton.cpp" />
+    <ClCompile Include="multisort_view\MultisortTableView.cpp" />
+    <ClCompile Include="LogConsole.cpp" />
+    <ClCompile Include="LogConsole.cpp" />
+    <ClCompile Include="multisort_view\MultisortTableView.cpp" />
     <ClCompile Include="RequestsExport.cpp" />
     <ClCompile Include="WASimUI.cpp" />
     <ClCompile Include="main.cpp" />
@@ -296,7 +301,13 @@
   <ItemGroup>
     <ClInclude Include="..\include\WASimCommander.h" />
     <ClInclude Include="..\include\wasim_version.h" />
+    <QtMoc Include="RequestsTableView.h" />
+    <QtMoc Include="LogConsole.h" />
     <QtMoc Include="RequestsExport.h" />
+    <ClInclude Include="multisort_view\AlphanumComparer.h" />
+    <QtMoc Include="multisort_view\AlphanumSortProxyModel.h" />
+    <ClInclude Include="multisort_view\ColumnsSorter.h" />
+    <QtMoc Include="multisort_view\MultisortTableView.h" />
     <ClInclude Include="RequestsFormat.h" />
     <QtMoc Include="Widgets.h" />
     <QtMoc Include="RequestsModel.h" />
