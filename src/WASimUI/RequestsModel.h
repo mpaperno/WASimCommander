@@ -116,7 +116,6 @@ struct RequestRecord : public WASimCommander::Client::DataRequestRecord
 			r.varTypePrefix = pfx.at(0).toLatin1();
 		return in;
 	}
-
 };
 Q_DECLARE_METATYPE(RequestRecord)
 
@@ -135,7 +134,7 @@ private:
 
 
 public:
-	enum Roles { DataRole = Qt::UserRole + 1, MetaTypeRole, IdStringRole, PropertiesRole };
+	enum Roles { DataRole = Qt::UserRole + 1, MetaTypeRole, PropertiesRole };
 	enum Columns {
 		COL_ID,   COL_TYPE,   COL_RES_TYPE,  COL_NAME,           COL_IDX,   COL_UNIT,   COL_SIZE,   COL_PERIOD,   COL_INTERVAL, COL_EPSILON, COL_VALUE,   COL_TIMESATMP,   COL_ENUM_END
 	};
@@ -183,17 +182,19 @@ public:
 		// set data display
 		const int dataType = item(row, COL_ID)->data(MetaTypeRole).toInt();
 		QVariant v = Utils::convertValueToType(dataType, res);
-		item(row, COL_VALUE)->setText(v.toString());
-		item(row, COL_VALUE)->setData(v);
-		item(row, COL_VALUE)->setToolTip(item(row, COL_VALUE)->text());
+		QStandardItem *itm = item(row, COL_VALUE);
+		itm->setText(v.toString());
+		itm->setData(v, DataRole);
+		itm->setToolTip(itm->text());
 
 		// update timestamp column
 		const auto ts = QDateTime::fromMSecsSinceEpoch(res.lastUpdate);
-		const auto lastts = item(row, COL_TIMESATMP)->data().toULongLong();
+		itm = item(row, COL_TIMESATMP);
+		const auto lastts = itm->data().toULongLong();
 		const uint64_t tsDelta = lastts ? res.lastUpdate - lastts : 0;
-		item(row, COL_TIMESATMP)->setText(QString("%1 (%2)").arg(ts.toString("hh:mm:ss.zzz")).arg(tsDelta));
-		item(row, COL_TIMESATMP)->setToolTip(item(row, COL_TIMESATMP)->text());
-		item(row, COL_TIMESATMP)->setData(res.lastUpdate);
+		itm->setText(QString("%1 (%2)").arg(ts.toString("hh:mm:ss.zzz")).arg(tsDelta));
+		itm->setToolTip(itm->text());
+		itm->setData(res.lastUpdate, DataRole);
 		qDebug() << "Saved result" << v << "for request ID" << res.requestId << "ts" << res.lastUpdate << "size" << res.data.size() << "type" << (QMetaType::Type)dataType << "data : " << QByteArray((const char *)res.data.data(), res.data.size()).toHex(':');
 	}
 
@@ -233,78 +234,48 @@ public:
 		if (newRow)
 			row = rowCount();
 
-		setItem(row, COL_ID, new QStandardItem(QString("%1").arg(req.requestId)));
-		item(row, COL_ID)->setData(req.requestId, DataRole);
-		item(row, COL_ID)->setData(req.metaType, MetaTypeRole);
-		item(row, COL_ID)->setData(req.properties, PropertiesRole);
-		item(row, COL_ID)->setData(req.properties.value("id"), IdStringRole);  // for search
+		QStandardItem *itm = setOrCreateItem(row, COL_ID, QString::number(req.requestId), req.requestId);
+		itm->setData(req.metaType, MetaTypeRole);
+		itm->setData(req.properties, PropertiesRole);
 
-		setItem(row, COL_TYPE, new QStandardItem(WSEnums::RequestTypeNames[+req.requestType]));
-		item(row, COL_TYPE)->setData(+req.requestType);
-		item(row, COL_TYPE)->setToolTip(item(row, COL_TYPE)->text());
+		itm = setOrCreateItem(row, COL_TYPE, WSEnums::RequestTypeNames[+req.requestType], +req.requestType);
 
 		if (req.requestType == WSEnums::RequestType::Calculated) {
-			setItem(row, COL_RES_TYPE, new QStandardItem(WSEnums::CalcResultTypeNames[+req.calcResultType]));
-			item(row, COL_RES_TYPE)->setData(+req.calcResultType);
-			setItem(row, COL_IDX, new QStandardItem(tr("N/A")));
-			setItem(row, COL_UNIT, new QStandardItem(tr("N/A")));
-			item(row, COL_IDX)->setEnabled(false);
-			item(row, COL_UNIT)->setEnabled(false);
+			setOrCreateItem(row, COL_RES_TYPE, WSEnums::CalcResultTypeNames[+req.calcResultType], +req.calcResultType);
+			setOrCreateItem(row, COL_IDX, tr("N/A"), false);
+			itm = setOrCreateItem(row, COL_UNIT, tr("N/A"), QString(req.unitName), false);
 		}
 		else {
-			setItem(row, COL_RES_TYPE, new QStandardItem(QString(req.varTypePrefix)));
-			item(row, COL_RES_TYPE)->setData(req.varTypePrefix);
-			if (Utils::isUnitBasedVariableType(req.varTypePrefix)) {
-				setItem(row, COL_UNIT, new QStandardItem(QString(req.unitName)));
-			}
-			else {
-				setItem(row, COL_UNIT, new QStandardItem(tr("N/A")));
-				item(row, COL_UNIT)->setEnabled(false);
-			}
-			if (req.varTypePrefix == 'A') {
-				setItem(row, COL_IDX, new QStandardItem(QString("%1").arg(req.simVarIndex)));
-			}
-			else {
-				setItem(row, COL_IDX, new QStandardItem(tr("N/A")));
-				item(row, COL_IDX)->setEnabled(false);
-			}
+			setOrCreateItem(row, COL_RES_TYPE, QString(req.varTypePrefix), req.varTypePrefix);
+			if (Utils::isUnitBasedVariableType(req.varTypePrefix))
+				setOrCreateItem(row, COL_UNIT, req.unitName, QString(req.unitName));
+			else
+				setOrCreateItem(row, COL_UNIT, tr("N/A"), QString(req.unitName), false);
+			if (req.varTypePrefix == 'A')
+				setOrCreateItem(row, COL_IDX, QString::number(req.simVarIndex));
+			else
+				setOrCreateItem(row, COL_IDX, tr("N/A"), false);
 		}
-		item(row, COL_RES_TYPE)->setToolTip(item(row, COL_RES_TYPE)->text());
-		item(row, COL_UNIT)->setToolTip(item(row, COL_UNIT)->text());
-		item(row, COL_UNIT)->setData(QString(req.unitName));
 
 		if (req.metaType == QMetaType::UnknownType)
-			setItem(row, COL_SIZE, new QStandardItem(QString("%1").arg(req.valueSize)));
+			setOrCreateItem(row, COL_SIZE, QString::number(req.valueSize), req.valueSize);
 		else if (req.metaType > QMetaType::User)
-			setItem(row, COL_SIZE, new QStandardItem(QString("String (%1 B)").arg(req.metaType - QMetaType::User)));
+			setOrCreateItem(row, COL_SIZE, QString("String (%1 B)").arg(req.metaType - QMetaType::User), req.valueSize);
 		else
-			setItem(row, COL_SIZE, new QStandardItem(QString("%1 (%2 B)").arg(QString(QMetaType::typeName(req.metaType)).replace("q", "")).arg(QMetaType::sizeOf(req.metaType))));
-		item(row, COL_SIZE)->setData(req.valueSize);
-		item(row, COL_SIZE)->setToolTip(item(row, COL_SIZE)->text());
+			setOrCreateItem(row, COL_SIZE, QString("%1 (%2 B)").arg(QString(QMetaType::typeName(req.metaType)).replace("q", "")).arg(QMetaType::sizeOf(req.metaType)), req.valueSize);
 
-		setItem(row, COL_PERIOD, new QStandardItem(WSEnums::UpdatePeriodNames[+req.period]));
-		item(row, COL_PERIOD)->setToolTip(item(row, COL_PERIOD)->text());
-		item(row, COL_PERIOD)->setData(+req.period);
+		setOrCreateItem(row, COL_PERIOD, WSEnums::UpdatePeriodNames[+req.period], +req.period);
+		setOrCreateItem(row, COL_NAME, req.nameOrCode);
+		setOrCreateItem(row, COL_INTERVAL, QString::number(req.interval));
 
-		setItem(row, COL_NAME, new QStandardItem(QString(req.nameOrCode)));
-		item(row, COL_NAME)->setToolTip(item(row, COL_NAME)->text());
-
-		setItem(row, COL_INTERVAL, new QStandardItem(QString("%1").arg(req.interval)));
-
-		if (req.metaType > QMetaType::UnknownType && req.metaType < QMetaType::User) {
-			setItem(row, COL_EPSILON, new QStandardItem(QString::number(req.deltaEpsilon)));
-		}
-		else  {
-			setItem(row, COL_EPSILON, new QStandardItem(tr("N/A")));
-			item(row, COL_EPSILON)->setEnabled(false);
-		}
-		item(row, COL_EPSILON)->setData(req.deltaEpsilon);
-		item(row, COL_EPSILON)->setToolTip(item(row, COL_EPSILON)->text());
+		if (req.metaType > QMetaType::UnknownType && req.metaType < QMetaType::User)
+			setOrCreateItem(row, COL_EPSILON, QString::number(req.deltaEpsilon), req.deltaEpsilon);
+		else
+			setOrCreateItem(row, COL_EPSILON, tr("N/A"), req.deltaEpsilon, false);
 
 		if (newRow) {
-			setItem(row, COL_VALUE, new QStandardItem("???"));
-			setItem(row, COL_TIMESATMP, new QStandardItem("Never"));
-			item(row, COL_TIMESATMP)->setData(0);
+			setOrCreateItem(row, COL_VALUE, tr("???"));
+			setOrCreateItem(row, COL_TIMESATMP, tr("Never"), 0);
 		}
 
 		return index(row, 0);
@@ -370,6 +341,22 @@ public:
 	signals:
 		void rowCountChanged(int rows);
 
+	protected:
+		QStandardItem *setOrCreateItem(int row, int col, const QString &text, const QVariant &data = QVariant(), bool en = true, bool edit = false, const QString &tt = QString())
+		{
+			QStandardItem *itm = item(row, col);
+			if (!itm){
+				setItem(row, col, new QStandardItem());
+				itm = item(row, col);
+			}
+			itm->setText(text);
+			itm->setToolTip(tt.isEmpty() ? text : tt);
+			itm->setEnabled(en);
+			itm->setEditable(edit);
+			if (data.isValid())
+				itm->setData(data, DataRole);
+			return itm;
+		}
 	private:
 		uint32_t m_nextRequestId = 0;
 
