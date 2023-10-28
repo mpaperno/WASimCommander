@@ -17,6 +17,9 @@
   <property name="windowTitle">
    <string>WASimUI</string>
   </property>
+  <property name="toolButtonStyle">
+   <enum>Qt::ToolButtonTextBesideIcon</enum>
+  </property>
   <property name="dockOptions">
    <set>QMainWindow::AllowNestedDocks|QMainWindow::AllowTabbedDocks|QMainWindow::AnimatedDocks</set>
   </property>
@@ -894,7 +897,10 @@ Submitted requests will appear in the &quot;Data Requests&quot; window. Double-c
         <number>6</number>
        </property>
        <item row="2" column="0" colspan="2">
-        <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="0,1,0,1,0,1,1,0,0,0">
+        <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="0,1,0,1,0,1,1,0,0,0,0">
+         <property name="leftMargin">
+          <number>4</number>
+         </property>
          <item>
           <widget class="QLabel" name="label_2">
            <property name="sizePolicy">
@@ -993,15 +999,12 @@ Submitted requests will appear in the &quot;Data Requests&quot; window. Double-c
           </spacer>
          </item>
          <item>
-          <widget class="ActionPushButton" name="pbClearRequest">
+          <widget class="ActionPushButton" name="btnClearRequest">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
-           </property>
-           <property name="toolTip">
-            <string>Add new request record from current form entries.</string>
            </property>
            <property name="text">
             <string>Clear</string>
@@ -1009,7 +1012,23 @@ Submitted requests will appear in the &quot;Data Requests&quot; window. Double-c
           </widget>
          </item>
          <item>
-          <widget class="ActionPushButton" name="pbUpdateRequest">
+          <spacer name="horizontalSpacer_9">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeType">
+            <enum>QSizePolicy::Fixed</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>1</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="ActionPushButton" name="btnUpdateRequest">
            <property name="enabled">
             <bool>false</bool>
            </property>
@@ -1019,24 +1038,18 @@ Submitted requests will appear in the &quot;Data Requests&quot; window. Double-c
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
-           <property name="toolTip">
-            <string>Update the existing request record from current form entries.</string>
-           </property>
            <property name="text">
             <string>Save</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="ActionPushButton" name="pbAddRequest">
+          <widget class="ActionPushButton" name="btnAddRequest">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
-           </property>
-           <property name="toolTip">
-            <string>Add new request record from current form entries.</string>
            </property>
            <property name="text">
             <string>Add</string>
@@ -1789,19 +1802,19 @@ Submitted requests will appear in the &quot;Data Requests&quot; window. Double-c
         <enum>QLayout::SetMaximumSize</enum>
        </property>
        <property name="leftMargin">
-        <number>0</number>
+        <number>10</number>
        </property>
        <property name="topMargin">
         <number>0</number>
        </property>
        <property name="rightMargin">
-        <number>0</number>
+        <number>10</number>
        </property>
        <property name="bottomMargin">
         <number>0</number>
        </property>
        <item>
-        <widget class="ActionPushButton" name="pbReqestsRemove">
+        <widget class="ActionPushButton" name="btnReqestsRemove">
          <property name="enabled">
           <bool>false</bool>
          </property>
@@ -1817,7 +1830,7 @@ Submitted requests will appear in the &quot;Data Requests&quot; window. Double-c
         </widget>
        </item>
        <item>
-        <widget class="ActionPushButton" name="pbReqestsUpdate">
+        <widget class="ActionPushButton" name="btnReqestsUpdate">
          <property name="enabled">
           <bool>false</bool>
          </property>
@@ -1833,7 +1846,23 @@ Submitted requests will appear in the &quot;Data Requests&quot; window. Double-c
         </widget>
        </item>
        <item>
-        <widget class="ActionPushButton" name="pbReqestsPause">
+        <spacer name="horizontalSpacer_4">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Fixed</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="ActionPushButton" name="btnReqestsPause">
          <property name="enabled">
           <bool>false</bool>
          </property>
@@ -1862,7 +1891,7 @@ Submitted requests will appear in the &quot;Data Requests&quot; window. Double-c
         </spacer>
        </item>
        <item>
-        <widget class="ActionPushButton" name="pbReqestsLoad">
+        <widget class="ActionPushButton" name="btnReqestsLoad">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -1875,7 +1904,7 @@ Submitted requests will appear in the &quot;Data Requests&quot; window. Double-c
         </widget>
        </item>
        <item>
-        <widget class="ActionPushButton" name="pbReqestsSave">
+        <widget class="ActionPushButton" name="btnReqestsSave">
          <property name="enabled">
           <bool>false</bool>
          </property>
@@ -1979,9 +2008,6 @@ Submitted requests will appear in the &quot;Data Requests&quot; window. Double-c
        <property name="selectionBehavior">
         <enum>QAbstractItemView::SelectRows</enum>
        </property>
-       <property name="textElideMode">
-        <enum>Qt::ElideMiddle</enum>
-       </property>
        <property name="verticalScrollMode">
         <enum>QAbstractItemView::ScrollPerPixel</enum>
        </property>
@@ -2023,46 +2049,46 @@ Submitted requests will appear in the &quot;Data Requests&quot; window. Double-c
         <number>4</number>
        </property>
        <property name="leftMargin">
-        <number>0</number>
+        <number>6</number>
        </property>
        <property name="topMargin">
         <number>0</number>
        </property>
        <property name="rightMargin">
-        <number>0</number>
+        <number>6</number>
        </property>
        <property name="bottomMargin">
         <number>0</number>
        </property>
        <item>
-        <widget class="ActionPushButton" name="pbEventsRemove">
+        <widget class="QToolButton" name="btnEventsRemove">
          <property name="enabled">
           <bool>false</bool>
-         </property>
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
          </property>
          <property name="text">
           <string>Remove</string>
          </property>
+         <property name="iconSize">
+          <size>
+           <width>24</width>
+           <height>24</height>
+          </size>
+         </property>
         </widget>
        </item>
        <item>
-        <widget class="ActionPushButton" name="pbEventsTransmit">
+        <widget class="QToolButton" name="btnEventsTransmit">
          <property name="enabled">
           <bool>false</bool>
          </property>
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
          <property name="text">
           <string>Update</string>
+         </property>
+         <property name="iconSize">
+          <size>
+           <width>24</width>
+           <height>24</height>
+          </size>
          </property>
         </widget>
        </item>
@@ -2080,31 +2106,34 @@ Submitted requests will appear in the &quot;Data Requests&quot; window. Double-c
         </spacer>
        </item>
        <item>
-        <widget class="ActionPushButton" name="pbEventsLoad">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
+        <widget class="QToolButton" name="btnEventsLoad">
          <property name="text">
           <string>Load</string>
+         </property>
+         <property name="iconSize">
+          <size>
+           <width>24</width>
+           <height>24</height>
+          </size>
+         </property>
+         <property name="popupMode">
+          <enum>QToolButton::InstantPopup</enum>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="ActionPushButton" name="pbEventsSave">
+        <widget class="QToolButton" name="btnEventsSave">
          <property name="enabled">
           <bool>false</bool>
          </property>
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
          <property name="text">
           <string>Save</string>
+         </property>
+         <property name="iconSize">
+          <size>
+           <width>24</width>
+           <height>24</height>
+          </size>
          </property>
         </widget>
        </item>
@@ -2117,6 +2146,11 @@ Submitted requests will appear in the &quot;Data Requests&quot; window. Double-c
  </widget>
  <layoutdefault spacing="6" margin="6"/>
  <customwidgets>
+  <customwidget>
+   <class>ActionPushButton</class>
+   <extends>QPushButton</extends>
+   <header>ActionPushButton.h</header>
+  </customwidget>
   <customwidget>
    <class>WASimUiNS::DeletableItemsComboBox</class>
    <extends>QComboBox</extends>
@@ -2141,11 +2175,6 @@ Submitted requests will appear in the &quot;Data Requests&quot; window. Double-c
    <class>WASimUiNS::UpdatePeriodComboBox</class>
    <extends>QComboBox</extends>
    <header>Widgets.h</header>
-  </customwidget>
-  <customwidget>
-   <class>ActionPushButton</class>
-   <extends>QPushButton</extends>
-   <header>ActionPushButton.h</header>
   </customwidget>
   <customwidget>
    <class>WASimUiNS::UnitTypeComboBox</class>

@@ -159,6 +159,21 @@ public:
 		return item(row, COL_ID)->data(DataRole).toUInt();
 	}
 
+	int findRequestRow(uint32_t requestId) const
+	{
+		if (rowCount()) {
+			const QModelIndexList src = match(index(0, COL_ID), DataRole, requestId, 1, Qt::MatchExactly);
+			//qDebug() << requestId << src << (!src.isEmpty() ? src.first() : QModelIndex());
+			if (!src.isEmpty())
+				return src.first().row();
+		}
+		return -1;
+	}
+
+	QModelIndexList allRequests() const {
+		return match(index(0, COL_ID), Qt::EditRole, "*", -1, Qt::MatchWildcard | Qt::MatchWrap);
+	}
+
 	void setRequestValue(const WASimCommander::Client::DataRequestRecord &res)
 	{
 		const int row = findRequestRow(res.requestId);
@@ -352,34 +367,11 @@ public:
 		return ret;
 	}
 
-	static inline QModelIndexList flattenIndexList(const QModelIndexList &list)
-	{
-		QModelIndexList ret;
-		QModelIndex lastIdx;
-		for (const QModelIndex &idx : list) {
-			if (idx.column() == COL_ID && lastIdx.row() != idx.row() && idx.row() < idx.model()->rowCount())
-				ret.append(idx);
-			lastIdx = idx;
-		}
-		return ret;
-	}
-
 	signals:
 		void rowCountChanged(int rows);
 
 	private:
 		uint32_t m_nextRequestId = 0;
-
-		int findRequestRow(uint32_t requestId) const
-		{
-			if (rowCount()) {
-				const QModelIndexList src = match(index(0, COL_ID), DataRole, requestId, 1, Qt::MatchExactly);
-				//qDebug() << requestId << src << (!src.isEmpty() ? src.first() : QModelIndex());
-				if (!src.isEmpty())
-					return src.first().row();
-			}
-			return -1;
-		}
 
 };
 

@@ -410,7 +410,7 @@ class Utils
 			palette.setColor(QPalette::All,      QPalette::Highlight, cHlt);
 			palette.setColor(QPalette::Disabled, QPalette::Highlight, QColor("#9Cbbd5ff"));
 
-			const QColor cLnkTxt("#6685ff");
+			const QColor cLnkTxt("#5eb5ff");
 			palette.setColor(QPalette::All,      QPalette::Link, cLnkTxt);
 			palette.setColor(QPalette::Disabled, QPalette::Link, cLnkTxt.darker());
 
