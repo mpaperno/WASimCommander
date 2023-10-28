@@ -1,0 +1,413 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>RequestsExport</class>
+ <widget class="QWidget" name="RequestsExport">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1229</width>
+    <height>760</height>
+   </rect>
+  </property>
+  <property name="contextMenuPolicy">
+   <enum>Qt::ActionsContextMenu</enum>
+  </property>
+  <property name="windowTitle">
+   <string>Export Requests</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout_2">
+   <property name="leftMargin">
+    <number>6</number>
+   </property>
+   <property name="rightMargin">
+    <number>6</number>
+   </property>
+   <property name="bottomMargin">
+    <number>6</number>
+   </property>
+   <property name="horizontalSpacing">
+    <number>10</number>
+   </property>
+   <item row="1" column="0">
+    <widget class="QGroupBox" name="wBulkEdit">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="title">
+      <string>Bulk Update Selected Item(s)</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout">
+      <property name="verticalSpacing">
+       <number>8</number>
+      </property>
+      <item row="0" column="2">
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>Format</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="3">
+       <widget class="QLineEdit" name="leFormat">
+        <property name="toolTip">
+         <string>&lt;p&gt;Set the formatting string on selected item(s).&lt;/p&gt;
+&lt;p&gt;To set the formatting to an empty value, enter two single or double quotes (&lt;tt&gt;''&lt;/tt&gt; or &lt;tt&gt;&amp;quot;&amp;quot;&lt;/tt&gt;).&lt;/p&gt;</string>
+        </property>
+        <property name="clearButtonEnabled">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0" colspan="4">
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <property name="spacing">
+         <number>20</number>
+        </property>
+        <property name="leftMargin">
+         <number>10</number>
+        </property>
+        <property name="rightMargin">
+         <number>10</number>
+        </property>
+        <item>
+         <widget class="ActionPushButton" name="pbClearValues">
+          <property name="text">
+           <string>Clear Form</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pbRegen">
+          <property name="toolTip">
+           <string>&lt;p&gt;Regenerate new export IDs or display names based on current values on selected request row(s).&lt;/p&gt;</string>
+          </property>
+          <property name="text">
+           <string> Regenerate...</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="ActionPushButton" name="pbSetValues">
+          <property name="text">
+           <string>Update Selected</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Category</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>ID Prefix</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="DataComboBox" name="cbDefaultCategory">
+        <property name="toolTip">
+         <string>Sets the sorting category on each selected item.</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="3">
+       <widget class="QLineEdit" name="leDefault">
+        <property name="toolTip">
+         <string>&lt;p&gt;Set the default value on selected item(s).&lt;/p&gt;
+&lt;p&gt;To clear the default value, enter two single or double quotes (&lt;tt&gt;''&lt;/tt&gt; or &lt;tt&gt;&amp;quot;&amp;quot;&lt;/tt&gt;).&lt;/p&gt;</string>
+        </property>
+        <property name="clearButtonEnabled">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLineEdit" name="leIdPrefix">
+        <property name="toolTip">
+         <string>&lt;p&gt;Prepends the prefix to the ID of each selected item.&lt;/p&gt;
+&lt;p&gt;To remove a prefix (any string at the beginning of an ID), start the value here with a exclamation mark (&lt;tt&gt;!&lt;/tt&gt;). For example: &lt;tt&gt;!MyPrefix_&lt;/tt&gt;&lt;/p&gt;</string>
+        </property>
+        <property name="clearButtonEnabled">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2">
+       <widget class="QLabel" name="label_4">
+        <property name="text">
+         <string>Default Value</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0" colspan="4">
+       <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="QLabel" name="label_7">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>In</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="DataComboBox" name="cbReplCol">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="toolTip">
+           <string>Select which column to search in.</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_8">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>replace</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="WASimUiNS::DeletableItemsComboBox" name="cbReplWhat">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>100</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="toolTip">
+           <string>&lt;p&gt;What to replace. The comparison is case-sensitive. You may use regular expression syntax here.&lt;/p&gt;&lt;p&gt;Press Enter when done to save your entry for later selection. Saved items can be removed by right-clicking on them while the list is open.&lt;/p&gt;</string>
+          </property>
+          <property name="insertPolicy">
+           <enum>QComboBox::InsertAlphabetically</enum>
+          </property>
+          <property name="sizeAdjustPolicy">
+           <enum>QComboBox::AdjustToContents</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_9">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>with</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="WASimUiNS::DeletableItemsComboBox" name="cbReplWith">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>100</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="toolTip">
+           <string>&lt;p&gt;Replacement string. Use backslashes (&lt;tt&gt;&amp;#92;&lt;/tt&gt;) for regular expression capture references, for example: &lt;tt&quot;&gt;&amp;#92;1&lt;/tt&gt; for first capture group.&lt;/p&gt;&lt;p&gt;Press Enter when done to save your entry for later selection. Saved items can be removed by right-clicking on them while the list is open.&lt;/p&gt;</string>
+          </property>
+          <property name="insertPolicy">
+           <enum>QComboBox::InsertAlphabetically</enum>
+          </property>
+          <property name="sizeAdjustPolicy">
+           <enum>QComboBox::AdjustToContents</enum>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QLabel" name="label_5">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="font">
+      <font>
+       <family>Segoe UI</family>
+      </font>
+     </property>
+     <property name="text">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The produced INI file can be used directly in the plugin as a &amp;quot;Variables Definition&amp;quot; file to provide custom states. See the wiki article &lt;a href=&quot;https://github.com/mpaperno/MSFSTouchPortalPlugin/wiki/Using-Custom-States-and-Simulator-Variables&quot;&gt;Using Custom States and Simulator Variables&lt;/a&gt; for more information.&lt;/p&gt;&lt;p&gt;The &lt;i&gt;Category&lt;/i&gt;, &lt;i&gt;Export ID&lt;/i&gt;, &lt;i&gt;Display Name&lt;/i&gt;, &lt;i&gt;Default&lt;/i&gt;, and &lt;i&gt;Format&lt;/i&gt; columns can be edited by clicking on the respective field in the table. Apply changes in bulk to selected table row(s) using the form on the left (hover over form fields for more details). &lt;span style=&quot; font-weight:600;&quot;&gt;Note&lt;/span&gt;: there is no way to undo bulk edits.&lt;/p&gt;&lt;p&gt;The records will be exported in the same order as in the table below. Click headings to sort, drag to arrange, and right-click to toggle.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="textFormat">
+      <enum>Qt::AutoText</enum>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+     <property name="margin">
+      <number>10</number>
+     </property>
+     <property name="indent">
+      <number>-1</number>
+     </property>
+     <property name="openExternalLinks">
+      <bool>true</bool>
+     </property>
+     <property name="textInteractionFlags">
+      <set>Qt::LinksAccessibleByMouse</set>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0" colspan="3">
+    <widget class="WASimUiNS::RequestsTableView" name="tableView"/>
+   </item>
+   <item row="3" column="0" colspan="3">
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <property name="leftMargin">
+      <number>10</number>
+     </property>
+     <property name="rightMargin">
+      <number>10</number>
+     </property>
+     <item>
+      <widget class="ActionPushButton" name="pbCancel">
+       <property name="text">
+        <string>Close</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_3">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="ActionPushButton" name="pbExportSel">
+       <property name="text">
+        <string>Export Selected</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="ActionPushButton" name="pbExportAll">
+       <property name="text">
+        <string>Export All</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="0" column="1">
+    <widget class="QLabel" name="label_6">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="font">
+      <font>
+       <family>Segoe UI Semibold</family>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Export Data Requests to MSFS/SimConnect Touch Portal Plugin Format&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="textFormat">
+      <enum>Qt::RichText</enum>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>ActionPushButton</class>
+   <extends>QPushButton</extends>
+   <header>ActionPushButton.h</header>
+  </customwidget>
+  <customwidget>
+   <class>WASimUiNS::DeletableItemsComboBox</class>
+   <extends>QComboBox</extends>
+   <header>Widgets.h</header>
+  </customwidget>
+  <customwidget>
+   <class>WASimUiNS::RequestsTableView</class>
+   <extends>QTableView</extends>
+   <header>RequestsTableView.h</header>
+  </customwidget>
+  <customwidget>
+   <class>DataComboBox</class>
+   <extends>QComboBox</extends>
+   <header>DataComboBox.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

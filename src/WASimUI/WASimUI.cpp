@@ -39,6 +39,8 @@ and is also available at <http://www.gnu.org/licenses/>.
 
 #include "EventsModel.h"
 #include "LogConsole.h"
+#include "RequestsExport.h"
+#include "RequestsFormat.h"
 #include "RequestsModel.h"
 #include "Utils.h"
 #include "Widgets.h"
@@ -70,6 +72,7 @@ public:
 	StatusWidget *statWidget;
 	RequestsModel *reqModel;
 	EventsModel *eventsModel;
+	RequestsExportWidget *reqExportWidget = nullptr;
 	QAction *toggleConnAct = nullptr;
 	QAction *initAct = nullptr;
 	QAction *connectAct = nullptr;
@@ -492,7 +495,7 @@ public:
 		ui->btnReqestsPause->setIcon(chk ? dataResumeIcon : dataPauseIcon);
 	};
 
-	void saveRequests()
+	void saveRequests(bool forExport = false)
 	{
 		if (!reqModel->rowCount())
 			return;
@@ -501,8 +504,27 @@ public:
 		if (fname.isEmpty())
 			return;
 		lastRequestsFile = fname;
-		const int rows = reqModel->saveToFile(fname);
+		const int rows = forExport ? RequestsFormat::exportToPluginFormat(reqModel, reqModel->allRequests(), fname) : reqModel->saveToFile(fname);
 		logUiMessage(tr("Saved %1 Data Request(s) to file: %2").arg(rows).arg(fname), CommandId::Ack, LogLevel::Info);
+	}
+
+	void exportRequests()
+	{
+		if (!reqModel->rowCount())
+			return;
+
+		if (reqExportWidget) {
+			reqExportWidget->raise();
+			return;
+		}
+
+		reqExportWidget = new RequestsExportWidget(reqModel, q);
+		reqExportWidget->setWindowFlag(Qt::Dialog);
+		reqExportWidget->setAttribute(Qt::WA_DeleteOnClose);
+		reqExportWidget->setLastUsedFile(lastRequestsFile);
+		QObject::connect(reqExportWidget, &RequestsExportWidget::lastUsedFileChanged, [&](const QString &fn) { lastRequestsFile = fn; });
+		QObject::connect(reqExportWidget, &QObject::destroyed, q, [=]() { reqExportWidget = nullptr; });
+		reqExportWidget->show();
 	}
 
 	void loadRequests(bool replace)
@@ -513,7 +535,17 @@ public:
 		lastRequestsFile = fname;
 		if (replace)
 			removeAllRequests();
-		const QList<RequestRecord> &added = reqModel->loadFromFile(fname);
+
+		QFile f(fname);
+		if (!f.open(QFile::ReadOnly | QFile::Text)) {
+			logUiMessage(tr("Could not open file '%1' for reading").arg(fname), CommandId::Nak, LogLevel::Error);
+			return;
+		}
+		const QString first = f.readLine();
+		f.close();
+		const bool isNative = first.startsWith(QLatin1Literal("[Requests]"));
+
+		const QList<RequestRecord> &added = isNative ? reqModel->loadFromFile(fname) : RequestsFormat::importFromPluginFormat(reqModel, fname);
 		for (const DataRequest &req : added)
 			client->saveDataRequest(req, true);  // async
 
@@ -839,7 +871,12 @@ WASimUI::WASimUI(QWidget *parent) :
 	ui.cbNameOrCode->lineEdit()->setMaxLength(STRSZ_REQ);
 
 	// Set up the Requests table view
+	ui.requestsView->setExportCategories(RequestsFormat::categoriesList());
 	ui.requestsView->setModel(d->reqModel);
+	// Hide unused columns
+	QHeaderView *hdr = ui.requestsView->header();
+	for (int i = RequestsModel::COL_FIRST_META; i <= RequestsModel::COL_LAST_META; ++i)
+		hdr->hideSection(i);
 	// connect double click action to populate the request editor form
 	connect(ui.requestsView, &QTableView::doubleClicked, this, [this](const QModelIndex &idx) { d->populateRequestForm(idx); });
 
@@ -1022,7 +1059,15 @@ WASimUI::WASimUI(QWidget *parent) :
 	pauseRequestsAct->setCheckable(true);
 
 	// Save current Requests to a file
-	MAKE_ACTION_PB_D(saveRequestsAct, tr("Save Requests"), tr("Save"), "save", btnReqestsSave, wRequests, saveRequests(), tr("Save requests to a file for later use."), QKeySequence::Save);
+	MAKE_ACTION_PB_NC(saveRequestsAct, tr("Save Requests"), tr("Save"), "save", btnReqestsSave, wRequests, tr("Save requests to a file for later use or bring up a dialog with export options."));
+	saveRequestsAct->setDisabled(true);
+	QMenu *saveRequestsMenu = new QMenu(tr("Requests Save Action"), this);
+	saveRequestsMenu->addAction(GLYPH_ICON("keyboard_command_key"), tr("In native WASimUI format"), this, [this]() { d->saveRequests(false); }, QKeySequence::Save);
+	saveRequestsMenu->addAction(GLYPH_ICON("overlay=align=AlignRight\\fg=#5eb5ff\\arrow_outward/touch_app"), tr("Export for Touch Portal Plugin with Editor..."),
+	                            this, [this]() { d->exportRequests(); }, QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_S));
+	saveRequestsMenu->addAction(GLYPH_ICON("touch_app"), tr("Export for Touch Portal Plugin Directly"),
+	                            this, [this]() { d->saveRequests(true); }, QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::AltModifier | Qt::Key_S));
+	saveRequestsAct->setMenu(saveRequestsMenu);
 
 	// Load Requests from a file. This is actually two actions: load and append to existing records + load and replace existing records.
 	MAKE_ACTION_PB_NC(loadRequestsAct, tr("Load Requests"), tr("Load"), "folder_open", btnReqestsLoad, wRequests,

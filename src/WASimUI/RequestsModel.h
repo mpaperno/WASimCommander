@@ -136,10 +136,45 @@ private:
 public:
 	enum Roles { DataRole = Qt::UserRole + 1, MetaTypeRole, PropertiesRole };
 	enum Columns {
-		COL_ID,   COL_TYPE,   COL_RES_TYPE,  COL_NAME,           COL_IDX,   COL_UNIT,   COL_SIZE,   COL_PERIOD,   COL_INTERVAL, COL_EPSILON, COL_VALUE,   COL_TIMESATMP,   COL_ENUM_END
+		COL_ID,
+		COL_TYPE,
+		COL_RES_TYPE,
+		COL_NAME,
+		COL_IDX,
+		COL_UNIT,
+		COL_SIZE,
+		COL_PERIOD,
+		COL_INTERVAL,
+		COL_EPSILON,
+		COL_VALUE,
+		COL_TIMESATMP,
+		COL_META_ID,
+		COL_META_NAME,
+		COL_META_CAT,
+		COL_META_DEF,
+		COL_META_FMT,
+		COL_ENUM_END,
+		COL_FIRST_META = COL_META_ID,
+		COL_LAST_META = COL_META_FMT,
 	};
 	const QStringList columnNames = {
-		tr("ID"), tr("Type"), tr("Res/Var"), tr("Name or Code"), tr("Idx"), tr("Unit"), tr("Size"), tr("Period"), tr("Intvl"),   tr("ΔΕ"),   tr("Value"), tr("Last Updt.")
+		tr("ID"),
+		tr("Type"),
+		tr("Res/Var"),
+		tr("Name or Code"),
+		tr("Idx"),
+		tr("Unit"),
+		tr("Size"),
+		tr("Period"),
+		tr("Intvl"),
+		tr("ΔΕ"),
+		tr("Value"),
+		tr("Last Updt."),
+		tr("Export ID"),
+		tr("Display Name"),
+		tr("Category"),
+		tr("Default"),
+		tr("Format"),
 	};
 
 	RequestsModel(QObject *parent = nullptr) :
@@ -221,7 +256,13 @@ public:
 		req.setUnitName(item(row, COL_UNIT)->data(DataRole).toByteArray().constData());
 
 		req.metaType = item(row, COL_ID)->data(MetaTypeRole).toInt();
-		req.properties = item(row, COL_ID)->data(PropertiesRole).toMap();
+
+		req.properties["id"] = item(row, COL_META_ID)->data(Qt::EditRole).toString();
+		req.properties["name"] = item(row, COL_META_NAME)->data(Qt::EditRole).toString();
+		req.properties["categoryId"] = item(row, COL_META_CAT)->data(Qt::EditRole).toString();
+		req.properties["category"] = item(row, COL_META_CAT)->data(Qt::ToolTipRole).toString();
+		req.properties["default"] = item(row, COL_META_DEF)->data(Qt::EditRole).toString();
+		req.properties["format"] = item(row, COL_META_FMT)->data(Qt::EditRole).toString();
 
 		//std::cout << req << std::endl;
 		return req;
@@ -278,7 +319,19 @@ public:
 			setOrCreateItem(row, COL_TIMESATMP, tr("Never"), 0);
 		}
 
+		updateFromMetaData(row, req);
+
 		return index(row, 0);
+	}
+
+	void updateFromMetaData(int row, const RequestRecord &req)
+	{
+		// Meta data for exports
+		setOrCreateEditableItem(row, COL_META_ID, req.properties.value("id").toString());
+		setOrCreateEditableItem(row, COL_META_NAME, req.properties.value("name").toString());
+		setOrCreateEditableItem(row, COL_META_CAT, req.properties.value("categoryId").toString(), req.properties.value("category").toString());
+		setOrCreateEditableItem(row, COL_META_DEF, req.properties.value("default").toString());
+		setOrCreateEditableItem(row, COL_META_FMT, req.properties.value("format").toString());
 	}
 
 	void removeRequest(const uint32_t requestId)
@@ -357,6 +410,10 @@ public:
 				itm->setData(data, DataRole);
 			return itm;
 		}
+		QStandardItem *setOrCreateEditableItem(int row, int col, const QString &text, const QString &tt = QString()) {
+			return setOrCreateItem(row, col, text, QVariant(), true, true, tt);
+		}
+
 	private:
 		uint32_t m_nextRequestId = 0;
 

@@ -260,11 +260,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <QtRcc Include="WASimUI.qrc" />
-    <QtUic Include="LogConsole.ui" />
+    <QtUic Include="RequestsExport.ui" />
     <QtUic Include="WASimUI.ui" />
     <QtMoc Include="WASimUI.h" />
     <ClCompile Include="ActionPushButton.cpp" />
-    <ClCompile Include="LogConsole.cpp" />
+    <ClCompile Include="RequestsExport.cpp" />
     <ClCompile Include="WASimUI.cpp" />
     <ClCompile Include="main.cpp" />
     <None Include="..\WASimClient\client_conf.ini">
@@ -296,8 +296,8 @@
   <ItemGroup>
     <ClInclude Include="..\include\WASimCommander.h" />
     <ClInclude Include="..\include\wasim_version.h" />
-    <QtMoc Include="RequestsTableView.h" />
-    <QtMoc Include="LogConsole.h" />
+    <QtMoc Include="RequestsExport.h" />
+    <ClInclude Include="RequestsFormat.h" />
     <QtMoc Include="Widgets.h" />
     <QtMoc Include="RequestsModel.h" />
     <QtMoc Include="ActionPushButton.h" />
