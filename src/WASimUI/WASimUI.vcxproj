@@ -296,6 +296,7 @@
   <ItemGroup>
     <ClInclude Include="..\include\WASimCommander.h" />
     <ClInclude Include="..\include\wasim_version.h" />
+    <QtMoc Include="RequestsTableView.h" />
     <QtMoc Include="LogConsole.h" />
     <QtMoc Include="Widgets.h" />
     <QtMoc Include="RequestsModel.h" />
