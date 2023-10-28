@@ -25,7 +25,7 @@ and is also available at <http://www.gnu.org/licenses/>.
 #include <QStyledItemDelegate>
 #include <QTableView>
 
-#include "multisort_view/MultisortTableView.h"
+#include "CustomTableView.h"
 
 #include "RequestsModel.h"
 #include "Widgets.h"
@@ -63,87 +63,25 @@ class CategoryDelegate : public QStyledItemDelegate
 		}
 };
 
-class RequestsTableView : public MultisortTableView
+class RequestsTableView : public CustomTableView
 {
 	Q_OBJECT
 
 	public:
 		RequestsTableView(QWidget *parent)
-			: MultisortTableView(parent),
-			m_cbCategoryDelegate{new CategoryDelegate(this)},
-			m_defaultFontSize{font().pointSize()}
+			: CustomTableView(parent),
+			m_cbCategoryDelegate{new CategoryDelegate(this)}
 		{
 			setObjectName(QStringLiteral("RequestsTableView"));
 
-			setContextMenuPolicy(Qt::ActionsContextMenu);
-			setEditTriggers(QAbstractItemView::AllEditTriggers);
-			setSelectionMode(QAbstractItemView::ExtendedSelection);
-			setSelectionBehavior(QAbstractItemView::SelectRows);
-			setIconSize(QSize(16, 16));
-			setVerticalScrollMode(QAbstractItemView::ScrollPerItem);
-			setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
-			setGridStyle(Qt::DotLine);
-			setSortingEnabled(true);
-			setWordWrap(false);
-			setCornerButtonEnabled(false);
-			verticalHeader()->setVisible(false);
-
-			QHeaderView *hdr = horizontalHeader();
-			hdr->setCascadingSectionResizes(false);
-			hdr->setMinimumSectionSize(20);
-			hdr->setDefaultSectionSize(80);
-			hdr->setHighlightSections(false);
-			hdr->setSortIndicatorShown(false);
-			hdr->setStretchLastSection(true);
-			hdr->setSectionsMovable(true);
-			hdr->setSectionResizeMode(QHeaderView::Interactive);
-			hdr->setContextMenuPolicy(Qt::ActionsContextMenu);
-			hdr->setToolTip(tr(
-				"<p>"
-					"- <tt>CTRL-click</tt> to sort on multiple columns.<br/>"
-					"- <tt>Right-click</tt> for menu to toggle column visibility.<br/>"
-					"- <tt>Click-and-drag</tt> headings to re-arrange columns.<br/>"
-					"- <tt>Double-click</tt> dividers to adjust column width to fit widest content.<br/>"
-				"</p>"
-			));
-
-			m_fontActions.reserve(3);
-			m_fontActions.append(new QAction(QIcon("arrow_upward.glyph"), tr("Increase font size"), this));
-			m_fontActions.append(new QAction(QIcon("restart_alt.glyph"), tr("Reset font size"), this));
-			m_fontActions.append(new QAction(QIcon("arrow_downward.glyph"), tr("Decrease font size"), this));
-			m_fontActions[0]->setShortcuts({ QKeySequence::ZoomIn, QKeySequence(Qt::ControlModifier | Qt::Key_Equal) });
-			m_fontActions[1]->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_0));
-			m_fontActions[2]->setShortcut(QKeySequence::ZoomOut);
-			connect(m_fontActions[0], &QAction::triggered, this, &RequestsTableView::fontSizeInc);
-			connect(m_fontActions[1], &QAction::triggered, this, &RequestsTableView::fontSizeReset);
-			connect(m_fontActions[2], &QAction::triggered, this, &RequestsTableView::fontSizeDec);
-		}
-
-		QHeaderView *header() const { return horizontalHeader(); }
-		QByteArray saveState() const { return header()->saveState(); }
-		const QList<QAction*> &fontActions() const { return m_fontActions; }
-
-		QMenu *columnToggleActionsMenu(QWidget *parent) const {
-			QMenu *menu = new QMenu(tr("Toggle table columns"), parent);
-			menu->setIcon(QIcon(QStringLiteral("view_column.glyph")));
-			menu->addActions(header()->actions());
-			return menu;
-		}
-
-		QMenu *fontActionsMenu(QWidget *parent) const {
-			QMenu *menu = new QMenu(tr("Adjust font size"), parent);
-			menu->setIcon(QIcon(QStringLiteral("format_size.glyph")));
-			menu->addActions(m_fontActions);
-			return menu;
 		}
 
 	public Q_SLOTS:
 		void setExportCategories(const QMap<QString, QString> &map) { m_cbCategoryDelegate->textDataMap = map; }
-		void moveColumn(int from, int to) const { horizontalHeader()->moveSection(from, to); }
 
 		void setModel(RequestsModel *model)
 		{
-			MultisortTableView::setModel(model);
+			CustomTableView::setModel(model);
 
 			QHeaderView *hdr = horizontalHeader();
 			hdr->resizeSection(RequestsModel::COL_ID, 40);
@@ -166,64 +104,10 @@ class RequestsTableView : public MultisortTableView
 			hdr->resizeSection(RequestsModel::COL_META_FMT, 50);
 
 			setItemDelegateForColumn(RequestsModel::COL_META_CAT, m_cbCategoryDelegate);
-
-			for (int i=0; i < model->columnCount(); ++i) {
-				QAction *act = new QAction(model->headerData(i, Qt::Horizontal).toString(), this);
-				act->setCheckable(true);
-				act->setChecked(!hdr->isSectionHidden(i));
-				act->setProperty("col", i);
-				hdr->addAction(act);
-
-				connect(act, &QAction::triggered, this, [=](bool chk) {
-					if (QAction *act = qobject_cast<QAction*>(sender())) {
-						int id = act->property("col").toInt();
-						if (id > -1)
-							horizontalHeader()->setSectionHidden(id, !chk);
-					}
-				});
-			}
-
-		}
-
-		void fontSizeReset() {
-			QFont f = font();
-			if (f.pointSize() != m_defaultFontSize) {
-				f.setPointSize(m_defaultFontSize);
-				setFont(f);
-				resizeRowsToContents();
-			}
-		}
-		void fontSizeInc() {
-			QFont f = font();
-			f.setPointSize(f.pointSize() + 1);
-			setFont(f);
-			resizeRowsToContents();
-		}
-		void fontSizeDec() {
-			if (font().pointSize() > 2) {
-				QFont f = font();
-				f.setPointSize(f.pointSize() - 1);
-				setFont(f);
-				resizeRowsToContents();
-			}
-		}
-
-		bool restoreState(const QByteArray &state)
-		{
-			if (!model())
-				return false;
-			QHeaderView *hdr = horizontalHeader();
-			hdr->restoreState(state);
-			for (int i = 0; i < model()->columnCount() && i < hdr->actions().length(); ++i)
-				hdr->actions().at(i)->setChecked(!hdr->isSectionHidden(i));
-			hdr->setSortIndicatorShown(false);
-			return true;
 		}
 
 	private:
 		CategoryDelegate *m_cbCategoryDelegate;
-		QList<QAction*> m_fontActions { };
-		int m_defaultFontSize;
 };
 
 }

@@ -1089,9 +1089,8 @@ WASimUI::WASimUI(QWidget *parent) :
 	}, Qt::QueuedConnection);
 
 	// Add column toggle and font size actions
-	ui.wRequests->addAction(ui.requestsView->columnToggleActionsMenu(this)->menuAction());
-	ui.wRequests->addAction(ui.requestsView->fontActionsMenu(this)->menuAction());
-
+	ui.wRequests->addAction(ui.requestsView->columnToggleMenuAction());
+	ui.wRequests->addAction(ui.requestsView->fontSizeMenuAction());
 
 	// Registered calculator events model view actions
 

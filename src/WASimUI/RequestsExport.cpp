@@ -107,8 +107,8 @@ RequestsExportWidget::RequestsExportWidget(RequestsModel *model, QWidget *parent
 	//ui.pbRegen->setHidden(true);
 
 	addAction(updateMenu->menuAction());
-	addAction(ui.tableView->columnToggleActionsMenu(this)->menuAction());
-	addAction(ui.tableView->fontActionsMenu(this)->menuAction());
+	addAction(ui.tableView->columnToggleMenuAction());
+	addAction(ui.tableView->fontSizeMenuAction());
 
 	connect(ui.cbDefaultCategory, &DataComboBox::currentDataChanged, this, [&]() { toggleEditFormBtn(ui); });
 	connect(ui.leIdPrefix, &QLineEdit::textChanged, this, [&]() { toggleEditFormBtn(ui); });
