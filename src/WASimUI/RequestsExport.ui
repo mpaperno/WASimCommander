@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1229</width>
+    <width>1288</width>
     <height>760</height>
    </rect>
   </property>
@@ -288,7 +288,7 @@
       </font>
      </property>
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The produced INI file can be used directly in the plugin as a &amp;quot;Variables Definition&amp;quot; file to provide custom states. See the wiki article &lt;a href=&quot;https://github.com/mpaperno/MSFSTouchPortalPlugin/wiki/Using-Custom-States-and-Simulator-Variables&quot;&gt;Using Custom States and Simulator Variables&lt;/a&gt; for more information.&lt;/p&gt;&lt;p&gt;The &lt;i&gt;Category&lt;/i&gt;, &lt;i&gt;Export ID&lt;/i&gt;, &lt;i&gt;Display Name&lt;/i&gt;, &lt;i&gt;Default&lt;/i&gt;, and &lt;i&gt;Format&lt;/i&gt; columns can be edited by clicking on the respective field in the table. Apply changes in bulk to selected table row(s) using the form on the left (hover over form fields for more details). &lt;span style=&quot; font-weight:600;&quot;&gt;Note&lt;/span&gt;: there is no way to undo bulk edits.&lt;/p&gt;&lt;p&gt;The records will be exported in the same order as in the table below. Click headings to sort, drag to arrange, and right-click to toggle.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The produced INI file can be used directly in the plugin as a &amp;quot;Variables Definition&amp;quot; file to provide custom states. See the wiki article &lt;a href=&quot;https://github.com/mpaperno/MSFSTouchPortalPlugin/wiki/Using-Custom-States-and-Simulator-Variables&quot;&gt;Using Custom States and Simulator Variables&lt;/a&gt; for more information.&lt;/p&gt;&lt;p&gt;The &lt;i&gt;Category&lt;/i&gt;, &lt;i&gt;Export ID&lt;/i&gt;, &lt;i&gt;Display Name&lt;/i&gt;, &lt;i&gt;Default&lt;/i&gt;, and &lt;i&gt;Format&lt;/i&gt; columns can be edited by clicking on the respective field in the table. Apply changes in bulk to selected table row(s) using the form on the left (hover over form fields for more details). &lt;span style=&quot; font-weight:600;&quot;&gt;Note&lt;/span&gt;: there is no way to undo bulk edits.&lt;/p&gt;&lt;p&gt;The records will be exported in the same order as in the table below (CTRL-click headings to sort by multiple columns).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
      <property name="textFormat">
       <enum>Qt::AutoText</enum>
