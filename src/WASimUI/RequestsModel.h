@@ -270,6 +270,8 @@ public:
 
 	QModelIndex addRequest(const RequestRecord &req)
 	{
+		static const QString NA = tr("-", "Used for non-applicable column values, like 'N/A'.");  // tr("N/A")
+
 		int row = findRequestRow(req.requestId);
 		const bool newRow = row < 0;
 		if (newRow)
@@ -279,23 +281,23 @@ public:
 		itm->setData(req.metaType, MetaTypeRole);
 		itm->setData(req.properties, PropertiesRole);
 
-		itm = setOrCreateItem(row, COL_TYPE, WSEnums::RequestTypeNames[+req.requestType], +req.requestType);
+		setOrCreateItem(row, COL_TYPE, WSEnums::RequestTypeNames[+req.requestType], +req.requestType);
 
 		if (req.requestType == WSEnums::RequestType::Calculated) {
 			setOrCreateItem(row, COL_RES_TYPE, WSEnums::CalcResultTypeNames[+req.calcResultType], +req.calcResultType);
-			setOrCreateItem(row, COL_IDX, tr("N/A"), false);
-			itm = setOrCreateItem(row, COL_UNIT, tr("N/A"), QString(req.unitName), false);
+			setOrCreateItem(row, COL_IDX, NA, QString::number(req.simVarIndex), false);
+			setOrCreateItem(row, COL_UNIT, NA, QString(req.unitName), false);
 		}
 		else {
 			setOrCreateItem(row, COL_RES_TYPE, QString(req.varTypePrefix), req.varTypePrefix);
 			if (Utils::isUnitBasedVariableType(req.varTypePrefix))
 				setOrCreateItem(row, COL_UNIT, req.unitName, QString(req.unitName));
 			else
-				setOrCreateItem(row, COL_UNIT, tr("N/A"), QString(req.unitName), false);
+				setOrCreateItem(row, COL_UNIT, NA, QString(req.unitName), false);
 			if (req.varTypePrefix == 'A')
 				setOrCreateItem(row, COL_IDX, QString::number(req.simVarIndex));
 			else
-				setOrCreateItem(row, COL_IDX, tr("N/A"), false);
+				setOrCreateItem(row, COL_IDX, NA, QString::number(req.simVarIndex), false);
 		}
 
 		if (req.metaType == QMetaType::UnknownType)
@@ -312,7 +314,7 @@ public:
 		if (req.metaType > QMetaType::UnknownType && req.metaType < QMetaType::User)
 			setOrCreateItem(row, COL_EPSILON, QString::number(req.deltaEpsilon), req.deltaEpsilon);
 		else
-			setOrCreateItem(row, COL_EPSILON, tr("N/A"), req.deltaEpsilon, false);
+			setOrCreateItem(row, COL_EPSILON, NA, req.deltaEpsilon, false);
 
 		if (newRow) {
 			setOrCreateItem(row, COL_VALUE, tr("???"));
