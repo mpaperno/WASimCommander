@@ -28,7 +28,8 @@ ALIASES                = \
                          "pacc=\par Access functions:^^" \
                          "psig=\par Notifier signal:^^" \
                          "intern=\par<b>Internal use only.</b>" \
-                         "qflags{2}=<p>The \ref \1 type is a typedef for `QFlags<\2>`. It stores an OR combination of \ref \2 values.</p>"
+                         "qflags{2}=<p>The \ref \1 type is a typedef for `QFlags<\2>`. It stores an OR combination of \ref \2 values.</p>" \
+                         "since{1}=\par **Since \1**"
 
 TOC_INCLUDE_HEADINGS   = 5
 AUTOLINK_SUPPORT       = YES

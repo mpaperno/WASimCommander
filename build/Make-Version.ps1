@@ -40,5 +40,7 @@ function Make-Version {
 	Merge-Tokens -InputFile $SrcPath\include\wasim_version.in -OutputFile $SrcPath\include\wasim_version.h -Tokens $Tokens -NoWarning
 	Merge-Tokens -InputFile $SrcPath\WASimClient_CLI\AssemblyInfo.cpp.in -OutputFile $SrcPath\WASimClient_CLI\AssemblyInfo.cpp -Tokens $Tokens -NoWarning
 	Merge-Tokens -InputFile $DocPath\version.Doxyfile.in -OutputFile $DocPath\version.Doxyfile -Tokens $Tokens -NoWarning
+	$path = "${SrcPath}\WASimModule\WASimModuleProject\WASimCommander-Module\PackageDefinitions\wasimcommander-module.xml"
+	Merge-Tokens -InputFile "${path}.in" -OutputFile $path -Tokens $Tokens -NoWarning
 
 }

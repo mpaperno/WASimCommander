@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AssetPackage Version="@VER_MAJOR@.@VER_MINOR@.@VER_PATCH@">
+	<ItemSettings>
+		<ContentType>MISC</ContentType>
+		<Title>@PROJECT_NAME@ WASM Module</Title>
+		<Manufacturer/>
+		<Creator>@PROJECT_COPY@</Creator>
+	</ItemSettings>
+	<Flags>
+		<VisibleInStore>false</VisibleInStore>
+		<CanBeReferenced>false</CanBeReferenced>
+	</Flags>
+	<AssetGroups>
+		<AssetGroup Name="ContentInfo">
+			<Type>ContentInfo</Type>
+			<Flags>
+				<FSXCompatibility>false</FSXCompatibility>
+			</Flags>
+			<AssetDir>PackageDefinitions\wasimcommander-module\ContentInfo\</AssetDir>
+			<OutputDir>ContentInfo\wasimcommander-module\</OutputDir>
+		</AssetGroup>
+		<AssetGroup Name="@SERVER_NAME@">
+			<Type>Copy</Type>
+			<Flags>
+				<FSXCompatibility>false</FSXCompatibility>
+			</Flags>
+			<AssetDir>PackageSources\@SERVER_NAME@\</AssetDir>
+			<OutputDir>modules\</OutputDir>
+		</AssetGroup>
+	</AssetGroups>
+</AssetPackage>
