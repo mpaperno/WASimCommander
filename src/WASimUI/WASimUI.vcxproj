@@ -55,28 +55,28 @@
   </ImportGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="QtSettings">
     <QtInstall>5.12.12_msvc2017_64</QtInstall>
-    <QtModules>core;gui;widgets</QtModules>
+    <QtModules>core;sql;gui;widgets</QtModules>
     <QtBuildConfig>debug</QtBuildConfig>
     <QtQMLDebugEnable>false</QtQMLDebugEnable>
     <QtDeploy>false</QtDeploy>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="QtSettings">
     <QtInstall>5.12.12_msvc2017_64</QtInstall>
-    <QtModules>core;gui;widgets</QtModules>
+    <QtModules>core;sql;gui;widgets</QtModules>
     <QtBuildConfig>release</QtBuildConfig>
     <QtDeploy>true</QtDeploy>
     <QtQMLDebugEnable>false</QtQMLDebugEnable>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-DLL|x64'" Label="QtSettings">
     <QtInstall>5.12.12_msvc2017_64</QtInstall>
-    <QtModules>core;gui;widgets</QtModules>
+    <QtModules>core;sql;gui;widgets</QtModules>
     <QtBuildConfig>release</QtBuildConfig>
     <QtDeploy>true</QtDeploy>
     <QtQMLDebugEnable>false</QtQMLDebugEnable>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-DLL|x64'" Label="QtSettings">
     <QtInstall>5.12.12_msvc2017_64</QtInstall>
-    <QtModules>core;gui;widgets</QtModules>
+    <QtModules>core;sql;gui;widgets</QtModules>
     <QtBuildConfig>debug</QtBuildConfig>
     <QtDeploy>true</QtDeploy>
     <QtQMLDebugEnable>false</QtQMLDebugEnable>
@@ -270,6 +270,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <QtRcc Include="WASimUI.qrc" />
+    <QtUic Include="DocImportsBrowser.ui" />
     <QtUic Include="LogConsole.ui" />
     <QtUic Include="RequestsExport.ui" />
     <QtUic Include="WASimUI.ui" />
@@ -287,6 +288,15 @@
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release-DLL|x64'">true</DeploymentContent>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug-DLL|x64'">true</DeploymentContent>
     </None>
+    <CopyFileToFolders Include="resources\MSFS_SDK_Doc_Import.sqlite3">
+      <FileType>Document</FileType>
+      <RootFolder Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </RootFolder>
+      <TreatOutputAsContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</TreatOutputAsContent>
+      <TreatOutputAsContent Condition="'$(Configuration)|$(Platform)'=='Release-DLL|x64'">true</TreatOutputAsContent>
+      <TreatOutputAsContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</TreatOutputAsContent>
+      <TreatOutputAsContent Condition="'$(Configuration)|$(Platform)'=='Debug-DLL|x64'">true</TreatOutputAsContent>
+    </CopyFileToFolders>
     <None Include="SimConnect.cfg">
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
@@ -314,6 +324,8 @@
     <QtMoc Include="LogConsole.h" />
     <QtMoc Include="RequestsExport.h" />
     <QtMoc Include="widgets\CustomTableView.h" />
+    <QtMoc Include="DocImports.h" />
+    <QtMoc Include="DocImportsBrowser.h" />
     <QtMoc Include="widgets\DeletableItemsComboBox.h" />
     <QtMoc Include="widgets\FilterLineEdit.h" />
     <QtMoc Include="widgets\FilterTableHeader.h" />
