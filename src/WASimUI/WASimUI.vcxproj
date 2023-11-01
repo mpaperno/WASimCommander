@@ -104,17 +104,21 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <CopyLocalDeploymentContent>true</CopyLocalDeploymentContent>
+    <IncludePath>$(ProjectDir)widgets;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
     <CopyLocalDeploymentContent>true</CopyLocalDeploymentContent>
+    <IncludePath>$(ProjectDir)widgets;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-DLL|x64'">
     <CopyLocalDeploymentContent>true</CopyLocalDeploymentContent>
     <CopyLocalProjectReference>true</CopyLocalProjectReference>
+    <IncludePath>$(ProjectDir)widgets;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-DLL|x64'">
     <CopyLocalDeploymentContent>true</CopyLocalDeploymentContent>
     <CopyLocalProjectReference>true</CopyLocalProjectReference>
+    <IncludePath>$(ProjectDir)widgets;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -264,9 +268,9 @@
     <QtUic Include="RequestsExport.ui" />
     <QtUic Include="WASimUI.ui" />
     <QtMoc Include="WASimUI.h" />
-    <ClCompile Include="ActionPushButton.cpp" />
-    <ClCompile Include="multisort_view\MultisortTableView.cpp" />
-    <ClCompile Include="LogConsole.cpp" />
+    <ClCompile Include="widgets\ActionPushButton.cpp" />
+    <ClCompile Include="widgets\FilterLineEdit.cpp" />
+    <ClCompile Include="widgets\FilterTableHeader.cpp" />
     <ClCompile Include="LogConsole.cpp" />
     <ClCompile Include="multisort_view\MultisortTableView.cpp" />
     <ClCompile Include="RequestsExport.cpp" />
@@ -304,16 +308,20 @@
     <QtMoc Include="RequestsTableView.h" />
     <QtMoc Include="LogConsole.h" />
     <QtMoc Include="RequestsExport.h" />
-    <QtMoc Include="CustomTableView.h" />
+    <QtMoc Include="widgets\CustomTableView.h" />
+    <QtMoc Include="widgets\DeletableItemsComboBox.h" />
+    <QtMoc Include="widgets\FilterLineEdit.h" />
+    <QtMoc Include="widgets\FilterTableHeader.h" />
+    <QtMoc Include="widgets\BuddyLabel.h" />
     <ClInclude Include="multisort_view\AlphanumComparer.h" />
     <QtMoc Include="multisort_view\AlphanumSortProxyModel.h" />
     <ClInclude Include="multisort_view\ColumnsSorter.h" />
     <QtMoc Include="multisort_view\MultisortTableView.h" />
     <ClInclude Include="RequestsFormat.h" />
-    <QtMoc Include="Widgets.h" />
+    <QtMoc Include="widgets\Widgets.h" />
     <QtMoc Include="RequestsModel.h" />
-    <QtMoc Include="ActionPushButton.h" />
-    <QtMoc Include="DataComboBox.h" />
+    <QtMoc Include="widgets\ActionPushButton.h" />
+    <QtMoc Include="widgets\DataComboBox.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">

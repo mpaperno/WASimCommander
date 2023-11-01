@@ -19,17 +19,14 @@ and is also available at <http://www.gnu.org/licenses/>.
 
 #pragma once
 
-#include <QAbstractItemView>
-#include <QApplication>
 #include <QDebug>
-#include <QComboBox>
 #include <QBoxLayout>
 #include <QLabel>
-#include <QLineEdit>
 #include <vector>
 
 #include "client/WASimClient.h"
 #include "DataComboBox.h"
+#include "DeletableItemsComboBox.h"
 #include "Utils.h"
 
 namespace WASimUiNS
@@ -289,84 +286,6 @@ public:
 	}
 };
 
-
-class DeletableItemsComboBox : public DataComboBox
-{
-	Q_OBJECT
-	Q_PROPERTY(QString placeholderText READ placeholderText WRITE setPlaceholderText)
-public:
-	DeletableItemsComboBox(QWidget *p = nullptr) : DataComboBox(p)
-	{
-		setEditable(true);
-		setInsertPolicy(InsertAtTop);
-		setSizeAdjustPolicy(AdjustToContents);
-		//setMinimumContentsLength(25);
-		setMaxVisibleItems(25);
-		setCurrentIndex(-1);
-		setToolTip(tr("Manually added text items (at top of list) can be removed by right-clicking on them while the list is open."));
-
-		connect(this, &DeletableItemsComboBox::editTextChanged, this, [this](const QString &txt) {
-			if (txt.isEmpty())
-				setCurrentIndex(-1);
-		});
-		connect(view(), &QAbstractItemView::pressed, [this](const QModelIndex &idx) {
-			if (idx.isValid() && !idx.data(Qt::UserRole).isValid() && (QApplication::mouseButtons() & Qt::RightButton))
-				model()->removeRow(idx.row());
-		});
-	}
-
-	void setClearButtonEnabled(bool enabled = true) { if (lineEdit()) lineEdit()->setClearButtonEnabled(enabled); }
-
-	const QStringList editedItems() const
-	{
-		QStringList ret;
-		if (!isEditable())
-			return ret;
-		for (int i = 0, e = count(); i < e; ++i) {
-			if (!itemData(i).isValid() && !itemText(i).isEmpty())
-				ret << itemText(i);
-		}
-		return ret;
-	}
-
-	void insertEditedItems(const QStringList &items, InsertPolicy policy = NoInsert)
-	{
-		if (!isEditable() || insertPolicy() == NoInsert)
-			return;
-		if (policy == NoInsert)
-			policy = insertPolicy();
-		int index = 0;
-		switch (policy) {
-			case InsertAtTop:
-				break;
-			case InsertAtBottom:
-				index = count();
-				break;
-			case InsertAfterCurrent:
-				index = qMax(0, currentIndex());
-				break;
-			case InsertBeforeCurrent:
-				index = qMax(0, currentIndex() - 1);
-				break;
-		}
-		const int currIdx = currentIndex();
-		insertItems(index, items);
-		if (policy == InsertAlphabetically)
-			model()->sort(0);
-		if (currIdx == -1)
-			setCurrentIndex(currIdx);
-	}
-
-	QString placeholderText() const { return lineEdit() ? lineEdit()->placeholderText() : ""; }
-
-	void setPlaceholderText(const QString &text)
-	{
-		if (lineEdit())
-			lineEdit()->setPlaceholderText(text);
-	}
-
-};
-
 class ValueSizeComboBox : public DeletableItemsComboBox
 {
 	Q_OBJECT
@@ -403,6 +322,13 @@ class UnitTypeComboBox : public DeletableItemsComboBox
 public:
 	UnitTypeComboBox(QWidget *p = nullptr) : DeletableItemsComboBox(p)
 	{
+		setToolTip(tr(
+			"<p>Unit Name for the value. For L vars this can be left blank to get the default value of the variable.</p>"
+			"<p>The completion suggestions are looked up from imported SimConnect SDK documentation unit types.</p>"
+			"<p>Unit types may also be saved for quick selection later by pressing Return after selecting one or typing it in.</p>"
+			"<p>Saved items can be removed by right-clicking on them while the list is open.</p>"
+		));
+
 		setInsertPolicy(InsertAlphabetically);
 		int i = 0;
 		addItem(QStringLiteral("bar"), i++);

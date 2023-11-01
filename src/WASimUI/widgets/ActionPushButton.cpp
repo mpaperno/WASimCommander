@@ -34,7 +34,6 @@
 #include <QStyle>
 #include <QStylePainter>
 #include <QStyleOption>
-#include <qdebug.h>
 
 ActionPushButton::ActionPushButton(QAction *defaultAction, QWidget *parent) :
   QPushButton(parent)
