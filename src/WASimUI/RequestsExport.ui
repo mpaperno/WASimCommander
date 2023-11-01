@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1288</width>
+    <width>1290</width>
     <height>760</height>
    </rect>
   </property>
@@ -32,7 +32,7 @@
    <item row="1" column="0">
     <widget class="QGroupBox" name="wBulkEdit">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+      <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
@@ -44,24 +44,6 @@
       <property name="verticalSpacing">
        <number>8</number>
       </property>
-      <item row="0" column="2">
-       <widget class="QLabel" name="label_3">
-        <property name="text">
-         <string>Format</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="3">
-       <widget class="QLineEdit" name="leFormat">
-        <property name="toolTip">
-         <string>&lt;p&gt;Set the formatting string on selected item(s).&lt;/p&gt;
-&lt;p&gt;To set the formatting to an empty value, enter two single or double quotes (&lt;tt&gt;''&lt;/tt&gt; or &lt;tt&gt;&amp;quot;&amp;quot;&lt;/tt&gt;).&lt;/p&gt;</string>
-        </property>
-        <property name="clearButtonEnabled">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
       <item row="3" column="0" colspan="4">
        <layout class="QHBoxLayout" name="horizontalLayout">
         <property name="spacing">
@@ -112,51 +94,21 @@
         </item>
        </layout>
       </item>
-      <item row="0" column="0">
-       <widget class="QLabel" name="label">
-        <property name="text">
-         <string>Category</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="label_2">
-        <property name="text">
-         <string>ID Prefix</string>
-        </property>
-       </widget>
-      </item>
       <item row="0" column="1">
        <widget class="DataComboBox" name="cbDefaultCategory">
         <property name="toolTip">
-         <string>Sets the sorting category on each selected item.</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="3">
-       <widget class="QLineEdit" name="leDefault">
-        <property name="toolTip">
-         <string>&lt;p&gt;Set the default value on selected item(s).&lt;/p&gt;
-&lt;p&gt;To clear the default value, enter two single or double quotes (&lt;tt&gt;''&lt;/tt&gt; or &lt;tt&gt;&amp;quot;&amp;quot;&lt;/tt&gt;).&lt;/p&gt;</string>
-        </property>
-        <property name="clearButtonEnabled">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QLineEdit" name="leIdPrefix">
-        <property name="toolTip">
-         <string>&lt;p&gt;Prepends the prefix to the ID of each selected item.&lt;/p&gt;
-&lt;p&gt;To remove a prefix (any string at the beginning of an ID), start the value here with a exclamation mark (&lt;tt&gt;!&lt;/tt&gt;). For example: &lt;tt&gt;!MyPrefix_&lt;/tt&gt;&lt;/p&gt;</string>
-        </property>
-        <property name="clearButtonEnabled">
-         <bool>true</bool>
+         <string>&lt;p&gt;Sets the plugin display category on each selected item.&lt;/p&gt;</string>
         </property>
        </widget>
       </item>
       <item row="1" column="2">
-       <widget class="QLabel" name="label_4">
+       <widget class="BuddyLabel" name="label_4">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="text">
          <string>Default Value</string>
         </property>
@@ -168,7 +120,7 @@
          <number>0</number>
         </property>
         <item>
-         <widget class="QLabel" name="label_7">
+         <widget class="BuddyLabel" name="label_7">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
             <horstretch>0</horstretch>
@@ -177,6 +129,9 @@
           </property>
           <property name="text">
            <string>In</string>
+          </property>
+          <property name="buddy">
+           <cstring>cbReplCol</cstring>
           </property>
          </widget>
         </item>
@@ -194,20 +149,20 @@
          </widget>
         </item>
         <item>
-         <widget class="QLabel" name="label_8">
+         <widget class="DataComboBox" name="cvReplType">
           <property name="sizePolicy">
-           <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+           <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
-          <property name="text">
-           <string>replace</string>
+          <property name="toolTip">
+           <string>Select the syntax for search/replace, exact match or regular expression.</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="WASimUiNS::DeletableItemsComboBox" name="cbReplWhat">
+         <widget class="DeletableItemsComboBox" name="cbReplWhat">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
             <horstretch>0</horstretch>
@@ -221,7 +176,8 @@
            </size>
           </property>
           <property name="toolTip">
-           <string>&lt;p&gt;What to replace. The comparison is case-sensitive. You may use regular expression syntax here.&lt;/p&gt;&lt;p&gt;Press Enter when done to save your entry for later selection. Saved items can be removed by right-clicking on them while the list is open.&lt;/p&gt;</string>
+           <string>&lt;p&gt;What to replace. The comparison is case-sensitive. Select &quot;Replace Regex&quot; in the preceeding option to use regular expression syntax here and backreferences in the replacement value.&lt;/p&gt;
+&lt;p&gt;Press Enter when done to save your entry for later selection. Saved items can be removed by right-clicking on them while the list is open.&lt;/p&gt;</string>
           </property>
           <property name="insertPolicy">
            <enum>QComboBox::InsertAlphabetically</enum>
@@ -232,7 +188,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QLabel" name="label_9">
+         <widget class="BuddyLabel" name="label_9">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
             <horstretch>0</horstretch>
@@ -242,10 +198,13 @@
           <property name="text">
            <string>with</string>
           </property>
+          <property name="buddy">
+           <cstring>cbReplWith</cstring>
+          </property>
          </widget>
         </item>
         <item>
-         <widget class="WASimUiNS::DeletableItemsComboBox" name="cbReplWith">
+         <widget class="DeletableItemsComboBox" name="cbReplWith">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
             <horstretch>0</horstretch>
@@ -259,7 +218,8 @@
            </size>
           </property>
           <property name="toolTip">
-           <string>&lt;p&gt;Replacement string. Use backslashes (&lt;tt&gt;&amp;#92;&lt;/tt&gt;) for regular expression capture references, for example: &lt;tt&quot;&gt;&amp;#92;1&lt;/tt&gt; for first capture group.&lt;/p&gt;&lt;p&gt;Press Enter when done to save your entry for later selection. Saved items can be removed by right-clicking on them while the list is open.&lt;/p&gt;</string>
+           <string>&lt;p&gt;Replacement string. Use backslashes (&lt;tt&gt;&amp;#92;&lt;/tt&gt;) for regular expression capture references, for example: &lt;tt&quot;&gt;&amp;#92;1&lt;/tt&gt; for first capture group.&lt;/p&gt;
+&lt;p&gt;Press Enter when done to save your entry for later selection. Saved items can be removed by right-clicking on them while the list is open.&lt;/p&gt;</string>
           </property>
           <property name="insertPolicy">
            <enum>QComboBox::InsertAlphabetically</enum>
@@ -271,50 +231,131 @@
         </item>
        </layout>
       </item>
+      <item row="1" column="0">
+       <widget class="BuddyLabel" name="label_2">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>ID Prefix</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <widget class="BuddyLabel" name="label_3">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Format</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="BuddyLabel" name="label">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Category</string>
+        </property>
+        <property name="buddy">
+         <cstring>cbDefaultCategory</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="DeletableItemsComboBox" name="cbIdPrefix">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>100</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="toolTip">
+         <string>&lt;p&gt;Prepends the prefix to the ID of each selected item.&lt;/p&gt;
+&lt;p&gt;To remove a prefix (any string at the beginning of an ID), start the value here with a exclamation mark (&lt;tt&gt;!&lt;/tt&gt;). For example: &lt;tt&gt;!MyPrefix_&lt;/tt&gt;&lt;/p&gt;
+&lt;p&gt;Press Enter when done to save your entry for later selection. Saved items can be removed by right-clicking on them while the list is open.&lt;/p&gt;</string>
+        </property>
+        <property name="insertPolicy">
+         <enum>QComboBox::InsertAlphabetically</enum>
+        </property>
+        <property name="sizeAdjustPolicy">
+         <enum>QComboBox::AdjustToContents</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="3">
+       <widget class="DeletableItemsComboBox" name="cbFormat">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>100</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="toolTip">
+         <string>&lt;p&gt;Set the formatting string on selected item(s).&lt;/p&gt;
+&lt;p&gt;To set the formatting to an empty value, enter two single or double quotes (&lt;tt&gt;''&lt;/tt&gt; or &lt;tt&gt;&amp;quot;&amp;quot;&lt;/tt&gt;).&lt;/p&gt;
+&lt;p&gt;Press Enter when done to save your entry for later selection. Saved items can be removed by right-clicking on them while the list is open.&lt;/p&gt;</string>
+        </property>
+        <property name="insertPolicy">
+         <enum>QComboBox::InsertAlphabetically</enum>
+        </property>
+        <property name="sizeAdjustPolicy">
+         <enum>QComboBox::AdjustToContents</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="3">
+       <widget class="DeletableItemsComboBox" name="cbDefault">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>100</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="toolTip">
+         <string>&lt;p&gt;Set the default value on selected item(s).&lt;/p&gt;
+&lt;p&gt;To clear the default value, enter two single or double quotes (&lt;tt&gt;''&lt;/tt&gt; or &lt;tt&gt;&amp;quot;&amp;quot;&lt;/tt&gt;).&lt;/p&gt;
+&lt;p&gt;Press Enter when done to save your entry for later selection. Saved items can be removed by right-clicking on them while the list is open.&lt;/p&gt;</string>
+        </property>
+        <property name="insertPolicy">
+         <enum>QComboBox::InsertAlphabetically</enum>
+        </property>
+        <property name="sizeAdjustPolicy">
+         <enum>QComboBox::AdjustToContents</enum>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
-   </item>
-   <item row="1" column="1">
-    <widget class="QLabel" name="label_5">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="font">
-      <font>
-       <family>Segoe UI</family>
-      </font>
-     </property>
-     <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The produced INI file can be used directly in the plugin as a &amp;quot;Variables Definition&amp;quot; file to provide custom states. See the wiki article &lt;a href=&quot;https://github.com/mpaperno/MSFSTouchPortalPlugin/wiki/Using-Custom-States-and-Simulator-Variables&quot;&gt;Using Custom States and Simulator Variables&lt;/a&gt; for more information.&lt;/p&gt;&lt;p&gt;The &lt;i&gt;Category&lt;/i&gt;, &lt;i&gt;Export ID&lt;/i&gt;, &lt;i&gt;Display Name&lt;/i&gt;, &lt;i&gt;Default&lt;/i&gt;, and &lt;i&gt;Format&lt;/i&gt; columns can be edited by clicking on the respective field in the table. Apply changes in bulk to selected table row(s) using the form on the left (hover over form fields for more details). &lt;span style=&quot; font-weight:600;&quot;&gt;Note&lt;/span&gt;: there is no way to undo bulk edits.&lt;/p&gt;&lt;p&gt;The records will be exported in the same order as in the table below (CTRL-click headings to sort by multiple columns).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-     </property>
-     <property name="textFormat">
-      <enum>Qt::AutoText</enum>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-     </property>
-     <property name="wordWrap">
-      <bool>true</bool>
-     </property>
-     <property name="margin">
-      <number>10</number>
-     </property>
-     <property name="indent">
-      <number>-1</number>
-     </property>
-     <property name="openExternalLinks">
-      <bool>true</bool>
-     </property>
-     <property name="textInteractionFlags">
-      <set>Qt::LinksAccessibleByMouse</set>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="0" colspan="3">
-    <widget class="WASimUiNS::RequestsTableView" name="tableView"/>
    </item>
    <item row="3" column="0" colspan="3">
     <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -383,6 +424,48 @@
      </property>
     </widget>
    </item>
+   <item row="2" column="0" colspan="2">
+    <widget class="WASimUiNS::RequestsTableView" name="tableView"/>
+   </item>
+   <item row="1" column="1">
+    <widget class="QLabel" name="label_5">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="font">
+      <font>
+       <family>Segoe UI</family>
+      </font>
+     </property>
+     <property name="text">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The produced INI file can be used directly in the plugin as a &amp;quot;Variables Definition&amp;quot; file to provide custom states. See the wiki article &lt;a href=&quot;https://github.com/mpaperno/MSFSTouchPortalPlugin/wiki/Using-Custom-States-and-Simulator-Variables&quot;&gt;Using Custom States and Simulator Variables&lt;/a&gt; for more information.&lt;/p&gt;&lt;p&gt;The &lt;i&gt;Category&lt;/i&gt;, &lt;i&gt;Export ID&lt;/i&gt;, &lt;i&gt;Display Name&lt;/i&gt;, &lt;i&gt;Default&lt;/i&gt;, and &lt;i&gt;Format&lt;/i&gt; columns can be edited by clicking on the respective field in the table. Apply changes in bulk to selected table row(s) using the form on the left (hover over form fields for more details). &lt;span style=&quot; font-weight:600;&quot;&gt;Note&lt;/span&gt;: there is no way to undo bulk edits.&lt;/p&gt;&lt;p&gt;The records will be exported in the same order as in the table below (CTRL-click headings to sort by multiple columns).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="textFormat">
+      <enum>Qt::AutoText</enum>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+     <property name="margin">
+      <number>10</number>
+     </property>
+     <property name="indent">
+      <number>-1</number>
+     </property>
+     <property name="openExternalLinks">
+      <bool>true</bool>
+     </property>
+     <property name="textInteractionFlags">
+      <set>Qt::LinksAccessibleByMouse</set>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
@@ -393,9 +476,9 @@
    <header>ActionPushButton.h</header>
   </customwidget>
   <customwidget>
-   <class>WASimUiNS::DeletableItemsComboBox</class>
+   <class>DeletableItemsComboBox</class>
    <extends>QComboBox</extends>
-   <header>Widgets.h</header>
+   <header>DeletableItemsComboBox.h</header>
   </customwidget>
   <customwidget>
    <class>WASimUiNS::RequestsTableView</class>
@@ -403,11 +486,33 @@
    <header>RequestsTableView.h</header>
   </customwidget>
   <customwidget>
+   <class>BuddyLabel</class>
+   <extends>QLabel</extends>
+   <header>BuddyLabel.h</header>
+  </customwidget>
+  <customwidget>
    <class>DataComboBox</class>
    <extends>QComboBox</extends>
    <header>DataComboBox.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>pbCancel</tabstop>
+  <tabstop>pbExportSel</tabstop>
+  <tabstop>pbExportAll</tabstop>
+  <tabstop>cbDefaultCategory</tabstop>
+  <tabstop>cbFormat</tabstop>
+  <tabstop>cbIdPrefix</tabstop>
+  <tabstop>cbDefault</tabstop>
+  <tabstop>cbReplCol</tabstop>
+  <tabstop>cvReplType</tabstop>
+  <tabstop>cbReplWhat</tabstop>
+  <tabstop>cbReplWith</tabstop>
+  <tabstop>pbClearValues</tabstop>
+  <tabstop>pbRegen</tabstop>
+  <tabstop>pbSetValues</tabstop>
+  <tabstop>tableView</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

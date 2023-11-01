@@ -31,9 +31,9 @@ using namespace WASimUiNS;
 static bool editFormEmpty(const Ui::RequestsExport ui)
 {
 	return ui.cbDefaultCategory->currentText().isEmpty() &&
-		ui.leIdPrefix->text().isEmpty() &&
-		ui.leFormat->text().isEmpty() &&
-		ui.leDefault->text().isEmpty() &&
+		ui.cbIdPrefix->currentText().isEmpty() &&
+		ui.cbFormat->currentText().isEmpty() &&
+		ui.cbDefault->currentText().isEmpty() &&
 		(ui.cbReplWhat->currentText().isEmpty() || ui.cbReplCol->currentData().toInt() < 0);
 }
 
@@ -62,11 +62,17 @@ RequestsExportWidget::RequestsExportWidget(RequestsModel *model, QWidget *parent
 	const auto &cats = RequestsFormat::categoriesList();
 	ui.cbDefaultCategory->addItems(cats.values(), cats.keys());
 
+	ui.cbIdPrefix->setClearButtonEnabled();
+	ui.cbFormat->setClearButtonEnabled();
+	ui.cbDefault->setClearButtonEnabled();
+
 	ui.cbReplCol->addItem("", -1);
 	for (int i = RequestsModel::COL_FIRST_META; i <= RequestsModel::COL_LAST_META; ++i)
 		if (i != RequestsModel::COL_META_CAT)
 			ui.cbReplCol->addItem(m_model->columnNames[i], i);
 
+	ui.cvReplType->addItem(tr("Replace"), 0);
+	ui.cvReplType->addItem(tr("Repl. Regex"), 1);
 	ui.cbReplWhat->setPlaceholderText(tr("Search for..."));
 	ui.cbReplWhat->setClearButtonEnabled();
 	ui.cbReplWith->setPlaceholderText(tr("Replace with..."));
@@ -107,18 +113,16 @@ RequestsExportWidget::RequestsExportWidget(RequestsModel *model, QWidget *parent
 	//ui.pbRegen->setHidden(true);
 
 	addAction(updateMenu->menuAction());
-	addAction(ui.tableView->columnToggleMenuAction());
-	addAction(ui.tableView->fontSizeMenuAction());
+	addAction(ui.tableView->actionsMenu(this)->menuAction());
 
 	connect(ui.cbDefaultCategory, &DataComboBox::currentDataChanged, this, [&]() { toggleEditFormBtn(ui); });
-	connect(ui.leIdPrefix, &QLineEdit::textChanged, this, [&]() { toggleEditFormBtn(ui); });
-	connect(ui.leFormat, &QLineEdit::textChanged, this, [&]() { toggleEditFormBtn(ui); });
-	connect(ui.leDefault, &QLineEdit::textChanged, this, [&]() { toggleEditFormBtn(ui); });
+	connect(ui.cbIdPrefix, &QComboBox::currentTextChanged, this, [&]() { toggleEditFormBtn(ui); });
+	connect(ui.cbFormat, &QComboBox::currentTextChanged, this, [&]() { toggleEditFormBtn(ui); });
+	connect(ui.cbDefault, &QComboBox::currentTextChanged, this, [&]() { toggleEditFormBtn(ui); });
 	connect(ui.cbReplCol, &DataComboBox::currentDataChanged, this, [&]() { toggleEditFormBtn(ui); });
 	connect(ui.cbReplWhat, &QComboBox::currentTextChanged, this, [&]() { toggleEditFormBtn(ui); });
 
 	loadSettings();
-
 }
 
 void RequestsExportWidget::setModel(RequestsModel *model) {
@@ -183,9 +187,9 @@ void RequestsExportWidget::updateBulk()
 	if (list.isEmpty() || editFormEmpty(ui))
 		return;
 	QString cid = ui.cbDefaultCategory->currentData().toString();
-	QString idp = ui.leIdPrefix->text();
-	QString fmt = ui.leFormat->text();
-	QString def = ui.leDefault->text();
+	QString idp = ui.cbIdPrefix->currentText();
+	QString fmt = ui.cbFormat->currentText();
+	QString def = ui.cbDefault->currentText();
 
 	for (const QModelIndex &r : list) {
 		if (!cid.isEmpty()) {
@@ -222,7 +226,10 @@ void RequestsExportWidget::updateBulk()
 			const QModelIndex col = m_model->index(r.row(), ui.cbReplCol->currentData().toInt());
 			if (col.isValid()) {
 				QString val = m_model->data(col, Qt::EditRole).toString();
-				val.replace(QRegularExpression(ui.cbReplWhat->currentText()), ui.cbReplWith->currentText());
+				if (ui.cvReplType->currentData().toInt() == 0)
+					val.replace(ui.cbReplWhat->currentText(), ui.cbReplWith->currentText());
+				else
+					val.replace(QRegularExpression(ui.cbReplWhat->currentText()), ui.cbReplWith->currentText());
 				m_model->setData(col, val, Qt::EditRole);
 				m_model->setData(col, val, Qt::ToolTipRole);
 			}
@@ -277,9 +284,9 @@ void RequestsExportWidget::ensureDefaultValues()
 void RequestsExportWidget::clearForm()
 {
 	ui.cbDefaultCategory->setCurrentIndex(0);
-	ui.leIdPrefix->clear();
-	ui.leDefault->clear();
-	ui.leFormat->clear();
+	ui.cbIdPrefix->clear();
+	ui.cbDefault->clear();
+	ui.cbFormat->clear();
 	ui.cbReplCol->setCurrentData(-1);
 	toggleEditFormBtn(ui);
 }
@@ -290,8 +297,9 @@ void RequestsExportWidget::saveSettings() const
 	s.beginGroup(objectName());
 	s.setValue(QStringLiteral("windowGeo"), saveGeometry());
 	s.setValue(QStringLiteral("tableViewState"), ui.tableView->saveState());
-	s.setValue(ui.cbReplWhat->objectName(), ui.cbReplWhat->editedItems());
-	s.setValue(ui.cbReplWith->objectName(), ui.cbReplWhat->editedItems());
+	const QList<DeletableItemsComboBox *> editable = findChildren<DeletableItemsComboBox *>();
+	for (DeletableItemsComboBox *cb : editable)
+		s.setValue(cb->objectName(), cb->saveState());
 	s.endGroup();
 }
 
@@ -299,12 +307,10 @@ void RequestsExportWidget::loadSettings()
 {
 	QSettings s;
 	s.beginGroup(objectName());
-	if (s.contains(QStringLiteral("windowGeo")))
-		restoreGeometry(s.value(QStringLiteral("windowGeo")).toByteArray());
+	restoreGeometry(s.value(QStringLiteral("windowGeo")).toByteArray());
 	ui.tableView->restoreState(s.value(QStringLiteral("tableViewState")).toByteArray());
-	if (s.contains(ui.cbReplWhat->objectName()))
-		ui.cbReplWhat->insertEditedItems(s.value(ui.cbReplWhat->objectName()).toStringList());
-	if (s.contains(ui.cbReplWith->objectName()))
-		ui.cbReplWith->insertEditedItems(s.value(ui.cbReplWith->objectName()).toStringList());
+	const QList<DeletableItemsComboBox *> editable = findChildren<DeletableItemsComboBox *>();
+	for (DeletableItemsComboBox *cb : editable)
+		cb->restoreState(s.value(cb->objectName()).toByteArray());
 	s.endGroup();
 }
