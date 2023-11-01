@@ -31,18 +31,23 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>PGOptimize</WholeProgramOptimization>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-DLL|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-DLL|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt_defaults.props')">
@@ -53,7 +58,7 @@
     <QtModules>core;gui;widgets</QtModules>
     <QtBuildConfig>debug</QtBuildConfig>
     <QtQMLDebugEnable>false</QtQMLDebugEnable>
-    <QtDeploy>true</QtDeploy>
+    <QtDeploy>false</QtDeploy>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="QtSettings">
     <QtInstall>5.12.12_msvc2017_64</QtInstall>
@@ -104,21 +109,21 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <CopyLocalDeploymentContent>true</CopyLocalDeploymentContent>
-    <IncludePath>$(ProjectDir)widgets;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)model;$(ProjectDir)widgets;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
     <CopyLocalDeploymentContent>true</CopyLocalDeploymentContent>
-    <IncludePath>$(ProjectDir)widgets;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)model;$(ProjectDir)widgets;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-DLL|x64'">
     <CopyLocalDeploymentContent>true</CopyLocalDeploymentContent>
     <CopyLocalProjectReference>true</CopyLocalProjectReference>
-    <IncludePath>$(ProjectDir)widgets;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)model;$(ProjectDir)widgets;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-DLL|x64'">
     <CopyLocalDeploymentContent>true</CopyLocalDeploymentContent>
     <CopyLocalProjectReference>true</CopyLocalProjectReference>
-    <IncludePath>$(ProjectDir)widgets;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)model;$(ProjectDir)widgets;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -164,6 +169,7 @@
       <WholeProgramOptimization>true</WholeProgramOptimization>
       <PreprocessorDefinitions>WSMCMND_API_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <CallingConvention>StdCall</CallingConvention>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
     </ClCompile>
     <Link />
     <Link>
@@ -272,7 +278,6 @@
     <ClCompile Include="widgets\FilterLineEdit.cpp" />
     <ClCompile Include="widgets\FilterTableHeader.cpp" />
     <ClCompile Include="LogConsole.cpp" />
-    <ClCompile Include="multisort_view\MultisortTableView.cpp" />
     <ClCompile Include="RequestsExport.cpp" />
     <ClCompile Include="WASimUI.cpp" />
     <ClCompile Include="main.cpp" />
@@ -312,11 +317,10 @@
     <QtMoc Include="widgets\DeletableItemsComboBox.h" />
     <QtMoc Include="widgets\FilterLineEdit.h" />
     <QtMoc Include="widgets\FilterTableHeader.h" />
+    <QtMoc Include="model\MultiColumnProxyModel.h" />
     <QtMoc Include="widgets\BuddyLabel.h" />
-    <ClInclude Include="multisort_view\AlphanumComparer.h" />
-    <QtMoc Include="multisort_view\AlphanumSortProxyModel.h" />
-    <ClInclude Include="multisort_view\ColumnsSorter.h" />
-    <QtMoc Include="multisort_view\MultisortTableView.h" />
+    <ClInclude Include="model\AlphanumComparer.h" />
+    <QtMoc Include="widgets\MultisortTableView.h" />
     <ClInclude Include="RequestsFormat.h" />
     <QtMoc Include="widgets\Widgets.h" />
     <QtMoc Include="RequestsModel.h" />

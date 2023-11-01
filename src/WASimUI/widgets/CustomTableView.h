@@ -24,7 +24,8 @@ and is also available at <http://www.gnu.org/licenses/>.
 #include <QTableView>
 //#include <QDebug>
 
-#include "multisort_view/MultisortTableView.h"
+#include "MultisortTableView.h"
+#include "FilterTableHeader.h"
 
 namespace WASimUiNS
 {
@@ -38,7 +39,8 @@ namespace WASimUiNS
 			: MultisortTableView(parent),
 			m_defaultFontSize{font().pointSize()},
 			m_headerToggleMenu{new QMenu(tr("Toggle table columns"), this)},
-			m_fontSizeMenu{new QMenu(tr("Adjust table font size"), this)}
+			m_fontSizeMenu{new QMenu(tr("Adjust table font size"), this)},
+			m_toggleFilterAction(new QAction(tr("Toggle column filters"), this))
 		{
 			setObjectName(QStringLiteral("CustomTableView"));
 
@@ -58,10 +60,18 @@ namespace WASimUiNS
 			verticalHeader()->setMinimumSectionSize(10);
 			adjustRowSize();
 
-			setupHeader();
+			FilterTableHeader *hdr = new FilterTableHeader(this);
+			setHorizontalHeader(hdr);
 
 			m_headerToggleMenu->setIcon(QIcon(QStringLiteral("view_column.glyph")));
 			m_fontSizeMenu->setIcon(QIcon(QStringLiteral("format_size.glyph")));
+
+			QIcon fltIcon(QStringLiteral("filter_list_off.glyph"));
+			fltIcon.addFile(QStringLiteral("filter_list.glyph"), QSize(), QIcon::Normal, QIcon::On);
+			m_toggleFilterAction->setIcon(fltIcon);
+			m_toggleFilterAction->setCheckable(true);
+			m_toggleFilterAction->setChecked(hdr->areFiltersVisible());
+			connect(m_toggleFilterAction, &QAction::toggled, this, &CustomTableView::setFiltersVisible);
 
 			QAction *plusAct = m_fontSizeMenu->addAction(QIcon("arrow_upward.glyph"), tr("Increase font size"), this, &CustomTableView::fontSizeInc);
 			plusAct->setShortcuts({ QKeySequence::ZoomIn, QKeySequence(Qt::ControlModifier | Qt::Key_Equal) });
@@ -72,29 +82,69 @@ namespace WASimUiNS
 		QHeaderView *header() const { return horizontalHeader(); }
 		QAction *columnToggleMenuAction() const { return m_headerToggleMenu->menuAction(); }
 		QAction *fontSizeMenuAction() const { return m_fontSizeMenu->menuAction(); }
+		QAction *filterToggleAction() const { return m_toggleFilterAction; }
+		QMenu *actionsMenu(QWidget *parent)
+		{
+			QMenu *menu = new QMenu(tr("Table Header Options"), parent);
+			menu->setIcon(QIcon(QStringLiteral("table_rows.glyph")));
+			menu->addAction(filterToggleAction());
+			menu->addSeparator();
+			menu->addAction(columnToggleMenuAction());
+			menu->addSeparator();
+			menu->addAction(fontSizeMenuAction());
+			return menu;
+		}
+
+		bool areFiltersVisible() const {
+			if (FilterTableHeader *fth = qobject_cast<FilterTableHeader*>(header()))
+				return fth->areFiltersVisible();
+			return false;
+		}
 
 		QByteArray saveState() const {
 			QByteArray state;
 			QDataStream ds(&state, QIODevice::WriteOnly);
 			ds << header()->saveState();
 			ds << font().pointSize();
+			ds << areFiltersVisible();
 			return state;
 		}
 
 	public Q_SLOTS:
-		void setModel(QAbstractItemModel *model)
+		void setModel(QAbstractItemModel *model) override
 		{
 			MultisortTableView::setModel(model);
 			buildHeaderActions();
 		}
 
-		void setHorizontalHeader(QHeaderView *hdr)
+		void setHorizontalHeader(QHeaderView *hdr) override
 		{
 			MultisortTableView::setHorizontalHeader(hdr);
 			setupHeader();
 		}
 
 		void moveColumn(int from, int to) const { horizontalHeader()->moveSection(from, to); }
+
+		void setFiltersVisible(bool en = true) {
+			if (FilterTableHeader *fth = qobject_cast<FilterTableHeader*>(header()))
+				fth->setFiltersVisible(en);
+			m_toggleFilterAction->setChecked(en);
+		}
+
+		void setFilterFocus(int column) {
+			if (FilterTableHeader *fth = qobject_cast<FilterTableHeader*>(header()))
+				fth->setFocusColumn(column);
+		}
+
+		void setFilterText(int column, const QString& value){
+			if (FilterTableHeader *fth = qobject_cast<FilterTableHeader*>(header()))
+				fth->setFilter(column, value);
+		}
+
+		void clearFilters() {
+			if (FilterTableHeader *fth = qobject_cast<FilterTableHeader*>(header()))
+				fth->clearFilters();
+		}
 
 		void setFontSize(int pointSize) {
 			QFont f = font();
@@ -129,6 +179,7 @@ namespace WASimUiNS
 
 			QByteArray hdrState;
 			int fontSize = m_defaultFontSize;
+			bool fltVis = areFiltersVisible();
 			QHeaderView *hdr = horizontalHeader();
 
 			QDataStream ds(state);
@@ -136,6 +187,8 @@ namespace WASimUiNS
 				ds >> hdrState;
 				if (!ds.atEnd())
 					ds >> fontSize;
+				if (!ds.atEnd())
+					ds >> fltVis;
 			}
 			else {
 				hdrState = state;
@@ -143,12 +196,17 @@ namespace WASimUiNS
 
 			setFontSize(fontSize);
 			hdr->restoreState(hdrState);
+			setFiltersVisible(fltVis);
 
 			for (int i = 0; i < model()->columnCount() && i < hdr->actions().length(); ++i)
 				hdr->actions().at(i)->setChecked(!hdr->isSectionHidden(i));
-			hdr->setSortIndicatorShown(false);
+			hdr->setSortIndicatorShown(false);      // in case it was saved as "shown" for some reason
+			setSortingEnabled(isSortingEnabled());  // update sort indicator
 			return true;
 		}
+
+	Q_SIGNALS:
+		void filterChanged(int column, QString value);
 
 	private:
 
@@ -159,7 +217,6 @@ namespace WASimUiNS
 			hdr->setMinimumSectionSize(20);
 			hdr->setDefaultSectionSize(80);
 			hdr->setHighlightSections(false);
-			hdr->setSortIndicatorShown(false);
 			hdr->setStretchLastSection(true);
 			hdr->setSectionsMovable(true);
 			hdr->setSectionResizeMode(QHeaderView::Interactive);
@@ -178,6 +235,8 @@ namespace WASimUiNS
 			hdr->setFont(f);
 
 			connect(hdr, &QHeaderView::sectionCountChanged, this, &CustomTableView::onSectionCountChanged, Qt::QueuedConnection);
+			if (FilterTableHeader *fth = qobject_cast<FilterTableHeader*>(hdr))
+				connect(fth, &FilterTableHeader::filterChanged, this, &CustomTableView::setDisplayRoleStringFilter);
 		}
 
 		void onSectionCountChanged(int oldCnt, int newCnt)
@@ -211,18 +270,25 @@ namespace WASimUiNS
 				return;
 
 			QHeaderView *hdr = horizontalHeader();
+			hdr->removeAction(m_toggleFilterAction);
+
 			for (int i=0; i < model()->columnCount(); ++i) {
-				QAction *act = m_headerToggleMenu->addAction(model()->headerData(i, Qt::Horizontal).toString(), this, &CustomTableView::onHeaderToggled);
+				QAction *act = m_headerToggleMenu->addAction(model()->headerData(i, Qt::Horizontal, Qt::EditRole).toString(), this, &CustomTableView::onHeaderToggled);
 				act->setCheckable(true);
 				act->setChecked(!hdr->isSectionHidden(i));
 				act->setProperty("col", i);
 			}
 			hdr->addActions(m_headerToggleMenu->actions());
+			hdr->addAction(m_toggleFilterAction);
+
+			if (FilterTableHeader *fth = qobject_cast<FilterTableHeader*>(hdr))
+				fth->generateFilters(model()->columnCount());
 		}
 
 		int m_defaultFontSize;
 		QMenu *m_headerToggleMenu;
 		QMenu *m_fontSizeMenu;
+		QAction *m_toggleFilterAction;
 	};
 
 }

@@ -29,33 +29,36 @@ class FilterLineEdit;
 
 class FilterTableHeader : public QHeaderView
 {
-    Q_OBJECT
+		Q_OBJECT
 
 public:
-    explicit FilterTableHeader(QTableView* parent = nullptr);
-    QSize sizeHint() const override;
-    bool hasFilters() const {return (filterWidgets.size() > 0);}
-    QString filterValue(int column) const;
+		explicit FilterTableHeader(QTableView* parent = nullptr);
+		QSize sizeHint() const override;
+		bool hasFilters() const { return (filterWidgets.size() > 0); }
+		bool areFiltersVisible() const { return m_filtersVisible; }
+		QString filterValue(int column) const;
 
-public slots:
-    void generateFilters(int number);
-    void adjustPositions();
-    void clearFilters();
-    void setFilter(int column, const QString& value);
+	public Q_SLOTS:
+		void generateFilters(int number);
+		void adjustPositions();
+		void clearFilters();
+		void setFilter(int column, const QString& value);
 		void setFocusColumn(int column);
+		void setFiltersVisible(bool visible = true);
 
-signals:
-    void filterChanged(int column, QString value);
-    void filterFocused();
+	Q_SIGNALS:
+		void filterChanged(int column, QString value);
+		void filterFocused();
 
-protected:
-    void updateGeometries() override;
+	protected:
+		void updateGeometries() override;
 
-private slots:
-    void inputChanged(int col, const QString& new_value);
+	private Q_SLOTS:
+		void inputChanged(int col, const QString& new_value);
 
-private:
-    std::vector<FilterLineEdit*> filterWidgets;
+	private:
+		std::vector<FilterLineEdit*> filterWidgets {};
+		bool m_filtersVisible = false;
 };
 
 #endif
