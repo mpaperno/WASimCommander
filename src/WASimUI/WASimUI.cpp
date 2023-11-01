@@ -101,6 +101,13 @@ public:
 		client->setCommandResultCallback(&WASimUI::commandResultReady, q);
 		client->setDataCallback(&WASimUI::dataResultReady, q);
 		client->setListResultsCallback(&WASimUI::listResults, q);
+
+		// Connect our own signals for client callback handling in a thread-safe manner, marshaling back to GUI thread as needed.
+		// The "signal" methods are "emitted" by the Client as callbacks, registered in Private::setupClient().
+		QObject::connect(q, &WASimUI::clientEvent, q, &WASimUI::onClientEvent, Qt::QueuedConnection);
+		QObject::connect(q, &WASimUI::listResults, q, &WASimUI::onListResults, Qt::QueuedConnection);
+		// Data updates can go right to the requests model.
+		QObject::connect(q, &WASimUI::dataResultReady, reqModel, &RequestsModel::setRequestValue, Qt::QueuedConnection);
 	}
 
 	bool isConnected() const { return client->isConnected(); }
@@ -514,7 +521,13 @@ public:
 			return;
 
 		if (reqExportWidget) {
-			reqExportWidget->raise();
+			if (reqExportWidget->isMinimized()) {
+				reqExportWidget->showNormal();
+			}
+			else {
+				reqExportWidget->raise();
+				reqExportWidget->activateWindow();
+			}
 			return;
 		}
 
@@ -701,7 +714,7 @@ public:
 		QSettings set;
 		set.setValue(QStringLiteral("mainWindowGeo"), q->saveGeometry());
 		set.setValue(QStringLiteral("mainWindowState"), q->saveState());
-		set.setValue(QStringLiteral("eventsViewHeaderState"), ui->eventsView->horizontalHeader()->saveState());
+		set.setValue(QStringLiteral("eventsViewState"), ui->eventsView->saveState());
 		set.setValue(QStringLiteral("requestsViewState"), ui->requestsView->saveState());
 		ui->wLogWindow->saveSettings();
 
@@ -718,7 +731,7 @@ public:
 		set.beginGroup(QStringLiteral("EditableSelectors"));
 		const QList<DeletableItemsComboBox *> editable = q->findChildren<DeletableItemsComboBox *>();
 		for (DeletableItemsComboBox *cb : editable)
-			set.setValue(cb->objectName(), cb->editedItems());
+			set.setValue(cb->objectName(), cb->saveState());
 		set.endGroup();
 
 		// Variables form
@@ -738,7 +751,7 @@ public:
 		QSettings set;
 		q->restoreGeometry(set.value(QStringLiteral("mainWindowGeo")).toByteArray());
 		q->restoreState(set.value(QStringLiteral("mainWindowState")).toByteArray());
-		ui->eventsView->horizontalHeader()->restoreState(set.value(QStringLiteral("eventsViewHeaderState")).toByteArray());
+		ui->eventsView->restoreState(set.value(QStringLiteral("eventsViewState")).toByteArray());
 		ui->requestsView->restoreState(set.value(QStringLiteral("requestsViewState")).toByteArray());
 		ui->wLogWindow->loadSettings();
 
@@ -758,14 +771,11 @@ public:
 		set.beginGroup(QStringLiteral("EditableSelectors"));
 		const QList<DeletableItemsComboBox *> editable = q->findChildren<DeletableItemsComboBox *>();
 		for (DeletableItemsComboBox *cb : editable) {
-			if (set.contains(cb->objectName())) {
-				QStringList val = set.value(cb->objectName()).toStringList();
-				if (val.isEmpty())
-					continue;
-				if (cb->insertPolicy() != QComboBox::InsertAlphabetically)
-					std::sort(val.begin(), val.end());
-				cb->insertEditedItems(val);
-			}
+			// check for old version settings format
+			if (set.value(cb->objectName()).canConvert<QStringList>())
+				cb->insertEditedItems(set.value(cb->objectName()).toStringList());
+			else
+				cb->restoreState(set.value(cb->objectName()).toByteArray());
 		}
 		set.endGroup();
 
@@ -792,22 +802,22 @@ public:
 #define GLYPH_STR(ICN)   QStringLiteral(##ICN ".glyph")
 #define GLYPH_ICON(ICN)  QIcon(GLYPH_STR(ICN))
 
-#define MAKE_ACTION_NC(ACT, TTL, ICN, BTN, W, TT) \
-	QAction *ACT = new QAction(GLYPH_ICON(ICN), TTL, this);  \
-	ACT->setAutoRepeat(false); ACT->setToolTip(TT); ui.##BTN->setDefaultAction(ACT); ui.##W->addAction(ACT)
+#define MAKE_ACTION_NW(ACT, TTL, ICN, TT)  QAction *ACT = new QAction(GLYPH_ICON(ICN), TTL, this); ACT->setAutoRepeat(false); ACT->setToolTip(TT)
+#define MAKE_ACTION_NB(ACT, TTL, ICN, W, TT)        MAKE_ACTION_NW(ACT, TTL, ICN, TT); ui.##W->addAction(ACT)
+#define MAKE_ACTION_NC(ACT, TTL, ICN, BTN, W, TT)   MAKE_ACTION_NB(ACT, TTL, ICN, W, TT); ui.##BTN->setDefaultAction(ACT)
 
-#define MAKE_ACTION_CONN(ACT, M)   connect(ACT, &QAction::triggered, this, [this](bool chk) { d->##M; })
-#define MAKE_ACTION_SCUT(ACT, KS)  ACT->setShortcut(KS); ACT->setShortcutContext(Qt::WidgetWithChildrenShortcut)
-#define MAKE_ACTION_ITXT(ACT, T)   ACT->setIconText(" " + T)
+#define MAKE_ACTION_CONN(ACT, M)    connect(ACT, &QAction::triggered, this, [this](bool chk) { d->##M; })
+#define MAKE_ACTION_SCUT(ACT, KS)   ACT->setShortcut(KS); ACT->setShortcutContext(Qt::WidgetWithChildrenShortcut)
+#define MAKE_ACTION_ITXT(ACT, T)    ACT->setIconText(" " + T)
 
-#define MAKE_ACTION(ACT, TTL, ICN, BTN, W, M, TT)  MAKE_ACTION_NC(ACT, TTL, ICN, BTN, W, TT); MAKE_ACTION_CONN(ACT, M)
-
-#define MAKE_ACTION_D(ACT, TTL, ICN, BTN, W, M, TT)                 MAKE_ACTION(ACT, TTL, ICN, BTN, W, M, TT); ACT->setDisabled(true)
-#define MAKE_ACTION_SC(ACT, TTL, ICN, BTN, W, M, TT, KS)            MAKE_ACTION(ACT, TTL, ICN, BTN, W, M, TT); MAKE_ACTION_SCUT(ACT, KS)
-#define MAKE_ACTION_SC_D(ACT, TTL, ICN, BTN, W, M, TT, KS)          MAKE_ACTION_SC(ACT, TTL, ICN, BTN, W, M, TT, KS); ACT->setDisabled(true)
-#define MAKE_ACTION_PB(ACT, TTL, IT, ICN, BTN, W, M, TT, KS)        MAKE_ACTION_SC(ACT, TTL, ICN, BTN, W, M, TT, KS); MAKE_ACTION_ITXT(ACT, IT)
-#define MAKE_ACTION_PB_D(ACT, TTL, IT, ICN, BTN, W, M, TT, KS)      MAKE_ACTION_SC_D(ACT, TTL, ICN, BTN, W, M, TT, KS); MAKE_ACTION_ITXT(ACT, IT)
-#define MAKE_ACTION_PB_NC(ACT, TTL, IT, ICN, BTN, W, TT)            MAKE_ACTION_NC(ACT, TTL, ICN, BTN, W, TT); MAKE_ACTION_ITXT(ACT, IT)
+#define MAKE_ACTION(ACT, TTL, ICN, BTN, W, M, TT)                MAKE_ACTION_NC(ACT, TTL, ICN, BTN, W, TT); MAKE_ACTION_CONN(ACT, M)
+#define MAKE_ACTION_D(ACT, TTL, ICN, BTN, W, M, TT)              MAKE_ACTION(ACT, TTL, ICN, BTN, W, M, TT); ACT->setDisabled(true)
+#define MAKE_ACTION_SC(ACT, TTL, ICN, BTN, W, M, TT, KS)         MAKE_ACTION(ACT, TTL, ICN, BTN, W, M, TT); MAKE_ACTION_SCUT(ACT, KS)
+#define MAKE_ACTION_SC_D(ACT, TTL, ICN, BTN, W, M, TT, KS)       MAKE_ACTION_SC(ACT, TTL, ICN, BTN, W, M, TT, KS); ACT->setDisabled(true)
+#define MAKE_ACTION_PB(ACT, TTL, IT, ICN, BTN, W, M, TT, KS)     MAKE_ACTION_SC(ACT, TTL, ICN, BTN, W, M, TT, KS); MAKE_ACTION_ITXT(ACT, IT)
+#define MAKE_ACTION_PB_D(ACT, TTL, IT, ICN, BTN, W, M, TT, KS)   MAKE_ACTION_SC_D(ACT, TTL, ICN, BTN, W, M, TT, KS); MAKE_ACTION_ITXT(ACT, IT)
+#define MAKE_ACTION_PB_NC(ACT, TTL, IT, ICN, BTN, W, TT)         MAKE_ACTION_NC(ACT, TTL, ICN, BTN, W, TT); MAKE_ACTION_ITXT(ACT, IT)
+#define MAKE_ACTION_NW_SC(ACT, TTL, IT, ICN, M, TT, KS)          MAKE_ACTION_NW(ACT, TTL, ICN, TT); MAKE_ACTION_CONN(ACT, M); MAKE_ACTION_ITXT(ACT, IT); MAKE_ACTION_SCUT(ACT, KS)
 // ---------------------------------
 
 WASimUI::WASimUI(QWidget *parent) :
@@ -863,12 +873,18 @@ WASimUI::WASimUI(QWidget *parent) :
 	ui.dsbDeltaEpsilon->setMaximum(FLT_MAX);
 	// maximum lengths for text edit boxes
 	ui.leCmdSData->setMaxLength(STRSZ_CMD);
-	ui.cbCalculatorCode->lineEdit()->setMaxLength(STRSZ_CMD);
-	ui.cbVariableName->lineEdit()->setMaxLength(STRSZ_CMD);
+	ui.cbCalculatorCode->setMaxLength(STRSZ_CMD);
+	ui.cbVariableName->setMaxLength(STRSZ_CMD);
 	ui.cbLvars->lineEdit()->setMaxLength(STRSZ_CMD);
-	ui.cbLookupName->lineEdit()->setMaxLength(STRSZ_CMD);
+	ui.cbLookupName->setMaxLength(STRSZ_CMD);
 	ui.leEventName->setMaxLength(STRSZ_ENAME);
-	ui.cbNameOrCode->lineEdit()->setMaxLength(STRSZ_REQ);
+	ui.cbNameOrCode->setMaxLength(STRSZ_REQ);
+
+	// Init the calculator editor form
+	ui.wCalcForm->setProperty("eventId", -1);
+	ui.btnUpdateEvent->setVisible(false);
+	// Connect variable selector to enable/disable relevant actions
+	connect(ui.cbCalculatorCode, &QComboBox::currentTextChanged, this, [=](const QString &txt) { d->updateCalcCodeFormState(txt); });
 
 	// Set up the Requests table view
 	ui.requestsView->setExportCategories(RequestsFormat::categoriesList());
@@ -879,6 +895,8 @@ WASimUI::WASimUI(QWidget *parent) :
 		hdr->hideSection(i);
 	// connect double click action to populate the request editor form
 	connect(ui.requestsView, &QTableView::doubleClicked, this, [this](const QModelIndex &idx) { d->populateRequestForm(idx); });
+	// Connect to table view selection model to en/disable the remove/update actions when selection changes.
+	connect(ui.requestsView->selectionModel(), &QItemSelectionModel::selectionChanged, this, [=]() { d->toggleRequestButtonsState(); });
 
 	// Set up the Events table view
 	ui.eventsView->setModel(d->eventsModel);
@@ -888,21 +906,29 @@ WASimUI::WASimUI(QWidget *parent) :
 	ui.eventsView->horizontalHeader()->resizeSection(EventsModel::COL_CODE, 140);
 	// connect double click action to populate the event editor form
 	connect(ui.eventsView, &QTableView::doubleClicked, this, [this](const QModelIndex &idx) { d->populateEventForm(idx); });
+	// Connect to table view selection model to en/disable the remove/update actions when selection changes.
+	connect(ui.eventsView->selectionModel(), &QItemSelectionModel::selectionChanged, this, [=]() { d->toggleEventButtonsState(); });
 
 	// Set up the Log table view
 	ui.wLogWindow->setClient(d->client);
 
 	// Set initial state of Variables form, Local var type is default.
-	ui.wOtherVarsForm->setVisible(false);
-	ui.wGetSetSimVarIndex->setVisible(false);
+	d->toggleSetGetVariableType();
 
-	// Init the request and calc editor forms
+	// Connect variable selector to enable/disable relevant actions
+	connect(ui.cbLvars, &QComboBox::currentTextChanged, this, [=]() { d->updateLocalVarsFormState(); });
+	connect(ui.cbVariableName, &QComboBox::currentTextChanged, this, [=]() { d->updateLocalVarsFormState(); });
+
+	// connect to variable type combo box to switch between views for local vars vs. everything else
+	connect(ui.cbGetSetVarType, &DataComboBox::currentDataChanged, this, [=](const QVariant &) {
+		d->toggleSetGetVariableType();
+		d->updateLocalVarsFormState();
+	});
+
+	// Init the request editor form
 	ui.wRequestForm->setProperty("requestId", -1);
-	ui.wCalcForm->setProperty("eventId", -1);
-
 	// Update the Data Request form UI based on default types.
 	d->toggleRequestType();
-	d->toggleRequestVariableType();
 
 	// Connect the request type radio buttons to toggle the UI.
 	connect(ui.bgrpRequestType, QOverload<int, bool>::of(&QButtonGroup::buttonToggled), this, [this](int,bool) { d->toggleRequestType(); });
@@ -926,27 +952,12 @@ WASimUI::WASimUI(QWidget *parent) :
 		ui.sbInterval->setEnabled(data.toUInt() >= +UpdatePeriod::Tick);
 	});
 
-	// connect the Data Request save/add buttons
-	MAKE_ACTION_PB(addReqAct, tr("Add Request"), tr("Add"), "add", btnAddRequest, wRequestForm, handleRequestForm(false),
-	               tr("Add new request record from current form entries."), QKeySequence(Qt::ControlModifier | Qt::Key_Return));
-	MAKE_ACTION_PB_D(saveReqAct, tr("Save Edited Request"), tr("Save"), "edit", btnUpdateRequest, wRequestForm, handleRequestForm(true),
-	               tr("Update the existing request record from current form entries."), QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_Return));
-	MAKE_ACTION_PB(updReqAct, tr("Clear Form"), tr("Clear"), "scale=.9/backspace", btnClearRequest, wRequestForm, clearRequestForm(),
-								 tr("Reset the editor form to default values."), QKeySequence(Qt::ControlModifier | Qt::Key_Backspace));
-
 	// connect to requests model row removed to check if the current editor needs to be reset, otherwise the "Save" button stays active and re-adds a deleted request.
 	connect(d->reqModel, &RequestsModel::rowsAboutToBeRemoved, this, [this](const QModelIndex &, int first, int last) {
 		const int current = d->reqModel->findRequestRow(ui.wRequestForm->property("requestId").toInt());
 		if (current >= first && current <= last)
 			d->setRequestFormId(-1);
 	});
-
-	// Connect our own signals for client callback handling in a thread-safe manner, marshaling back to GUI thread as needed.
-	// The "signal" methods are "emitted" by the Client as callbacks, registered in Private::setupClient().
-	connect(this, &WASimUI::clientEvent, this, &WASimUI::onClientEvent, Qt::QueuedConnection);
-	connect(this, &WASimUI::listResults, this, &WASimUI::onListResults, Qt::QueuedConnection);
-	// Data updates can go right to the requests model.
-	connect(this, &WASimUI::dataResultReady, d->reqModel, &RequestsModel::setRequestValue, Qt::QueuedConnection);
 
 	// Set up actions for triggering various events. Actions are typically mapped to UI elements like buttons and menu items and can be reused in multiple places.
 
@@ -981,6 +992,7 @@ WASimUI::WASimUI(QWidget *parent) :
 	pingAct->setShortcut(QKeySequence(Qt::Key_F7));
 	connect(pingAct, &QAction::triggered, this, [this]() { d->pingServer(); });
 
+	// Sub-menu for individual connection actions.
 	QMenu *connectMenu = new QMenu(tr("Connection actions"), this);
 	connectMenu->setIcon(GLYPH_ICON("settings_remote"));
 	connectMenu->addActions({ d->initAct, pingAct, d->connectAct });
@@ -998,13 +1010,7 @@ WASimUI::WASimUI(QWidget *parent) :
 	MAKE_ACTION_SC_D(copyCalcAct, tr("Copy to Data Request"), "move_to_inbox", btnCopyCalcToRequest, wCalcForm, copyCalcCodeToRequest(),
 	                 tr("Copy Calculator Code to new Data Request."), QKeySequence(Qt::ControlModifier | Qt::Key_Down));
 
-	ui.btnUpdateEvent->setVisible(false);
-	// Connect variable selector to enable/disable relevant actions
-	connect(ui.cbCalculatorCode, &QComboBox::currentTextChanged, this, [=](const QString &txt) { d->updateCalcCodeFormState(txt); });
-
 	// Variables section actions
-
-	d->toggleSetGetVariableType();
 
 	// Request Local Vars list
 	MAKE_ACTION(reloadLVarsAct, tr("Reload L.Vars"), "autorenew", btnList, wVariables, refreshLVars(), tr("Reload Local Variables."));
@@ -1022,26 +1028,23 @@ WASimUI::WASimUI(QWidget *parent) :
 	MAKE_ACTION_SC_D(copyVarAct, tr("Copy to Data Request"), "move_to_inbox", btnCopyLVarToRequest, wVariables, copyLocalVarToRequest(), tr("Copy Variable to new Data Request."),
 	                 QKeySequence(Qt::ControlModifier | Qt::Key_Down));
 
-	// Connect variable selector to enable/disable relevant actions
-	connect(ui.cbLvars, &QComboBox::currentTextChanged, this, [=]() { d->updateLocalVarsFormState(); });
-	connect(ui.cbVariableName, &QComboBox::currentTextChanged, this, [=]() { d->updateLocalVarsFormState(); });
-
-	// connect to variable type combo box to switch between views for local vars vs. everything else
-	connect(ui.cbGetSetVarType, &DataComboBox::currentDataChanged, this, [=](const QVariant &) {
-		d->toggleSetGetVariableType();
-		d->updateLocalVarsFormState();
-	});
-
-	// Other forms
-
 	// Lookup action
 	MAKE_ACTION_SC(lookupItemAct, tr("Lookup"), "search", btnVarLookup, wDataLookup, lookupItem(), tr("Query server for ID of named item (Lookup command)."), QKeySequence(Qt::ControlModifier | Qt::Key_Return));
-	// Send Key Event action
+
+	// Send Key Event Form
 	MAKE_ACTION_SC(sendKeyEventAct, tr("Send Key Event"), "send", btnKeyEventSend, wKeyEvent, sendKeyEventForm(), tr("Send the specified Key Event to the server."), QKeySequence(Qt::ControlModifier | Qt::Key_Return));
 	// Send Command action
 	MAKE_ACTION_SC(sendCmdAct, tr("Send Command"), "keyboard_command_key", btnCmdSend, wCommand, sendCommandForm(), tr("Send the selected Command to the server."), QKeySequence(Qt::ControlModifier | Qt::Key_Return));
 
-	// Requests model view actions
+	// Requests editor form and model view actions
+
+	// connect the Data Request save/add buttons
+	MAKE_ACTION_PB(addReqAct, tr("Add Request"), tr("Add"), "add", btnAddRequest, wRequestForm, handleRequestForm(false),
+	               tr("Add new request record from current form entries."), QKeySequence(Qt::ControlModifier | Qt::Key_Return));
+	MAKE_ACTION_PB_D(saveReqAct, tr("Save Edited Request"), tr("Save"), "edit", btnUpdateRequest, wRequestForm, handleRequestForm(true),
+	               tr("Update the existing request record from current form entries."), QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_Return));
+	MAKE_ACTION_PB(updReqAct, tr("Clear Form"), tr("Clear"), "scale=.9/backspace", btnClearRequest, wRequestForm, clearRequestForm(),
+	               tr("Reset the editor form to default values."), QKeySequence(Qt::ControlModifier | Qt::Key_Backspace));
 
 	// Remove selected Data Request(s) from item model/view
 	MAKE_ACTION_PB_D(removeRequestsAct, tr("Remove Selected Data Request(s)"), tr("Remove"), "fg=#c2d32e2e/delete_forever", btnReqestsRemove, wRequests, removeSelectedRequests(),
@@ -1049,9 +1052,6 @@ WASimUI::WASimUI(QWidget *parent) :
 	// Update data of selected Data Request(s) in item model/view
 	MAKE_ACTION_PB_D(updateRequestsAct, tr("Update Selected Data Request(s)"), tr("Update"), "refresh", btnReqestsUpdate, wRequests, updateSelectedRequests(),
 	                 tr("Request data update on selected Data Request(s)."), QKeySequence(Qt::ControlModifier | Qt::Key_R, QKeySequence::Refresh));
-
-	// Connect to table view selection model to en/disable the remove/update actions when selection changes.
-	connect(ui.requestsView->selectionModel(), &QItemSelectionModel::selectionChanged, this, [=]() { d->toggleRequestButtonsState(); });
 
 	// Pause/resume data updates of requests
 	MAKE_ACTION_PB_D(pauseRequestsAct, tr("Toggle Updates"), tr("Suspend"), "pause", btnReqestsPause, wRequests, pauseRequests(chk),
@@ -1088,9 +1088,9 @@ WASimUI::WASimUI(QWidget *parent) :
 		d->toggleRequestButtonsState();
 	}, Qt::QueuedConnection);
 
-	// Add column toggle and font size actions
-	ui.wRequests->addAction(ui.requestsView->columnToggleMenuAction());
-	ui.wRequests->addAction(ui.requestsView->fontSizeMenuAction());
+	// Add column toggle and font size actions to the parent widgets
+	ui.wRequestForm->addAction(ui.requestsView->actionsMenu(ui.wRequests)->menuAction());
+	ui.wRequests->addAction(ui.requestsView->actionsMenu(ui.wRequests)->menuAction());
 
 	// Registered calculator events model view actions
 
@@ -1100,8 +1100,6 @@ WASimUI::WASimUI(QWidget *parent) :
 	// Update data of selected Data Request(s) in item model/view
 	MAKE_ACTION_PB_D(updateEventsAct, tr("Transmit Selected Event(s)"), tr("Transmit"), "play_for_work", btnEventsTransmit, wEventsList, transmitSelectedEvents(),
 	                 tr("Trigger the selected Event(s)."), QKeySequence(Qt::ControlModifier | Qt::Key_T));
-	// Connect to table view selection model to en/disable the remove/update actions when selection changes.
-	connect(ui.eventsView->selectionModel(), &QItemSelectionModel::selectionChanged, this, [=]() { d->toggleEventButtonsState(); });
 
 	// Save current Events to a file
 	MAKE_ACTION_PB_D(saveEventsAct, tr("Save Events"), tr("Save"), "save", btnEventsSave, wEventsList, saveEvents(), tr("Save current Events list to file."), QKeySequence::Save);
@@ -1123,6 +1121,8 @@ WASimUI::WASimUI(QWidget *parent) :
 			loadEventsAct->setMenu(nullptr);
 		saveEventsAct->setEnabled(rows > 0);
 	}, Qt::QueuedConnection);
+	// Add column toggle and font size actions to the parent widget
+	ui.wEventsList->addAction(ui.eventsView->actionsMenu(ui.wRequests)->menuAction());
 
 	// Other UI-related actions
 

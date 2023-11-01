@@ -263,7 +263,7 @@
           <widget class="QWidget" name="wLocalVarsForm" native="true">
            <layout class="QHBoxLayout" name="horizontalLayout_5">
             <property name="spacing">
-             <number>6</number>
+             <number>4</number>
             </property>
             <property name="leftMargin">
              <number>0</number>
@@ -278,7 +278,7 @@
              <number>0</number>
             </property>
             <item>
-             <widget class="QLabel" name="lblLocalVars">
+             <widget class="BuddyLabel" name="lblLocalVars">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
                 <horstretch>0</horstretch>
@@ -294,15 +294,18 @@
               <property name="text">
                <string>List</string>
               </property>
+              <property name="buddy">
+               <cstring>cbLvars</cstring>
+              </property>
              </widget>
             </item>
             <item>
-             <widget class="QComboBox" name="cbLvars">
+             <widget class="DeletableItemsComboBox" name="cbLvars">
               <property name="focusPolicy">
                <enum>Qt::ClickFocus</enum>
               </property>
               <property name="toolTip">
-               <string>Local Variables (press Refresh button to (re)load)</string>
+               <string>&lt;p&gt;List of Local variables currently defined on the simulator (press Refresh button to (re)load)&lt;/p&gt;</string>
               </property>
               <property name="editable">
                <bool>true</bool>
@@ -335,7 +338,7 @@
           <widget class="QWidget" name="wOtherVarsForm" native="true">
            <layout class="QHBoxLayout" name="horizontalLayout_12">
             <property name="spacing">
-             <number>6</number>
+             <number>4</number>
             </property>
             <property name="leftMargin">
              <number>0</number>
@@ -350,7 +353,7 @@
              <number>0</number>
             </property>
             <item>
-             <widget class="QLabel" name="lblLocalVars_4">
+             <widget class="BuddyLabel" name="lblLocalVars_4">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
                 <horstretch>0</horstretch>
@@ -366,15 +369,21 @@
               <property name="text">
                <string>Name</string>
               </property>
+              <property name="buddy">
+               <cstring>cbVariableName</cstring>
+              </property>
              </widget>
             </item>
             <item>
-             <widget class="WASimUiNS::DeletableItemsComboBox" name="cbVariableName">
+             <widget class="DeletableItemsComboBox" name="cbVariableName">
               <property name="focusPolicy">
                <enum>Qt::ClickFocus</enum>
               </property>
               <property name="toolTip">
-               <string>Variable name</string>
+               <string>&lt;p&gt;Enter the Variable name to use for the Get/Set command.&lt;/p&gt;
+&lt;p&gt;The Simulator Variable (SimVar) completion suggestions are loaded from imported SimConnect SDK documentation.&lt;/p&gt;
+&lt;p&gt;Press enter after entering text to save it in the list for future selection.&lt;/p&gt;
+&lt;p&gt;Saved items can be removed by right-clicking on them while the list is open.&lt;/p&gt;</string>
               </property>
               <property name="editable">
                <bool>true</bool>
@@ -414,9 +423,6 @@
            <property name="focusPolicy">
             <enum>Qt::StrongFocus</enum>
            </property>
-           <property name="toolTip">
-            <string>Optional Unit Name for the value. Leave blank to use the default units of the variable.&lt;p&gt;(Save items by pressing Enter, Remove by right-clicking on them while the list is open.)&lt;/p&gt;</string>
-           </property>
            <property name="editable">
             <bool>true</bool>
            </property>
@@ -447,7 +453,7 @@
              <number>0</number>
             </property>
             <item>
-             <widget class="QLabel" name="lblIndex_2">
+             <widget class="BuddyLabel" name="lblIndex_2">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
                 <horstretch>0</horstretch>
@@ -456,6 +462,9 @@
               </property>
               <property name="text">
                <string>Idx:</string>
+              </property>
+              <property name="buddy">
+               <cstring>sbGetSetSimVarIndex</cstring>
               </property>
              </widget>
             </item>
@@ -478,7 +487,7 @@
         </layout>
        </item>
        <item row="1" column="3">
-        <widget class="QLabel" name="label_7">
+        <widget class="BuddyLabel" name="label_7">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -488,10 +497,13 @@
          <property name="text">
           <string> Value:</string>
          </property>
+         <property name="buddy">
+          <cstring>dsbSetVarValue</cstring>
+         </property>
         </widget>
        </item>
        <item row="0" column="3">
-        <widget class="QLabel" name="lblSetVarUnit">
+        <widget class="BuddyLabel" name="lblSetVarUnit">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -500,6 +512,9 @@
          </property>
          <property name="text">
           <string> Unit:</string>
+         </property>
+         <property name="buddy">
+          <cstring>cbSetVarUnitName</cstring>
          </property>
         </widget>
        </item>
@@ -566,8 +581,8 @@
        <property name="verticalSpacing">
         <number>5</number>
        </property>
-       <item row="0" column="2">
-        <widget class="QLabel" name="lblKeyEventValues">
+       <item row="0" column="4">
+        <widget class="BuddyLabel" name="lblKeyEventValues">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -577,98 +592,12 @@
          <property name="text">
           <string>Values:</string>
          </property>
-        </widget>
-       </item>
-       <item row="0" column="5">
-        <widget class="QSpinBox" name="sbKeyEvent_v3">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="toolTip">
-          <string>Integer data for third event value.</string>
-         </property>
-         <property name="minimum">
-          <number>-999999999</number>
-         </property>
-         <property name="maximum">
-          <number>999999999</number>
+         <property name="buddy">
+          <cstring>sbKeyEvent_v1</cstring>
          </property>
         </widget>
        </item>
        <item row="0" column="8">
-        <widget class="QToolButton" name="btnKeyEventSend">
-         <property name="text">
-          <string>Send</string>
-         </property>
-         <property name="toolButtonStyle">
-          <enum>Qt::ToolButtonIconOnly</enum>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="7">
-        <widget class="QSpinBox" name="sbKeyEvent_v5">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="toolTip">
-          <string>Integer data for fifth event value.</string>
-         </property>
-         <property name="minimum">
-          <number>-999999999</number>
-         </property>
-         <property name="maximum">
-          <number>999999999</number>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="WASimUiNS::DeletableItemsComboBox" name="cbKeyEvent">
-         <property name="focusPolicy">
-          <enum>Qt::ClickFocus</enum>
-         </property>
-         <property name="toolTip">
-          <string>Event ID or Name or send. Names are listed in MSFS Event IDs reference, IDs can be found using the Lookup command.</string>
-         </property>
-         <property name="editable">
-          <bool>true</bool>
-         </property>
-         <property name="maxVisibleItems">
-          <number>25</number>
-         </property>
-         <property name="insertPolicy">
-          <enum>QComboBox::InsertAtTop</enum>
-         </property>
-         <property name="placeholderText" stdset="0">
-          <string>Name or ID</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="4">
-        <widget class="QSpinBox" name="sbKeyEvent_v2">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="toolTip">
-          <string>Integer data for second event value.</string>
-         </property>
-         <property name="minimum">
-          <number>-999999999</number>
-         </property>
-         <property name="maximum">
-          <number>999999999</number>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="6">
         <widget class="QSpinBox" name="sbKeyEvent_v4">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
@@ -687,7 +616,7 @@
          </property>
         </widget>
        </item>
-       <item row="0" column="3">
+       <item row="0" column="5">
         <widget class="QSpinBox" name="sbKeyEvent_v1">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
@@ -706,8 +635,46 @@
          </property>
         </widget>
        </item>
+       <item row="0" column="9">
+        <widget class="QSpinBox" name="sbKeyEvent_v5">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="toolTip">
+          <string>Integer data for fifth event value.</string>
+         </property>
+         <property name="minimum">
+          <number>-999999999</number>
+         </property>
+         <property name="maximum">
+          <number>999999999</number>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="6">
+        <widget class="QSpinBox" name="sbKeyEvent_v2">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="toolTip">
+          <string>Integer data for second event value.</string>
+         </property>
+         <property name="minimum">
+          <number>-999999999</number>
+         </property>
+         <property name="maximum">
+          <number>999999999</number>
+         </property>
+        </widget>
+       </item>
        <item row="0" column="0">
-        <widget class="QLabel" name="lblKeyEvent">
+        <widget class="BuddyLabel" name="lblKeyEvent">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -722,6 +689,66 @@
          </property>
         </widget>
        </item>
+       <item row="0" column="7">
+        <widget class="QSpinBox" name="sbKeyEvent_v3">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="toolTip">
+          <string>Integer data for third event value.</string>
+         </property>
+         <property name="minimum">
+          <number>-999999999</number>
+         </property>
+         <property name="maximum">
+          <number>999999999</number>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="10">
+        <widget class="QToolButton" name="btnKeyEventSend">
+         <property name="text">
+          <string>Send</string>
+         </property>
+         <property name="toolButtonStyle">
+          <enum>Qt::ToolButtonIconOnly</enum>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="2">
+        <layout class="QHBoxLayout" name="horizontalLayout_17">
+         <property name="spacing">
+          <number>3</number>
+         </property>
+         <item>
+          <widget class="DeletableItemsComboBox" name="cbKeyEvent">
+           <property name="focusPolicy">
+            <enum>Qt::ClickFocus</enum>
+           </property>
+           <property name="toolTip">
+            <string>&lt;p&gt;SimConnect Key Event name or ID to send..&lt;/p&gt;
+&lt;p&gt;The completion suggestions are loaded from imported SimConnect SDK documentation.&lt;/p&gt;
+&lt;p&gt;IDs can be found using the Lookup command.&lt;/p&gt;
+&lt;p&gt;Press enter after entering text to save it in the list for future selection.&lt;/p&gt;
+&lt;p&gt;Saved items can be removed by right-clicking on them while the list is open.&lt;/p&gt;</string>
+           </property>
+           <property name="editable">
+            <bool>true</bool>
+           </property>
+           <property name="maxVisibleItems">
+            <number>25</number>
+           </property>
+           <property name="insertPolicy">
+            <enum>QComboBox::InsertAtTop</enum>
+           </property>
+           <property name="placeholderText" stdset="0">
+            <string>Name or ID</string>
+           </property>
+          </widget>
+         </item>
       </layout>
      </widget>
     </item>
@@ -753,7 +780,7 @@
         <number>4</number>
        </property>
        <item>
-        <widget class="QLabel" name="lblLookup">
+        <widget class="BuddyLabel" name="lblLookup">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -765,6 +792,9 @@
          </property>
          <property name="text">
           <string>Lookup Type:</string>
+         </property>
+         <property name="buddy">
+          <cstring>cbLookupItemType</cstring>
          </property>
         </widget>
        </item>
@@ -779,7 +809,7 @@
         </widget>
        </item>
        <item>
-        <widget class="WASimUiNS::DeletableItemsComboBox" name="cbLookupName">
+        <widget class="DeletableItemsComboBox" name="cbLookupName">
          <property name="focusPolicy">
           <enum>Qt::ClickFocus</enum>
          </property>
@@ -902,7 +932,7 @@ Submitted requests will appear in the &quot;Data Requests&quot; window. Double-c
           <number>4</number>
          </property>
          <item>
-          <widget class="QLabel" name="label_2">
+          <widget class="BuddyLabel" name="label_2">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
              <horstretch>0</horstretch>
@@ -911,6 +941,9 @@ Submitted requests will appear in the &quot;Data Requests&quot; window. Double-c
            </property>
            <property name="text">
             <string>Update On:</string>
+           </property>
+           <property name="buddy">
+            <cstring>cbPeriod</cstring>
            </property>
           </widget>
          </item>
@@ -922,7 +955,7 @@ Submitted requests will appear in the &quot;Data Requests&quot; window. Double-c
           </widget>
          </item>
          <item>
-          <widget class="QLabel" name="label_3">
+          <widget class="BuddyLabel" name="label_3">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
              <horstretch>0</horstretch>
@@ -931,6 +964,9 @@ Submitted requests will appear in the &quot;Data Requests&quot; window. Double-c
            </property>
            <property name="text">
             <string>Interval:</string>
+           </property>
+           <property name="buddy">
+            <cstring>sbInterval</cstring>
            </property>
           </widget>
          </item>
@@ -948,7 +984,7 @@ Submitted requests will appear in the &quot;Data Requests&quot; window. Double-c
           </widget>
          </item>
          <item>
-          <widget class="QLabel" name="label_4">
+          <widget class="BuddyLabel" name="label_4">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
              <horstretch>0</horstretch>
@@ -957,6 +993,9 @@ Submitted requests will appear in the &quot;Data Requests&quot; window. Double-c
            </property>
            <property name="text">
             <string>ΔΕ:</string>
+           </property>
+           <property name="buddy">
+            <cstring>dsbDeltaEpsilon</cstring>
            </property>
           </widget>
          </item>
@@ -1199,7 +1238,7 @@ Submitted requests will appear in the &quot;Data Requests&quot; window. Double-c
         </layout>
        </item>
        <item row="1" column="0" colspan="2">
-        <layout class="QHBoxLayout" name="horizontalLayout_6">
+        <layout class="QHBoxLayout" name="horizontalLayout_6" stretch="0,4,1,0,1,0">
          <property name="spacing">
           <number>6</number>
          </property>
@@ -1219,15 +1258,18 @@ Submitted requests will appear in the &quot;Data Requests&quot; window. Double-c
           <widget class="WASimUiNS::VariableTypeComboBox" name="cbVariableType"/>
          </item>
          <item>
-          <widget class="WASimUiNS::DeletableItemsComboBox" name="cbNameOrCode">
+          <widget class="DeletableItemsComboBox" name="cbNameOrCode">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
            <property name="toolTip">
-            <string>Variable Name or Calculator Code&lt;p&gt;(Save items by pressing Enter, Remove by right-clicking on them while the list is open.)&lt;/p&gt;</string>
+            <string>&lt;p&gt;Variable Name or Calculator Code for the Request.&lt;/p&gt;
+&lt;p&gt;The Simulator Variable completion suggestions are loaded from imported SimConnect SDK documentation.&lt;/p&gt;
+&lt;p&gt;Press enter after entering text to save it in the list for future selection.&lt;/p&gt;
+&lt;p&gt;Saved items can be removed by right-clicking on them while the list is open.&lt;/p&gt;</string>
            </property>
            <property name="editable">
             <bool>true</bool>
@@ -1252,7 +1294,7 @@ Submitted requests will appear in the &quot;Data Requests&quot; window. Double-c
             <number>0</number>
            </property>
            <item>
-            <widget class="QLabel" name="lblIndex">
+            <widget class="BuddyLabel" name="lblIndex">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
                <horstretch>0</horstretch>
@@ -1261,6 +1303,9 @@ Submitted requests will appear in the &quot;Data Requests&quot; window. Double-c
              </property>
              <property name="text">
               <string>Idx:</string>
+             </property>
+             <property name="buddy">
+              <cstring>sbSimVarIndex</cstring>
              </property>
             </widget>
            </item>
@@ -1278,7 +1323,7 @@ Submitted requests will appear in the &quot;Data Requests&quot; window. Double-c
             </widget>
            </item>
            <item>
-            <widget class="QLabel" name="lblUnit">
+            <widget class="BuddyLabel" name="lblUnit">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
                <horstretch>0</horstretch>
@@ -1287,6 +1332,9 @@ Submitted requests will appear in the &quot;Data Requests&quot; window. Double-c
              </property>
              <property name="text">
               <string>Unit:</string>
+             </property>
+             <property name="buddy">
+              <cstring>cbUnitName</cstring>
              </property>
             </widget>
            </item>
@@ -1297,9 +1345,6 @@ Submitted requests will appear in the &quot;Data Requests&quot; window. Double-c
                <horstretch>0</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>
-             </property>
-             <property name="toolTip">
-              <string>Optional Unit Name for Named Variables&lt;p&gt;(Save items by pressing Enter, Remove by right-clicking on them while the list is open.)&lt;/p&gt;</string>
              </property>
              <property name="editable">
               <bool>true</bool>
@@ -1317,7 +1362,7 @@ Submitted requests will appear in the &quot;Data Requests&quot; window. Double-c
             <number>0</number>
            </property>
            <item>
-            <widget class="QLabel" name="lblRequestCalcResultType">
+            <widget class="BuddyLabel" name="lblRequestCalcResultType">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
                <horstretch>0</horstretch>
@@ -1326,6 +1371,9 @@ Submitted requests will appear in the &quot;Data Requests&quot; window. Double-c
              </property>
              <property name="text">
               <string>Result:</string>
+             </property>
+             <property name="buddy">
+              <cstring>cbRequestCalcResultType</cstring>
              </property>
             </widget>
            </item>
@@ -1339,7 +1387,7 @@ Submitted requests will appear in the &quot;Data Requests&quot; window. Double-c
           </layout>
          </item>
          <item>
-          <widget class="QLabel" name="label_5">
+          <widget class="BuddyLabel" name="label_5">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
              <horstretch>0</horstretch>
@@ -1348,6 +1396,9 @@ Submitted requests will appear in the &quot;Data Requests&quot; window. Double-c
            </property>
            <property name="text">
             <string>Size:</string>
+           </property>
+           <property name="buddy">
+            <cstring>cbValueSize</cstring>
            </property>
           </widget>
          </item>
@@ -1507,6 +1558,9 @@ Submitted requests will appear in the &quot;Data Requests&quot; window. Double-c
            <property name="text">
             <string>Event</string>
            </property>
+           <property name="buddy">
+            <cstring>leEventName</cstring>
+           </property>
           </widget>
          </item>
          <item>
@@ -1541,7 +1595,7 @@ Submitted requests will appear in the &quot;Data Requests&quot; window. Double-c
         </layout>
        </item>
        <item row="0" column="0">
-        <widget class="QLabel" name="lblCalcCode">
+        <widget class="BuddyLabel" name="lblCalcCode">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -1550,6 +1604,9 @@ Submitted requests will appear in the &quot;Data Requests&quot; window. Double-c
          </property>
          <property name="text">
           <string>Code:</string>
+         </property>
+         <property name="buddy">
+          <cstring>cbCalculatorCode</cstring>
          </property>
         </widget>
        </item>
@@ -1571,7 +1628,7 @@ Submitted requests will appear in the &quot;Data Requests&quot; window. Double-c
         </widget>
        </item>
        <item row="0" column="1">
-        <widget class="WASimUiNS::DeletableItemsComboBox" name="cbCalculatorCode">
+        <widget class="DeletableItemsComboBox" name="cbCalculatorCode">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -1587,7 +1644,7 @@ Submitted requests will appear in the &quot;Data Requests&quot; window. Double-c
         </widget>
        </item>
        <item row="0" column="2">
-        <widget class="QLabel" name="lblSetVarUnit_5">
+        <widget class="BuddyLabel" name="lblSetVarUnit_5">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -1596,6 +1653,9 @@ Submitted requests will appear in the &quot;Data Requests&quot; window. Double-c
          </property>
          <property name="text">
           <string>Result:</string>
+         </property>
+         <property name="buddy">
+          <cstring>cbCalcResultType</cstring>
          </property>
         </widget>
        </item>
@@ -1630,7 +1690,7 @@ Submitted requests will appear in the &quot;Data Requests&quot; window. Double-c
         <number>3</number>
        </property>
        <item row="0" column="2">
-        <widget class="QLabel" name="lblSetVarUnit_2">
+        <widget class="BuddyLabel" name="lblSetVarUnit_2">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -1640,10 +1700,13 @@ Submitted requests will appear in the &quot;Data Requests&quot; window. Double-c
          <property name="text">
           <string>uData:</string>
          </property>
+         <property name="buddy">
+          <cstring>sbCmdUData</cstring>
+         </property>
         </widget>
        </item>
        <item row="0" column="6">
-        <widget class="QLabel" name="lblSetVarUnit_4">
+        <widget class="BuddyLabel" name="lblSetVarUnit_4">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -1652,6 +1715,9 @@ Submitted requests will appear in the &quot;Data Requests&quot; window. Double-c
          </property>
          <property name="text">
           <string>sData:</string>
+         </property>
+         <property name="buddy">
+          <cstring>leCmdSData</cstring>
          </property>
         </widget>
        </item>
@@ -1711,7 +1777,7 @@ Submitted requests will appear in the &quot;Data Requests&quot; window. Double-c
         </widget>
        </item>
        <item row="0" column="4">
-        <widget class="QLabel" name="lblSetVarUnit_3">
+        <widget class="BuddyLabel" name="lblSetVarUnit_3">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -1721,10 +1787,13 @@ Submitted requests will appear in the &quot;Data Requests&quot; window. Double-c
          <property name="text">
           <string>fData:</string>
          </property>
+         <property name="buddy">
+          <cstring>sbCmdFData</cstring>
+         </property>
         </widget>
        </item>
        <item row="0" column="0">
-        <widget class="QLabel" name="lblLookup_2">
+        <widget class="BuddyLabel" name="lblLookup_2">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -1736,6 +1805,9 @@ Submitted requests will appear in the &quot;Data Requests&quot; window. Double-c
          </property>
          <property name="text">
           <string>Command</string>
+         </property>
+         <property name="buddy">
+          <cstring>cbCommandId</cstring>
          </property>
         </widget>
        </item>
@@ -1995,7 +2067,7 @@ Submitted requests will appear in the &quot;Data Requests&quot; window. Double-c
       <number>5</number>
      </property>
      <item row="0" column="0">
-      <widget class="QTableView" name="eventsView">
+      <widget class="WASimUiNS::CustomTableView" name="eventsView">
        <property name="toolTip">
         <string>Registered Events (double click to edit)</string>
        </property>
@@ -2152,9 +2224,9 @@ Submitted requests will appear in the &quot;Data Requests&quot; window. Double-c
    <header>ActionPushButton.h</header>
   </customwidget>
   <customwidget>
-   <class>WASimUiNS::DeletableItemsComboBox</class>
+   <class>DeletableItemsComboBox</class>
    <extends>QComboBox</extends>
-   <header>Widgets.h</header>
+   <header>DeletableItemsComboBox.h</header>
   </customwidget>
   <customwidget>
    <class>WASimUiNS::CalculationTypeComboBox</class>
@@ -2202,7 +2274,75 @@ Submitted requests will appear in the &quot;Data Requests&quot; window. Double-c
    <extends>QTableView</extends>
    <header>RequestsTableView.h</header>
   </customwidget>
+  <customwidget>
+   <class>BuddyLabel</class>
+   <extends>QLabel</extends>
+   <header>BuddyLabel.h</header>
+  </customwidget>
+  <customwidget>
+   <class>WASimUiNS::CustomTableView</class>
+   <extends>QTableView</extends>
+   <header>CustomTableView.h</header>
+  </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>cbCalculatorCode</tabstop>
+  <tabstop>cbCalcResultType</tabstop>
+  <tabstop>btnCalc</tabstop>
+  <tabstop>btnCopyCalcToRequest</tabstop>
+  <tabstop>leEventName</tabstop>
+  <tabstop>btnUpdateEvent</tabstop>
+  <tabstop>btnAddEvent</tabstop>
+  <tabstop>cbGetSetVarType</tabstop>
+  <tabstop>btnList</tabstop>
+  <tabstop>btnFindSimVar</tabstop>
+  <tabstop>cbSetVarUnitName</tabstop>
+  <tabstop>sbGetSetSimVarIndex</tabstop>
+  <tabstop>btnGetVar</tabstop>
+  <tabstop>btnGetCreate</tabstop>
+  <tabstop>btnCopyLVarToRequest</tabstop>
+  <tabstop>dsbSetVarValue</tabstop>
+  <tabstop>btnSetVar</tabstop>
+  <tabstop>btnSetCreate</tabstop>
+  <tabstop>cbLookupItemType</tabstop>
+  <tabstop>btnVarLookup</tabstop>
+  <tabstop>sbKeyEvent_v1</tabstop>
+  <tabstop>sbKeyEvent_v2</tabstop>
+  <tabstop>sbKeyEvent_v3</tabstop>
+  <tabstop>sbKeyEvent_v4</tabstop>
+  <tabstop>sbKeyEvent_v5</tabstop>
+  <tabstop>btnKeyEventSend</tabstop>
+  <tabstop>cbCommandId</tabstop>
+  <tabstop>sbCmdUData</tabstop>
+  <tabstop>sbCmdFData</tabstop>
+  <tabstop>leCmdSData</tabstop>
+  <tabstop>btnCmdSend</tabstop>
+  <tabstop>rbRequestType_Named</tabstop>
+  <tabstop>rbRequestType_Calculated</tabstop>
+  <tabstop>cbVariableType</tabstop>
+  <tabstop>cbNameOrCode</tabstop>
+  <tabstop>sbSimVarIndex</tabstop>
+  <tabstop>cbUnitName</tabstop>
+  <tabstop>cbRequestCalcResultType</tabstop>
+  <tabstop>cbValueSize</tabstop>
+  <tabstop>cbPeriod</tabstop>
+  <tabstop>sbInterval</tabstop>
+  <tabstop>dsbDeltaEpsilon</tabstop>
+  <tabstop>btnClearRequest</tabstop>
+  <tabstop>btnUpdateRequest</tabstop>
+  <tabstop>btnAddRequest</tabstop>
+  <tabstop>requestsView</tabstop>
+  <tabstop>btnReqestsRemove</tabstop>
+  <tabstop>btnReqestsUpdate</tabstop>
+  <tabstop>btnReqestsPause</tabstop>
+  <tabstop>btnReqestsLoad</tabstop>
+  <tabstop>btnReqestsSave</tabstop>
+  <tabstop>eventsView</tabstop>
+  <tabstop>btnEventsRemove</tabstop>
+  <tabstop>btnEventsTransmit</tabstop>
+  <tabstop>btnEventsLoad</tabstop>
+  <tabstop>btnEventsSave</tabstop>
+ </tabstops>
  <resources>
   <include location="WASimUI.qrc"/>
  </resources>
