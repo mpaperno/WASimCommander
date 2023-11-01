@@ -390,6 +390,19 @@
               </property>
              </widget>
             </item>
+            <item>
+             <widget class="QToolButton" name="btnFindSimVar">
+              <property name="text">
+               <string>Lookup</string>
+              </property>
+              <property name="toolButtonStyle">
+               <enum>Qt::ToolButtonIconOnly</enum>
+              </property>
+              <property name="autoRaise">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
            </layout>
           </widget>
          </item>
@@ -749,6 +762,21 @@
            </property>
           </widget>
          </item>
+         <item>
+          <widget class="QToolButton" name="btnFindEvent">
+           <property name="text">
+            <string>Lookup</string>
+           </property>
+           <property name="toolButtonStyle">
+            <enum>Qt::ToolButtonIconOnly</enum>
+           </property>
+           <property name="autoRaise">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
       </layout>
      </widget>
     </item>
@@ -1293,6 +1321,19 @@ Submitted requests will appear in the &quot;Data Requests&quot; window. Double-c
            <property name="bottomMargin">
             <number>0</number>
            </property>
+           <item>
+            <widget class="QToolButton" name="btnReqFindSimVar">
+             <property name="text">
+              <string>Lookup</string>
+             </property>
+             <property name="toolButtonStyle">
+              <enum>Qt::ToolButtonIconOnly</enum>
+             </property>
+             <property name="autoRaise">
+              <bool>false</bool>
+             </property>
+            </widget>
+           </item>
            <item>
             <widget class="BuddyLabel" name="lblIndex">
              <property name="sizePolicy">

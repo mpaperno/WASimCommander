@@ -20,6 +20,7 @@ and is also available at <http://www.gnu.org/licenses/>.
 #include <iostream>
 
 #include <QAction>
+#include <QCompleter>
 #include <QCloseEvent>
 #include <QDateTime>
 #include <QDebug>
@@ -37,6 +38,8 @@ and is also available at <http://www.gnu.org/licenses/>.
 
 #include "WASimUI.h"
 
+#include "DocImports.h"
+#include "DocImportsBrowser.h"
 #include "EventsModel.h"
 #include "LogConsole.h"
 #include "RequestsExport.h"
@@ -46,6 +49,7 @@ and is also available at <http://www.gnu.org/licenses/>.
 #include "Widgets.h"
 
 using namespace WASimUiNS;
+using namespace DocImports;
 using namespace WASimCommander;
 using namespace WASimCommander::Client;
 using namespace WASimCommander::Enums;
@@ -73,6 +77,7 @@ public:
 	RequestsModel *reqModel;
 	EventsModel *eventsModel;
 	RequestsExportWidget *reqExportWidget = nullptr;
+	DocImportsBrowser *docBrowserWidget = nullptr;
 	QAction *toggleConnAct = nullptr;
 	QAction *initAct = nullptr;
 	QAction *connectAct = nullptr;
@@ -266,17 +271,25 @@ public:
 	void toggleSetGetVariableType()
 	{
 		const QChar vtype = ui->cbGetSetVarType->currentData().toChar();
-		bool isLocal = vtype == 'L';
+		bool isLocal = vtype == 'L', isSimVar = vtype == 'A';
 		ui->wLocalVarsForm->setVisible(isLocal);
 		ui->wOtherVarsForm->setVisible(!isLocal);
-		ui->wGetSetSimVarIndex->setVisible(!isLocal && vtype == 'A');  // sim var index box visible only for... simvars!
+		ui->wGetSetSimVarIndex->setVisible(isSimVar);
 		ui->btnSetCreate->setVisible(isLocal);
 		ui->btnGetCreate->setVisible(isLocal);
 		bool hasUnit = ui->cbGetSetVarType->currentText().contains('*');
 		ui->cbSetVarUnitName->setVisible(hasUnit);
 		ui->lblSetVarUnit->setVisible(hasUnit);
-		if (isLocal)
-			ui->cbSetVarUnitName->setCurrentText("");
+		if (isSimVar) {
+			ui->cbVariableName->setCompleter(new DocImports::NameCompleter(DocImports::RecordType::SimVars, ui->cbNameOrCode));
+			ui->cbVariableName->lineEdit()->addAction(ui->btnFindSimVar->defaultAction(), QLineEdit::TrailingPosition);
+		}
+		else {
+			ui->cbVariableName->lineEdit()->removeAction(ui->btnFindSimVar->defaultAction());
+			ui->cbVariableName->resetCompleter();
+			if (isLocal)
+				ui->cbSetVarUnitName->setCurrentText("");
+		}
 	}
 
 	void copyLocalVarToRequest()
@@ -340,8 +353,6 @@ public:
 		ui->cbRequestCalcResultType->setVisible(isCalc);
 		ui->lblRequestCalcResultType->setVisible(isCalc);
 		ui->cbVariableType->setVisible(!isCalc);
-		//ui->lblUnit->setVisible(!isCalc);
-		//ui->cbUnitName->setVisible(!isCalc);
 		toggleRequestVariableType();
 		if (isCalc)
 			ui->cbValueSize->setCurrentData(Utils::calcResultTypeToMetaType(CalcResultType(ui->cbRequestCalcResultType->currentData().toUInt())));
@@ -359,8 +370,18 @@ public:
 		bool hasUnit = !isCalc && ui->cbVariableType->currentText().contains('*');
 		ui->lblUnit->setVisible(hasUnit);
 		ui->cbUnitName->setVisible(hasUnit);
-		if (type == 'L')
-			ui->cbUnitName->setCurrentText("");
+
+		if (needIdx) {
+			ui->cbNameOrCode->setCompleter(new DocImports::NameCompleter(DocImports::RecordType::SimVars, ui->cbNameOrCode));
+			ui->cbNameOrCode->lineEdit()->addAction(ui->btnReqFindSimVar->defaultAction(), QLineEdit::TrailingPosition);
+		}
+		else {
+			// restore default completer
+			ui->cbNameOrCode->resetCompleter();
+			ui->cbNameOrCode->lineEdit()->removeAction(ui->btnReqFindSimVar->defaultAction());
+			if (type == 'L')
+				ui->cbUnitName->setCurrentText("");
+		}
 	}
 
 	void setRequestFormId(uint32_t id)
@@ -706,6 +727,46 @@ public:
 			emit q->commandResultReady(Command(level == LogLevel::Error ? CommandId::Nak : CommandId::Ack, +cmd, qPrintable(msg)));
 	}
 
+	void openDocsLookup(DocImports::RecordType type, QComboBox *cb)
+	{
+		DocImportsBrowser *browser = new DocImportsBrowser(q, type, DocImportsBrowser::ViewMode::PopupViewMode);
+		browser->setAttribute(Qt::WA_DeleteOnClose);
+		browser->setWindowFlag(Qt::Dialog);
+		browser->setWindowModality(Qt::ApplicationModal);
+		browser->show();
+		const QPoint qPos = q->mapToGlobal(QPoint(0,0));
+		const QPoint cbPos = cb->mapToGlobal(QPoint(0, cb->height()));
+		const QRect rect(qPos, q->size());
+		QPoint pos = QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, browser->size(), rect).topLeft();
+		pos.setY(rect.y() + cbPos.y() - qPos.y());
+		browser->move(pos);
+		QObject::connect(browser, &DocImportsBrowser::itemSelected, q, [=](const QModelIndex &row) {
+			if (row.isValid())
+				cb->setCurrentText(browser->model()->record(row.row()).field("Name").value().toString());
+			browser->close();
+		});
+	}
+
+	void openDocsLookupWindow()
+	{
+		if (docBrowserWidget) {
+			if (docBrowserWidget->isMinimized()) {
+				docBrowserWidget->showNormal();
+			}
+			else {
+				docBrowserWidget->raise();
+				docBrowserWidget->activateWindow();
+			}
+			return;
+		}
+
+		docBrowserWidget = new DocImportsBrowser(q);
+		docBrowserWidget->setAttribute(Qt::WA_DeleteOnClose);
+		docBrowserWidget->setWindowFlag(Qt::Dialog);
+		docBrowserWidget->show();
+		QObject::connect(docBrowserWidget, &QObject::destroyed, q, [=]() { docBrowserWidget = nullptr; });
+	}
+
 
 	// Save/Load UI settings  -------------------------------------------------
 
@@ -880,11 +941,31 @@ WASimUI::WASimUI(QWidget *parent) :
 	ui.leEventName->setMaxLength(STRSZ_ENAME);
 	ui.cbNameOrCode->setMaxLength(STRSZ_REQ);
 
+	// Unit name suggestions completer from imported docs.
+	ui.cbUnitName->setCompleter(new DocImports::NameCompleter(DocImports::RecordType::SimVarUnits, ui.cbUnitName), true);
+	ui.cbSetVarUnitName->setCompleter(new DocImports::NameCompleter(DocImports::RecordType::SimVarUnits, ui.cbSetVarUnitName), true);
+	ui.cbSetVarUnitName->setCompleterOptionsButtonEnabled();
+	// Enable clear and suggestion options buttons on the data lookup combos.
+	ui.cbCalculatorCode->setCompleterOptions(Qt::MatchContains, QCompleter::PopupCompletion);
+	ui.cbCalculatorCode->setClearButtonEnabled();
+	ui.cbLvars->setCompleterOptions(Qt::MatchStartsWith, QCompleter::PopupCompletion);
+	ui.cbLvars->setClearButtonEnabled();
+	ui.cbVariableName->setCompleterOptions(Qt::MatchContains, QCompleter::PopupCompletion);
+	ui.cbVariableName->setClearButtonEnabled();
+	ui.cbKeyEvent->setCompleterOptions(Qt::MatchContains, QCompleter::PopupCompletion);
+	ui.cbKeyEvent->setClearButtonEnabled();
+	ui.cbNameOrCode->setCompleterOptions(Qt::MatchContains, QCompleter::PopupCompletion);
+	ui.cbNameOrCode->setClearButtonEnabled();
+	ui.cbUnitName->setCompleterOptions(Qt::MatchStartsWith, QCompleter::PopupCompletion);
+
 	// Init the calculator editor form
 	ui.wCalcForm->setProperty("eventId", -1);
 	ui.btnUpdateEvent->setVisible(false);
 	// Connect variable selector to enable/disable relevant actions
 	connect(ui.cbCalculatorCode, &QComboBox::currentTextChanged, this, [=](const QString &txt) { d->updateCalcCodeFormState(txt); });
+
+	// Key event name completer
+	ui.cbKeyEvent->setCompleter(new DocImports::NameCompleter(DocImports::RecordType::KeyEvents, ui.cbKeyEvent));
 
 	// Set up the Requests table view
 	ui.requestsView->setExportCategories(RequestsFormat::categoriesList());
@@ -1027,12 +1108,22 @@ WASimUI::WASimUI(QWidget *parent) :
 	// Copy LVar as new Data Request
 	MAKE_ACTION_SC_D(copyVarAct, tr("Copy to Data Request"), "move_to_inbox", btnCopyLVarToRequest, wVariables, copyLocalVarToRequest(), tr("Copy Variable to new Data Request."),
 	                 QKeySequence(Qt::ControlModifier | Qt::Key_Down));
+	// Open docs import browser for Sim Vars
+	MAKE_ACTION_SC(findSimVarAct, tr("Sim Var Lookup"), "search", btnFindSimVar, wVariables, openDocsLookup(DocImports::RecordType::SimVars, ui.cbVariableName),
+	               tr("Open a new window to search and select Simulator Variables from imported MSFS SDK documentation."), QKeySequence::Find);
+	ui.btnFindSimVar->setVisible(false);  // hide the button, we put the action into the combo box for now
 
 	// Lookup action
 	MAKE_ACTION_SC(lookupItemAct, tr("Lookup"), "search", btnVarLookup, wDataLookup, lookupItem(), tr("Query server for ID of named item (Lookup command)."), QKeySequence(Qt::ControlModifier | Qt::Key_Return));
 
 	// Send Key Event Form
 	MAKE_ACTION_SC(sendKeyEventAct, tr("Send Key Event"), "send", btnKeyEventSend, wKeyEvent, sendKeyEventForm(), tr("Send the specified Key Event to the server."), QKeySequence(Qt::ControlModifier | Qt::Key_Return));
+	// Open docs import browser for Key Events
+	MAKE_ACTION_SC(findKeyEventAct, tr("Key Event Lookup"), "search", btnFindEvent, wKeyEvent, openDocsLookup(DocImports::RecordType::KeyEvents, ui.cbKeyEvent),
+	               tr("Open a new window to search and select Key Events from imported MSFS SDK documentation."), QKeySequence::Find);
+	ui.cbKeyEvent->lineEdit()->addAction(findKeyEventAct, QLineEdit::TrailingPosition);
+	ui.btnFindEvent->setHidden(true);  // hide the button, we put the action into the combo box for now
+
 	// Send Command action
 	MAKE_ACTION_SC(sendCmdAct, tr("Send Command"), "keyboard_command_key", btnCmdSend, wCommand, sendCommandForm(), tr("Send the selected Command to the server."), QKeySequence(Qt::ControlModifier | Qt::Key_Return));
 
@@ -1045,6 +1136,11 @@ WASimUI::WASimUI(QWidget *parent) :
 	               tr("Update the existing request record from current form entries."), QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_Return));
 	MAKE_ACTION_PB(updReqAct, tr("Clear Form"), tr("Clear"), "scale=.9/backspace", btnClearRequest, wRequestForm, clearRequestForm(),
 	               tr("Reset the editor form to default values."), QKeySequence(Qt::ControlModifier | Qt::Key_Backspace));
+
+	// Open docs import browser for Sim Vars
+	MAKE_ACTION_SC(findReqSimVarAct, tr("Sim Var Lookup"), "search", btnReqFindSimVar, wRequestForm, openDocsLookup(DocImports::RecordType::SimVars, ui.cbNameOrCode),
+	               tr("Open a new window to search and select Simulator Variables from imported MSFS SDK documentation."), QKeySequence::Find);
+	ui.btnReqFindSimVar->setVisible(false);  // hide the button, we put the action into the combo box for now
 
 	// Remove selected Data Request(s) from item model/view
 	MAKE_ACTION_PB_D(removeRequestsAct, tr("Remove Selected Data Request(s)"), tr("Remove"), "fg=#c2d32e2e/delete_forever", btnReqestsRemove, wRequests, removeSelectedRequests(),
@@ -1130,6 +1226,11 @@ WASimUI::WASimUI(QWidget *parent) :
 	viewMenu->setIcon(GLYPH_ICON("grid_view"));
 	//viewMenu->menuAction()->setShortcut(QKeySequence(Qt::AltModifier | Qt::Key_M));
 
+	MAKE_ACTION_NW_SC(docBrowserAct, tr("SimConnect SDK Docs Reference Browser"), tr("Reference"), "search", openDocsLookupWindow(),
+	                  tr("<p>Opens a window which allow searching through Simulator Variables, Key Events, and Unit types imported from online SimConnect SDK documentation.</p>"),
+	                  QKeySequence(Qt::AltModifier | Qt::Key_R));
+	viewMenu->addAction(docBrowserAct);
+
 #define WIDGET_VIEW_TOGGLE_ACTION(T, W, V, K)  {\
 		QAction *act = new QAction(tr("Show %1 Form").arg(T), this); \
 		act->setAutoRepeat(false); act->setCheckable(true); act->setChecked(V);  \
@@ -1164,7 +1265,7 @@ WASimUI::WASimUI(QWidget *parent) :
 	// add all actions to this widget, for context menu and shortcut handling
 	addActions({
 		d->toggleConnAct, connectMenu->menuAction(),
-		Utils::separatorAction(this), viewMenu->menuAction(), styleAct, aboutAct, projectLinkAct
+		Utils::separatorAction(this), docBrowserAct, viewMenu->menuAction(), styleAct, aboutAct, projectLinkAct
 	});
 
 
@@ -1180,7 +1281,7 @@ WASimUI::WASimUI(QWidget *parent) :
 	toolbar->addWidget(Utils::spacerWidget(Qt::Horizontal, 6));
 	toolbar->addActions({ d->toggleConnAct });
 	toolbar->addSeparator();
-	toolbar->addActions({ viewMenu->menuAction(), styleAct, aboutAct /*, projectLinkAct*/ });
+	toolbar->addActions({ viewMenu->menuAction(), docBrowserAct, styleAct, aboutAct /*, projectLinkAct*/ });
 	// default toolbutton menu mode is lame
 	if (QToolButton *tb = qobject_cast<QToolButton *>(toolbar->widgetForAction(d->toggleConnAct))) {
 		tb->setMenu(connectMenu);
