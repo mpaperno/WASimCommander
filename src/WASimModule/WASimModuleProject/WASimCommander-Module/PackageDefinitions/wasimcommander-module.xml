@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<AssetPackage ReleaseNotes="PackageDefinitions\wasimcommander-module\ReleaseNotes.xml" Version="1.1.2">
+<AssetPackage Version="1.2.0">
 	<ItemSettings>
 		<ContentType>MISC</ContentType>
 		<Title>WASimCommander WASM Module</Title>
 		<Manufacturer/>
-		<Creator>Maxim Paperno</Creator>
+		<Creator>Copyright Maxim Paperno; All rights reserved.</Creator>
 	</ItemSettings>
 	<Flags>
 		<VisibleInStore>false</VisibleInStore>
@@ -29,4 +29,3 @@
 		</AssetGroup>
 	</AssetGroups>
 </AssetPackage>
-
