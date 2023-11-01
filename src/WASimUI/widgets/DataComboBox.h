@@ -53,7 +53,7 @@ class DataComboBox: public QComboBox
 		explicit DataComboBox(QWidget *parent = nullptr):
 		  QComboBox(parent)
 		{
-			connect(this, SIGNAL(currentIndexChanged(int)), this, SLOT(onCurrentIndexChanged(int)));
+			connect(this, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &DataComboBox::onCurrentIndexChanged);
 		}
 
 		//! The Role id to use for data operations unless otherwise specified. Default is \c Qt::UserRole. \sa setDefaultRole()
@@ -69,16 +69,19 @@ class DataComboBox: public QComboBox
 			return QComboBox::currentData(role);
 		}
 
+		//! Adds an item like `QComboBox::addItem(const QString &, const QVariant &)` does but allows specifying the role.
+		void addItem(const QString &text, const QVariant &data, int role) {
+			QComboBox::addItem(text);
+			setItemData(count() - 1, data, role);
+		}
+
 		//! Add items with names from \a texts, with corresponding data from \a datas list, using the specified \a role. If \a role is \c -1 (default) then the \p defaultRole is used.
 		void addItems(const QStringList &texts, const QVariantList &datas, int role = -1)
 		{
 			if (role < 0)
 				role = m_role;
-			const int c = count();
-			for (int i=0; i < texts.count(); ++i) {
-				addItem(texts.at(i));
-				setItemData(i + c, datas.value(i, texts.at(i)), role);
-			}
+			for (int i=0; i < texts.count(); ++i)
+				addItem(texts.at(i), datas.value(i, texts.at(i)), role);
 		}
 
 		//! Add items with corresponding data from \a items map, using the specified \a role. If \a role is \c -1 (default) then the \p defaultRole is used.
@@ -91,11 +94,8 @@ class DataComboBox: public QComboBox
 		{
 			if (role < 0)
 				role = m_role;
-			const int c = count();
-			for (int i=0; i < texts.count(); ++i) {
-				addItem(texts.at(i));
-				setItemData(i + c, datas.value(i, texts.at(i)), role);
-			}
+			for (int i=0; i < texts.count(); ++i)
+				addItem(texts.at(i), datas.value(i, texts.at(i)), role);
 		}
 
 		//! Add items with corresponding data from \a items map, using the specified \a role. If \a role is \c -1 (default) then the \p defaultRole is used.
@@ -103,7 +103,9 @@ class DataComboBox: public QComboBox
 			addItems(items.keys(), items.values(), role);
 		}
 
-		using QComboBox::addItems;  // bring back the superclass version
+		// bring back the superclass versions
+		using QComboBox::addItem;
+		using QComboBox::addItems;
 
 	public slots:
 		//! Convenience slot for \c QComboBox::setCurrentIndex(findData(value, role, matchFlags))
