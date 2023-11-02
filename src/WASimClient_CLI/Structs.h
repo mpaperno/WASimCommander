@@ -34,6 +34,9 @@ using namespace System::Collections::Generic;
 using namespace System::Runtime::InteropServices;
 using namespace msclr::interop;
 
+// We need this to ignore the errors about "unknown" pragmas which actually work to suppress bogus Intellisense errors. Yeah.
+#pragma warning(disable:4068)
+
 /// WASimCommander::CLI::Structs namespace.
 /// CLI/.NET versions of WASimCommander API and Client data structures.
 namespace WASimCommander::CLI::Structs
@@ -148,9 +151,11 @@ namespace WASimCommander::CLI::Structs
 			explicit Command(CommandId id) : commandId(id) { }
 			explicit Command(CommandId id, uint32_t uData) : uData(uData), commandId(id) { }
 			explicit Command(CommandId id, uint32_t uData, double fData) : uData(uData), fData(fData), commandId(id) { }
+#pragma diag_suppress 144   // a value of type "System::String ^" cannot be used to initialize an entity of type "unsigned char"  (sData is not a uchar... someone's confused)
 			explicit Command(CommandId id, uint32_t uData, String ^sData) : uData(uData), fData(0.0), commandId(id), sData{sData} { }
 			explicit Command(CommandId id, uint32_t uData, String ^sData, double fData) : uData(uData), fData(fData), commandId(id), sData{sData} { }
 			explicit Command(CommandId id, uint32_t uData, String ^sData, double fData, int32_t token) : token(token), uData(uData), fData(fData), commandId(id), sData{sData} { }
+#pragma diag_restore 144
 
 			void setStringData(String ^sData)
 			{
@@ -455,8 +460,10 @@ namespace WASimCommander::CLI::Structs
 			explicit ListResult(const WASimCommander::Client::ListResult &r) :
 				listType{(LookupItemType)r.listType}, result(r.result), list{gcnew ListCollectionType((int)r.list.size()) }
 			{
+#pragma diag_suppress 2242  // for list[] operator: expression must have pointer-to-object or handle-to-C++/CLI-array type but it has type "ListCollectionType ^"  (um... isn't `list`  a pointer?)
 				for (const auto &pr : r.list)
-					list->TryAdd(pr.first, gcnew String(pr.second.c_str()));
+					list[pr.first] = gcnew String(pr.second.c_str());
+#pragma diag_default 2242
 			}
 	};
 
