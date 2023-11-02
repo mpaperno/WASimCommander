@@ -8,7 +8,7 @@
 Param(
   [string[]]$Targets = "all",
   [string]$RootPath = "..",
-  [string[]]$Configuration = @("Debug", "Debug-DLL", "Release-DLL", "Release-net6", "Release-netfw", "Release"),
+  [string[]]$Configuration = @("Debug", "Debug-DLL", "Release-DLL", "Release-net6", "Release-net7", "Release-netfw", "Release"),
   [string]$Platform = "x64",
   [string[]]$Projects = "all",
   [string]$BuildType = "Clean,Rebuild",
@@ -153,6 +153,9 @@ robocopy "$BuildPath\${CLIENT_NAME}_CLI\Release-$Platform" "${csLibPath}\net5" *
 if ($LastExitCode -ge 8) { Write-Output($LastExitCode); Exit 1  }
 # .NET 6
 robocopy "$BuildPath\${CLIENT_NAME}_CLI\Release-net6-$Platform" "${csLibPath}\net6" *.dll *.pdb *.xml *.ini $copyOptions
+if ($LastExitCode -ge 8) { Write-Output($LastExitCode); Exit 1  }
+# .NET 7
+robocopy "$BuildPath\${CLIENT_NAME}_CLI\Release-net7-$Platform" "${csLibPath}\net7" *.dll *.pdb *.xml *.ini $copyOptions
 if ($LastExitCode -ge 8) { Write-Output($LastExitCode); Exit 1  }
 # .NET Framework
 robocopy "$BuildPath\${CLIENT_NAME}_CLI\Release-netfw-$Platform" "${csLibPath}\net46" *.dll *.pdb *.xml *.ini $copyOptions
