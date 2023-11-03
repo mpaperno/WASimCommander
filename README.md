@@ -1,6 +1,7 @@
 [![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/mpaperno/WASimCommander?include_prereleases)](https://github.com/mpaperno/WASimCommander/releases)
 [![GPLv3 License](https://img.shields.io/badge/license-GPLv3-blue.svg)](LICENSE.GPL.txt)
 [![LGPGv3 License](https://img.shields.io/badge/license-LGPLv3-blue.svg)](LICENSE.LGPL.txt)
+[![API Documentation](https://img.shields.io/badge/API-Documentation-07A7EC?labelColor=black)](https://wasimcommander.max.paperno.us/)
 [![Discord](https://img.shields.io/static/v1?style=flat&color=7289DA&&labelColor=7289DA&message=Discord%20Chat&label=&logo=discord&logoColor=white)](https://discord.gg/meWyE4dcAt)
 
 
@@ -15,7 +16,7 @@
 **A WASM module-based Server and a full Client API combination.**
 
 This project is geared towards other MSFS developers/coders who need a convenient way to remotely access parts of the Simulator which are normally
-inaccessible via _SimConnect_, such as locally-defined aircraft variables or custom events.
+inaccessible via _SimConnect_, such as some variable types and 'H' events, and running RPN "calculator code" directly on the sim.
 
 The Client API can be utilized natively from C++, or via .NET managed assembly from C#, Python, or other languages.
 
@@ -90,7 +91,9 @@ On a more practical note, I am using it with the [MSFS Touch Portal Plugin](http
 
 #### Desktop GUI
 - Includes a full-featured desktop application which demonstrates/tests all available features of the API.
-- Fully usable as a standalone application which saves preferences, imports/exports lists of data subscriptions/registered events, and other usabililty features.
+- Fully usable as a standalone application which saves preferences, imports/exports lists of data subscriptions/registered events, and other friendly features.
+- Very useful for "exploring" the simulator in general, like checking variable values, testing effects of key events and RPN calculator code.
+- Can be used with the [MSFS/SimConnect Touch Portal Plugin](https://github.com/mpaperno/MSFSTouchPortalPlugin) for import/export of custom variable request definitions.
 
 <p> &nbsp; </p>
 <div align="center">
@@ -117,8 +120,8 @@ Update announcements are also posted on my Discord server's [WASimCommander rele
 There are three basic console-style tests/examples included for `C++`, `C#`, and `Python` in the [src/Testing](https://github.com/mpaperno/WASimCommander/tree/main/src/Testing) folder.
 If you like reading code, this is the place to start.
 
-API docuemntation generated from source comments is published here: https://mpaperno.github.io/WASimCommander/ <br/>
-A good place to start with the docs is probably the [`WASimClient`](https://mpaperno.github.io/WASimCommander/class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html) page.
+API docuemntation generated from source comments is published here: https://wasimcommander.max.paperno.us/ <br/>
+A good place to start with the docs is probably the [`WASimClient`](https://wasimcommander.max.paperno.us/class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html) page.
 
 The GUI is written in C++ (using Qt library for UI), and while not the simplest example, _is_ a full implementation of almost all the available
 API features. The main `WASimClient` interactions all happen in the `MainWindow::Private` class at the top of the 
@@ -185,12 +188,17 @@ Uses and includes [_IniPP_ by Matthias C. M. Troffaes](https://github.com/mcmtro
 
 Uses the _Microsoft SimConnect SDK_ under the terms of the _MS Flight Simulator SDK EULA (11/2019)_ document.
 
-The GUI component uses portions of the [_Qt Library_](http://qt.io) under the terms of the GPL v3 license.
+WASimUI (GUI):
+- Uses portions of the [_Qt Library_](http://qt.io) under the terms of the GPL v3 license.
+- Uses and includes the following symbol fonts for icons, under the terms of their respective licenses:
+  - [IcoMoon Free](https://icomoon.io/#icons-icomoon) - IcoMoon.io, GPL v3.
+  - [Material Icons](https://material.io/) - Google, Apache License v2.0.
+- Uses modified versions of `FilterTableHeader` and `FilterLineEdit` components from [DB Browser for SQLite](https://github.com/sqlitebrowser/sqlitebrowser) under GPL v3 license.
+- Uses modified version of `MultisortTableView` from <https://github.com/dimkanovikov/MultisortTableView> under GPL v3 license.
+- Uses Natural (alpha-numeric) sorting algorithm implementation for _Qt_ by Litkevich Yuriy (public domain).
 
-The GUI component uses and includes the following symbol fonts for icons, under the terms of their respective licenses:
-- [IcoMoon Free](https://icomoon.io/#icons-icomoon) - IcoMoon.io, GPL v3.
-- [Material Icons](https://material.io/) - Google, Apache License v2.0.
 
+Documentation generated with [Doxygen](https://www.doxygen.nl/) and styled with the most excellent [Doxygen Awesome](https://jothepro.github.io/doxygen-awesome-css).
 
 -------------
 ### Copyright, License, and Disclaimer
