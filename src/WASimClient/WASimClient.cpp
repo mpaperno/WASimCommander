@@ -787,7 +787,7 @@ class WASimClient::Private
 		return &reponses.try_emplace(token, token, cv).first->second;
 	}
 
-	// Blocks and waits for a response to a specific command token.
+	// Blocks and waits for a response to a specific command token. `timeout` can be -1 to use `extraPredicate` only (which is then required).
 	HRESULT waitCommandResponse(uint32_t token, Command *response, uint32_t timeout = 0, std::function<bool(void)> extraPredicate = nullptr)
 	{
 		TrackedResponse *tr = findTrackedResponse(token);
@@ -798,8 +798,10 @@ class WASimClient::Private
 		if (!timeout)
 			timeout = settings.networkTimeout;
 
-		auto stop_waiting = [=]() {
-			return !serverConnected || (tr->response.commandId != CommandId::None && tr->response.token == token && (!extraPredicate || extraPredicate()));
+		bool stopped = false;
+		auto stop_waiting = [=, &stopped]() {
+			return stopped =
+				!serverConnected || (tr->response.commandId != CommandId::None && tr->response.token == token && (!extraPredicate || extraPredicate()));
 		};
 
 		HRESULT hr = E_TIMEOUT;
@@ -808,10 +810,20 @@ class WASimClient::Private
 		}
 		else {
 			unique_lock lock(tr->mutex);
-			if (cv->wait_for(lock, chrono::milliseconds(timeout), stop_waiting))
-				hr = S_OK;
+			if (timeout > 0) {
+				if (cv->wait_for(lock, chrono::milliseconds(timeout), stop_waiting))
+					hr = S_OK;
+			}
+			else if (!!extraPredicate) {
+				cv->wait(lock, stop_waiting);
+				hr = stopped ? ERROR_ABANDONED_WAIT_0 : S_OK;
+			}
+			else {
+				hr = E_INVALIDARG;
+				LOG_DBG << "waitCommandResponse() requires a predicate condition when timeout parameter is < 0.";
+			}
 		}
-		if (SUCCEEDED(hr) && response) {
+		if (SUCCEEDED(hr) && !!response) {
 			unique_lock lock(tr->mutex);
 			*response = move(tr->response);
 		}
@@ -839,14 +851,17 @@ class WASimClient::Private
 	void waitListRequestEnd()
 	{
 		auto stop_waiting = [this]() {
-			//shared_lock lock(listResult.mutex);
 			return listResult.nextTimeout.load() >= Clock::now();
 		};
 
 		Command response;
-		HRESULT hr = waitCommandResponse(listResult.token, &response, 0, stop_waiting);
-		if (hr == E_TIMEOUT) {
+		HRESULT hr = waitCommandResponse(listResult.token, &response, -1, stop_waiting);
+		if (hr == ERROR_ABANDONED_WAIT_0) {
 			LOG_ERR << "List request timed out.";
+			hr = E_TIMEOUT;
+		}
+		else if (hr != S_OK) {
+			LOG_ERR << "List request failed with result: "  << LOG_HR(hr);
 		}
 		else if (response.commandId != CommandId::Ack) {
 			LOG_WRN << "Server returned Nak for list request of " << Utilities::getEnumName(listResult.listType.load(), LookupItemTypeNames);
