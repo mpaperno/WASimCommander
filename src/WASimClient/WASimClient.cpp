@@ -952,10 +952,14 @@ class WASimClient::Private
 
 	HRESULT setVariable(const VariableRequest &v, const double value)
 	{
-		const string sValue = buildVariableCommandString(v, true);
-		if (sValue.empty() || sValue.length() >= STRSZ_CMD)
-			return E_INVALIDARG;
-		return sendServerCommand(Command(v.createLVar && v.variableType == 'L' ? CommandId::SetCreate : CommandId::Set, v.variableType, sValue.c_str(), value));
+		if (Utilities::isSettableVariableType(v.variableType)) {
+			const string sValue = buildVariableCommandString(v, true);
+			if (sValue.empty() || sValue.length() >= STRSZ_CMD)
+				return E_INVALIDARG;
+			return sendServerCommand(Command(v.createLVar && v.variableType == 'L' ? CommandId::SetCreate : CommandId::Set, v.variableType, sValue.c_str(), value));
+		}
+		LOG_WRN << "Cannot Set a variable of type '" << v.variableType << "'.";
+		return E_INVALIDARG;
 	}
 
 #pragma endregion
