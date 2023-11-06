@@ -222,7 +222,7 @@ class Utils
 			if (unit == "string")
 				return QMetaType::User + 256;
 			if (boolUnits.contains(unit))
-				return QMetaType::Bool;
+				return QMetaType::UChar;
 			if (integralUnits.contains(unit))
 				return QMetaType::Int;
 			return QMetaType::Double;
