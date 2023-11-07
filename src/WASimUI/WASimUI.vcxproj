@@ -31,18 +31,23 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>PGOptimize</WholeProgramOptimization>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-DLL|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-DLL|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt_defaults.props')">
@@ -50,28 +55,28 @@
   </ImportGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="QtSettings">
     <QtInstall>5.12.12_msvc2017_64</QtInstall>
-    <QtModules>core;gui;widgets</QtModules>
+    <QtModules>core;sql;gui;widgets</QtModules>
     <QtBuildConfig>debug</QtBuildConfig>
     <QtQMLDebugEnable>false</QtQMLDebugEnable>
-    <QtDeploy>true</QtDeploy>
+    <QtDeploy>false</QtDeploy>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="QtSettings">
     <QtInstall>5.12.12_msvc2017_64</QtInstall>
-    <QtModules>core;gui;widgets</QtModules>
+    <QtModules>core;sql;gui;widgets</QtModules>
     <QtBuildConfig>release</QtBuildConfig>
     <QtDeploy>true</QtDeploy>
     <QtQMLDebugEnable>false</QtQMLDebugEnable>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-DLL|x64'" Label="QtSettings">
     <QtInstall>5.12.12_msvc2017_64</QtInstall>
-    <QtModules>core;gui;widgets</QtModules>
+    <QtModules>core;sql;gui;widgets</QtModules>
     <QtBuildConfig>release</QtBuildConfig>
     <QtDeploy>true</QtDeploy>
     <QtQMLDebugEnable>false</QtQMLDebugEnable>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-DLL|x64'" Label="QtSettings">
     <QtInstall>5.12.12_msvc2017_64</QtInstall>
-    <QtModules>core;gui;widgets</QtModules>
+    <QtModules>core;sql;gui;widgets</QtModules>
     <QtBuildConfig>debug</QtBuildConfig>
     <QtDeploy>true</QtDeploy>
     <QtQMLDebugEnable>false</QtQMLDebugEnable>
@@ -104,17 +109,21 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <CopyLocalDeploymentContent>true</CopyLocalDeploymentContent>
+    <IncludePath>$(ProjectDir)model;$(ProjectDir)widgets;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
     <CopyLocalDeploymentContent>true</CopyLocalDeploymentContent>
+    <IncludePath>$(ProjectDir)model;$(ProjectDir)widgets;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-DLL|x64'">
     <CopyLocalDeploymentContent>true</CopyLocalDeploymentContent>
     <CopyLocalProjectReference>true</CopyLocalProjectReference>
+    <IncludePath>$(ProjectDir)model;$(ProjectDir)widgets;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-DLL|x64'">
     <CopyLocalDeploymentContent>true</CopyLocalDeploymentContent>
     <CopyLocalProjectReference>true</CopyLocalProjectReference>
+    <IncludePath>$(ProjectDir)model;$(ProjectDir)widgets;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -160,6 +169,7 @@
       <WholeProgramOptimization>true</WholeProgramOptimization>
       <PreprocessorDefinitions>WSMCMND_API_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <CallingConvention>StdCall</CallingConvention>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
     </ClCompile>
     <Link />
     <Link>
@@ -260,9 +270,16 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <QtRcc Include="WASimUI.qrc" />
+    <QtUic Include="DocImportsBrowser.ui" />
+    <QtUic Include="LogConsole.ui" />
+    <QtUic Include="RequestsExport.ui" />
     <QtUic Include="WASimUI.ui" />
     <QtMoc Include="WASimUI.h" />
-    <ClCompile Include="ActionPushButton.cpp" />
+    <ClCompile Include="widgets\ActionPushButton.cpp" />
+    <ClCompile Include="widgets\FilterLineEdit.cpp" />
+    <ClCompile Include="widgets\FilterTableHeader.cpp" />
+    <ClCompile Include="LogConsole.cpp" />
+    <ClCompile Include="RequestsExport.cpp" />
     <ClCompile Include="WASimUI.cpp" />
     <ClCompile Include="main.cpp" />
     <None Include="..\WASimClient\client_conf.ini">
@@ -271,6 +288,15 @@
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release-DLL|x64'">true</DeploymentContent>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug-DLL|x64'">true</DeploymentContent>
     </None>
+    <CopyFileToFolders Include="resources\MSFS_SDK_Doc_Import.sqlite3">
+      <FileType>Document</FileType>
+      <RootFolder Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </RootFolder>
+      <TreatOutputAsContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</TreatOutputAsContent>
+      <TreatOutputAsContent Condition="'$(Configuration)|$(Platform)'=='Release-DLL|x64'">true</TreatOutputAsContent>
+      <TreatOutputAsContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</TreatOutputAsContent>
+      <TreatOutputAsContent Condition="'$(Configuration)|$(Platform)'=='Debug-DLL|x64'">true</TreatOutputAsContent>
+    </CopyFileToFolders>
     <None Include="SimConnect.cfg">
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
@@ -294,10 +320,24 @@
   <ItemGroup>
     <ClInclude Include="..\include\WASimCommander.h" />
     <ClInclude Include="..\include\wasim_version.h" />
-    <QtMoc Include="Widgets.h" />
+    <QtMoc Include="RequestsTableView.h" />
+    <QtMoc Include="LogConsole.h" />
+    <QtMoc Include="RequestsExport.h" />
+    <QtMoc Include="widgets\CustomTableView.h" />
+    <QtMoc Include="DocImports.h" />
+    <QtMoc Include="DocImportsBrowser.h" />
+    <QtMoc Include="widgets\DeletableItemsComboBox.h" />
+    <QtMoc Include="widgets\FilterLineEdit.h" />
+    <QtMoc Include="widgets\FilterTableHeader.h" />
+    <QtMoc Include="model\MultiColumnProxyModel.h" />
+    <QtMoc Include="widgets\BuddyLabel.h" />
+    <ClInclude Include="model\AlphanumComparer.h" />
+    <QtMoc Include="widgets\MultisortTableView.h" />
+    <ClInclude Include="RequestsFormat.h" />
+    <QtMoc Include="widgets\Widgets.h" />
     <QtMoc Include="RequestsModel.h" />
-    <QtMoc Include="ActionPushButton.h" />
-    <QtMoc Include="DataComboBox.h" />
+    <QtMoc Include="widgets\ActionPushButton.h" />
+    <QtMoc Include="widgets\DataComboBox.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">

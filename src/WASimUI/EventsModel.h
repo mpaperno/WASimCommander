@@ -103,7 +103,6 @@ public:
 		EventRecord req(-1);
 		if (row >= rowCount())
 			return req;
-		QStandardItem *idItem = item(row, COL_ID);
 		req.eventId = item(row, COL_ID)->data(DataRole).toUInt();
 		req.code = item(row, COL_CODE)->text().toStdString();
 		req.name = item(row, COL_NAME)->text().toStdString();
@@ -116,12 +115,9 @@ public:
 		if (row < 0)
 			row = rowCount();
 
-		setItem(row, COL_ID, new QStandardItem(QString("%1").arg(req.eventId)));
-		item(row, COL_ID)->setData(req.eventId, DataRole);
-
-		setItem(row, COL_CODE, new QStandardItem(QString::fromStdString(req.code)));
-		setItem(row, COL_NAME, new QStandardItem(QString::fromStdString(req.name)));
-
+		setOrCreateItem(row, COL_ID, QString::number(req.eventId), req.eventId);
+		setOrCreateItem(row, COL_CODE, QString::fromStdString(req.code));
+		setOrCreateItem(row, COL_NAME, QString::fromStdString(req.name));
 		return index(row, 0);
 	}
 
@@ -182,20 +178,23 @@ public:
 		return ret;
 	}
 
-	static inline QModelIndexList flattenIndexList(const QModelIndexList &list)
-	{
-		QModelIndexList ret;
-		QModelIndex lastIdx;
-		for (const QModelIndex &idx : list) {
-			if (idx.column() == COL_ID && lastIdx.row() != idx.row() && idx.row() < idx.model()->rowCount())
-				ret.append(idx);
-			lastIdx = idx;
-		}
-		return ret;
-	}
-
 signals:
 	void rowCountChanged(int rows);
+
+protected:
+	QStandardItem *setOrCreateItem(int row, int col, const QString &text, const QVariant &data = QVariant())
+	{
+		QStandardItem *itm = item(row, col);
+		if (!itm){
+			setItem(row, col, new QStandardItem());
+			itm = item(row, col);
+		}
+		itm->setText(text);
+		itm->setToolTip(text);
+		if (data.isValid())
+			itm->setData(data, DataRole);
+		return itm;
+	}
 
 private:
 	uint32_t m_nextEventId = 0;

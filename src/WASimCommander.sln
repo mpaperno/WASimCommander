@@ -76,6 +76,8 @@ Global
 		Release-DLL|x64 = Release-DLL|x64
 		Release-net6|MSFS = Release-net6|MSFS
 		Release-net6|x64 = Release-net6|x64
+		Release-net7|MSFS = Release-net7|MSFS
+		Release-net7|x64 = Release-net7|x64
 		Release-netfw|MSFS = Release-netfw|MSFS
 		Release-netfw|x64 = Release-netfw|x64
 	EndGlobalSection
@@ -96,6 +98,9 @@ Global
 		{A5468B35-BBBD-4C55-97ED-81BFE343B0E4}.Release-DLL|x64.ActiveCfg = Release|MSFS
 		{A5468B35-BBBD-4C55-97ED-81BFE343B0E4}.Release-net6|MSFS.ActiveCfg = Release|MSFS
 		{A5468B35-BBBD-4C55-97ED-81BFE343B0E4}.Release-net6|x64.ActiveCfg = Release|MSFS
+		{A5468B35-BBBD-4C55-97ED-81BFE343B0E4}.Release-net7|MSFS.ActiveCfg = Release|MSFS
+		{A5468B35-BBBD-4C55-97ED-81BFE343B0E4}.Release-net7|MSFS.Build.0 = Release|MSFS
+		{A5468B35-BBBD-4C55-97ED-81BFE343B0E4}.Release-net7|x64.ActiveCfg = Release|MSFS
 		{A5468B35-BBBD-4C55-97ED-81BFE343B0E4}.Release-netfw|MSFS.ActiveCfg = Release|MSFS
 		{A5468B35-BBBD-4C55-97ED-81BFE343B0E4}.Release-netfw|MSFS.Build.0 = Release|MSFS
 		{A5468B35-BBBD-4C55-97ED-81BFE343B0E4}.Release-netfw|x64.ActiveCfg = Release|MSFS
@@ -115,6 +120,10 @@ Global
 		{639093FF-FD94-4E89-92AC-C6FABE5DF664}.Release-net6|MSFS.ActiveCfg = Release|x64
 		{639093FF-FD94-4E89-92AC-C6FABE5DF664}.Release-net6|x64.ActiveCfg = Release|x64
 		{639093FF-FD94-4E89-92AC-C6FABE5DF664}.Release-net6|x64.Build.0 = Release|x64
+		{639093FF-FD94-4E89-92AC-C6FABE5DF664}.Release-net7|MSFS.ActiveCfg = Release-DLL|x64
+		{639093FF-FD94-4E89-92AC-C6FABE5DF664}.Release-net7|MSFS.Build.0 = Release-DLL|x64
+		{639093FF-FD94-4E89-92AC-C6FABE5DF664}.Release-net7|x64.ActiveCfg = Release|x64
+		{639093FF-FD94-4E89-92AC-C6FABE5DF664}.Release-net7|x64.Build.0 = Release|x64
 		{639093FF-FD94-4E89-92AC-C6FABE5DF664}.Release-netfw|MSFS.ActiveCfg = Release|x64
 		{639093FF-FD94-4E89-92AC-C6FABE5DF664}.Release-netfw|MSFS.Build.0 = Release|x64
 		{639093FF-FD94-4E89-92AC-C6FABE5DF664}.Release-netfw|x64.ActiveCfg = Release|x64
@@ -132,6 +141,9 @@ Global
 		{E9AD8656-009B-4A6A-832B-0D19DE288BFC}.Release-DLL|x64.ActiveCfg = Release-DLL|x64
 		{E9AD8656-009B-4A6A-832B-0D19DE288BFC}.Release-net6|MSFS.ActiveCfg = Release-DLL|x64
 		{E9AD8656-009B-4A6A-832B-0D19DE288BFC}.Release-net6|x64.ActiveCfg = Release|x64
+		{E9AD8656-009B-4A6A-832B-0D19DE288BFC}.Release-net7|MSFS.ActiveCfg = Release-DLL|x64
+		{E9AD8656-009B-4A6A-832B-0D19DE288BFC}.Release-net7|MSFS.Build.0 = Release-DLL|x64
+		{E9AD8656-009B-4A6A-832B-0D19DE288BFC}.Release-net7|x64.ActiveCfg = Release|x64
 		{E9AD8656-009B-4A6A-832B-0D19DE288BFC}.Release-netfw|MSFS.ActiveCfg = Release|x64
 		{E9AD8656-009B-4A6A-832B-0D19DE288BFC}.Release-netfw|MSFS.Build.0 = Release|x64
 		{E9AD8656-009B-4A6A-832B-0D19DE288BFC}.Release-netfw|x64.ActiveCfg = Release|x64
@@ -152,6 +164,10 @@ Global
 		{DAF5B792-C4E6-4E54-9CBF-0A0335E80306}.Release-net6|MSFS.Build.0 = Release-net6|x64
 		{DAF5B792-C4E6-4E54-9CBF-0A0335E80306}.Release-net6|x64.ActiveCfg = Release-net6|x64
 		{DAF5B792-C4E6-4E54-9CBF-0A0335E80306}.Release-net6|x64.Build.0 = Release-net6|x64
+		{DAF5B792-C4E6-4E54-9CBF-0A0335E80306}.Release-net7|MSFS.ActiveCfg = Release-net7|x64
+		{DAF5B792-C4E6-4E54-9CBF-0A0335E80306}.Release-net7|MSFS.Build.0 = Release-net7|x64
+		{DAF5B792-C4E6-4E54-9CBF-0A0335E80306}.Release-net7|x64.ActiveCfg = Release-net7|x64
+		{DAF5B792-C4E6-4E54-9CBF-0A0335E80306}.Release-net7|x64.Build.0 = Release-net7|x64
 		{DAF5B792-C4E6-4E54-9CBF-0A0335E80306}.Release-netfw|MSFS.ActiveCfg = Release|x64
 		{DAF5B792-C4E6-4E54-9CBF-0A0335E80306}.Release-netfw|MSFS.Build.0 = Release|x64
 		{DAF5B792-C4E6-4E54-9CBF-0A0335E80306}.Release-netfw|x64.ActiveCfg = Release-netfw|x64
@@ -164,11 +180,14 @@ Global
 		{5B7D7234-D6C8-4D1F-B135-C5297D6476D8}.Release|MSFS.ActiveCfg = Release|x64
 		{5B7D7234-D6C8-4D1F-B135-C5297D6476D8}.Release|MSFS.Build.0 = Release|x64
 		{5B7D7234-D6C8-4D1F-B135-C5297D6476D8}.Release|x64.ActiveCfg = Release|x64
-		{5B7D7234-D6C8-4D1F-B135-C5297D6476D8}.Release|x64.Build.0 = Release|x64
 		{5B7D7234-D6C8-4D1F-B135-C5297D6476D8}.Release-DLL|MSFS.ActiveCfg = Release|x64
 		{5B7D7234-D6C8-4D1F-B135-C5297D6476D8}.Release-DLL|x64.ActiveCfg = Release|x64
 		{5B7D7234-D6C8-4D1F-B135-C5297D6476D8}.Release-net6|MSFS.ActiveCfg = Release|x64
 		{5B7D7234-D6C8-4D1F-B135-C5297D6476D8}.Release-net6|x64.ActiveCfg = Release|x64
+		{5B7D7234-D6C8-4D1F-B135-C5297D6476D8}.Release-net6|x64.Build.0 = Release|x64
+		{5B7D7234-D6C8-4D1F-B135-C5297D6476D8}.Release-net7|MSFS.ActiveCfg = Release|x64
+		{5B7D7234-D6C8-4D1F-B135-C5297D6476D8}.Release-net7|MSFS.Build.0 = Release|x64
+		{5B7D7234-D6C8-4D1F-B135-C5297D6476D8}.Release-net7|x64.ActiveCfg = Release-net7|x64
 		{5B7D7234-D6C8-4D1F-B135-C5297D6476D8}.Release-netfw|MSFS.ActiveCfg = Release|x64
 		{5B7D7234-D6C8-4D1F-B135-C5297D6476D8}.Release-netfw|MSFS.Build.0 = Release|x64
 		{5B7D7234-D6C8-4D1F-B135-C5297D6476D8}.Release-netfw|x64.ActiveCfg = Release|x64
@@ -187,6 +206,9 @@ Global
 		{523ABD54-4C1A-4F21-8977-5EFA5821F71D}.Release-DLL|x64.ActiveCfg = Release-DLL|x64
 		{523ABD54-4C1A-4F21-8977-5EFA5821F71D}.Release-net6|MSFS.ActiveCfg = Release-DLL|x64
 		{523ABD54-4C1A-4F21-8977-5EFA5821F71D}.Release-net6|x64.ActiveCfg = Release|x64
+		{523ABD54-4C1A-4F21-8977-5EFA5821F71D}.Release-net7|MSFS.ActiveCfg = Release-DLL|x64
+		{523ABD54-4C1A-4F21-8977-5EFA5821F71D}.Release-net7|MSFS.Build.0 = Release-DLL|x64
+		{523ABD54-4C1A-4F21-8977-5EFA5821F71D}.Release-net7|x64.ActiveCfg = Release|x64
 		{523ABD54-4C1A-4F21-8977-5EFA5821F71D}.Release-netfw|MSFS.ActiveCfg = Release|x64
 		{523ABD54-4C1A-4F21-8977-5EFA5821F71D}.Release-netfw|MSFS.Build.0 = Release|x64
 		{523ABD54-4C1A-4F21-8977-5EFA5821F71D}.Release-netfw|x64.ActiveCfg = Release|x64
@@ -200,6 +222,8 @@ Global
 		{C6D4303F-E717-4257-990B-2CAE894898A0}.Release-DLL|x64.ActiveCfg = Release|Any CPU
 		{C6D4303F-E717-4257-990B-2CAE894898A0}.Release-net6|MSFS.ActiveCfg = Release|Any CPU
 		{C6D4303F-E717-4257-990B-2CAE894898A0}.Release-net6|x64.ActiveCfg = Release|Any CPU
+		{C6D4303F-E717-4257-990B-2CAE894898A0}.Release-net7|MSFS.ActiveCfg = Release|Any CPU
+		{C6D4303F-E717-4257-990B-2CAE894898A0}.Release-net7|x64.ActiveCfg = Release|Any CPU
 		{C6D4303F-E717-4257-990B-2CAE894898A0}.Release-netfw|MSFS.ActiveCfg = Release|Any CPU
 		{C6D4303F-E717-4257-990B-2CAE894898A0}.Release-netfw|x64.ActiveCfg = Release|Any CPU
 	EndGlobalSection

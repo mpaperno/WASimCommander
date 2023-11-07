@@ -234,6 +234,7 @@ class WASimClient::Private
 	atomic_bool simConnected = false;
 	atomic_bool serverConnected = false;
 	atomic_bool logCDAcreated = false;
+	atomic_bool requestsPaused = false;
 
 	HANDLE hSim = nullptr;
 	HANDLE hSimEvent = nullptr;
@@ -676,6 +677,8 @@ class WASimClient::Private
 		listResult.reset();
 		// make sure server knows our desired log level and set up data area/request if needed
 		updateServerLogLevel();
+		// set update status of data requests before adding any, in case we don't actually want results yet
+		sendServerCommand(Command(CommandId::Subscribe, (requestsPaused ? 0 : 1)));
 		// (re-)register (or delete) any saved DataRequests
 		registerAllDataRequests();
 		// same with calculator events
@@ -784,7 +787,7 @@ class WASimClient::Private
 		return &reponses.try_emplace(token, token, cv).first->second;
 	}
 
-	// Blocks and waits for a response to a specific command token.
+	// Blocks and waits for a response to a specific command token. `timeout` can be -1 to use `extraPredicate` only (which is then required).
 	HRESULT waitCommandResponse(uint32_t token, Command *response, uint32_t timeout = 0, std::function<bool(void)> extraPredicate = nullptr)
 	{
 		TrackedResponse *tr = findTrackedResponse(token);
@@ -795,8 +798,10 @@ class WASimClient::Private
 		if (!timeout)
 			timeout = settings.networkTimeout;
 
-		auto stop_waiting = [=]() {
-			return !serverConnected || (tr->response.commandId != CommandId::None && tr->response.token == token && (!extraPredicate || extraPredicate()));
+		bool stopped = false;
+		auto stop_waiting = [=, &stopped]() {
+			return stopped =
+				!serverConnected || (tr->response.commandId != CommandId::None && tr->response.token == token && (!extraPredicate || extraPredicate()));
 		};
 
 		HRESULT hr = E_TIMEOUT;
@@ -805,10 +810,20 @@ class WASimClient::Private
 		}
 		else {
 			unique_lock lock(tr->mutex);
-			if (cv->wait_for(lock, chrono::milliseconds(timeout), stop_waiting))
-				hr = S_OK;
+			if (timeout > 0) {
+				if (cv->wait_for(lock, chrono::milliseconds(timeout), stop_waiting))
+					hr = S_OK;
+			}
+			else if (!!extraPredicate) {
+				cv->wait(lock, stop_waiting);
+				hr = stopped ? ERROR_ABANDONED_WAIT_0 : S_OK;
+			}
+			else {
+				hr = E_INVALIDARG;
+				LOG_DBG << "waitCommandResponse() requires a predicate condition when timeout parameter is < 0.";
+			}
 		}
-		if (SUCCEEDED(hr) && response) {
+		if (SUCCEEDED(hr) && !!response) {
 			unique_lock lock(tr->mutex);
 			*response = move(tr->response);
 		}
@@ -836,14 +851,17 @@ class WASimClient::Private
 	void waitListRequestEnd()
 	{
 		auto stop_waiting = [this]() {
-			//shared_lock lock(listResult.mutex);
 			return listResult.nextTimeout.load() >= Clock::now();
 		};
 
 		Command response;
-		HRESULT hr = waitCommandResponse(listResult.token, &response, 0, stop_waiting);
-		if (hr == E_TIMEOUT) {
+		HRESULT hr = waitCommandResponse(listResult.token, &response, -1, stop_waiting);
+		if (hr == ERROR_ABANDONED_WAIT_0) {
 			LOG_ERR << "List request timed out.";
+			hr = E_TIMEOUT;
+		}
+		else if (hr != S_OK) {
+			LOG_ERR << "List request failed with result: "  << LOG_HR(hr);
 		}
 		else if (response.commandId != CommandId::Ack) {
 			LOG_WRN << "Server returned Nak for list request of " << Utilities::getEnumName(listResult.listType.load(), LookupItemTypeNames);
@@ -911,7 +929,7 @@ class WASimClient::Private
 		return sValue;
 	}
 
-	HRESULT getVariable(const VariableRequest &v, double *result)
+	HRESULT getVariable(const VariableRequest &v, double *result, std::string *sResult = nullptr, double dflt = 0.0)
 	{
 		const string sValue = buildVariableCommandString(v, false);
 		if (sValue.empty() || sValue.length() >= STRSZ_CMD)
@@ -919,7 +937,7 @@ class WASimClient::Private
 
 		HRESULT hr;
 		Command response;
-		if FAILED(hr = sendCommandWithResponse(Command(CommandId::Get, v.variableType, sValue.c_str()), &response))
+		if FAILED(hr = sendCommandWithResponse(Command(v.createLVar && v.variableType == 'L' ? CommandId::GetCreate : CommandId::Get, v.variableType, sValue.c_str(), dflt), &response))
 			return hr;
 		if (response.commandId != CommandId::Ack) {
 			LOG_WRN << "Get Variable request for " << quoted(sValue) << " returned Nak response. Reason, if any: " << quoted(response.sData);
@@ -927,15 +945,21 @@ class WASimClient::Private
 		}
 		if (result)
 			*result = response.fData;
+		if (sResult)
+			*sResult = response.sData;
 		return S_OK;
 	}
 
-	HRESULT setVariable(const VariableRequest &v, const double value, bool create = false)
+	HRESULT setVariable(const VariableRequest &v, const double value)
 	{
-		const string sValue = buildVariableCommandString(v, true);
-		if (sValue.empty() || sValue.length() >= STRSZ_CMD)
-			return E_INVALIDARG;
-		return sendServerCommand(Command(create ? CommandId::SetCreate : CommandId::Set, v.variableType, sValue.c_str(), value));
+		if (Utilities::isSettableVariableType(v.variableType)) {
+			const string sValue = buildVariableCommandString(v, true);
+			if (sValue.empty() || sValue.length() >= STRSZ_CMD)
+				return E_INVALIDARG;
+			return sendServerCommand(Command(v.createLVar && v.variableType == 'L' ? CommandId::SetCreate : CommandId::Set, v.variableType, sValue.c_str(), value));
+		}
+		LOG_WRN << "Cannot Set a variable of type '" << v.variableType << "'.";
+		return E_INVALIDARG;
 	}
 
 #pragma endregion
@@ -971,14 +995,14 @@ class WASimClient::Private
 
 	// Writes DataRequest data to the corresponding CDA and waits for an Ack/Nak from server.
 	// If the DataRequest::requestType == None, the request will be deleted by the server and the response wait is skipped.
-	HRESULT sendDataRequest(const DataRequest &req)
+	HRESULT sendDataRequest(const DataRequest &req, bool async)
 	{
 		HRESULT hr;
 		if FAILED(hr = writeDataRequest(req))
 			return hr;
 
 		// check if just deleting an existing request and don't wait around for that response
-		if (req.requestType == RequestType::None)
+		if (async || req.requestType == RequestType::None)
 			return hr;
 
 		shared_ptr<condition_variable_any> cv = make_shared<condition_variable_any>();
@@ -1033,7 +1057,7 @@ class WASimClient::Private
 		return SimConnectHelper::removeClientDataDefinition(hSim, tr->dataId);
 	}
 
-	HRESULT addOrUpdateRequest(const DataRequest &req)
+	HRESULT addOrUpdateRequest(const DataRequest &req, bool async)
 	{
 		if (req.requestType == RequestType::None)
 			return removeRequest(req.requestId);
@@ -1082,7 +1106,7 @@ class WASimClient::Private
 				hr = registerDataRequestArea(tr, isNewRequest, dataAllocationChanged);
 			if SUCCEEDED(hr) {
 				// send the request and wait for Ack; Request may timeout or return a Nak.
-				hr = sendDataRequest(req);
+				hr = sendDataRequest(req, async);
 			}
 			if (FAILED(hr) && isNewRequest) {
 				// delete a new request if anything failed
@@ -1248,7 +1272,8 @@ class WASimClient::Private
 			case SIMCONNECT_RECV_ID_CLIENT_DATA: {
 				SIMCONNECT_RECV_CLIENT_DATA* data = (SIMCONNECT_RECV_CLIENT_DATA*)pData;
 				LOG_TRC << LOG_SC_RCV_CLIENT_DATA(data);
-				const size_t dataSize = (size_t)pData->dwSize + 4 - sizeof(SIMCONNECT_RECV_CLIENT_DATA);  // dwSize reports 4 bytes less than actual size of SIMCONNECT_RECV_CLIENT_DATA
+				// dwSize always under-reports by 4 bytes when sizeof(SIMCONNECT_RECV_CLIENT_DATA) is subtracted, and the minimum reported size is 4 bytes even for 0-3 bytes of actual data.
+				const size_t dataSize = (size_t)pData->dwSize + 4 - sizeof(SIMCONNECT_RECV_CLIENT_DATA);
 				switch (data->dwRequestID)
 				{
 					case DATA_REQ_RESPONSE: {
@@ -1355,12 +1380,11 @@ class WASimClient::Private
 								LOG_WRN << "DataRequest ID " << data->dwRequestID - SIMCONNECTID_LAST << " not found in tracked requests.";
 								return;
 							}
-							// be paranoid
-							if (dataSize != tr->dataSize) {
+							// be paranoid; note that the reported pData->dwSize is never less than 4 bytes.
+							if (dataSize < tr->dataSize) {
 								LOG_CRT << "Invalid data result size! Expected " << tr->dataSize << " but got " << dataSize;
 								return;
 							}
-							//unique_lock lock(mtxRequests);
 							unique_lock datalock(tr->m_dataMutex);
 							memcpy(tr->data.data(), (void*)&data->dwData, tr->dataSize);
 							tr->lastUpdate = chrono::duration_cast<chrono::milliseconds>(chrono::system_clock::now().time_since_epoch()).count();
@@ -1387,8 +1411,6 @@ class WASimClient::Private
 						serverVersion = data->dwData;
 						serverLastSeen = Clock::now();
 						LOG_DBG << "Got ping response at " << Utilities::timePointToString(serverLastSeen.load()) << " with version " << STREAM_HEX8(serverVersion);
-						if (serverVersion != WSMCMND_VERSION)
-							LOG_WRN << "Server version " << STREAM_HEX8(serverVersion) << " does not match WASimClient version " << STREAM_HEX8(WSMCMND_VERSION);
 						break;
 
 					default:
@@ -1526,38 +1548,41 @@ HRESULT WASimClient::executeCalculatorCode(const std::string &code, CalcResultTy
 
 #pragma region Variable accessors ----------------------------------------------
 
-HRESULT WASimClient::getVariable(const VariableRequest & variable, double * pfResult)
+HRESULT WASimClient::getVariable(const VariableRequest & variable, double * pfResult, std::string *psResult)
 {
 	if (variable.variableId > -1 && !Utilities::isIndexedVariableType(variable.variableType)) {
 		LOG_ERR << "Cannot get variable type '" << variable.variableType << "' by index.";
 		return E_INVALIDARG;
 	}
-	return d->getVariable(variable, pfResult);
+	return d->getVariable(variable, pfResult, psResult);
 }
 
-HRESULT WASimClient::getLocalVariable(const std::string &variableName, double * pfResult) {
-	return d->getVariable(VariableRequest('L', variableName), pfResult);
+HRESULT WASimClient::getLocalVariable(const std::string &variableName, double *pfResult, const std::string &unitName) {
+	return d->getVariable(VariableRequest(variableName, false, unitName), pfResult);
 }
 
+HRESULT WASimClient::getOrCreateLocalVariable(const std::string &variableName, double *pfResult, double defaultValue, const std::string &unitName) {
+	return d->getVariable(VariableRequest(variableName, true, unitName), pfResult, nullptr, defaultValue);
+}
 
 HRESULT WASimClient::setVariable(const VariableRequest & variable, const double value) {
 	return d->setVariable(variable, value);
 }
 
-HRESULT WASimClient::setLocalVariable(const std::string &variableName, const double value) {
-	return d->setVariable(VariableRequest('L', variableName), value, false);
+HRESULT WASimClient::setLocalVariable(const std::string &variableName, const double value, const std::string &unitName) {
+	return d->setVariable(VariableRequest(variableName, false, unitName), value);
 }
 
-HRESULT WASimClient::setOrCreateLocalVariable(const std::string &variableName, const double value) {
-	return d->setVariable(VariableRequest('L', variableName), value, true);
+HRESULT WASimClient::setOrCreateLocalVariable(const std::string &variableName, const double value, const std::string &unitName) {
+	return d->setVariable(VariableRequest(variableName, true, unitName), value);
 }
 
 #pragma endregion
 
 #pragma region Data Requests ----------------------------------------------
 
-HRESULT WASimClient::saveDataRequest(const DataRequest &request) {
-	return d->addOrUpdateRequest(request);
+HRESULT WASimClient::saveDataRequest(const DataRequest &request, bool async) {
+	return d->addOrUpdateRequest(request, async);
 }
 
 HRESULT WASimClient::removeDataRequest(const uint32_t requestId) {
@@ -1607,7 +1632,14 @@ vector<uint32_t> WASimClient::dataRequestIdsList() const
 }
 
 HRESULT WASimClient::setDataRequestsPaused(bool paused) const {
-	return d_const->sendServerCommand(Command(CommandId::Subscribe, (paused ? 0 : 1)));
+	if (isConnected()) {
+		HRESULT hr = d_const->sendServerCommand(Command(CommandId::Subscribe, (paused ? 0 : 1)));
+		if SUCCEEDED(hr)
+			d->requestsPaused = paused;
+		return hr;
+	}
+	d->requestsPaused = paused;
+	return S_OK;
 }
 
 #pragma endregion Data

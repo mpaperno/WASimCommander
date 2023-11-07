@@ -18,33 +18,40 @@ and is also available at <http://www.gnu.org/licenses/>.
 */
 
 #pragma once
+
 #include <QMainWindow>
-#include "ui_WASimUI.h"
-#include "client/WASimClient.h"
+#include <QSettings>
+#include "ui_LogConsole.h"
+#include "LogRecordsModel.h"
+#include "WASimCommander.h"
 
-class WASimUIPrivate;
+class WASimCommander::Client::WASimClient;
 
-class WASimUI : public QMainWindow
+namespace WASimUiNS {
+
+class LogConsole : public QWidget
 {
 	Q_OBJECT
 
 public:
-		WASimUI(QWidget *parent = Q_NULLPTR);
-		~WASimUI();
+	LogConsole(QWidget *parent = nullptr);
+	~LogConsole();
+
+	void setClient(WASimCommander::Client::WASimClient *c);
+	WASimUiNS::LogRecordsModel *getModel() const;
+
+public Q_SLOTS:
+	void saveSettings() const;
+	void loadSettings();
+	void logMessage(int level, const QString &msg) const;
 
 signals:
-	void clientEvent(const WASimCommander::Client::ClientEvent &ev);
-	void commandResultReady(const WASimCommander::Command &c);
-	void listResults(const WASimCommander::Client::ListResult &list);
-	void dataResultReady(const WASimCommander::Client::DataRequestRecord &r);
-
-protected:
-	void closeEvent(QCloseEvent *) override;
-	void onClientEvent(const WASimCommander::Client::ClientEvent &ev);
-	void onListResults(const WASimCommander::Client::ListResult &list);
+	void logMessageReady(const WASimCommander::LogRecord &r, quint8 src) const;
 
 private:
-	Ui::WASimUIClass ui;
-	QScopedPointer<WASimUIPrivate> d;
-	friend class WASimUIPrivate;
+	Ui::LogConsole ui;
+	WASimUiNS::LogRecordsModel *logModel = nullptr;
+	WASimCommander::Client::WASimClient *wsClient = nullptr;
 };
+
+}

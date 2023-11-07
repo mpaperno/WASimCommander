@@ -18,33 +18,48 @@ and is also available at <http://www.gnu.org/licenses/>.
 */
 
 #pragma once
-#include <QMainWindow>
-#include "ui_WASimUI.h"
-#include "client/WASimClient.h"
 
-class WASimUIPrivate;
+#include <QWidget>
+#include "ui_RequestsExport.h"
+#include "DataComboBox.h"
 
-class WASimUI : public QMainWindow
+namespace WASimUiNS {
+
+class RequestsModel;
+
+class RequestsExportWidget : public QWidget
 {
 	Q_OBJECT
 
 public:
-		WASimUI(QWidget *parent = Q_NULLPTR);
-		~WASimUI();
+	explicit RequestsExportWidget(RequestsModel *model, QWidget *parent = nullptr);
+	RequestsModel *model() const;
 
-signals:
-	void clientEvent(const WASimCommander::Client::ClientEvent &ev);
-	void commandResultReady(const WASimCommander::Command &c);
-	void listResults(const WASimCommander::Client::ListResult &list);
-	void dataResultReady(const WASimCommander::Client::DataRequestRecord &r);
+public Q_SLOTS:
+	void setLastUsedFile(const QString &fn) { m_lastFile = fn; };
+	void exportAll();
+	void exportSelected();
+
+Q_SIGNALS:
+	void lastUsedFileChanged(const QString &fn);
 
 protected:
 	void closeEvent(QCloseEvent *) override;
-	void onClientEvent(const WASimCommander::Client::ClientEvent &ev);
-	void onListResults(const WASimCommander::Client::ListResult &list);
 
 private:
-	Ui::WASimUIClass ui;
-	QScopedPointer<WASimUIPrivate> d;
-	friend class WASimUIPrivate;
+	void setModel(RequestsModel *model);
+	void exportRecords(bool all = true);
+	void ensureDefaultValues();
+	void updateBulk();
+	void regenIds();
+	void regenNames();
+	void clearForm();
+	void saveSettings() const;
+	void loadSettings();
+
+	QString m_lastFile;
+	RequestsModel *m_model = nullptr;
+	Ui::RequestsExport ui;
 };
+
+}  // WASimUiNS

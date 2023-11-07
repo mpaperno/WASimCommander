@@ -1,4 +1,4 @@
- /*
+/*
 This file is part of the WASimCommander project.
 https://github.com/mpaperno/WASimCommander
 
@@ -27,21 +27,21 @@ and are available at <http://www.gnu.org/licenses/>.
 #define WSMCMND_GUI_NAME          "WASimUI"
 
 #define WSMCMND_VER_MAJOR         1
-#define WSMCMND_VER_MINOR         1
-#define WSMCMND_VER_PATCH         2
+#define WSMCMND_VER_MINOR         2
+#define WSMCMND_VER_PATCH         0
 #define WSMCMND_VER_BUILD         0
 // Git commit hash (top 8 bytes)
-#define WSMCMND_VER_COMIT         0x0C321F25UL
+#define WSMCMND_VER_COMIT         0x4A699DF9UL
 /// Version number in 32 bit "binary coded decimal", eg. 0x01230400 = 1.23.4.0
-#define WSMCMND_VERSION           0x01010200UL
+#define WSMCMND_VERSION           0x01020000UL
 /// Possible version suffix, eg "-beta1"  (can be blank for release versions)
 #define WSMCMND_VER_NAME          ""
 /// Dotted version string Maj.Min.Pat.Bld, eg. "1.23.4.0"
-#define WSMCMND_VERSION_STR       "1.1.2.0"
+#define WSMCMND_VERSION_STR       "1.2.0.0"
 /// Dotted version string with possible suffix, eg. "1.23.4.0-beta1"
-#define WSMCMND_VERSION_INFO      "1.1.2.0"
+#define WSMCMND_VERSION_INFO      "1.2.0.0"
 /// Build date & time in ISO-8601 "Zulu Time" format, UTC
-#define WSMCMND_BUILD_DATE        "2023-02-23T09:43:21Z"
+#define WSMCMND_BUILD_DATE        "2023-11-01T18:50:07Z"
 
 
 #define WSMCMND_PROJECT_URL       "https://github.com/mpaperno/WASimCommander"

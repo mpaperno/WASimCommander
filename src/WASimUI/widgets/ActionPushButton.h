@@ -75,6 +75,7 @@ class ActionPushButton : public QPushButton
 
 	private slots:
 		void updateFromAction(QAction *action);
+		void onClicked(bool checked = false);
 		void onActionTriggered();
 
 	private:

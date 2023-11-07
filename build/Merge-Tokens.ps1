@@ -83,11 +83,12 @@ function Merge-Tokens {
 		Exit 1
 	}
 
+	$TmpFile = [System.IO.Path]::GetTempFileName()
+
 	# If the OutputFile is null, we will write to a temporary file
 	if ([string]::IsNullOrWhiteSpace($OutputFile)) {
 		Write-Verbose "OutputFile was omitted. Replacing InputFile."
-		$OutputFile = [System.IO.Path]::GetTempFileName()
-		$ReplaceInputFile = $true
+		$OutputFile = $InputFile
 	}
 
 	# Empty OutputFile if it already exists
@@ -115,8 +116,6 @@ function Merge-Tokens {
 	$usedTokens = New-Object -TypeName "System.Collections.ArrayList"
 
 	#$sw = [System.IO.File]::AppendText($OutputFile)
-	# hack to force no-BOM UTF8 on PS v5.x
-	" " | Out-File -Encoding ASCII -NoNewline -FilePath $OutputFile
 	(Get-Content $InputFile) | ForEach-Object {
 		$line = $_
 		$totalTokens += GetTokenCount($line)
@@ -134,13 +133,11 @@ function Merge-Tokens {
 		}
 		$missedTokens += GetTokenCount($line)
 		#$sw.WriteLine($line)
-		$line | Out-File -Append -Encoding UTF8 -FilePath $OutputFile
+		$line | Out-File -Append -Encoding UTF8 -FilePath $TmpFile
 	}
 
-	# If no OutputFile was given, we will replace the InputFile with the temporary file
-	if ($ReplaceInputFile) {
-		Get-Content -Path $OutputFile | Out-File -FilePath $InputFile -Encoding UTF8
-	}
+	# Remove UTF8 BOM
+	Get-Content -Path $TmpFile | Out-File -FilePath $OutputFile
 
 	# Write warning if there were tokens given in the Token parameter which were not replaced
 	if (!$NoWarning -and $usedTokens.Count -ne $Tokens.Count) {

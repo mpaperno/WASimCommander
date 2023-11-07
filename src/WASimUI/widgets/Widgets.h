@@ -19,17 +19,14 @@ and is also available at <http://www.gnu.org/licenses/>.
 
 #pragma once
 
-#include <QAbstractItemView>
-#include <QApplication>
 #include <QDebug>
-#include <QComboBox>
 #include <QBoxLayout>
 #include <QLabel>
-#include <QLineEdit>
 #include <vector>
 
 #include "client/WASimClient.h"
 #include "DataComboBox.h"
+#include "DeletableItemsComboBox.h"
 #include "Utils.h"
 
 namespace WASimUiNS
@@ -134,8 +131,11 @@ public:
 		lo->setContentsMargins(8, 1, 10, 2);
 		iconLabel = new QLabel(this);
 		iconLabel->setFixedSize(iconSize, iconSize);
+		tsLabel = new QLabel(this);
+		tsLabel->setForegroundRole(QPalette::Link);
 		textLabel = new QLabel(this);
 		lo->addWidget(iconLabel, 0);
+		lo->addWidget(tsLabel, 0);
 		lo->addWidget(textLabel, 1);
 
 		icon.addFile("fg=green/thumb_up.glyph", QSize(), QIcon::Normal, QIcon::Off);
@@ -154,11 +154,13 @@ public:
 		const QIcon::Mode icnMode = resp.commandId == WSEnums::CommandId::Ack ? QIcon::Mode::Normal :  QIcon::Mode::Active;
 		iconLabel->setPixmap(icon.pixmap(iconSize, icnMode));
 		textLabel->setText(msg + details);
+		tsLabel->setText(QTime::currentTime().toString("[hh:mm:ss.zzz]"));
 	}
 
 private:
 	QIcon icon;
 	QLabel *iconLabel;
+	QLabel *tsLabel;
 	QLabel *textLabel;
 	int iconSize;
 };
@@ -264,16 +266,16 @@ class VariableTypeComboBox : public DataComboBox
 public:
 	VariableTypeComboBox(QWidget *p = nullptr) : DataComboBox(p)
 	{
-		setToolTip(tr("Named variable type. Types marked with a * use Unit specifiers."));
+		setToolTip(tr("Named variable type. Types marked with a * use Unit specifiers. Most 'L' vars will ignore the Unit (default is 'number')."));
 
 		addItem(tr("A: SimVar *"), 'A');
-		addItem(tr("B: Input"),    'B');
+		//addItem(tr("B: Input"),    'B');  // only for gauge modules
 		addItem(tr("C: GPS *"),    'C');
 		addItem(tr("E: Env. *"),   'E');
 		addItem(tr("H: HTML"),     'H');
 		//addItem(tr("I: Instr."),   'I');  // only for gauge modules
 		addItem(tr("K: Key"),      'K');
-		addItem(tr("L: Local"),    'L');
+		addItem(tr("L: Local *"),  'L');
 		addItem(tr("M: Mouse"),    'M');
 		//addItem(tr("O: Comp."),    'O');  // only for gauge modules
 		//addItem(tr("R: Resource"), 'R');  // strings only, can't be read with "Get" command or set at all
@@ -282,84 +284,6 @@ public:
 
 		setCurrentData('L');
 	}
-};
-
-
-class DeletableItemsComboBox : public DataComboBox
-{
-	Q_OBJECT
-	Q_PROPERTY(QString placeholderText READ placeholderText WRITE setPlaceholderText)
-public:
-	DeletableItemsComboBox(QWidget *p = nullptr) : DataComboBox(p)
-	{
-		setEditable(true);
-		setInsertPolicy(InsertAtTop);
-		setSizeAdjustPolicy(AdjustToContents);
-		//setMinimumContentsLength(25);
-		setMaxVisibleItems(25);
-		setCurrentIndex(-1);
-		setToolTip(tr("Manually added text items (at top of list) can be removed by right-clicking on them while the list is open."));
-
-		connect(this, &DeletableItemsComboBox::editTextChanged, this, [this](const QString &txt) {
-			if (txt.isEmpty())
-				setCurrentIndex(-1);
-		});
-		connect(view(), &QAbstractItemView::pressed, [this](const QModelIndex &idx) {
-			if (idx.isValid() && !idx.data(Qt::UserRole).isValid() && (QApplication::mouseButtons() & Qt::RightButton))
-				model()->removeRow(idx.row());
-		});
-	}
-
-	void setClearButtonEnabled(bool enabled) { lineEdit()->setClearButtonEnabled(enabled); }
-
-	const QStringList editedItems() const
-	{
-		QStringList ret;
-		if (!isEditable())
-			return ret;
-		for (int i = 0, e = count(); i < e; ++i) {
-			if (!itemData(i).isValid() && !itemText(i).isEmpty())
-				ret << itemText(i);
-		}
-		return ret;
-	}
-
-	void insertEditedItems(const QStringList &items, InsertPolicy policy = NoInsert)
-	{
-		if (!isEditable() || insertPolicy() == NoInsert)
-			return;
-		if (policy == NoInsert)
-			policy = insertPolicy();
-		int index = 0;
-		switch (policy) {
-			case InsertAtTop:
-				break;
-			case InsertAtBottom:
-				index = count();
-				break;
-			case InsertAfterCurrent:
-				index = qMax(0, currentIndex());
-				break;
-			case InsertBeforeCurrent:
-				index = qMax(0, currentIndex() - 1);
-				break;
-		}
-		const int currIdx = currentIndex();
-		insertItems(index, items);
-		if (policy == InsertAlphabetically)
-			model()->sort(0);
-		if (currIdx == -1)
-			setCurrentIndex(currIdx);
-	}
-
-	QString placeholderText() const { return lineEdit() ? lineEdit()->placeholderText() : ""; }
-
-	void setPlaceholderText(const QString &text)
-	{
-		if (lineEdit())
-			lineEdit()->setPlaceholderText(text);
-	}
-
 };
 
 class ValueSizeComboBox : public DeletableItemsComboBox
@@ -398,6 +322,13 @@ class UnitTypeComboBox : public DeletableItemsComboBox
 public:
 	UnitTypeComboBox(QWidget *p = nullptr) : DeletableItemsComboBox(p)
 	{
+		setToolTip(tr(
+			"<p>Unit Name for the value. For L vars this can be left blank to get the default value of the variable.</p>"
+			"<p>The completion suggestions are looked up from imported SimConnect SDK documentation unit types.</p>"
+			"<p>Unit types may also be saved for quick selection later by pressing Return after selecting one or typing it in.</p>"
+			"<p>Saved items can be removed by right-clicking on them while the list is open.</p>"
+		));
+
 		setInsertPolicy(InsertAlphabetically);
 		int i = 0;
 		addItem(QStringLiteral("bar"), i++);
@@ -430,6 +361,7 @@ public:
 		addItem(QStringLiteral("psi"), i++);
 		addItem(QStringLiteral("radians"), i++);
 		addItem(QStringLiteral("rpm"), i++);
+		addItem(QStringLiteral("seconds"), i++);
 		addItem(QStringLiteral("string"), i++);
 		addItem(QStringLiteral("volts"), i++);
 		addItem(QStringLiteral("Watts"), i++);

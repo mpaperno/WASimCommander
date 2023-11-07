@@ -20,29 +20,36 @@ and is also available at <http://www.gnu.org/licenses/>.
 #include <iostream>
 
 #include <QAction>
+#include <QCompleter>
+#include <QCloseEvent>
 #include <QDateTime>
 #include <QDebug>
 #include <QDesktopServices>
 #include <QFileDialog>
+#include <QItemSelectionModel>
 #include <QMenu>
 #include <QMetaType>
 #include <QPushButton>
-#include <QResizeEvent>
 #include <QScrollBar>
-#include <QItemSelectionModel>
 #include <QSettings>
 #include <QStandardPaths>
 #include <QString>
 #include <QToolBar>
 
 #include "WASimUI.h"
-#include "RequestsModel.h"
+
+#include "DocImports.h"
+#include "DocImportsBrowser.h"
 #include "EventsModel.h"
-#include "LogRecordsModel.h"
+#include "LogConsole.h"
+#include "RequestsExport.h"
+#include "RequestsFormat.h"
+#include "RequestsModel.h"
 #include "Utils.h"
 #include "Widgets.h"
 
 using namespace WASimUiNS;
+using namespace DocImports;
 using namespace WASimCommander;
 using namespace WASimCommander::Client;
 using namespace WASimCommander::Enums;
@@ -55,6 +62,13 @@ class WASimUIPrivate
 {
 	friend class WASimUI;
 	Q_DECLARE_TR_FUNCTIONS(WASimUI)
+
+	struct FormWidget {
+		QString name;
+		QWidget *w;
+		QAction *a;
+	};
+
 public:
 	WASimUI *q;
 	Ui::WASimUIClass *ui;
@@ -62,18 +76,20 @@ public:
 	StatusWidget *statWidget;
 	RequestsModel *reqModel;
 	EventsModel *eventsModel;
-	LogRecordsModel *logModel;
+	RequestsExportWidget *reqExportWidget = nullptr;
+	DocImportsBrowser *docBrowserWidget = nullptr;
+	QAction *toggleConnAct = nullptr;
 	QAction *initAct = nullptr;
 	QAction *connectAct = nullptr;
 	ClientStatus clientStatus = ClientStatus::Idle;
 	QString lastRequestsFile;
 	QString lastEventsFile;
 	uint32_t nextCmdToken = 0x0000FFFF;
+	QVector<FormWidget> formWidgets { };
 
 	WASimUIPrivate(WASimUI *q) : q(q), ui(&q->ui),
 		reqModel(new RequestsModel(q)),
 		eventsModel(new EventsModel(q)),
-		logModel(new LogRecordsModel(q)),
 		statWidget(new StatusWidget(q)),
 		client(new WASimClient(0xDEADBEEF))
 	{
@@ -90,8 +106,16 @@ public:
 		client->setCommandResultCallback(&WASimUI::commandResultReady, q);
 		client->setDataCallback(&WASimUI::dataResultReady, q);
 		client->setListResultsCallback(&WASimUI::listResults, q);
-		client->setLogCallback([=](const LogRecord &l, LogSource s) { emit q->logMessageReady(l, +s); });
+
+		// Connect our own signals for client callback handling in a thread-safe manner, marshaling back to GUI thread as needed.
+		// The "signal" methods are "emitted" by the Client as callbacks, registered in Private::setupClient().
+		QObject::connect(q, &WASimUI::clientEvent, q, &WASimUI::onClientEvent, Qt::QueuedConnection);
+		QObject::connect(q, &WASimUI::listResults, q, &WASimUI::onListResults, Qt::QueuedConnection);
+		// Data updates can go right to the requests model.
+		QObject::connect(q, &WASimUI::dataResultReady, reqModel, &RequestsModel::setRequestValue, Qt::QueuedConnection);
 	}
+
+	bool isConnected() const { return client->isConnected(); }
 
 	bool checkConnected()
 	{
@@ -100,6 +124,38 @@ public:
 		logUiMessage(tr("Server not connected."), CommandId::Nak);
 		return false;
 	}
+
+	void pingServer() {
+		quint32 v = client->pingServer();
+		if (v > 0)
+			logUiMessage(tr("Server responded to ping with version: %1").arg(v, 8, 16, QChar('0')), CommandId::Ping, LogLevel::Info);
+		else
+			logUiMessage(tr("Ping request timed out!"), CommandId::Ping);
+	}
+
+	void toggleConnection(bool sim, bool wasim)
+	{
+		if (client->isConnected()) {
+			if (wasim)
+				client->disconnectServer();
+			if (sim)
+				client->disconnectSimulator();
+			return;
+		}
+		if (client->isInitialized() && !wasim) {
+				client->disconnectSimulator();
+				return;
+		}
+		if (!client->isInitialized()) {
+			if (SUCCEEDED(client->connectSimulator()) && wasim)
+				client->connectServer();
+		}
+		else if (wasim && !client->isConnected()) {
+			client->connectServer();
+		}
+	}
+
+	// Calculator Code form -------------------------------------------------
 
 	void runCalcCode()
 	{
@@ -124,7 +180,6 @@ public:
 		else {
 			ui->leCalcResult->setText(tr("Execute failed, check log."));
 		}
-
 	}
 
 	void copyCalcCodeToRequest()
@@ -136,9 +191,15 @@ public:
 		//ui->cbValueSize->setCurrentData(Utils::calcResultTypeToMetaType(CalcResultType(ui->cbCalcResultType->currentData().toUInt())));
 	}
 
-	void refreshLVars() {
-		client->list();
+	void updateCalcCodeFormState(const QString &txt) {
+		const bool en = !txt.isEmpty();
+		ui->btnCalc->defaultAction()->setEnabled(en && isConnected());
+		ui->btnAddEvent->defaultAction()->setEnabled(en);
+		ui->btnUpdateEvent->defaultAction()->setEnabled(en);
+		ui->btnCopyCalcToRequest->defaultAction()->setEnabled(en);
 	}
+
+	// Lookups form  -------------------------------------------------
 
 	void lookupItem()
 	{
@@ -157,7 +218,13 @@ public:
 			ui->leLookupResult->setText(tr("Lookup failed."));
 	}
 
-	void getLocalVar()
+	// Variables form -------------------------------------------------
+
+	void refreshLVars() {
+		client->list();
+	}
+
+	void getLocalVar(bool create = false)
 	{
 		if (!checkConnected())
 			return;
@@ -168,14 +235,27 @@ public:
 			return;
 		}
 		double result;
-		const HRESULT hr = client->getVariable(VariableRequest(vtype, varName.toStdString(), ui->cbSetVarUnitName->currentText().toStdString(), ui->sbGetSetSimVarIndex->value()), &result);
-		if (hr == S_OK)
-			ui->leVarResult->setText(QString("%1").arg(result, 0, 'f', 7));
+		std::string sRes;
+		HRESULT hr;
+		if (vtype == 'L' && create)
+			hr = client->getOrCreateLocalVariable(varName.toStdString(), &result, ui->dsbSetVarValue->value(), ui->cbSetVarUnitName->currentText().toStdString());
 		else
-			ui->leVarResult->setText(QString("Error: 0x%1").arg((quint32)hr, 8, 16, QChar('0')));
+			hr = client->getVariable(VariableRequest(vtype, varName.toStdString(), ui->cbSetVarUnitName->currentText().toStdString(), ui->sbGetSetSimVarIndex->value()), &result, &sRes);
+		if (hr == S_OK) {
+			if (ui->cbSetVarUnitName->currentText() == QLatin1Literal("string"))
+				ui->leVarResult->setText(sRes.empty() ? tr("Result returned empty string") : QString::fromStdString(sRes));
+			else
+				ui->leVarResult->setText(QString::number(result));
+			return;
+		}
+		ui->leVarResult->setText(QString("Error: 0x%1").arg((quint32)hr, 8, 16, QChar('0')));
+		logUiMessage(tr("Variable request failed."), CommandId::Get);
 	}
 
-	void setLocalVar(bool create = false) {
+	void setLocalVar(bool create = false)
+	{
+		if (!checkConnected())
+			return;
 		const char vtype = ui->cbGetSetVarType->currentData().toChar().toLatin1();
 		const QString &varName = vtype == 'L' ? ui->cbLvars->currentText() : ui->cbVariableName->currentText();
 		if (varName.isEmpty()) {
@@ -183,9 +263,33 @@ public:
 			return;
 		}
 		if (vtype == 'L' && create)
-			client->setOrCreateLocalVariable(varName.toStdString(), ui->dsbSetVarValue->value());
+			client->setOrCreateLocalVariable(varName.toStdString(), ui->dsbSetVarValue->value(), ui->cbSetVarUnitName->currentText().toStdString());
 		else
 			client->setVariable(VariableRequest(vtype, varName.toStdString(), ui->cbSetVarUnitName->currentText().toStdString(), ui->sbGetSetSimVarIndex->value()), ui->dsbSetVarValue->value());
+	}
+
+	void toggleSetGetVariableType()
+	{
+		const QChar vtype = ui->cbGetSetVarType->currentData().toChar();
+		bool isLocal = vtype == 'L', isSimVar = vtype == 'A';
+		ui->wLocalVarsForm->setVisible(isLocal);
+		ui->wOtherVarsForm->setVisible(!isLocal);
+		ui->wGetSetSimVarIndex->setVisible(isSimVar);
+		ui->btnSetCreate->setVisible(isLocal);
+		ui->btnGetCreate->setVisible(isLocal);
+		bool hasUnit = ui->cbGetSetVarType->currentText().contains('*');
+		ui->cbSetVarUnitName->setVisible(hasUnit);
+		ui->lblSetVarUnit->setVisible(hasUnit);
+		if (isSimVar) {
+			ui->cbVariableName->setCompleter(new DocImports::NameCompleter(DocImports::RecordType::SimVars, ui->cbNameOrCode));
+			ui->cbVariableName->lineEdit()->addAction(ui->btnFindSimVar->defaultAction(), QLineEdit::TrailingPosition);
+		}
+		else {
+			ui->cbVariableName->lineEdit()->removeAction(ui->btnFindSimVar->defaultAction());
+			ui->cbVariableName->resetCompleter();
+			if (isLocal)
+				ui->cbSetVarUnitName->setCurrentText("");
+		}
 	}
 
 	void copyLocalVarToRequest()
@@ -196,8 +300,21 @@ public:
 		ui->cbNameOrCode->setCurrentText(vtype == 'L' ? ui->cbLvars->currentText() : ui->cbVariableName->currentText());
 		ui->cbVariableType->setCurrentData(vtype);
 		ui->cbUnitName->setCurrentText(ui->cbSetVarUnitName->currentText());
-		ui->cbValueSize->setCurrentData(+QMetaType::Double);
+		ui->cbValueSize->setCurrentData(Utils::unitToMetaType(ui->cbUnitName->currentText()));
 	}
+
+	void updateLocalVarsFormState() {
+		const bool isLocal = ui->wLocalVarsForm->isVisible();
+		const bool haveData = !(isLocal ? ui->cbLvars->currentText().isEmpty() : ui->cbVariableName->currentText().isEmpty());
+		const bool en = haveData && isConnected();
+		ui->btnGetVar->defaultAction()->setEnabled(en);
+		ui->btnSetVar->defaultAction()->setEnabled(en);
+		ui->btnSetCreate->defaultAction()->setEnabled(en && isLocal);
+		ui->btnGetCreate->defaultAction()->setEnabled(en && isLocal);
+		ui->btnCopyLVarToRequest->defaultAction()->setEnabled(haveData);
+	}
+
+	// Key Events form -------------------------------------------------
 
 	void sendKeyEventForm()
 	{
@@ -228,7 +345,6 @@ public:
 		client->sendCommand(cmd);
 	}
 
-
 	// Data Requests handling -------------------------------------------------
 
 	void toggleRequestType()
@@ -237,20 +353,35 @@ public:
 		ui->cbRequestCalcResultType->setVisible(isCalc);
 		ui->lblRequestCalcResultType->setVisible(isCalc);
 		ui->cbVariableType->setVisible(!isCalc);
-		//ui->lblUnit->setVisible(!isCalc);
-		//ui->cbUnitName->setVisible(!isCalc);
 		toggleRequestVariableType();
+		if (isCalc)
+			ui->cbValueSize->setCurrentData(Utils::calcResultTypeToMetaType(CalcResultType(ui->cbRequestCalcResultType->currentData().toUInt())));
+		else
+			ui->cbValueSize->setCurrentData(Utils::unitToMetaType(ui->cbUnitName->currentText()));
 	}
 
 	void toggleRequestVariableType()
 	{
+		const QChar type = ui->cbVariableType->currentData().toChar();
 		bool isCalc = ui->rbRequestType_Calculated->isChecked();
-		bool needIdx = !isCalc && ui->cbVariableType->currentData().toChar() == 'A';
+		bool needIdx = !isCalc && type == 'A';
 		ui->lblIndex->setVisible(needIdx);
 		ui->sbSimVarIndex->setVisible(needIdx);
 		bool hasUnit = !isCalc && ui->cbVariableType->currentText().contains('*');
 		ui->lblUnit->setVisible(hasUnit);
 		ui->cbUnitName->setVisible(hasUnit);
+
+		if (needIdx) {
+			ui->cbNameOrCode->setCompleter(new DocImports::NameCompleter(DocImports::RecordType::SimVars, ui->cbNameOrCode));
+			ui->cbNameOrCode->lineEdit()->addAction(ui->btnReqFindSimVar->defaultAction(), QLineEdit::TrailingPosition);
+		}
+		else {
+			// restore default completer
+			ui->cbNameOrCode->resetCompleter();
+			ui->cbNameOrCode->lineEdit()->removeAction(ui->btnReqFindSimVar->defaultAction());
+			if (type == 'L')
+				ui->cbUnitName->setCurrentText("");
+		}
 	}
 
 	void setRequestFormId(uint32_t id)
@@ -258,11 +389,11 @@ public:
 		ui->wRequestForm->setProperty("requestId", id);
 		if ((int)id > -1) {
 			ui->lblCurrentRequestId->setText(QString("%1").arg(id));
-			ui->pbUpdateRequest->setEnabled(true);
+			ui->btnUpdateRequest->defaultAction()->setEnabled(true);
 		}
 		else  {
 			ui->lblCurrentRequestId->setText(tr("New"));
-			ui->pbUpdateRequest->setEnabled(false);
+			ui->btnUpdateRequest->defaultAction()->setEnabled(false);
 		}
 	}
 
@@ -273,11 +404,15 @@ public:
 			return;
 		}
 
-		uint32_t requestId = ui->wRequestForm->property("requestId").toUInt();
-		if ((int)requestId < 0 || !update)
-			requestId = reqModel->nextRequestId();
+		RequestRecord req;
+		int row = -1;
+		if (update && ui->wRequestForm->property("requestId").toInt() > -1)
+			row = reqModel->findRequestRow(ui->wRequestForm->property("requestId").toUInt());
+		if (row < 0)
+			req = RequestRecord(reqModel->nextRequestId());
+		else
+			req = reqModel->getRequest(row);
 
-		RequestRecord req(requestId);
 		req.requestType = ui->rbRequestType_Calculated->isChecked() ? RequestType::Calculated : RequestType::Named;
 		if (req.requestType == RequestType::Calculated) {
 			req.calcResultType = (CalcResultType)ui->cbRequestCalcResultType->currentData().toUInt();
@@ -289,7 +424,6 @@ public:
 		req.setNameOrCode(qPrintable(ui->cbNameOrCode->currentText()));
 		req.setUnitName(qPrintable(ui->cbUnitName->currentText()));
 
-		int metaType = QMetaType::UnknownType;
 		if (ui->cbValueSize->currentData().isValid())
 			req.valueSize = Utils::metaTypeToSimType(req.metaType = ui->cbValueSize->currentData().toInt());
 		else
@@ -305,7 +439,7 @@ public:
 		//std::cout << req << std::endl;
 		setRequestFormId(req.requestId);
 
-		if FAILED(client->saveDataRequest(req))
+		if (FAILED(client->saveDataRequest(req)) && row < 0)
 			return;
 		const QModelIndex idx = reqModel->addRequest(req);
 		ui->requestsView->selectRow(idx.row());
@@ -330,14 +464,22 @@ public:
 			ui->cbUnitName->setCurrentText(req.unitName);
 			ui->sbSimVarIndex->setValue(req.simVarIndex);
 		}
-		if (req.metaType == QMetaType::UnknownType)
-			ui->cbValueSize->setCurrentText(QString("%1").arg(req.valueSize));
-		else
-			ui->cbValueSize->setCurrentData(req.metaType);
 		ui->cbNameOrCode->setCurrentText(req.nameOrCode);
 		ui->cbPeriod->setCurrentData(+req.period);
 		ui->sbInterval->setValue(req.interval);
 		ui->dsbDeltaEpsilon->setValue(req.deltaEpsilon);
+	}
+
+	void clearRequestForm()
+	{
+		setRequestFormId(-1);
+		ui->cbNameOrCode->setCurrentText("");
+		ui->cbUnitName->setCurrentText("");
+		ui->cbValueSize->setCurrentText("");
+		ui->sbSimVarIndex->setValue(0);
+		ui->cbPeriod->setCurrentData(+UpdatePeriod::Tick);
+		ui->sbInterval->setValue(0);
+		ui->dsbDeltaEpsilon->setValue(0.0);
 	}
 
 	void removeRequests(const QModelIndexList &list)
@@ -351,7 +493,7 @@ public:
 	}
 
 	void removeSelectedRequests() {
-		removeRequests(reqModel->flattenIndexList(ui->requestsView->selectionModel()->selectedIndexes()));
+		removeRequests(ui->requestsView->selectionModel()->selectedRows(RequestsModel::COL_ID));
 	}
 
 	void removeAllRequests() {
@@ -367,12 +509,21 @@ public:
 	{
 		if (!checkConnected())
 			return;
-		const QModelIndexList list = reqModel->flattenIndexList(ui->requestsView->selectionModel()->selectedIndexes());
+		const QModelIndexList list = ui->requestsView->selectionModel()->selectedRows(RequestsModel::COL_ID);
 		for (const QModelIndex &idx : list)
 			client->updateDataRequest(reqModel->requestId(idx.row()));
 	}
 
-	void saveRequests()
+	void pauseRequests(bool chk) {
+		static const QIcon dataResumeIcon(QStringLiteral("play_arrow.glyph"));
+		static const QIcon dataPauseIcon(QStringLiteral("pause.glyph"));
+		client->setDataRequestsPaused(chk);
+		ui->btnReqestsPause->defaultAction()->setIconText(chk ? tr("Resume") : tr("Suspend"));
+		// for some reason the checked icon "on" state doesn't work automatically like it should...
+		ui->btnReqestsPause->setIcon(chk ? dataResumeIcon : dataPauseIcon);
+	};
+
+	void saveRequests(bool forExport = false)
 	{
 		if (!reqModel->rowCount())
 			return;
@@ -381,8 +532,33 @@ public:
 		if (fname.isEmpty())
 			return;
 		lastRequestsFile = fname;
-		const int rows = reqModel->saveToFile(fname);
+		const int rows = forExport ? RequestsFormat::exportToPluginFormat(reqModel, reqModel->allRequests(), fname) : reqModel->saveToFile(fname);
 		logUiMessage(tr("Saved %1 Data Request(s) to file: %2").arg(rows).arg(fname), CommandId::Ack, LogLevel::Info);
+	}
+
+	void exportRequests()
+	{
+		if (!reqModel->rowCount())
+			return;
+
+		if (reqExportWidget) {
+			if (reqExportWidget->isMinimized()) {
+				reqExportWidget->showNormal();
+			}
+			else {
+				reqExportWidget->raise();
+				reqExportWidget->activateWindow();
+			}
+			return;
+		}
+
+		reqExportWidget = new RequestsExportWidget(reqModel, q);
+		reqExportWidget->setWindowFlag(Qt::Dialog);
+		reqExportWidget->setAttribute(Qt::WA_DeleteOnClose);
+		reqExportWidget->setLastUsedFile(lastRequestsFile);
+		QObject::connect(reqExportWidget, &RequestsExportWidget::lastUsedFileChanged, [&](const QString &fn) { lastRequestsFile = fn; });
+		QObject::connect(reqExportWidget, &QObject::destroyed, q, [=]() { reqExportWidget = nullptr; });
+		reqExportWidget->show();
 	}
 
 	void loadRequests(bool replace)
@@ -393,13 +569,33 @@ public:
 		lastRequestsFile = fname;
 		if (replace)
 			removeAllRequests();
-		const QList<RequestRecord> &added = reqModel->loadFromFile(fname);
+
+		QFile f(fname);
+		if (!f.open(QFile::ReadOnly | QFile::Text)) {
+			logUiMessage(tr("Could not open file '%1' for reading").arg(fname), CommandId::Nak, LogLevel::Error);
+			return;
+		}
+		const QString first = f.readLine();
+		f.close();
+		const bool isNative = first.startsWith(QLatin1Literal("[Requests]"));
+
+		const QList<RequestRecord> &added = isNative ? reqModel->loadFromFile(fname) : RequestsFormat::importFromPluginFormat(reqModel, fname);
 		for (const DataRequest &req : added)
-			client->saveDataRequest(req);
+			client->saveDataRequest(req, true);  // async
 
 		logUiMessage(tr("Loaded %1 Data Request(s) from file: %2").arg(added.count()).arg(fname), CommandId::Ack, LogLevel::Info);
 	}
 
+	void toggleRequestButtonsState()
+	{
+		bool conn = isConnected();
+		bool hasSel = ui->requestsView->selectionModel()->hasSelection();
+		bool hasRecords = reqModel->rowCount() > 0;
+		ui->btnReqestsRemove->defaultAction()->setEnabled(hasSel);
+		ui->btnReqestsUpdate->defaultAction()->setEnabled(hasSel && conn);
+		ui->btnReqestsPause->defaultAction()->setEnabled(hasRecords);
+		ui->btnReqestsSave->defaultAction()->setEnabled(hasRecords);
+	}
 
 	// Registered calc events -------------------------------------------------
 
@@ -464,7 +660,7 @@ public:
 	}
 
 	void removeSelectedEvents() {
-		removeEvents(eventsModel->flattenIndexList(ui->eventsView->selectionModel()->selectedIndexes()));
+		removeEvents(ui->eventsView->selectionModel()->selectedRows(EventsModel::COL_ID));
 	}
 
 	void removeAllEvents() {
@@ -481,7 +677,7 @@ public:
 	{
 		if (!checkConnected())
 			return;
-		const QModelIndexList list = eventsModel->flattenIndexList(ui->eventsView->selectionModel()->selectedIndexes());
+		const QModelIndexList list = ui->eventsView->selectionModel()->selectedRows(EventsModel::COL_ID);
 		for (const QModelIndex &idx : list)
 			client->transmitEvent(eventsModel->eventId(idx.row()));
 	}
@@ -514,15 +710,61 @@ public:
 		logUiMessage(tr("Loaded %1 Data Request(s) from file: %2").arg(added.count()).arg(fname), CommandId::Ack, LogLevel::Info);
 	}
 
+	void toggleEventButtonsState()
+	{
+		bool hasSel = ui->eventsView->selectionModel()->hasSelection();
+		ui->btnEventsRemove->defaultAction()->setEnabled(hasSel);
+		ui->btnEventsTransmit->defaultAction()->setEnabled(hasSel && isConnected());
+	}
+
 
 	// Utilities  -------------------------------------------------
 
 	void logUiMessage(const QString &msg, CommandId cmd = CommandId::None, LogLevel level = LogLevel::Error)
 	{
-		LogRecord l(level, qPrintable(msg));
-		emit q->logMessageReady(l, +LogRecordsModel::LogSource::UI);
+		ui->wLogWindow->logMessage(+level, msg);
 		if (cmd != CommandId::None)
 			emit q->commandResultReady(Command(level == LogLevel::Error ? CommandId::Nak : CommandId::Ack, +cmd, qPrintable(msg)));
+	}
+
+	void openDocsLookup(DocImports::RecordType type, QComboBox *cb)
+	{
+		DocImportsBrowser *browser = new DocImportsBrowser(q, type, DocImportsBrowser::ViewMode::PopupViewMode);
+		browser->setAttribute(Qt::WA_DeleteOnClose);
+		browser->setWindowFlag(Qt::Dialog);
+		browser->setWindowModality(Qt::ApplicationModal);
+		browser->show();
+		const QPoint qPos = q->mapToGlobal(QPoint(0,0));
+		const QPoint cbPos = cb->mapToGlobal(QPoint(0, cb->height()));
+		const QRect rect(qPos, q->size());
+		QPoint pos = QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, browser->size(), rect).topLeft();
+		pos.setY(rect.y() + cbPos.y() - qPos.y());
+		browser->move(pos);
+		QObject::connect(browser, &DocImportsBrowser::itemSelected, q, [=](const QModelIndex &row) {
+			if (row.isValid())
+				cb->setCurrentText(browser->model()->record(row.row()).field("Name").value().toString());
+			browser->close();
+		});
+	}
+
+	void openDocsLookupWindow()
+	{
+		if (docBrowserWidget) {
+			if (docBrowserWidget->isMinimized()) {
+				docBrowserWidget->showNormal();
+			}
+			else {
+				docBrowserWidget->raise();
+				docBrowserWidget->activateWindow();
+			}
+			return;
+		}
+
+		docBrowserWidget = new DocImportsBrowser(q);
+		docBrowserWidget->setAttribute(Qt::WA_DeleteOnClose);
+		docBrowserWidget->setWindowFlag(Qt::Dialog);
+		docBrowserWidget->show();
+		QObject::connect(docBrowserWidget, &QObject::destroyed, q, [=]() { docBrowserWidget = nullptr; });
 	}
 
 
@@ -533,8 +775,15 @@ public:
 		QSettings set;
 		set.setValue(QStringLiteral("mainWindowGeo"), q->saveGeometry());
 		set.setValue(QStringLiteral("mainWindowState"), q->saveState());
-		set.setValue(QStringLiteral("eventsViewHeaderState"), ui->eventsView->horizontalHeader()->saveState());
-		set.setValue(QStringLiteral("logViewHeaderState"), ui->logView->horizontalHeader()->saveState());
+		set.setValue(QStringLiteral("eventsViewState"), ui->eventsView->saveState());
+		set.setValue(QStringLiteral("requestsViewState"), ui->requestsView->saveState());
+		ui->wLogWindow->saveSettings();
+
+		// Visible form widgets
+		set.beginGroup(QStringLiteral("Widgets"));
+		for (const FormWidget &vw : qAsConst(formWidgets))
+			set.setValue(vw.name, vw.a->isChecked());
+		set.endGroup();
 
 		set.setValue(QStringLiteral("useDarkTheme"), Utils::isDarkStyle());
 		set.setValue(QStringLiteral("lastRequestsFile"), lastRequestsFile);
@@ -543,21 +792,35 @@ public:
 		set.beginGroup(QStringLiteral("EditableSelectors"));
 		const QList<DeletableItemsComboBox *> editable = q->findChildren<DeletableItemsComboBox *>();
 		for (DeletableItemsComboBox *cb : editable)
-			set.setValue(cb->objectName(), cb->editedItems());
+			set.setValue(cb->objectName(), cb->saveState());
+		set.endGroup();
+
+		// Variables form
+		set.beginGroup(ui->wLocalVarsForm->objectName());
+		set.setValue(ui->cbGetSetVarType->objectName(), ui->cbGetSetVarType->currentData());
+		set.endGroup();
+
+		// Requests form
+		set.beginGroup(ui->wRequests->objectName());
+		set.setValue(ui->bgrpRequestType->objectName(), ui->rbRequestType_Named->isChecked());
+		set.setValue(ui->cbVariableType->objectName(), ui->cbVariableType->currentData());
 		set.endGroup();
 	}
 
 	void readSettings()
 	{
 		QSettings set;
-		if (set.contains(QStringLiteral("mainWindowGeo")))
-			q->restoreGeometry(set.value(QStringLiteral("mainWindowGeo")).toByteArray());
-		if (set.contains(QStringLiteral("mainWindowState")))
-			q->restoreState(set.value(QStringLiteral("mainWindowState")).toByteArray());
-		if (set.contains(QStringLiteral("eventsViewHeaderState")))
-			ui->eventsView->horizontalHeader()->restoreState(set.value(QStringLiteral("eventsViewHeaderState")).toByteArray());
-		if (set.contains(QStringLiteral("logViewHeaderState")))
-			ui->logView->horizontalHeader()->restoreState(set.value(QStringLiteral("logViewHeaderState")).toByteArray());
+		q->restoreGeometry(set.value(QStringLiteral("mainWindowGeo")).toByteArray());
+		q->restoreState(set.value(QStringLiteral("mainWindowState")).toByteArray());
+		ui->eventsView->restoreState(set.value(QStringLiteral("eventsViewState")).toByteArray());
+		ui->requestsView->restoreState(set.value(QStringLiteral("requestsViewState")).toByteArray());
+		ui->wLogWindow->loadSettings();
+
+		// Visible form widgets
+		set.beginGroup(QStringLiteral("Widgets"));
+		for (const FormWidget &vw : qAsConst(formWidgets))
+			vw.a->setChecked(set.value(vw.name, vw.a->isChecked()).toBool());
+		set.endGroup();
 
 		const QString defaultFileLoc = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
 		lastRequestsFile = set.value(QStringLiteral("lastRequestsFile"), defaultFileLoc + QStringLiteral("/WASimUI-requests.ini")).toString();
@@ -569,15 +832,23 @@ public:
 		set.beginGroup(QStringLiteral("EditableSelectors"));
 		const QList<DeletableItemsComboBox *> editable = q->findChildren<DeletableItemsComboBox *>();
 		for (DeletableItemsComboBox *cb : editable) {
-			if (set.contains(cb->objectName())) {
-				QStringList val = set.value(cb->objectName()).toStringList();
-				if (val.isEmpty())
-					continue;
-				if (cb->insertPolicy() != QComboBox::InsertAlphabetically)
-					std::sort(val.begin(), val.end());
-				cb->insertEditedItems(val);
-			}
+			// check for old version settings format
+			if (set.value(cb->objectName()).canConvert<QStringList>())
+				cb->insertEditedItems(set.value(cb->objectName()).toStringList());
+			else
+				cb->restoreState(set.value(cb->objectName()).toByteArray());
 		}
+		set.endGroup();
+
+		// Variables form
+		set.beginGroup(ui->wLocalVarsForm->objectName());
+		ui->cbGetSetVarType->setCurrentData(set.value(ui->cbGetSetVarType->objectName(), ui->cbGetSetVarType->currentData()));
+		set.endGroup();
+
+		// Requests form
+		set.beginGroup(ui->wRequests->objectName());
+		ui->rbRequestType_Named->setChecked(set.value(ui->bgrpRequestType->objectName(), ui->rbRequestType_Named->isChecked()).toBool());
+		ui->cbVariableType->setCurrentData(set.value(ui->cbVariableType->objectName(), ui->cbVariableType->currentData()));
 		set.endGroup();
 	}
 
@@ -587,6 +858,28 @@ public:
 // -------------------------------------------------------------
 // WASimUI
 // -------------------------------------------------------------
+
+// Action creation macros used below
+#define GLYPH_STR(ICN)   QStringLiteral(##ICN ".glyph")
+#define GLYPH_ICON(ICN)  QIcon(GLYPH_STR(ICN))
+
+#define MAKE_ACTION_NW(ACT, TTL, ICN, TT)  QAction *ACT = new QAction(GLYPH_ICON(ICN), TTL, this); ACT->setAutoRepeat(false); ACT->setToolTip(TT)
+#define MAKE_ACTION_NB(ACT, TTL, ICN, W, TT)        MAKE_ACTION_NW(ACT, TTL, ICN, TT); ui.##W->addAction(ACT)
+#define MAKE_ACTION_NC(ACT, TTL, ICN, BTN, W, TT)   MAKE_ACTION_NB(ACT, TTL, ICN, W, TT); ui.##BTN->setDefaultAction(ACT)
+
+#define MAKE_ACTION_CONN(ACT, M)    connect(ACT, &QAction::triggered, this, [this](bool chk) { d->##M; })
+#define MAKE_ACTION_SCUT(ACT, KS)   ACT->setShortcut(KS); ACT->setShortcutContext(Qt::WidgetWithChildrenShortcut)
+#define MAKE_ACTION_ITXT(ACT, T)    ACT->setIconText(" " + T)
+
+#define MAKE_ACTION(ACT, TTL, ICN, BTN, W, M, TT)                MAKE_ACTION_NC(ACT, TTL, ICN, BTN, W, TT); MAKE_ACTION_CONN(ACT, M)
+#define MAKE_ACTION_D(ACT, TTL, ICN, BTN, W, M, TT)              MAKE_ACTION(ACT, TTL, ICN, BTN, W, M, TT); ACT->setDisabled(true)
+#define MAKE_ACTION_SC(ACT, TTL, ICN, BTN, W, M, TT, KS)         MAKE_ACTION(ACT, TTL, ICN, BTN, W, M, TT); MAKE_ACTION_SCUT(ACT, KS)
+#define MAKE_ACTION_SC_D(ACT, TTL, ICN, BTN, W, M, TT, KS)       MAKE_ACTION_SC(ACT, TTL, ICN, BTN, W, M, TT, KS); ACT->setDisabled(true)
+#define MAKE_ACTION_PB(ACT, TTL, IT, ICN, BTN, W, M, TT, KS)     MAKE_ACTION_SC(ACT, TTL, ICN, BTN, W, M, TT, KS); MAKE_ACTION_ITXT(ACT, IT)
+#define MAKE_ACTION_PB_D(ACT, TTL, IT, ICN, BTN, W, M, TT, KS)   MAKE_ACTION_SC_D(ACT, TTL, ICN, BTN, W, M, TT, KS); MAKE_ACTION_ITXT(ACT, IT)
+#define MAKE_ACTION_PB_NC(ACT, TTL, IT, ICN, BTN, W, TT)         MAKE_ACTION_NC(ACT, TTL, ICN, BTN, W, TT); MAKE_ACTION_ITXT(ACT, IT)
+#define MAKE_ACTION_NW_SC(ACT, TTL, IT, ICN, M, TT, KS)          MAKE_ACTION_NW(ACT, TTL, ICN, TT); MAKE_ACTION_CONN(ACT, M); MAKE_ACTION_ITXT(ACT, IT); MAKE_ACTION_SCUT(ACT, KS)
+// ---------------------------------
 
 WASimUI::WASimUI(QWidget *parent) :
 	QMainWindow(parent),
@@ -641,19 +934,50 @@ WASimUI::WASimUI(QWidget *parent) :
 	ui.dsbDeltaEpsilon->setMaximum(FLT_MAX);
 	// maximum lengths for text edit boxes
 	ui.leCmdSData->setMaxLength(STRSZ_CMD);
-	ui.cbCalculatorCode->lineEdit()->setMaxLength(STRSZ_CMD);
-	ui.cbVariableName->lineEdit()->setMaxLength(STRSZ_CMD);
+	ui.cbCalculatorCode->setMaxLength(STRSZ_CMD);
+	ui.cbVariableName->setMaxLength(STRSZ_CMD);
 	ui.cbLvars->lineEdit()->setMaxLength(STRSZ_CMD);
-	ui.cbLookupName->lineEdit()->setMaxLength(STRSZ_CMD);
+	ui.cbLookupName->setMaxLength(STRSZ_CMD);
 	ui.leEventName->setMaxLength(STRSZ_ENAME);
-	ui.cbNameOrCode->lineEdit()->setMaxLength(STRSZ_REQ);
+	ui.cbNameOrCode->setMaxLength(STRSZ_REQ);
+
+	// Unit name suggestions completer from imported docs.
+	ui.cbUnitName->setCompleter(new DocImports::NameCompleter(DocImports::RecordType::SimVarUnits, ui.cbUnitName), true);
+	ui.cbSetVarUnitName->setCompleter(new DocImports::NameCompleter(DocImports::RecordType::SimVarUnits, ui.cbSetVarUnitName), true);
+	ui.cbSetVarUnitName->setCompleterOptionsButtonEnabled();
+	// Enable clear and suggestion options buttons on the data lookup combos.
+	ui.cbCalculatorCode->setCompleterOptions(Qt::MatchContains, QCompleter::PopupCompletion);
+	ui.cbCalculatorCode->setClearButtonEnabled();
+	ui.cbLvars->setCompleterOptions(Qt::MatchStartsWith, QCompleter::PopupCompletion);
+	ui.cbLvars->setClearButtonEnabled();
+	ui.cbVariableName->setCompleterOptions(Qt::MatchContains, QCompleter::PopupCompletion);
+	ui.cbVariableName->setClearButtonEnabled();
+	ui.cbKeyEvent->setCompleterOptions(Qt::MatchContains, QCompleter::PopupCompletion);
+	ui.cbKeyEvent->setClearButtonEnabled();
+	ui.cbNameOrCode->setCompleterOptions(Qt::MatchContains, QCompleter::PopupCompletion);
+	ui.cbNameOrCode->setClearButtonEnabled();
+	ui.cbUnitName->setCompleterOptions(Qt::MatchStartsWith, QCompleter::PopupCompletion);
+
+	// Init the calculator editor form
+	ui.wCalcForm->setProperty("eventId", -1);
+	ui.btnUpdateEvent->setVisible(false);
+	// Connect variable selector to enable/disable relevant actions
+	connect(ui.cbCalculatorCode, &QComboBox::currentTextChanged, this, [=](const QString &txt) { d->updateCalcCodeFormState(txt); });
+
+	// Key event name completer
+	ui.cbKeyEvent->setCompleter(new DocImports::NameCompleter(DocImports::RecordType::KeyEvents, ui.cbKeyEvent));
 
 	// Set up the Requests table view
+	ui.requestsView->setExportCategories(RequestsFormat::categoriesList());
 	ui.requestsView->setModel(d->reqModel);
-	ui.requestsView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
-	ui.requestsView->horizontalHeader()->setSectionsMovable(true);
+	// Hide unused columns
+	QHeaderView *hdr = ui.requestsView->header();
+	for (int i = RequestsModel::COL_FIRST_META; i <= RequestsModel::COL_LAST_META; ++i)
+		hdr->hideSection(i);
 	// connect double click action to populate the request editor form
 	connect(ui.requestsView, &QTableView::doubleClicked, this, [this](const QModelIndex &idx) { d->populateRequestForm(idx); });
+	// Connect to table view selection model to en/disable the remove/update actions when selection changes.
+	connect(ui.requestsView->selectionModel(), &QItemSelectionModel::selectionChanged, this, [=]() { d->toggleRequestButtonsState(); });
 
 	// Set up the Events table view
 	ui.eventsView->setModel(d->eventsModel);
@@ -663,33 +987,38 @@ WASimUI::WASimUI(QWidget *parent) :
 	ui.eventsView->horizontalHeader()->resizeSection(EventsModel::COL_CODE, 140);
 	// connect double click action to populate the event editor form
 	connect(ui.eventsView, &QTableView::doubleClicked, this, [this](const QModelIndex &idx) { d->populateEventForm(idx); });
+	// Connect to table view selection model to en/disable the remove/update actions when selection changes.
+	connect(ui.eventsView->selectionModel(), &QItemSelectionModel::selectionChanged, this, [=]() { d->toggleEventButtonsState(); });
 
 	// Set up the Log table view
-	ui.logView->setModel(d->logModel);
-	ui.logView->sortByColumn(LogRecordsModel::COL_TS, Qt::AscendingOrder);
-	//ui.logView->horizontalHeader()->setSortIndicator(LogRecordsModel::COL_TS, Qt::AscendingOrder);
-	ui.logView->horizontalHeader()->setSortIndicatorShown(false);
-	ui.logView->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
-	ui.logView->horizontalHeader()->setSectionsMovable(true);
-	ui.logView->horizontalHeader()->resizeSection(LogRecordsModel::COL_LEVEL, 70);
-	ui.logView->horizontalHeader()->resizeSection(LogRecordsModel::COL_TS, 110);
-	ui.logView->horizontalHeader()->resizeSection(LogRecordsModel::COL_SOURCE, 20);
-	ui.logView->horizontalHeader()->setToolTip(tr("Severity Level | Timestamp | Source | Message"));
+	ui.wLogWindow->setClient(d->client);
 
 	// Set initial state of Variables form, Local var type is default.
-	ui.wOtherVarsForm->setVisible(false);
-	ui.wGetSetSimVarIndex->setVisible(false);
+	d->toggleSetGetVariableType();
 
-	// Init the request and calc editor forms
+	// Connect variable selector to enable/disable relevant actions
+	connect(ui.cbLvars, &QComboBox::currentTextChanged, this, [=]() { d->updateLocalVarsFormState(); });
+	connect(ui.cbVariableName, &QComboBox::currentTextChanged, this, [=]() { d->updateLocalVarsFormState(); });
+
+	// connect to variable type combo box to switch between views for local vars vs. everything else
+	connect(ui.cbGetSetVarType, &DataComboBox::currentDataChanged, this, [=](const QVariant &) {
+		d->toggleSetGetVariableType();
+		d->updateLocalVarsFormState();
+	});
+
+	// Init the request editor form
 	ui.wRequestForm->setProperty("requestId", -1);
-	ui.wCalcForm->setProperty("eventId", -1);
-
-	// Update the Data Request form UI based on default type.
+	// Update the Data Request form UI based on default types.
 	d->toggleRequestType();
+
 	// Connect the request type radio buttons to toggle the UI.
 	connect(ui.bgrpRequestType, QOverload<int, bool>::of(&QButtonGroup::buttonToggled), this, [this](int,bool) { d->toggleRequestType(); });
 	// show/hide SimVar index spin box based on type of variable selected
 	connect(ui.cbVariableType, &DataComboBox::currentDataChanged, this, [this](const QVariant&) { d->toggleRequestVariableType(); });
+	// Connect the data request unit type selector to choose a default result size
+	connect(ui.cbUnitName, &DataComboBox::currentTextChanged, this, [this](const QString &data) {
+		ui.cbValueSize->setCurrentData(Utils::unitToMetaType(data));
+	});
 	// Connect the data request calc result type selector to choose a default result size
 	connect(ui.cbRequestCalcResultType, &DataComboBox::currentDataChanged, this, [this](const QVariant &data) {
 		ui.cbValueSize->setCurrentData(Utils::calcResultTypeToMetaType(CalcResultType(data.toUInt())));
@@ -703,310 +1032,178 @@ WASimUI::WASimUI(QWidget *parent) :
 	connect(ui.cbPeriod, &DataComboBox::currentDataChanged, this, [this](const QVariant &data) {
 		ui.sbInterval->setEnabled(data.toUInt() >= +UpdatePeriod::Tick);
 	});
-	// connect the Data Request save/add buttons
-	connect(ui.pbAddRequest, &QPushButton::clicked, this, [this]() { d->handleRequestForm(false); });
-	connect(ui.pbUpdateRequest, &QPushButton::clicked, this, [this]() { d->handleRequestForm(true); });
 
-	// Set and connect Log Level combo boxes for Client and Server logging levels
-	ui.cbLogLevelCallback->setProperties(d->client->logLevel(     LogFacility::Remote,  LogSource::Client), LogFacility::Remote,  LogSource::Client);
-	ui.cbLogLevelFile->setProperties(d->client->logLevel(         LogFacility::File,    LogSource::Client), LogFacility::File,    LogSource::Client);
-	ui.cbLogLevelConsole->setProperties(d->client->logLevel(      LogFacility::Console, LogSource::Client), LogFacility::Console, LogSource::Client);
-	ui.cbLogLevelServer->setProperties(d->client->logLevel(       LogFacility::Remote,  LogSource::Server), LogFacility::Remote,  LogSource::Server);
-	ui.cbLogLevelServerFile->setProperties(                                                   (LogLevel)-1, LogFacility::File,    LogSource::Server);     // unknown level at startup
-	ui.cbLogLevelServerConsole->setProperties(                                                (LogLevel)-1, LogFacility::Console, LogSource::Server);  // unknown level at startup
-	// Since the LogLevelComboBox types store the facility and source properties (which we just set), we can use one event handler for all of them.
-	auto setLogLevel = [=](LogLevel level) {
-		if (LogLevelComboBox *cb = qobject_cast<LogLevelComboBox*>(sender()))
-			d->client->setLogLevel(level, cb->facility(), cb->source());
-	};
-	connect(ui.cbLogLevelCallback,      &LogLevelComboBox::levelChanged, this, setLogLevel);
-	connect(ui.cbLogLevelFile,          &LogLevelComboBox::levelChanged, this, setLogLevel);
-	connect(ui.cbLogLevelConsole,       &LogLevelComboBox::levelChanged, this, setLogLevel);
-	connect(ui.cbLogLevelServer,        &LogLevelComboBox::levelChanged, this, setLogLevel);
-	connect(ui.cbLogLevelServerFile,    &LogLevelComboBox::levelChanged, this, setLogLevel);
-	connect(ui.cbLogLevelServerConsole, &LogLevelComboBox::levelChanged, this, setLogLevel);
-
-	// Connect our own signals for client callback handling in a thread-safe manner, marshaling back to GUI thread as needed.
-	// The "signal" methods are "emitted" by the Client as callbacks, registered in Private::setupClient().
-	connect(this, &WASimUI::clientEvent, this, &WASimUI::onClientEvent, Qt::QueuedConnection);
-	connect(this, &WASimUI::listResults, this, &WASimUI::onListResults, Qt::QueuedConnection);
-	// Data updates can go right to the requests model.
-	connect(this, &WASimUI::dataResultReady, d->reqModel, &RequestsModel::setRequestValue, Qt::QueuedConnection);
-	// Log messages can go right to the log records model. Log messages may arrive at any time, possibly from different threads,
-	// so placing them into a model allow proper sorting (and filtering).
-	connect(this, &WASimUI::logMessageReady, d->logModel, &LogRecordsModel::addRecord, Qt::QueuedConnection);
-	d->logUiMessage("Hello!", CommandId::Ack, LogLevel::Info);
+	// connect to requests model row removed to check if the current editor needs to be reset, otherwise the "Save" button stays active and re-adds a deleted request.
+	connect(d->reqModel, &RequestsModel::rowsAboutToBeRemoved, this, [this](const QModelIndex &, int first, int last) {
+		const int current = d->reqModel->findRequestRow(ui.wRequestForm->property("requestId").toInt());
+		if (current >= first && current <= last)
+			d->setRequestFormId(-1);
+	});
 
 	// Set up actions for triggering various events. Actions are typically mapped to UI elements like buttons and menu items and can be reused in multiple places.
 
+	// Network connection actions
+
+	// Toggle overall connection, both the SimConnect part and the WASimModule part.
+	QIcon connIco = GLYPH_ICON("link");
+	connIco.addFile(GLYPH_STR("link_off"), QSize(), QIcon::Mode::Normal, QIcon::State::On);
+	d->toggleConnAct = new QAction(connIco, tr("Connect"), this);
+	d->toggleConnAct->setToolTip(tr("<p>Toggle connection to WASimModule Server. This affects both the simulator connection (SimConnect) and the main server.</p>"
+	                       "<p>Use the sub-menu for individual actions.</p>"));
+	d->toggleConnAct->setCheckable(true);
+	d->toggleConnAct->setShortcut(QKeySequence(Qt::Key_F2));
+	connect(d->toggleConnAct, &QAction::triggered, this, [this]() { d->toggleConnection(true, true); }, Qt::QueuedConnection);
+
 	// Connect/Disconnect Simulator.
-	QIcon initIco(QStringLiteral("phone_in_talk.glyph"));
-	initIco.addFile(QStringLiteral("call_end.glyph"), QSize(), QIcon::Mode::Normal, QIcon::State::On);
+	QIcon initIco = GLYPH_ICON("phone_in_talk");
+	initIco.addFile(GLYPH_STR("call_end"), QSize(), QIcon::Mode::Normal, QIcon::State::On);
 	d->initAct = new QAction(initIco, tr("Connect to Simulator"), this);
 	d->initAct->setCheckable(true);
-	connect(d->initAct, &QAction::triggered, this, [this]() {
-		if (d->client->isInitialized())
-			d->client->disconnectSimulator();
-		else
-			d->client->connectSimulator();
-	}, Qt::QueuedConnection);
+	d->initAct->setShortcut(QKeySequence(Qt::Key_F5));
+	connect(d->initAct, &QAction::triggered, this, [this]() { d->toggleConnection(true, false); }, Qt::QueuedConnection);
 
 	// Connect/Disconnect WASim Server
-	QIcon connIco(QStringLiteral("link.glyph"));
-	connIco.addFile(QStringLiteral("link_off.glyph"), QSize(), QIcon::Mode::Normal, QIcon::State::On);
 	d->connectAct = new QAction(connIco, tr("Connect to Server"), this);
 	d->connectAct->setCheckable(true);
-	connect(d->connectAct, &QAction::triggered, this, [this]() {
-		if (d->client->isConnected())
-			d->client->disconnectServer();
-		else
-			d->client->connectServer();
-	}, Qt::QueuedConnection);
+	d->connectAct->setShortcut(QKeySequence(Qt::Key_F6));
+	connect(d->connectAct, &QAction::triggered, this, [this]() { d->toggleConnection(false, true); }, Qt::QueuedConnection);
 
 	// Ping the server.
-	QAction *pingAct = new QAction(QIcon(QStringLiteral("leak_add.glyph")), tr("Ping Server"), this);
-	connect(pingAct, &QAction::triggered, this, [this]() { d->client->pingServer(); });
+	QAction *pingAct = new QAction(GLYPH_ICON("leak_add"), tr("Ping Server"), this);
+	pingAct->setShortcut(QKeySequence(Qt::Key_F7));
+	connect(pingAct, &QAction::triggered, this, [this]() { d->pingServer(); });
 
+	// Sub-menu for individual connection actions.
+	QMenu *connectMenu = new QMenu(tr("Connection actions"), this);
+	connectMenu->setIcon(GLYPH_ICON("settings_remote"));
+	connectMenu->addActions({ d->initAct, pingAct, d->connectAct });
+	//d->toggleConnAct->setMenu(connectMenu);
 
 	// Calculator code actions
 
 	// Exec calculator code
-	QAction *execCalcAct = new QAction(QIcon(QStringLiteral("IcoMoon-Free/calculator.glyph")), tr("Execute Calculator Code"), this);
-	execCalcAct->setToolTip(tr("Execute Calculator Code"));
-	execCalcAct->setDisabled(true);
-	connect(execCalcAct, &QAction::triggered, this, [this]() { d->runCalcCode(); });
-	ui.btnCalc->setDefaultAction(execCalcAct);
-
+	MAKE_ACTION_SC_D(execCalcAct, tr("Execute Calculator Code"), "IcoMoon-Free/calculator", btnCalc, wCalcForm, runCalcCode(), tr("Execute Calculator Code."), QKeySequence(Qt::ControlModifier | Qt::Key_Return));
 	// Register calculator code event
-	QAction *regEventAct = new QAction(QIcon(QStringLiteral("control_point.glyph")), tr("Register Event"), this);
-	regEventAct->setToolTip(tr("Register this calculator code as a new Event."));
-	regEventAct->setDisabled(true);
-	connect(regEventAct, &QAction::triggered, this, [this]() { d->registerEvent(false); });
-	ui.btnAddEvent->setDefaultAction(regEventAct);
-
+	MAKE_ACTION_D(regEventAct, tr("Register Event"), "control_point", btnAddEvent, wCalcForm, registerEvent(false), tr("Register this calculator code as a new Event."));
 	// Save edited calculator code event
-	QAction *saveEventAct = new QAction(QIcon(QStringLiteral("edit.glyph")), tr("Update Event"), this);
-	saveEventAct->setToolTip(tr("Update existing event with new calculator code (name cannot be changed)."));
-	connect(saveEventAct, &QAction::triggered, this, [this]() { d->registerEvent(true); });
-	saveEventAct->setDisabled(true);
-	ui.btnUpdateEvent->setDefaultAction(saveEventAct);
-	ui.btnUpdateEvent->setVisible(false);
-
+	MAKE_ACTION_D(saveEventAct, tr("Update Event"), "edit", btnUpdateEvent, wCalcForm, registerEvent(true), tr("Update existing event with new calculator code (name cannot be changed)."));
 	// Copy calculator code as new Data Request
-	QAction *copyCalcAct = new QAction(QIcon(QStringLiteral("move_to_inbox.glyph")), tr("Copy to Data Request"), this);
-	copyCalcAct->setToolTip(tr("Copy Calculator Code to new Data Request"));
-	copyCalcAct->setDisabled(true);
-	connect(copyCalcAct, &QAction::triggered, this, [this]() { d->copyCalcCodeToRequest(); });
-	ui.btnCopyCalcToRequest->setDefaultAction(copyCalcAct);
-
-	// Connect variable selector to enable/disable relevant actions
-	connect(ui.cbCalculatorCode, &QComboBox::currentTextChanged, this, [=](const QString &txt) {
-		const bool en = !txt.isEmpty();
-		execCalcAct->setEnabled(en);
-		regEventAct->setEnabled(en);
-		saveEventAct->setEnabled(en);
-		copyCalcAct->setEnabled(en);
-	});
-
+	MAKE_ACTION_SC_D(copyCalcAct, tr("Copy to Data Request"), "move_to_inbox", btnCopyCalcToRequest, wCalcForm, copyCalcCodeToRequest(),
+	                 tr("Copy Calculator Code to new Data Request."), QKeySequence(Qt::ControlModifier | Qt::Key_Down));
 
 	// Variables section actions
 
 	// Request Local Vars list
-	QAction *reloadLVarsAct = new QAction(QIcon(QStringLiteral("autorenew.glyph")), tr("Reload L.Vars"), this);
-	reloadLVarsAct->setToolTip(tr("Reload Local Variables"));
-	connect(reloadLVarsAct, &QAction::triggered, this, [this]() { d->refreshLVars(); });
-	ui.btnList->setDefaultAction(reloadLVarsAct);
-
-	// Lookup a variable/unit ID
-	QAction *lookupItemAct = new QAction(QIcon(QStringLiteral("search.glyph")), tr("Lookup"), this);
-	lookupItemAct->setToolTip(tr("Query server for ID of named item (Lookup command)."));
-	connect(lookupItemAct, &QAction::triggered, this, [this]() { d->lookupItem(); });
-	ui.btnVarLookup->setDefaultAction(lookupItemAct);
-
+	MAKE_ACTION(reloadLVarsAct, tr("Reload L.Vars"), "autorenew", btnList, wVariables, refreshLVars(), tr("Reload Local Variables."));
 	// Get local variable value
-	QAction *getVarAct = new QAction(QIcon(QStringLiteral("rotate=180/send.glyph")), tr("Get Variable"), this);
-	getVarAct->setToolTip(tr("Get Variable Value."));
-	getVarAct->setDisabled(true);
-	connect(getVarAct, &QAction::triggered, this, [this]() { d->getLocalVar(); });
-	ui.btnGetVar->setDefaultAction(getVarAct);
-
+	MAKE_ACTION_SC_D(getVarAct, tr("Get Variable"), "rotate=180/send", btnGetVar, wVariables, getLocalVar(), tr("Get Variable Value."), QKeySequence(Qt::ControlModifier | Qt::Key_Return));
 	// Set variable value
-	QAction *setVarAct = new QAction(QIcon(QStringLiteral("send.glyph")), tr("Set Variable"), this);
-	setVarAct->setToolTip(tr("Set Variable Value."));
-	setVarAct->setDisabled(true);
-	connect(setVarAct, &QAction::triggered, this, [this]() { d->setLocalVar(); });
-	ui.btnSetVar->setDefaultAction(setVarAct);
-
+	MAKE_ACTION_SC_D(setVarAct, tr("Set Variable"), "send", btnSetVar, wVariables, setLocalVar(), tr("Set Variable Value."), QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_Return));
 	// Set or Create local variable
-	QAction *setCreateVarAct = new QAction(QIcon(QStringLiteral("overlay=\\align=AlignRight\\scale=.95\\fg=#17dde8\\add/send.glyph")), tr("Set/Create Variable"), this);
-	setCreateVarAct->setToolTip(tr("Set Or Create Local Variable."));
-	setCreateVarAct->setDisabled(true);
-	connect(setCreateVarAct, &QAction::triggered, this, [this]() { d->setLocalVar(true); });
-	ui.btnSetCreate->setDefaultAction(setCreateVarAct);
-
+	MAKE_ACTION_D(setCreateVarAct, tr("Set/Create Variable"), "overlay=\\align=AlignRight\\fg=#17dd29\\add/send", btnSetCreate, wVariables, setLocalVar(true),
+	              tr("Set Or Create Local Variable."));
+	// Get or Create local variable
+	MAKE_ACTION_D(getCreateVarAct, tr("Get/Create Variable"), "overlay=\\align=AlignLeft\\fg=#17dd29\\add/rotate=180/send", btnGetCreate, wVariables, getLocalVar(true),
+	              tr("Get Or Create Local Variable. The specified value and unit will be used as defaults if the variable is created."));
 	// Copy LVar as new Data Request
-	QAction *copyVarAct = new QAction(QIcon(QStringLiteral("move_to_inbox.glyph")), tr("Copy to Data Request"), this);
-	copyVarAct->setToolTip(tr("Copy Variable to new Data Request"));
-	copyVarAct->setDisabled(true);
-	connect(copyVarAct, &QAction::triggered, this, [this]() { d->copyLocalVarToRequest(); });
-	ui.btnCopyLVarToRequest->setDefaultAction(copyVarAct);
+	MAKE_ACTION_SC_D(copyVarAct, tr("Copy to Data Request"), "move_to_inbox", btnCopyLVarToRequest, wVariables, copyLocalVarToRequest(), tr("Copy Variable to new Data Request."),
+	                 QKeySequence(Qt::ControlModifier | Qt::Key_Down));
+	// Open docs import browser for Sim Vars
+	MAKE_ACTION_SC(findSimVarAct, tr("Sim Var Lookup"), "search", btnFindSimVar, wVariables, openDocsLookup(DocImports::RecordType::SimVars, ui.cbVariableName),
+	               tr("Open a new window to search and select Simulator Variables from imported MSFS SDK documentation."), QKeySequence::Find);
+	ui.btnFindSimVar->setVisible(false);  // hide the button, we put the action into the combo box for now
 
-	auto updateLocalVarsFormState = [=](const QString &) {
-		const bool en = (ui.wLocalVarsForm->isVisible() && !ui.cbLvars->currentText().isEmpty()) ||
-			(ui.wOtherVarsForm->isVisible() && !ui.cbVariableName->currentText().isEmpty());
-		getVarAct->setEnabled(en);
-		setVarAct->setEnabled(en);
-		setCreateVarAct->setEnabled(en);
-		copyVarAct->setEnabled(en);
-	};
+	// Lookup action
+	MAKE_ACTION_SC(lookupItemAct, tr("Lookup"), "search", btnVarLookup, wDataLookup, lookupItem(), tr("Query server for ID of named item (Lookup command)."), QKeySequence(Qt::ControlModifier | Qt::Key_Return));
 
-	// Connect variable selector to enable/disable relevant actions
-	connect(ui.cbLvars, &QComboBox::currentTextChanged, this, updateLocalVarsFormState);
-	connect(ui.cbVariableName, &QComboBox::currentTextChanged, this, updateLocalVarsFormState);
-
-	// connect to variable type combo box to switch between views for local vars vs. everything else
-	connect(ui.cbGetSetVarType, &DataComboBox::currentDataChanged, this, [=](const QVariant &vtype) {
-		bool isLocal = vtype.toChar() == 'L';
-		ui.wLocalVarsForm->setVisible(isLocal);
-		ui.wOtherVarsForm->setVisible(!isLocal);
-		ui.wGetSetSimVarIndex->setVisible(!isLocal && vtype.toChar() == 'A');  // sim var index box visible only for... simvars!
-		ui.btnSetCreate->setVisible(isLocal);
-		bool hasUnit = ui.cbGetSetVarType->currentText().contains('*');
-		ui.cbSetVarUnitName->setVisible(hasUnit);
-		ui.lblSetVarUnit->setVisible(hasUnit);
-		updateLocalVarsFormState(QString());
-	});
-
-
-	// Send Key Event action
-	QAction *sendKeyEventAct = new QAction(QIcon(QStringLiteral("send.glyph")), tr("Send Key Event"), this);
-	sendKeyEventAct->setToolTip(tr("Send the specified Key Event to the server."));
-	connect(sendKeyEventAct, &QAction::triggered, this, [this]() { d->sendKeyEventForm(); });
-	ui.btnKeyEventSend->setDefaultAction(sendKeyEventAct);
-
+	// Send Key Event Form
+	MAKE_ACTION_SC(sendKeyEventAct, tr("Send Key Event"), "send", btnKeyEventSend, wKeyEvent, sendKeyEventForm(), tr("Send the specified Key Event to the server."), QKeySequence(Qt::ControlModifier | Qt::Key_Return));
+	// Open docs import browser for Key Events
+	MAKE_ACTION_SC(findKeyEventAct, tr("Key Event Lookup"), "search", btnFindEvent, wKeyEvent, openDocsLookup(DocImports::RecordType::KeyEvents, ui.cbKeyEvent),
+	               tr("Open a new window to search and select Key Events from imported MSFS SDK documentation."), QKeySequence::Find);
+	ui.cbKeyEvent->lineEdit()->addAction(findKeyEventAct, QLineEdit::TrailingPosition);
+	ui.btnFindEvent->setHidden(true);  // hide the button, we put the action into the combo box for now
 
 	// Send Command action
-	QAction *sendCmdAct = new QAction(QIcon(QStringLiteral("keyboard_command_key.glyph")), tr("Send Command"), this);
-	sendCmdAct->setToolTip(tr("Send the selected Command to the server."));
-	connect(sendCmdAct, &QAction::triggered, this, [this]() { d->sendCommandForm(); });
-	ui.btnCmdSend->setDefaultAction(sendCmdAct);
+	MAKE_ACTION_SC(sendCmdAct, tr("Send Command"), "keyboard_command_key", btnCmdSend, wCommand, sendCommandForm(), tr("Send the selected Command to the server."), QKeySequence(Qt::ControlModifier | Qt::Key_Return));
 
+	// Requests editor form and model view actions
 
-	// Requests model view actions
+	// connect the Data Request save/add buttons
+	MAKE_ACTION_PB(addReqAct, tr("Add Request"), tr("Add"), "add", btnAddRequest, wRequestForm, handleRequestForm(false),
+	               tr("Add new request record from current form entries."), QKeySequence(Qt::ControlModifier | Qt::Key_Return));
+	MAKE_ACTION_PB_D(saveReqAct, tr("Save Edited Request"), tr("Save"), "edit", btnUpdateRequest, wRequestForm, handleRequestForm(true),
+	               tr("Update the existing request record from current form entries."), QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_Return));
+	MAKE_ACTION_PB(updReqAct, tr("Clear Form"), tr("Clear"), "scale=.9/backspace", btnClearRequest, wRequestForm, clearRequestForm(),
+	               tr("Reset the editor form to default values."), QKeySequence(Qt::ControlModifier | Qt::Key_Backspace));
+
+	// Open docs import browser for Sim Vars
+	MAKE_ACTION_SC(findReqSimVarAct, tr("Sim Var Lookup"), "search", btnReqFindSimVar, wRequestForm, openDocsLookup(DocImports::RecordType::SimVars, ui.cbNameOrCode),
+	               tr("Open a new window to search and select Simulator Variables from imported MSFS SDK documentation."), QKeySequence::Find);
+	ui.btnReqFindSimVar->setVisible(false);  // hide the button, we put the action into the combo box for now
 
 	// Remove selected Data Request(s) from item model/view
-	QAction *removeRequestsAct = new QAction(QIcon(QStringLiteral("delete_forever.glyph")), tr("Remove Selected Data Request(s)"), this);
-	removeRequestsAct->setIconText(tr("Remove"));
-	removeRequestsAct->setToolTip(tr("Delete the selected Data Request(s)."));
-	removeRequestsAct->setDisabled(true);
-	ui.pbReqestsRemove->setDefaultAction(removeRequestsAct);
-	connect(removeRequestsAct, &QAction::triggered, this, [this]() { d->removeSelectedRequests(); });
-
+	MAKE_ACTION_PB_D(removeRequestsAct, tr("Remove Selected Data Request(s)"), tr("Remove"), "fg=#c2d32e2e/delete_forever", btnReqestsRemove, wRequests, removeSelectedRequests(),
+	                 tr("Delete the selected Data Request(s)."), QKeySequence(Qt::ControlModifier | Qt::Key_D));
 	// Update data of selected Data Request(s) in item model/view
-	QAction *updateRequestsAct = new QAction(QIcon(QStringLiteral("refresh.glyph")), tr("Update Selected Data Request(s)"), this);
-	updateRequestsAct->setIconText(tr("Update"));
-	updateRequestsAct->setToolTip(tr("Request data update on selected Data Request(s)."));
-	updateRequestsAct->setDisabled(true);
-	ui.pbReqestsUpdate->setDefaultAction(updateRequestsAct);
-	connect(updateRequestsAct, &QAction::triggered, this, [this]() { d->updateSelectedRequests(); });
-
-	// Connect to table view selection model to en/disable the remove/update actions when selection changes.
-	connect(ui.requestsView->selectionModel(), &QItemSelectionModel::selectionChanged, this, [=](const QItemSelection &sel, const QItemSelection &) {
-		removeRequestsAct->setDisabled(sel.isEmpty());
-		updateRequestsAct->setDisabled(sel.isEmpty());
-	});
+	MAKE_ACTION_PB_D(updateRequestsAct, tr("Update Selected Data Request(s)"), tr("Update"), "refresh", btnReqestsUpdate, wRequests, updateSelectedRequests(),
+	                 tr("Request data update on selected Data Request(s)."), QKeySequence(Qt::ControlModifier | Qt::Key_R, QKeySequence::Refresh));
 
 	// Pause/resume data updates of requests
-	QIcon dataPauseIcon(QStringLiteral("pause.glyph"));
-	dataPauseIcon.addFile(QStringLiteral("play_arrow.glyph"), QSize(), QIcon::Normal, QIcon::On);
-	//dataPauseIcon.addFile(QStringLiteral("play_arrow.glyph"), QSize(), QIcon::Active, QIcon::On);
-	QAction *pauseRequestsAct = new QAction(dataPauseIcon, tr("Toggle Updates"), this);
-	pauseRequestsAct->setIconText(tr("Suspend"));
-	pauseRequestsAct->setToolTip(tr("Temporarily pause all data value updates on Server side."));
+	MAKE_ACTION_PB_D(pauseRequestsAct, tr("Toggle Updates"), tr("Suspend"), "pause", btnReqestsPause, wRequests, pauseRequests(chk),
+	                 tr("Temporarily pause all data value updates on Server side."), QKeySequence(Qt::ControlModifier | Qt::Key_U));
 	pauseRequestsAct->setCheckable(true);
-	pauseRequestsAct->setDisabled(true);
-	ui.pbReqestsPause->setDefaultAction(pauseRequestsAct);
-	connect(pauseRequestsAct, &QAction::triggered, this, [=](bool chk) {
-		static const QIcon dataResumeIcon(QStringLiteral("play_arrow.glyph"));
-		d->client->setDataRequestsPaused(chk);
-		pauseRequestsAct->setIconText(chk ? tr("Resume") : tr("Suspend"));
-		// for some reason the checked icon "on" state doesn't work automatically like it should...
-		ui.pbReqestsPause->setIcon(chk ? dataResumeIcon : dataPauseIcon);
-	});
 
 	// Save current Requests to a file
-	QAction *saveRequestsAct = new QAction(QIcon(QStringLiteral("save.glyph")), tr("Save Requests"), this);
-	saveRequestsAct->setIconText(tr("Save"));
-	saveRequestsAct->setToolTip(tr("Save current Requests list to file."));
+	MAKE_ACTION_PB_NC(saveRequestsAct, tr("Save Requests"), tr("Save"), "save", btnReqestsSave, wRequests, tr("Save requests to a file for later use or bring up a dialog with export options."));
 	saveRequestsAct->setDisabled(true);
-	ui.pbReqestsSave->setDefaultAction(saveRequestsAct);
-	connect(saveRequestsAct, &QAction::triggered, this, [this]() { d->saveRequests(); });
+	QMenu *saveRequestsMenu = new QMenu(tr("Requests Save Action"), this);
+	saveRequestsMenu->addAction(GLYPH_ICON("keyboard_command_key"), tr("In native WASimUI format"), this, [this]() { d->saveRequests(false); }, QKeySequence::Save);
+	saveRequestsMenu->addAction(GLYPH_ICON("overlay=align=AlignRight\\fg=#5eb5ff\\arrow_outward/touch_app"), tr("Export for Touch Portal Plugin with Editor..."),
+	                            this, [this]() { d->exportRequests(); }, QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_S));
+	saveRequestsMenu->addAction(GLYPH_ICON("touch_app"), tr("Export for Touch Portal Plugin Directly"),
+	                            this, [this]() { d->saveRequests(true); }, QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::AltModifier | Qt::Key_S));
+	saveRequestsAct->setMenu(saveRequestsMenu);
 
 	// Load Requests from a file. This is actually two actions: load and append to existing records + load and replace existing records.
-	QAction *loadRequestsAct = new QAction(QIcon(QStringLiteral("folder_open.glyph")), tr("Load Requests"), this);
-	loadRequestsAct->setIconText(tr("Load"));
-	loadRequestsAct->setToolTip(tr("Load saved Requests from file."));
+	MAKE_ACTION_PB_NC(loadRequestsAct, tr("Load Requests"), tr("Load"), "folder_open", btnReqestsLoad, wRequests,
+	                  tr("<p>Load or Import Requests from a file.</p><p>Files can be in \"native\" <i>WASimUI</> or <i>MSFS Touch Portal Plugin</i> formats. File type is detected automatically.</p>"));
+	loadRequestsAct->setShortcut(QKeySequence::Open);
 	QMenu *loadRequestsMenu = new QMenu(tr("Requests Load Action"), this);
-	QAction *loadReplaceAct = loadRequestsMenu->addAction(QIcon(QStringLiteral("view_list.glyph")), tr("Replace Existing"));
-	QAction *loadAppendAct = loadRequestsMenu->addAction(QIcon(QStringLiteral("playlist_add.glyph")), tr("Append to Existing"));
-	ui.pbReqestsLoad->setDefaultAction(loadRequestsAct);
-	connect(loadReplaceAct, &QAction::triggered, this, [this]() { d->loadRequests(true); });
-	connect(loadAppendAct, &QAction::triggered, this, [this]() { d->loadRequests(false); });
+	loadRequestsMenu->addAction(GLYPH_ICON("view_list"), tr("Replace Existing"), this, [this]() { d->loadRequests(true); }, QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_O));
+	loadRequestsMenu->addAction(GLYPH_ICON("playlist_add."), tr("Append to Existing"), this, [this]() { d->loadRequests(false); }, QKeySequence(Qt::ControlModifier | Qt::AltModifier | Qt::Key_O));
 	connect(loadRequestsAct, &QAction::triggered, this, [=]() { if (!loadRequestsAct->menu()) d->loadRequests(true); });
-	// Change the action type depending on number of current rows in data requests model, with or w/out a menu of Add/Replace Existing options.
+	// Change the load/save requests action type depending on number of current rows in data requests model, with or w/out a menu of Add/Replace Existing options.
 	connect(d->reqModel, &RequestsModel::rowCountChanged, this, [=](int rows) {
 		if (rows) {
 			if (!loadRequestsAct->menu())
 				loadRequestsAct->setMenu(loadRequestsMenu);
 		}
-		else if (loadRequestsAct->menu()) {
+		else if (loadRequestsAct->menu())
 			loadRequestsAct->setMenu(nullptr);
-		}
-		saveRequestsAct->setEnabled(rows > 0);
-		pauseRequestsAct->setEnabled(rows > 0);
+		d->toggleRequestButtonsState();
 	}, Qt::QueuedConnection);
 
+	// Add column toggle and font size actions to the parent widgets
+	ui.wRequestForm->addAction(ui.requestsView->actionsMenu(ui.wRequests)->menuAction());
+	ui.wRequests->addAction(ui.requestsView->actionsMenu(ui.wRequests)->menuAction());
 
 	// Registered calculator events model view actions
 
 	// Remove selected Data Request(s) from item model/view
-	QAction *removeEventsAct = new QAction(QIcon(QStringLiteral("delete_forever.glyph")), tr("Remove Selected Event(s)"), this);
-	removeEventsAct->setIconText(tr("Remove"));
-	removeEventsAct->setToolTip(tr("Delete the selected Event(s)."));
-	removeEventsAct->setDisabled(true);
-	ui.pbEventsRemove->setDefaultAction(removeEventsAct);
-	connect(removeEventsAct, &QAction::triggered, this, [this]() { d->removeSelectedEvents(); });
-
+	MAKE_ACTION_PB_D(removeEventsAct, tr("Remove Selected Event(s)"), tr("Remove"), "fg=#c2d32e2e/delete_forever", btnEventsRemove, wEventsList, removeSelectedEvents(),
+	                 tr("Delete the selected Event(s)."), QKeySequence(Qt::ControlModifier | Qt::Key_D));
 	// Update data of selected Data Request(s) in item model/view
-	QAction *updateEventsAct = new QAction(QIcon(QStringLiteral("rotate=180/play_for_work.glyph")), tr("Transmit Selected Event(s)"), this);
-	updateEventsAct->setIconText(tr("Transmit"));
-	updateEventsAct->setToolTip(tr("Trigger selected Event(s)."));
-	updateEventsAct->setDisabled(true);
-	ui.pbEventsTransmit->setDefaultAction(updateEventsAct);
-	connect(updateEventsAct, &QAction::triggered, this, [this]() { d->transmitSelectedEvents(); });
-
-	// Connect to table view selection model to en/disable the remove/update actions when selection changes.
-	connect(ui.eventsView->selectionModel(), &QItemSelectionModel::selectionChanged, this, [=](const QItemSelection &sel, const QItemSelection &) {
-		removeEventsAct->setDisabled(sel.isEmpty());
-		updateEventsAct->setDisabled(sel.isEmpty());
-	});
+	MAKE_ACTION_PB_D(updateEventsAct, tr("Transmit Selected Event(s)"), tr("Transmit"), "play_for_work", btnEventsTransmit, wEventsList, transmitSelectedEvents(),
+	                 tr("Trigger the selected Event(s)."), QKeySequence(Qt::ControlModifier | Qt::Key_T));
 
 	// Save current Events to a file
-	QAction *saveEventsAct = new QAction(QIcon(QStringLiteral("save.glyph")), tr("Save Events"), this);
-	saveEventsAct->setIconText(tr("Save"));
-	saveEventsAct->setToolTip(tr("Save current Events list to file."));
-	saveEventsAct->setDisabled(true);
-	ui.pbEventsSave->setDefaultAction(saveEventsAct);
-	connect(saveEventsAct, &QAction::triggered, this, [this]() { d->saveEvents(); });
-
+	MAKE_ACTION_PB_D(saveEventsAct, tr("Save Events"), tr("Save"), "save", btnEventsSave, wEventsList, saveEvents(), tr("Save current Events list to file."), QKeySequence::Save);
 	// Load Events from a file. This is actually two actions: load and append to existing records + load and replace existing records.
-	QAction *loadEventsAct = new QAction(QIcon(QStringLiteral("folder_open.glyph")), tr("Load Events"), this);
-	loadEventsAct->setIconText(tr("Load"));
-	loadEventsAct->setToolTip(tr("Load saved Events from file."));
+	MAKE_ACTION_PB_NC(loadEventsAct, tr("Load Events"), tr("Load"), "folder_open", btnEventsLoad, wEventsList, tr("Load saved Events from file."));
 	QMenu *loadEventsMenu = new QMenu(tr("Events Load Action"), this);
-	QAction *replaceEventsAct = loadEventsMenu->addAction(QIcon(QStringLiteral("view_list.glyph")), tr("Replace Existing"));
-	QAction *appendEventsAct = loadEventsMenu->addAction(QIcon(QStringLiteral("playlist_add.glyph")), tr("Append to Existing"));
-	ui.pbEventsLoad->setDefaultAction(loadEventsAct);
+	QAction *replaceEventsAct = loadEventsMenu->addAction(GLYPH_ICON("view_list"), tr("Replace Existing"));
+	QAction *appendEventsAct = loadEventsMenu->addAction(GLYPH_ICON("playlist_add"), tr("Append to Existing"));
 	connect(replaceEventsAct, &QAction::triggered, this, [this]() { d->loadEvents(true); });
 	connect(appendEventsAct, &QAction::triggered, this, [this]() { d->loadEvents(false); });
 	connect(loadEventsAct, &QAction::triggered, this, [=]() { if (!loadEventsAct->menu()) d->loadEvents(true); });
@@ -1016,131 +1213,59 @@ WASimUI::WASimUI(QWidget *parent) :
 			if (!loadEventsAct->menu())
 				loadEventsAct->setMenu(loadEventsMenu);
 		}
-		else if (loadEventsAct->menu()) {
+		else if (loadEventsAct->menu())
 			loadEventsAct->setMenu(nullptr);
-		}
 		saveEventsAct->setEnabled(rows > 0);
 	}, Qt::QueuedConnection);
-
-
-	// Logging window actions
-
-	QAction *filterErrorsAct = new QAction(QIcon(Utils::iconNameForLogLevel(LogLevel::Error)), tr("Toggle Errors"), this);
-	filterErrorsAct->setToolTip(tr("Toggle visibility of Error-level log messages."));
-	filterErrorsAct->setCheckable(true);
-	filterErrorsAct->setChecked(true);
-	ui.btnLogFilt_ERR->setDefaultAction(filterErrorsAct);
-	connect(filterErrorsAct, &QAction::triggered, this, [this](bool en) { d->logModel->setLevelFilter(LogLevel::Error, !en); });
-
-	QAction *filterWarningsAct = new QAction(QIcon(Utils::iconNameForLogLevel(LogLevel::Warning)), tr("Toggle Warnings"), this);
-	filterWarningsAct->setToolTip(tr("Toggle visibility of Warning-level log messages."));
-	filterWarningsAct->setCheckable(true);
-	filterWarningsAct->setChecked(true);
-	ui.btnLogFilt_WRN->setDefaultAction(filterWarningsAct);
-	connect(filterWarningsAct, &QAction::triggered, this, [this](bool en) { d->logModel->setLevelFilter(LogLevel::Warning, !en); });
-
-	QAction *filterInfoAct = new QAction(QIcon(Utils::iconNameForLogLevel(LogLevel::Info)), tr("Toggle Info"), this);
-	filterInfoAct->setToolTip(tr("Toggle visibility of Information-level log messages."));
-	filterInfoAct->setCheckable(true);
-	filterInfoAct->setChecked(true);
-	ui.btnLogFilt_INF->setDefaultAction(filterInfoAct);
-	connect(filterInfoAct, &QAction::triggered, this, [this](bool en) { d->logModel->setLevelFilter(LogLevel::Info, !en); });
-
-	QAction *filterDebugAct = new QAction(QIcon(Utils::iconNameForLogLevel(LogLevel::Debug)), tr("Toggle Debug"), this);
-	filterDebugAct->setToolTip(tr("Toggle visibility of Debug-level log messages."));
-	filterDebugAct->setCheckable(true);
-	filterDebugAct->setChecked(true);
-	ui.btnLogFilt_DBG->setDefaultAction(filterDebugAct);
-	connect(filterDebugAct, &QAction::triggered, this, [this](bool en) { d->logModel->setLevelFilter(LogLevel::Debug, !en); });
-
-	QAction *filterTraceAct = new QAction(QIcon(Utils::iconNameForLogLevel(LogLevel::Trace)), tr("Toggle Traces"), this);
-	filterTraceAct->setToolTip(tr("Toggle visibility of Trace-level log messages."));
-	filterTraceAct->setCheckable(true);
-	filterTraceAct->setChecked(true);
-	ui.btnLogFilt_TRC->setDefaultAction(filterTraceAct);
-	connect(filterTraceAct, &QAction::triggered, this, [this](bool en) { d->logModel->setLevelFilter(LogLevel::Trace, !en); });
-
-	QAction *filterServerAct = new QAction(QIcon(Utils::iconNameForLogSource(+LogSource::Server)), tr("Toggle Server Records"), this);
-	filterServerAct->setToolTip(tr("Toggle visibility of log messages from Server."));
-	filterServerAct->setCheckable(true);
-	filterServerAct->setChecked(true);
-	ui.btnLogFilt_Server->setDefaultAction(filterServerAct);
-	connect(filterServerAct, &QAction::triggered, this, [this](bool en) { d->logModel->setSourceFilter(+LogSource::Server, !en); });
-
-	QAction *filterClientAct = new QAction(QIcon(Utils::iconNameForLogSource(+LogSource::Client)), tr("Toggle Client Records"), this);
-	filterClientAct->setToolTip(tr("Toggle visibility of log messages from Client."));
-	filterClientAct->setCheckable(true);
-	filterClientAct->setChecked(true);
-	ui.btnLogFilt_Client->setDefaultAction(filterClientAct);
-	connect(filterClientAct, &QAction::triggered, this, [this](bool en) { d->logModel->setSourceFilter(+LogSource::Client, !en); });
-
-	QAction *filterUILogAct = new QAction(QIcon(Utils::iconNameForLogSource(+LogRecordsModel::LogSource::UI)), tr("Toggle UI Records"), this);
-	filterUILogAct->setToolTip(tr("Toggle visibility of log messages from this UI."));
-	filterUILogAct->setCheckable(true);
-	filterUILogAct->setChecked(true);
-	ui.btnLogFilt_UI->setDefaultAction(filterUILogAct);
-	connect(filterUILogAct, &QAction::triggered, this, [this](bool en) { d->logModel->setSourceFilter(+LogRecordsModel::LogSource::UI, !en); });
-
-	QIcon logPauseIcon(QStringLiteral("pause.glyph"));
-	logPauseIcon.addFile(QStringLiteral("play_arrow.glyph"), QSize(), QIcon::Normal, QIcon::On);
-	QAction *pauseLogScrollAct = new QAction(logPauseIcon, tr("Pause Log Scroll"), this);
-	pauseLogScrollAct->setToolTip(tr("<p>Toggle scrolling of the log window. Scrolling can also be paused by selecting a log entry row.</p>"));
-	pauseLogScrollAct->setCheckable(true);
-	ui.btnLogPause->setDefaultAction(pauseLogScrollAct);
-	connect(pauseLogScrollAct, &QAction::triggered, this, [this](bool en) { if (!en) ui.logView->selectionModel()->clear(); });  // clear log view selection on "un-pause"
-
-	QAction *clearLogWindowAct = new QAction(QIcon(QStringLiteral("delete.glyph")), tr("Clear Log Window"), this);
-	clearLogWindowAct->setToolTip(tr("Clear the log window."));
-	ui.btnLogClear->setDefaultAction(clearLogWindowAct);
-	connect(clearLogWindowAct, &QAction::triggered, this, [this]() { d->logModel->clear(); });
-
-	QIcon wordWrapIcon(QStringLiteral("wrap_text.glyph"));
-	wordWrapIcon.addFile(QStringLiteral("notes.glyph"), QSize(), QIcon::Normal, QIcon::On);
-	QAction *wordWrapLogWindowAct = new QAction(wordWrapIcon, tr("Word Wrap"), this);
-	wordWrapLogWindowAct->setToolTip(tr("Toggle word wrapping of the log window."));
-	wordWrapLogWindowAct->setCheckable(true);
-	wordWrapLogWindowAct->setChecked(true);
-	ui.btnLogWordWrap->setDefaultAction(wordWrapLogWindowAct);
-	connect(wordWrapLogWindowAct, &QAction::toggled, this, [this](bool chk) { ui.logView->setWordWrap(chk); ui.logView->resizeRowsToContents(); });
-
-	// connect the log model record added signal to make sure last record remains in view, unless scroll lock is enabled
-	connect(d->logModel, &LogRecordsModel::recordAdded, this, [=](const QModelIndex &i) {
-		// make sure log view scroll to bottom on insertions, unless a row is selected or scroll pause is set.
-		ui.logView->resizeRowToContents(i.row());
-		if (!pauseLogScrollAct->isChecked() && !ui.logView->selectionModel()->hasSelection())
-			ui.logView->scrollToBottom(/*i, QAbstractItemView::PositionAtBottom*/);
-	});
-	// connect log viewer selection model to show pause button active while there is a selection
-	connect(ui.logView->selectionModel(), &QItemSelectionModel::selectionChanged, this, [=](const QItemSelection &sel, const QItemSelection&) {
-		pauseLogScrollAct->setChecked(!sel.isEmpty());
-	});
+	// Add column toggle and font size actions to the parent widget
+	ui.wEventsList->addAction(ui.eventsView->actionsMenu(ui.wRequests)->menuAction());
 
 	// Other UI-related actions
 
-	QAction *viewAct = new QAction(QIcon(QStringLiteral("grid_view.glyph")), tr("View"), this);
 	QMenu *viewMenu = new QMenu(tr("View"), this);
-	viewMenu->addActions({ ui.dwRequests->toggleViewAction(), ui.dwEventsList->toggleViewAction(), ui.dwLog->toggleViewAction() });
-	viewAct->setMenu(viewMenu);
+	viewMenu->setIcon(GLYPH_ICON("grid_view"));
+	//viewMenu->menuAction()->setShortcut(QKeySequence(Qt::AltModifier | Qt::Key_M));
 
-	QAction *styleAct = new QAction(QIcon(QStringLiteral("style.glyph")), tr("Toggle Dark/Light Theme"), this);
+	MAKE_ACTION_NW_SC(docBrowserAct, tr("SimConnect SDK Docs Reference Browser"), tr("Reference"), "search", openDocsLookupWindow(),
+	                  tr("<p>Opens a window which allow searching through Simulator Variables, Key Events, and Unit types imported from online SimConnect SDK documentation.</p>"),
+	                  QKeySequence(Qt::AltModifier | Qt::Key_R));
+	viewMenu->addAction(docBrowserAct);
+
+#define WIDGET_VIEW_TOGGLE_ACTION(T, W, V, K)  {\
+		QAction *act = new QAction(tr("Show %1 Form").arg(T), this); \
+		act->setAutoRepeat(false); act->setCheckable(true); act->setChecked(V);  \
+		act->setShortcut(QKeySequence(Qt::AltModifier | Qt::Key_##K)); \
+		W->addAction(act); W->setWindowTitle(T); W->setVisible(V);  \
+		connect(act, &QAction::toggled, W, &QWidget::setVisible); \
+		d->formWidgets.append({T, W, act}); viewMenu->addAction(act); \
+	}
+	WIDGET_VIEW_TOGGLE_ACTION(tr("Calculator Code"), ui.wCalcForm, true, C)
+	WIDGET_VIEW_TOGGLE_ACTION(tr("Variables"), ui.wVariables, true, V)
+	WIDGET_VIEW_TOGGLE_ACTION(tr("Lookup"), ui.wDataLookup, true, L)
+	WIDGET_VIEW_TOGGLE_ACTION(tr("Key Events"), ui.wKeyEvent, true, K)
+	WIDGET_VIEW_TOGGLE_ACTION(tr("API Command"), ui.wCommand, false, A)
+	WIDGET_VIEW_TOGGLE_ACTION(tr("Data Request Editor"), ui.wRequestForm, true, R)
+#undef WIDGET_VIEW_TOGGLE_ACTION
+
+	viewMenu->addActions({ ui.dwRequests->toggleViewAction(), ui.dwEventsList->toggleViewAction(), ui.dwLog->toggleViewAction() });
+
+	QAction *styleAct = new QAction(GLYPH_ICON("style"), tr("Toggle Dark/Light Theme"), this);
+	styleAct->setIconText(tr("Theme"));
 	styleAct->setCheckable(true);
 	styleAct->setShortcut(tr("Alt+D"));
 	connect(styleAct, &QAction::triggered, &Utils::toggleAppStyle);
 
-	QAction *aboutAct = new QAction(QIcon(QStringLiteral("info.glyph")), tr("About"), this);
+	QAction *aboutAct = new QAction(GLYPH_ICON("info"), tr("About"), this);
 	aboutAct->setShortcut(QKeySequence::HelpContents);
 	connect(aboutAct, &QAction::triggered, this, [this]() {Utils::about(this); });
 
-	QAction *projectLinkAct = new QAction(QIcon(QStringLiteral("IcoMoon-Free/github.glyph")), tr("Project Site"), this);
+	QAction *projectLinkAct = new QAction(GLYPH_ICON("IcoMoon-Free/github"), tr("Project Site"), this);
 	connect(projectLinkAct, &QAction::triggered, this, [this]() { QDesktopServices::openUrl(QUrl(WSMCMND_PROJECT_URL)); });
 
 	// add all actions to this widget, for context menu and shortcut handling
 	addActions({
-		d->initAct, pingAct, d->connectAct,
-		Utils::separatorAction(this), removeRequestsAct, updateRequestsAct, saveRequestsAct, loadRequestsAct,
-		Utils::separatorAction(this), removeEventsAct, updateEventsAct, saveEventsAct, loadEventsAct,
-		Utils::separatorAction(this), pauseLogScrollAct, clearLogWindowAct, wordWrapLogWindowAct,
-		Utils::separatorAction(this), viewAct, styleAct, aboutAct, projectLinkAct
+		d->toggleConnAct, connectMenu->menuAction(),
+		Utils::separatorAction(this), docBrowserAct, viewMenu->menuAction(), styleAct, aboutAct, projectLinkAct
 	});
 
 
@@ -1149,12 +1274,20 @@ WASimUI::WASimUI(QWidget *parent) :
 	addToolBar(Qt::TopToolBarArea, toolbar);
 	toolbar->setMovable(false);
 	toolbar->setObjectName(QStringLiteral("TOOLBAR_MAIN"));
-	toolbar->setStyleSheet(QStringLiteral("QToolBar { border: 0; border-bottom: 1px solid palette(mid); spacing: 6px; } QToolBar::separator { background-color: palette(mid); width: 1px; padding: 0; margin: 6px 8px; }"));
-	toolbar->addActions({ d->initAct, pingAct, d->connectAct });
+	toolbar->setStyleSheet(QStringLiteral(
+		"QToolBar { border: 0; border-bottom: 1px solid palette(mid); spacing: 6px; margin-left: 12px; }"
+		"QToolBar::separator { background-color: palette(mid); width: 1px; padding: 0; margin: 6px 8px; }"
+	));
+	toolbar->addWidget(Utils::spacerWidget(Qt::Horizontal, 6));
+	toolbar->addActions({ d->toggleConnAct });
 	toolbar->addSeparator();
-	toolbar->addActions({ viewAct, styleAct, aboutAct, projectLinkAct });
+	toolbar->addActions({ viewMenu->menuAction(), docBrowserAct, styleAct, aboutAct /*, projectLinkAct*/ });
 	// default toolbutton menu mode is lame
-	if (QToolButton *tb = qobject_cast<QToolButton *>(toolbar->widgetForAction(viewAct)))
+	if (QToolButton *tb = qobject_cast<QToolButton *>(toolbar->widgetForAction(d->toggleConnAct))) {
+		tb->setMenu(connectMenu);
+		tb->setPopupMode(QToolButton::MenuButtonPopup);
+	}
+	if (QToolButton *tb = qobject_cast<QToolButton *>(toolbar->widgetForAction(viewMenu->menuAction())))
 		tb->setPopupMode(QToolButton::InstantPopup);
 
 	// Add the status widget to the toolbar, with spacers to right-align it with right padding.
@@ -1174,17 +1307,31 @@ WASimUI::WASimUI(QWidget *parent) :
 	// now restore any saved settings
 	d->readSettings();
 	styleAct->setChecked(Utils::isDarkStyle());
+
+	// Say Hi!
+	d->logUiMessage("Hello!", CommandId::Ack, LogLevel::Info);
 }
 
 void WASimUI::onClientEvent(const ClientEvent &ev)
 {
-	d->clientStatus = ev.status;
 	d->statWidget->setStatus(ev);
-	d->statWidget->setServerVersion(d->client->serverVersion());
-	d->initAct->setChecked(+ev.status & +ClientStatus::SimConnected);
-	d->initAct->setText(d->initAct->isChecked() ? tr("Disconnect Simulator") : tr("Connect to Simulator") );
-	d->connectAct->setChecked(+ev.status & +ClientStatus::Connected);
-	d->connectAct->setText(+d->connectAct->isChecked() ? tr("Disconnect Server") : tr("Connect to Server") );
+	int simConnected = (+ev.status & +ClientStatus::SimConnected);
+	int isConnected = (+ev.status & +ClientStatus::Connected);
+	d->toggleConnAct->setChecked(simConnected && isConnected);
+	d->toggleConnAct->setText(simConnected && isConnected ? tr("Disconnect") : simConnected ? tr("Connect Server") : tr("Connect"));
+	d->initAct->setChecked(simConnected);
+	d->initAct->setText(simConnected ? tr("Disconnect Simulator") : tr("Connect to Simulator"));
+	d->connectAct->setChecked(isConnected);
+	d->connectAct->setText(isConnected ? tr("Disconnect Server") : tr("Connect to Server") );
+	if ((+d->clientStatus & +ClientStatus::Connected) != isConnected) {
+		if (isConnected)
+			d->statWidget->setServerVersion(d->client->serverVersion());
+		d->updateCalcCodeFormState(ui.cbCalculatorCode->currentText());
+		d->updateLocalVarsFormState();
+		d->toggleRequestButtonsState();
+		d->toggleEventButtonsState();
+	}
+	d->clientStatus = ev.status;
 }
 
 void WASimUI::onListResults(const ListResult &list)
@@ -1194,6 +1341,7 @@ void WASimUI::onListResults(const ListResult &list)
 	ui.cbLvars->clear();
 	for (const auto &pair : list.list)
 		ui.cbLvars->addItem(QString::fromStdString(pair.second), pair.first);
+	ui.cbLvars->model()->sort(0);
 }
 
 void WASimUI::closeEvent(QCloseEvent *ev)

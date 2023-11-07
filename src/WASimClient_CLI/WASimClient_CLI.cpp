@@ -145,6 +145,24 @@ public:
 		return (HR)hr;
 	}
 
+	inline HR getVariable(VariableRequest ^var, interior_ptr<double> pfResult, interior_ptr<String ^> psResult)
+	{
+		pin_ptr<double> pf = pfResult;
+		std::string s { };
+		HR ret = (HR)client->getVariable(var, pf, psResult ? &s : nullptr);
+		if (psResult)
+			*psResult = marshal_as<String ^>(s);
+		return ret;
+	}
+
+	inline HR getOrCreateLocalVariable(String ^ name, interior_ptr<String ^> unit, double defaultValue, interior_ptr<double> pfResult)
+	{
+		pin_ptr<double> pf = pfResult;
+		if (unit)
+			return (HR)client->getOrCreateLocalVariable(marshal_as<std::string>(name), pf, defaultValue, marshal_as<std::string>((String ^)*unit));
+		return (HR)client->getOrCreateLocalVariable(marshal_as<std::string>(name), pf, defaultValue);
+	}
+
 	~Private()
 	{
 		if (client) {
@@ -197,16 +215,36 @@ WASimClient::!WASimClient()
 	m_client = nullptr;
 }
 
-inline HR WASimClient::executeCalculatorCode(String ^ code, CalcResultType resultType, [Out] double % pfResult) {
+inline HR WASimClient::executeCalculatorCode(String ^ code, CalcResultType resultType, double %pfResult) {
 	return d->executeCalculatorCode(code, resultType, &pfResult, nullptr);
 }
 
-inline HR WASimClient::executeCalculatorCode(String ^ code, CalcResultType resultType, [Out] String ^% psResult) {
+inline HR WASimClient::executeCalculatorCode(String ^ code, CalcResultType resultType, String^ %psResult) {
 	return d->executeCalculatorCode(code, resultType, nullptr, &psResult);
 }
 
-inline HR WASimClient::executeCalculatorCode(String ^ code, CalcResultType resultType, [Out] double % pfResult, [Out] String ^% psResult) {
+inline HR WASimClient::executeCalculatorCode(String ^ code, CalcResultType resultType, double %pfResult, String^ %psResult) {
 	return d->executeCalculatorCode(code, resultType, &pfResult, &psResult);
+}
+
+inline HR WASimClient::getVariable(VariableRequest ^ var, double %pfResult) {
+	return d->getVariable(var, &pfResult, nullptr);
+}
+
+inline HR WASimClient::getVariable(VariableRequest ^ var, String^ %psResult) {
+	return d->getVariable(var, nullptr, &psResult);
+}
+
+inline HR WASimClient::getVariable(VariableRequest ^ var, double %pfResult, String^ %psResult) {
+	return d->getVariable(var, &pfResult, &psResult);
+}
+
+inline HR WASimClient::getOrCreateLocalVariable(String ^variableName, double defaultValue, double %pfResult) {
+	return d->getOrCreateLocalVariable(variableName, nullptr, defaultValue, &pfResult);
+}
+
+inline HR WASimClient::getOrCreateLocalVariable(String ^variableName, String ^unitName, double defaultValue, double %pfResult) {
+	return d->getOrCreateLocalVariable(variableName, &unitName, defaultValue, &pfResult);
 }
 
 inline array<DataRequestRecord^>^ WASimClient::dataRequests()

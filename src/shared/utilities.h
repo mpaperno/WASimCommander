@@ -85,8 +85,13 @@ namespace WASimCommander {
 	}
 
 	static bool isUnitBasedVariableType(const char type) {
-		static const std::vector<char> VAR_TYPES_UNIT_BASED = { 'A', 'C', 'E', 'P' };
+		static const std::vector<char> VAR_TYPES_UNIT_BASED = { 'A', 'C', 'E', 'L', 'P' };
 		return find(VAR_TYPES_UNIT_BASED.cbegin(), VAR_TYPES_UNIT_BASED.cend(), type) != VAR_TYPES_UNIT_BASED.cend();
+	}
+
+	static bool isSettableVariableType(const char type) {
+		static const std::vector<char> VAR_TYPES_SETTABLE = { 'A', 'C', 'H', 'K', 'L', 'Z' };
+		return find(VAR_TYPES_SETTABLE.cbegin(), VAR_TYPES_SETTABLE.cend(), type) != VAR_TYPES_SETTABLE.cend();
 	}
 
 	// returns actual byte size from given size which may be one of the SimConnect_AddToClientDataDefinition() dwSizeOrType constants

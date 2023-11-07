@@ -74,17 +74,15 @@ void ActionPushButton::paintEvent(QPaintEvent *e)
 	QStylePainter p(this);
 	QStyleOptionButton option;
 	initStyleOption(&option);
-	if (!menu() && m_defaultAction && m_defaultAction->menu())
+	if (!menu() && m_menuFromAction)
 		option.features |= QStyleOptionButton::HasMenu;
 	p.drawControl(QStyle::CE_PushButton, option);
 }
 
 void ActionPushButton::nextCheckState()
 {
-	if (!!m_defaultAction)
-		m_defaultAction->trigger();
-	else
-		QPushButton::nextCheckState();
+	if (!m_defaultAction && isCheckable())
+		setChecked(!isChecked());
 }
 
 void ActionPushButton::updateFromAction(QAction *action)
@@ -123,8 +121,13 @@ void ActionPushButton::setDefaultAction(QAction *action)
 	if (m_defaultAction == action)
 		return;
 
-	if (m_menuFromAction && m_defaultAction->menu())
-		disconnect(action->menu()->menuAction(), 0, this, 0);
+	bool hadDefault = !!m_defaultAction;
+	if (!!m_defaultAction) {
+		disconnect(this, &QPushButton::clicked, this, &ActionPushButton::onClicked);
+		if (m_menuFromAction && m_defaultAction->menu())
+			disconnect(m_defaultAction->menu()->menuAction(), 0, this, 0);
+	}
+	m_menuFromAction = false;
 
 	m_defaultAction = action;
 	if (!action)
@@ -133,6 +136,18 @@ void ActionPushButton::setDefaultAction(QAction *action)
 	if (!actions().contains(action))
 		addAction(action);
 	updateFromAction(action);
+
+	connect(this, &QPushButton::clicked, this, &ActionPushButton::onClicked);
+}
+
+void ActionPushButton::onClicked(bool checked)
+{
+	if (!m_defaultAction)
+		return;
+	if (isCheckable())
+		m_defaultAction->setChecked(checked);
+	else
+		m_defaultAction->trigger();
 }
 
 void ActionPushButton::onActionTriggered()

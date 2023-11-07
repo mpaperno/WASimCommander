@@ -48,8 +48,9 @@ and is also available at <http://www.gnu.org/licenses/>.
 
 namespace WASimUiNS {
 
-namespace WSEnums = WASimCommander::Enums;
-namespace WSCEnums = WASimCommander::Client;
+namespace WS = WASimCommander;
+namespace WSEnums = WS::Enums;
+namespace WSCEnums = WS::Client;
 
 // Custom "+" operator for strong enum types to cast to underlying type.
 template <typename T, std::enable_if_t<std::is_enum<T>::value, bool> = true>
@@ -173,11 +174,11 @@ class Utils
 					break;
 				case QMetaType::Char:
 				case QMetaType::SChar:
-					v.setValue(qint8(res));
+					v.setValue(qint16((int8_t)res));  // upcast for printing
 					break;
 				case QMetaType::UChar:
 				case QMetaType::Bool:
-					v.setValue(quint8(res));
+					v.setValue(quint16((uint8_t)res));  // upcast for printing
 					break;
 				case QMetaType::Short:
 					v.setValue(qint16(res));
@@ -204,6 +205,27 @@ class Utils
 					break;
 			}
 			return v;
+		}
+
+		static int unitToMetaType(QString unit)
+		{
+			static const QStringList integralUnits {
+				"enum", "mask", "flags", "integer",
+				"position", "position 16k", "position 32k", "position 128",
+				"frequency bcd16", "frequency bcd32", "bco16", "bcd16", "bcd32",
+				"seconds", "minutes", "hours", "days", "years",
+				"celsius scaler 16k", "celsius scaler 256"
+			};
+			static const QStringList boolUnits { "bool", "boolean" };
+
+			unit = unit.toLower().simplified();
+			if (unit == "string")
+				return QMetaType::User + 256;
+			if (boolUnits.contains(unit))
+				return QMetaType::UChar;
+			if (integralUnits.contains(unit))
+				return QMetaType::Int;
+			return QMetaType::Double;
 		}
 
 		static bool isUnitBasedVariableType(const char type) {
@@ -388,7 +410,7 @@ class Utils
 			palette.setColor(QPalette::All,      QPalette::Highlight, cHlt);
 			palette.setColor(QPalette::Disabled, QPalette::Highlight, QColor("#9Cbbd5ff"));
 
-			const QColor cLnkTxt("#6685ff");
+			const QColor cLnkTxt("#5eb5ff");
 			palette.setColor(QPalette::All,      QPalette::Link, cLnkTxt);
 			palette.setColor(QPalette::Disabled, QPalette::Link, cLnkTxt.darker());
 

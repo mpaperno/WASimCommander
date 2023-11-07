@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<AssetPackage Version="1.2.0">
+<AssetPackage Version="@VER_MAJOR@.@VER_MINOR@.@VER_PATCH@">
 	<ItemSettings>
 		<ContentType>MISC</ContentType>
-		<Title>WASimCommander WASM Module</Title>
+		<Title>@PROJECT_NAME@ WASM Module</Title>
 		<Manufacturer/>
-		<Creator>Copyright Maxim Paperno; All rights reserved.</Creator>
+		<Creator>@PROJECT_COPY@</Creator>
 	</ItemSettings>
 	<Flags>
 		<VisibleInStore>false</VisibleInStore>
@@ -19,12 +19,12 @@
 			<AssetDir>PackageDefinitions\wasimcommander-module\ContentInfo\</AssetDir>
 			<OutputDir>ContentInfo\wasimcommander-module\</OutputDir>
 		</AssetGroup>
-		<AssetGroup Name="WASimModule">
+		<AssetGroup Name="@SERVER_NAME@">
 			<Type>Copy</Type>
 			<Flags>
 				<FSXCompatibility>false</FSXCompatibility>
 			</Flags>
-			<AssetDir>PackageSources\WASimModule\</AssetDir>
+			<AssetDir>PackageSources\@SERVER_NAME@\</AssetDir>
 			<OutputDir>modules\</OutputDir>
 		</AssetGroup>
 	</AssetGroups>

@@ -131,11 +131,23 @@ struct TrackedRequest : DataRequest
 
 	void checkRequestType()
 	{
-		// Anything besides L/A/T type vars just gets converted to calc code.
-		if (requestType == RequestType::Named && variableId < 0 && !Utilities::isIndexedVariableType(varTypePrefix)) {
-			const ostringstream codeStr = ostringstream() << "(" << varTypePrefix << ':' << nameOrCode << ')';
+		// Anything besides L/A/T type vars just gets converted to calc code, as well as any A vars with "string" unit type.
+		bool isString = false;
+		if (requestType == RequestType::Named && variableId < 0 &&
+				(!Utilities::isIndexedVariableType(varTypePrefix) || (isString = (unitId < 0 && varTypePrefix == 'A' && !strcasecmp(unitName, "string"))))
+		) {
+			ostringstream codeStr = ostringstream() << '(' << varTypePrefix << ':' << nameOrCode;
+			if (unitName[0] != '\0')
+				codeStr << ',' << unitName;
+			codeStr << ')';
 			setNameOrCode(codeStr.str().c_str());
 			requestType = RequestType::Calculated;
+			if (isString)
+				calcResultType = CalcResultType::String;
+			else if (valueSize > DATA_TYPE_INT64 || valueSize < 4)
+				calcResultType = CalcResultType::Integer;
+			else
+				calcResultType = CalcResultType::Double;
 		}
 	}
 
@@ -215,7 +227,7 @@ struct calcResult_t
 	string sVal;
 	void setF(const FLOAT64 val) { fVal = val; resultSize = sizeof(FLOAT64); resultMemberIndex = 0; }
 	void setI(const SINT32  val) { iVal = val; resultSize = sizeof(SINT32); resultMemberIndex = 1; }
-	void setS(const string &&val) { sVal = move(val); sVal.resize(strSize); resultSize = strSize; resultMemberIndex = 2; }
+	void setS(const string &&val) { sVal = std::move(val); sVal.resize(strSize); resultSize = strSize; resultMemberIndex = 2; }
 };
 
 typedef map<uint32_t, Client> clientMap_t;
@@ -237,7 +249,6 @@ steady_clock::time_point g_tpNextTick { steady_clock::now() };
 SIMCONNECT_CLIENT_EVENT_ID g_nextClientEventId = SIMCONNECTID_LAST;
 SIMCONNECT_CLIENT_DATA_DEFINITION_ID g_nextClienDataId = SIMCONNECTID_LAST;
 bool g_triggersRegistered = false;
-bool g_simConnectQuitEvent = false;
 #pragma endregion Globals
 
 //----------------------------------------------------------------------------
@@ -246,6 +257,8 @@ bool g_simConnectQuitEvent = false;
 
 bool sendResponse(const Client *c, const Command &cmd)
 {
+	if (c->status != ClientStatus::Connected)
+		return false;
 	LOG_TRC << "Sending command to " << c->name << ": " << cmd;
 	return INVOKE_SIMCONNECT(
 		SetClientData, g_hSimConnect,
@@ -279,6 +292,8 @@ bool sendPing(const Client *c) {
 
 bool sendLogRecord(const Client *c, const LogRecord &log)
 {
+	if (c->status != ClientStatus::Connected)
+		return false;
 	//if (c->logLevel < LogLevel::Trace) LOG_TRC << "Sending LogRecord to " << c->name << ": " << log;
 	return INVOKE_SIMCONNECT(
 		SetClientData, g_hSimConnect,
@@ -290,6 +305,8 @@ bool sendLogRecord(const Client *c, const LogRecord &log)
 
 bool writeRequestData(const Client *c, const TrackedRequest *tr, void *data)
 {
+	if (c->status != ClientStatus::Connected)
+		return false;
 	LOG_TRC << "Writing request ID " << tr->requestId << " data for " << c->name << " to CDA / CDD ID " << tr->dataId << " of size " << tr->dataSize;
 	return INVOKE_SIMCONNECT(
 		SetClientData, g_hSimConnect,
@@ -464,7 +481,7 @@ Client *getOrCreateClient(uint32_t clientId)
 	registerClientKeyEventDataArea(&c);
 
 	// move client record into map
-	Client *pC = &g_mClients.emplace(clientId, move(c)).first->second;
+	Client *pC = &g_mClients.emplace(clientId, std::move(c)).first->second;
 	// save mappings of the command and request data IDs (which SimConnect sends us) to the client record; for lookup in message dispatch.
 	g_mDefinitionIds.emplace(piecewise_construct, forward_as_tuple(c.cddID_command), forward_as_tuple(RecordType::CommandData, pC));  // no try_emplace?
 	g_mDefinitionIds.emplace(piecewise_construct, forward_as_tuple(c.cddID_request), forward_as_tuple(RecordType::RequestData, pC));
@@ -496,7 +513,9 @@ Client *connectClient(uint32_t id)
 	return connectClient(getOrCreateClient(id));
 }
 
-void checkTriggerEventNeeded();  // forward, in Utility Functions just below
+// forwards, in Utility Functions just below
+void checkTriggerEventNeeded();
+void resumeTriggerEvent();
 
 // marks client as disconnected or timed out and clears any saved requests/events
 void disconnectClient(Client *c, ClientStatus newStatus = ClientStatus::Disconnected)
@@ -530,6 +549,12 @@ void disconnectAllClients(const char *message = nullptr)
 {
 	for (auto &it : g_mClients)
 		disconnectClient(&it.second, message, ClientStatus::Disconnected);
+}
+
+void disableAllClients()
+{
+	for (auto &it : g_mClients)
+		it.second.status = ClientStatus::Disconnected;
 }
 
 // callback for logfault IdProxyHandler log handler
@@ -567,19 +592,19 @@ bool setClientLogLevel(Client *c, LogLevel level)
 //----------------------------------------------------------------------------
 
 // this runs once we have any requests to keep updated which essentially starts the tick() processing.
-void registerTriggerEvents()
+void resumeTriggerEvent()
 {
 	// use "Frame" event as trigger for our tick() loop
-	if FAILED(INVOKE_SIMCONNECT(SubscribeToSystemEvent, g_hSimConnect, (SIMCONNECT_CLIENT_EVENT_ID)EVENT_FRAME, "Frame"))
+	if FAILED(INVOKE_SIMCONNECT(SetSystemEventState, g_hSimConnect, (SIMCONNECT_CLIENT_EVENT_ID)EVENT_FRAME, SIMCONNECT_STATE_ON))
 		return;
 	g_triggersRegistered = true;
 	LOG_INF << "DataRequest data update processing started.";
 }
 
 // and here is the opposite... if all clients disconnect we can stop the ticker loop.
-void unregisterTriggerEvents()
+void pauseTriggerEvent()
 {
-	if FAILED(INVOKE_SIMCONNECT(UnsubscribeFromSystemEvent, g_hSimConnect, (SIMCONNECT_CLIENT_EVENT_ID)EVENT_FRAME))
+	if FAILED(INVOKE_SIMCONNECT(SetSystemEventState, g_hSimConnect, (SIMCONNECT_CLIENT_EVENT_ID)EVENT_FRAME, SIMCONNECT_STATE_OFF))
 		return;
 	g_triggersRegistered = false;
 	LOG_INF << "DataRequest update processing stopped.";
@@ -591,10 +616,11 @@ void unregisterTriggerEvents()
 void checkTriggerEventNeeded()
 {
 	for (const clientMap_t::value_type &it : g_mClients) {
-		if (it.second.status == ClientStatus::Connected)
+		const Client &c = it.second;
+		if (c.status == ClientStatus::Connected && !c.pauseDataUpdates && c.requests.size())
 			return;
 	}
-	unregisterTriggerEvents();
+	pauseTriggerEvent();
 }
 
 bool execCalculatorCode(const char *code, calcResult_t &result, bool precompiled = false)
@@ -634,11 +660,14 @@ bool getNamedVariableValue(char varType, calcResult_t &result)
 		case 'L':
 			if (result.varId < 0)
 				return false;
-			result.setF(get_named_variable_value(result.varId));
+			if (result.unitId > -1)
+				result.setF(get_named_variable_typed_value(result.varId, result.unitId));
+			else
+				result.setF(get_named_variable_value(result.varId));
 			break;
 
 		case 'A':
-			if (result.varId < 0)
+			if (result.varId < 0 || result.unitId < 0)
 				return false;
 			result.setF(aircraft_varget(result.varId, result.unitId, result.varIndex));
 			break;
@@ -754,11 +783,11 @@ int getVariableId(char varType, const char *name, bool createLocal = false)
 // Parse a command string to find a variable name/unit/index and populates the respective reference params.
 // Lookups are done on var names, depending on varType, and unit strings, to attempt conversion to IDs.
 // Used by setVariable() and getVariable(). Only handles A/L/T var types (not needed for others).
-bool parseVariableString(const char varType, const char *data, ID &varId, bool createLocal, ENUM *unitId = nullptr, uint8_t *varIndex = nullptr, string *varName = nullptr)
+bool parseVariableString(const char varType, const char *data, ID &varId, bool createLocal, ENUM *unitId = nullptr, uint8_t *varIndex = nullptr, string *varName = nullptr, bool *existed = nullptr)
 {
 	string_view svVar(data, strlen(data)), svUnit{};
 
-	if (varType == 'A') {
+	if (varType != 'T') {
 		// Check for unit type after variable name/id and comma
 		const size_t idx = svVar.find(',');
 		if (idx != string::npos) {
@@ -766,12 +795,12 @@ bool parseVariableString(const char varType, const char *data, ID &varId, bool c
 			svVar.remove_suffix(svVar.size() - idx);
 		}
 		// check for index value at end of SimVar name/ID
-		if (svVar.size() > 3) {
+		if (varType == 'A' && svVar.size() > 3) {
 			const string_view &svIndex = svVar.substr(svVar.size() - 3);
 			const size_t idx = svIndex.find(':');
 			if (idx != string::npos) {
 				// strtoul returns zero if conversion fails, which works fine since zero is not a valid simvar index
-				if (varIndex)
+				if (!!varIndex)
 					*varIndex = strtoul(svIndex.data() + idx + 1, nullptr, 10);
 				svVar.remove_suffix(3 - idx);
 			}
@@ -781,18 +810,28 @@ bool parseVariableString(const char varType, const char *data, ID &varId, bool c
 	if (svVar.empty())
 		return false;
 
-	if (varName)
-		*varName = string(svVar);
 	// Try to parse the remaining var name string as a numeric ID
 	auto result = from_chars(svVar.data(), svVar.data() + svVar.size(), varId);
 	// if number conversion failed, look up variable id
-	if (result.ec != errc())
-		varId = getVariableId(varType, string(svVar).c_str(), createLocal);
+	if (result.ec != errc()) {
+		const std::string vname(svVar);
+		if (createLocal && !!existed) {
+			varId = check_named_variable(vname.c_str());
+			*existed = varId > -1;
+			if (!*existed)
+				varId = register_named_variable(vname.c_str());
+		}
+		else {
+			varId = getVariableId(varType, vname.c_str(), createLocal);
+		}
+		if (!!varName)
+			*varName = vname;
+	}
 	// failed to find a numeric id, whole input was invalid
 	if (varId < 0)
 		return false;
 	// check for unit specification
-	if (unitId && !svUnit.empty()) {
+	if (!!unitId && !svUnit.empty()) {
 		// try to parse the string as a numeric ID
 		result = from_chars(svUnit.data(), svUnit.data() + svUnit.size(), *unitId);
 		// if number conversion failed, look up unit id
@@ -967,36 +1006,54 @@ void getVariable(const Client *c, const Command *const cmd)
 	const char varType = char(cmd->uData);
 	const char *data = cmd->sData;
 	LOG_TRC << "getVariable(" << varType << ", " << quoted(data) << ") for client " << c->name;
-	if (cmd->commandId == CommandId::GetCreate && varType != 'L')  {
-		logAndNak(c, *cmd, ostringstream() << "The GetCreate command only supports the 'L' variable type.");
-		return;
-	}
-	// Anything besides L/A/T type vars just gets converted to calc code.
-	if (!Utilities::isIndexedVariableType(varType)) {
+
+	// Anything besides L/A/T type vars just gets converted to calc code. Also if a "string" type unit A var is requested.
+	size_t datalen;
+	bool isString = false;
+	if (!Utilities::isIndexedVariableType(varType) || (isString = varType == 'A' && (datalen = strlen(data)) > 6 && !strcasecmp(data + datalen-6, "string"))) {
 		const ostringstream codeStr = ostringstream() << "(" << varType << ':' << data << ')';
-		const Command execCmd(cmd->commandId, +CalcResultType::Double, codeStr.str().c_str(), 0.0, cmd->token);
+		CalcResultType ctype = isString ? CalcResultType::String : CalcResultType::Double;
+		const Command execCmd(cmd->commandId, +ctype, codeStr.str().c_str(), 0.0, cmd->token);
 		return execCalculatorCode(c, &execCmd);
 	}
+
 	ID varId{-1};
 	ENUM unitId{-1};
 	uint8_t varIndex{0};
 	string varName;
-	if (!parseVariableString(varType, data, varId, (cmd->commandId == CommandId::GetCreate), &unitId, &varIndex, &varName)) {
+	bool existed = true;
+	if (!parseVariableString(varType, data, varId, (cmd->commandId == CommandId::GetCreate && varType == 'L'), &unitId, &varIndex, &varName, &existed)) {
 		logAndNak(c, *cmd, ostringstream() << "Could not resolve Variable ID for Get command from string " << quoted(data));
+		return;
+	}
+
+	// !existed can only happen for an L var if we just created it. In that case it has a default value and unit type (0.0, number).
+	if (!existed) {
+		if (unitId > -1)
+			set_named_variable_typed_value(varId, cmd->fData, unitId);
+		else if (cmd->fData != 0.0)
+			set_named_variable_value(varId, cmd->fData);
+		sendResponse(c, Command(CommandId::Ack, (uint32_t)CommandId::GetCreate, nullptr, cmd->fData, cmd->token));
+		LOG_DBG << "getVariable(" << quoted(data) << ") created new variable for client " << c->name;
+		return;
+	}
+
+	if (unitId < 0 && varType == 'A') {
+		logAndNak(c, *cmd, ostringstream() << "Could not resolve Unit ID for Get command from string " << quoted(data));
 		return;
 	}
 
 	calcResult_t res = calcResult_t { CalcResultType::Double, STRSZ_CMD, varId, unitId, varIndex, varName.c_str() };
 	if (!getNamedVariableValue(varType, res))
-		return logAndNak(c, *cmd, ostringstream() << "getNamedVariableValue() returned error result for code " << quoted(data));
-	Command resp(CommandId::Ack, (uint32_t)CommandId::Get);
+		return logAndNak(c, *cmd, ostringstream() << "getNamedVariableValue() returned error result for variable: " << quoted(data));
+	Command resp(CommandId::Ack, (uint32_t)cmd->commandId);
 	resp.token = cmd->token;
 	switch (res.resultMemberIndex) {
 		case 0: resp.fData = res.fVal; break;
 		case 1: resp.fData = res.iVal; break;
 		case 2: resp.setStringData(res.sVal.c_str()); break;
 		default:
-			return logAndNak(c, *cmd, ostringstream() << "getNamedVariableValue() returned invalid result index " << res.resultMemberIndex);
+			return logAndNak(c, *cmd, ostringstream() << "getNamedVariableValue() for " << quoted(data) << " returned invalid result index: " << res.resultMemberIndex);
 	}
 	sendResponse(c, resp);
 }
@@ -1007,10 +1064,7 @@ void setVariable(const Client *c, const Command *const cmd)
 	const char *data = cmd->sData;
 	const double value = cmd->fData;
 	LOG_TRC << "setVariable(" << varType << ", " << quoted(data) << ", " << value << ") for client " << c->name;
-	if (cmd->commandId == CommandId::SetCreate && varType != 'L')  {
-		logAndNak(c, *cmd, ostringstream() << "The SetCreate command only supports the 'L' variable type.");
-		return;
-	}
+
 	// Anything besides an L var just gets converted to calc code.
 	if (varType != 'L') {
 		const ostringstream codeStr = ostringstream() << fixed << setprecision(7) << value << " (>" << varType << ':' << data << ')';
@@ -1019,11 +1073,16 @@ void setVariable(const Client *c, const Command *const cmd)
 	}
 
 	ID varId{-1};
-	if (!parseVariableString(varType, data, varId, (cmd->commandId == CommandId::SetCreate))) {
+	ENUM unitId{-1};
+	if (!parseVariableString(varType, data, varId, (cmd->commandId == CommandId::SetCreate), &unitId)) {
 		logAndNak(c, *cmd, ostringstream() << "Could not resolve Variable ID for Set command from string " << quoted(data));
 		return;
 	}
-	set_named_variable_value(varId, value);
+
+	if (unitId > -1)
+		set_named_variable_typed_value(varId, value, unitId);
+	else
+		set_named_variable_value(varId, value);
 	sendAckNak(c, *cmd);
 }
 
@@ -1077,17 +1136,45 @@ bool updateRequestValue(const Client *c, TrackedRequest *tr, bool compareCheck =
 		// double
 		case 0:
 			// convert the value if necessary for proper binary representation
-			if (tr->dataSize == sizeof(float))
-				data = &(f32 = (float)res.fVal);
-			else if (tr->valueSize == DATA_TYPE_INT64)  // better way?
-				data = &(i64 = (int64_t)res.fVal);
-			else
-				data = &res.fVal;
+			switch (tr->valueSize) {
+				// ordered most to least likely
+				case DATA_TYPE_DOUBLE:
+				case sizeof(double):
+					data = &res.fVal;
+					break;
+				case DATA_TYPE_FLOAT:
+				case sizeof(float):
+					data = &(f32 = (float)res.fVal);
+					break;
+				case DATA_TYPE_INT32:
+				case 3:
+					data = &(res.iVal = (int32_t)res.fVal);
+					break;
+				case DATA_TYPE_INT8:
+				case 1:
+					data = &(res.iVal = (int8_t)res.fVal);
+					break;
+				case DATA_TYPE_INT16:
+				case 2:
+					data = &(res.iVal = (int16_t)res.fVal);
+					break;
+				case DATA_TYPE_INT64:
+					// the widest integer any gauge API function returns is 48b (for token/MODULE_VAR) so 53b precision is OK here
+					data = &(i64 = (int64_t)res.fVal);
+					break;
+				default:
+					data = &res.fVal;
+					break;
+			}
 			break;
 		// int32
-		case 1: data = &res.iVal; break;
+		case 1:
+			data = &res.iVal;
+			break;
 		// string
-		case 2: data = (void *)res.sVal.data(); break;
+		case 2:
+			data = (void *)res.sVal.data();
+			break;
 	}
 
 	if (compareCheck && tr->compareCheck && !memcmp(data, tr->data.data(), tr->dataSize)) {
@@ -1112,26 +1199,26 @@ bool removeRequest(Client *c, const uint32_t requestId)
 	c->requests.erase(tr->requestId);
 	LOG_DBG << "Deleted DataRequest ID " << requestId;
 	sendAckNak(c, CommandId::Subscribe, true, requestId);
+	if (g_triggersRegistered && !c->requests.size())
+		checkTriggerEventNeeded();  // check if anyone is still connected
 	return true;
 }
 
-// returns true if request has been scheduled *and* will require regular updates (period > UpdatePeriod::Once)
+// returns true if request has been scheduled or removed
 bool addOrUpdateRequest(Client *c, const DataRequest *const req)
 {
 	LOG_DBG << "Got DataRequest from Client " << c->name << ": " << *req;
 
 	// request type of "None" actually means to delete an existing request
-	if (req->requestType == RequestType::None) {
-		removeRequest(c, req->requestId);
-		return false;   // no updates needed
-	}
+	if (req->requestType == RequestType::None)
+		return removeRequest(c, req->requestId);
 
 	// setup response Command for Ack/Nak
 	const Command resp(CommandId::Subscribe, 0, nullptr, .0, req->requestId);
 
 	// check for empty name/code
 	if (req->nameOrCode[0] == '\0') {
-		logAndNak(c, resp, ostringstream() << "Error in DataRequest ID: " << req->requestId << "; Parameter 'nameOrCode' cannot be empty.");
+		logAndNak(c, resp, ostringstream() << "Error in DataRequest ID " << req->requestId << ": Parameter 'nameOrCode' cannot be empty.");
 		return false;
 	}
 
@@ -1145,29 +1232,29 @@ bool addOrUpdateRequest(Client *c, const DataRequest *const req)
 		const SIMCONNECT_CLIENT_DATA_DEFINITION_ID newDataId = g_nextClienDataId++;
 		// create a new data area and add definition
 		if (!registerClientVariableDataArea(c, req->requestId, newDataId, actualValSize, req->valueSize)) {
-			logAndNak(c, resp, ostringstream() << "Failed to create ClientDataDefinition, check log messages.");
+			logAndNak(c, resp, ostringstream()  << "Error in DataRequest ID " << req->requestId << ": Failed to create ClientDataDefinition, check log messages.");
 			return false;
 		}
-
+		// this may change the request from a named to a calculated type for vars/string types which don't have native gauge API access functions.
 		tr = &c->requests.emplace(piecewise_construct, forward_as_tuple(req->requestId), forward_as_tuple(*req, newDataId)).first->second;  // no try_emplace?
 	}
 	else {
 		// Existing request
 
 		if (actualValSize > tr->dataSize) {
-			logAndNak(c, resp, ostringstream() << "Value size cannot be increased after request is created.");
+			logAndNak(c, resp, ostringstream() << "Error in DataRequest ID " << req->requestId << ": Value size cannot be increased after request is created.");
 			return false;
 		}
 		// recreate data definition if necessary
 		if (actualValSize != tr->dataSize) {
 			// remove definition
 			if FAILED(SimConnectHelper::removeClientDataDefinition(g_hSimConnect, tr->dataId)) {
-				logAndNak(c, resp, ostringstream() << "Failed to clear ClientDataDefinition, check log messages.");
+				logAndNak(c, resp, ostringstream() << "Error in DataRequest ID " << req->requestId << ": Failed to clear ClientDataDefinition, check log messages.");
 				return false;
 			}
 			// add definition
 			if FAILED(SimConnectHelper::addClientDataDefinition(g_hSimConnect, tr->dataId, req->valueSize)) {
-				logAndNak(c, resp, ostringstream() << "Failed to create ClientDataDefinition, check log messages.");
+				logAndNak(c, resp, ostringstream() << "Error in DataRequest ID " << req->requestId << ": Failed to create ClientDataDefinition, check log messages.");
 				return false;
 			}
 		}
@@ -1182,10 +1269,10 @@ bool addOrUpdateRequest(Client *c, const DataRequest *const req)
 			tr->variableId = getVariableId(tr->varTypePrefix, tr->nameOrCode);
 			if (tr->variableId < 0) {
 				if (tr->varTypePrefix == 'T') {
-					LOG_WRN << "Token variable named " << quoted(tr->nameOrCode) << " was not found. Will fall back to initialize_var_by_name().";
+					LOG_WRN << "Warning in DataRequest ID " << req->requestId << ": Token variable named " << quoted(tr->nameOrCode) << " was not found. Will fall back to initialize_var_by_name().";
 				}
 				else {
-					LOG_WRN << "Variable named " << quoted(tr->nameOrCode) << " was not found, disabling updates.";
+					LOG_ERR << "Error in DataRequest ID " << req->requestId << ": Variable named " << quoted(tr->nameOrCode) << " was not found, disabling updates.";
 					tr->period = UpdatePeriod::Never;
 				}
 			}
@@ -1193,13 +1280,21 @@ bool addOrUpdateRequest(Client *c, const DataRequest *const req)
 		// look up unit ID if we don't have one already
 		if (tr->unitId < 0 && tr->unitName[0] != '\0') {
 			tr->unitId = get_units_enum(tr->unitName);
-			if (tr->unitId < 0)
-				LOG_WRN << "Unit named " << quoted(tr->unitName) << " was not found.";
+			if (tr->unitId < 0) {
+				if (tr->varTypePrefix == 'A') {
+					LOG_ERR << "Error in DataRequest ID " << req->requestId << ": Unit named " << quoted(tr->unitName) << " was not found, disabling updates.";
+					tr->period = UpdatePeriod::Never;
+				}
+				// maybe an L var... unit is not technically required.
+				else {
+					LOG_WRN << "Warning in DataRequest ID " << req->requestId << ": Unit named " << quoted(tr->unitName) << " was not found, no unit type will be used.";
+				}
+			}
 		}
 	}
 	// calculated value, update compiled string if needed
 	// NOTE: compiling code for format_calculator_string() doesn't seem to work as advertised in the docs, see:
-	//   https://devsupport.flightsimulator.com/questions/9513/gauge-calculator-code-precompile-with-code-meant-f.html
+	//   https://devsupport.flightsimulator.com/t/gauge-calculator-code-precompile-with-code-meant-for-format-calculator-string-reports-format-errors/4457
 	else if (tr->calcResultType != CalcResultType::Formatted && tr->calcBytecode.empty()) {
 		// assume the command has changed and re-compile
 		PCSTRINGZ pCompiled = nullptr;
@@ -1212,20 +1307,60 @@ bool addOrUpdateRequest(Client *c, const DataRequest *const req)
 		}
 		else {
 			LOG_WRN << "Calculator string compilation failed. gauge_calculator_code_precompile() returned: " << boolalpha << ok
-				<< "; size: " << pCompiledSize << "; Result null? " << (pCompiled == nullptr) << "; Original code : " << quoted(tr->nameOrCode);
+				<< " for request ID " << tr->requestId << ". Size: " << pCompiledSize << "; Result null ? " << (pCompiled == nullptr) << "; Original code : " << quoted(tr->nameOrCode);
 		}
 	}
-	// make sure any ms interval is >= our minimum tick time
-	if (tr->period == UpdatePeriod::Millisecond)
-		tr->interval = max((time_t)tr->interval, TICK_PERIOD_MS);
 
 	sendAckNak(c, resp, true);
-	if (tr->period != UpdatePeriod::Never)
-		updateRequestValue(c, tr, false);
+
+	if (tr->period != UpdatePeriod::Never) {
+		// make sure any ms interval is >= our minimum tick time
+		if (tr->period == UpdatePeriod::Millisecond && tr->interval < TICK_PERIOD_MS)
+			tr->interval = TICK_PERIOD_MS;
+		// If updates are not paused then send the value now; this takes care of "Once" type requests as well.
+		if (!c->pauseDataUpdates)
+			updateRequestValue(c, tr, false);
+		// If they're paused and this is a "Once" type request, use the interval as a flag to indicate that an update
+		// is pending for this request, which is then handled in setSuspendClientDataUpdates(false) below to send the value.
+		else if (tr->period == UpdatePeriod::Once)
+			tr->interval = 1;
+	}
 
 	LOG_DBG << (isNewRequest ? "Added " : "Updated ") << *tr;
-	return (tr->period > UpdatePeriod::Once);
+	if (!g_triggersRegistered && tr->period > UpdatePeriod::Once && !c->pauseDataUpdates)
+		resumeTriggerEvent();  // start update loop
+	return true;
 }
+
+std::string setSuspendClientDataUpdates(Client *c, bool suspend)
+{
+	if (c->pauseDataUpdates == suspend)
+		return suspend ? "Data Subscriptions already paused" : "Data Subscriptions already active";
+
+	if (suspend) {
+		c->pauseDataUpdates = true;
+		checkTriggerEventNeeded();
+		return "Data Subscription updates suspended";
+	}
+
+	// Check for any "Once" type requests which are still pending and send them.
+	// While we're at it we can also check if there are any data updates which need scheduling.
+	bool resume = false;
+	for (requestMap_t::value_type &rp : c->requests) {
+		if (rp.second.period >= UpdatePeriod::Tick) {
+			resume = true;
+		}
+		else if (rp.second.period == UpdatePeriod::Once && rp.second.interval == 1) {
+			rp.second.interval = 0;
+			updateRequestValue(c, &rp.second);
+		}
+	}
+	c->pauseDataUpdates = false;
+	if (resume && !g_triggersRegistered)
+		resumeTriggerEvent();
+	return "Data Subscription updates resumed";
+}
+
 #pragma endregion  Data Requests
 
 #pragma region  Registered Calculator Events  ----------------------------------------------
@@ -1387,9 +1522,9 @@ void tick()
 	g_tpNextTick = now + milliseconds(TICK_PERIOD_MS);
 
 	for (clientMap_t::value_type &cp : g_mClients) {
-		if (cp.second.status != ClientStatus::Connected)
-			continue;
 		Client &c = cp.second;
+		if (c.status != ClientStatus::Connected || c.pauseDataUpdates)
+			continue;
 		// check for timeout
 		if (now >= c.nextTimeout) {
 			disconnectClient(&c, "Client connection timed out.", ClientStatus::TimedOut);
@@ -1400,8 +1535,7 @@ void tick()
 			c.nextHearbeat = now + seconds(CONN_HEARTBEAT_SEC);
 			sendPing(&c);
 		}
-		if (c.pauseDataUpdates)
-			continue;
+		// process data requests
 		for (requestMap_t::value_type &rp : c.requests) {
 			TrackedRequest &r = rp.second;
 			// check if update needed
@@ -1455,8 +1589,7 @@ void processCommand(Client *c, const Command *const cmd)
 			break;
 
 		case CommandId::Subscribe:
-			c->pauseDataUpdates = !cmd->uData;
-			ackMsg = c->pauseDataUpdates ? "Data Subscription updates suspended" : "Data Subscription updates resumed";
+			ackMsg = setSuspendClientDataUpdates(c, !cmd->uData);
 			break;
 
 		case CommandId::Update:
@@ -1473,8 +1606,7 @@ void processCommand(Client *c, const Command *const cmd)
 
 		case CommandId::Disconnect:
 			disconnectClient(c);
-			ackMsg = "Disconnected by Client command.";
-			break;
+			return;
 
 		case CommandId::Ping:      // just ACK the ping
 		case CommandId::Connect:   // client was already re-connected or we wouldn't be here, just ACK
@@ -1542,8 +1674,8 @@ void CALLBACK dispatchMessage(SIMCONNECT_RECV* pData, DWORD cbData, void*)
 			}
 			if (c->status == ClientStatus::Connected)
 				updateClientTimeout(c);  // update heartbeat timer
-			else if (!connectClient(c))  // assume client wants to re-connect if they're not already
-				break;  // unlikely
+			else
+				connectClient(c);        // assume client wants to re-connect if they're not already
 
 			const size_t dataSize = (size_t)pData->dwSize + 4 - sizeof(SIMCONNECT_RECV_CLIENT_DATA);  // dwSize reports 4 bytes less than actual size of SIMCONNECT_RECV_CLIENT_DATA
 			switch (dr->type) {
@@ -1571,8 +1703,7 @@ void CALLBACK dispatchMessage(SIMCONNECT_RECV* pData, DWORD cbData, void*)
 						LOG_CRT << "Invalid DataRequest struct data size! Expected " << sizeof(DataRequest) << " but got " << dataSize;
 						return;
 					}
-					if (addOrUpdateRequest(c, reinterpret_cast<const DataRequest *const>(&data->dwData)) && !g_triggersRegistered)
-						registerTriggerEvents();  // start update loop
+					addOrUpdateRequest(c, reinterpret_cast<const DataRequest *const>(&data->dwData));
 					break;
 
 				default:
@@ -1590,8 +1721,9 @@ void CALLBACK dispatchMessage(SIMCONNECT_RECV* pData, DWORD cbData, void*)
 			SimConnectHelper::logSimVersion(pData);
 			break;
 
+		// This doesn't seem to ever actually happen... but I guess it may just start to one day  ¯\_(ツ)_/¯
 		case SIMCONNECT_RECV_ID_QUIT:
-			g_simConnectQuitEvent = true;
+			disableAllClients();
 			LOG_DBG << "Received quit command from SimConnect.";
 			break;
 
@@ -1658,6 +1790,13 @@ MSFS_CALLBACK void module_init(void)
 	// register incoming Ping event and add to notification group (this is technically not "critical" to operation so do not exit on error here
 	SimConnectHelper::newClientEvent(g_hSimConnect, CLI_EVENT_PING, string(EVENT_NAME_PING, strlen(EVENT_NAME_PING)), GROUP_DEFAULT);
 
+	// use "Frame" event as trigger for our tick() loop
+	if FAILED(hr = SimConnect_SubscribeToSystemEvent(g_hSimConnect, (SIMCONNECT_CLIENT_EVENT_ID)EVENT_FRAME, "Frame")) {
+		LOG_CRT << "SimConnect_SubscribeToSystemEvent failed with " << LOG_HR(hr);;
+		return;
+	}
+	pauseTriggerEvent();  // pause frame updates for now
+
 	// Go
 	if FAILED(hr = SimConnect_CallDispatch(g_hSimConnect, dispatchMessage, nullptr)) {
 		LOG_CRT << "SimConnect_CallDispatch failed with " << LOG_HR(hr);;
@@ -1669,18 +1808,11 @@ MSFS_CALLBACK void module_init(void)
 
 MSFS_CALLBACK void module_deinit(void)
 {
+	// don't send out any more data at this point (especially logs!) as it may prevent the simulator from exiting (new in SU13, yay!)
+	disableAllClients();
 	LOG_INF << "Stopping " WSMCMND_PROJECT_NAME " " WSMCMND_SERVER_NAME;
-
-	if (g_hSimConnect != INVALID_HANDLE_VALUE) {
-		// Unloading of module would typically only happen when simulator quits, except during development and manual project rebuild.
-		// The below code is just for that occasion. Normally any connected Clients should detect shutdown via the SimConnect Close event.
-		if (!g_simConnectQuitEvent) {
-			// Disconnect any clients (does not seem to actually send any data... SimConnect context destroyed?)
-			LOG_DBG << "SimConnect apparently didn't send Quit message... disconnecting any clients.";
-			disconnectAllClients("Server is shutting down.");
-		}
+	if (g_hSimConnect != INVALID_HANDLE_VALUE)
 		SimConnect_Close(g_hSimConnect);
-	}
 	g_hSimConnect = INVALID_HANDLE_VALUE;
 }
 

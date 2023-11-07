@@ -34,6 +34,9 @@ using namespace System::Collections::Generic;
 using namespace System::Runtime::InteropServices;
 using namespace msclr::interop;
 
+// We need this to ignore the errors about "unknown" pragmas which actually work to suppress bogus Intellisense errors. Yeah.
+#pragma warning(disable:4068)
+
 /// WASimCommander::CLI::Structs namespace.
 /// CLI/.NET versions of WASimCommander API and Client data structures.
 namespace WASimCommander::CLI::Structs
@@ -148,9 +151,11 @@ namespace WASimCommander::CLI::Structs
 			explicit Command(CommandId id) : commandId(id) { }
 			explicit Command(CommandId id, uint32_t uData) : uData(uData), commandId(id) { }
 			explicit Command(CommandId id, uint32_t uData, double fData) : uData(uData), fData(fData), commandId(id) { }
+#pragma diag_suppress 144   // a value of type "System::String ^" cannot be used to initialize an entity of type "unsigned char"  (sData is not a uchar... someone's confused)
 			explicit Command(CommandId id, uint32_t uData, String ^sData) : uData(uData), fData(0.0), commandId(id), sData{sData} { }
 			explicit Command(CommandId id, uint32_t uData, String ^sData, double fData) : uData(uData), fData(fData), commandId(id), sData{sData} { }
 			explicit Command(CommandId id, uint32_t uData, String ^sData, double fData, int32_t token) : token(token), uData(uData), fData(fData), commandId(id), sData{sData} { }
+#pragma diag_restore 144
 
 			void setStringData(String ^sData)
 			{
@@ -250,16 +255,19 @@ namespace WASimCommander::CLI::Structs
 				requestType(RequestType::Calculated), calcResultType(resultType), nameOrCode(calculatorCode)
 			{	}
 
+			/// <summary>Set the `nameOrCode` member using a `string` type value. </summary>
 			void setNameOrCode(String ^nameOrCode)
 			{
 				this->nameOrCode = char_array<STRSZ_REQ>(nameOrCode);
 			}
 
+			/// <summary>Set the `unitName` member using a `string` type value. </summary>
 			void setUnitName(String ^unitName)
 			{
 				this->unitName = char_array<STRSZ_UNIT>(unitName);
 			}
 
+			/// <summary>Serializes this `DataRequest` to a string for debugging purposes.</summary>
 			String ^ToString() override
 			{
 				String ^str = String::Format(
@@ -319,11 +327,14 @@ namespace WASimCommander::CLI::Structs
 			array<Byte> ^data {};   ///< Value data array.
 
 
-			/// <summary> Tries to populate a value reference of the desired type and returns true or false
+			/// <summary> Tries to populate a value reference of the desired type `T` and returns true or false
 			/// depending on if the conversion was valid (meaning the size of requested type matches the data size). </summary>
 			/// If the conversion fails, result is default-initialized.
-			/// The requested type must be a `value` type (not reference) and be default-constructible, (eg. numerics, chars), or fixed-size arrays of such types.
-			generic<typename T> where T : value class, gcnew()
+			/// The requested type (`T`) must be a `value` type (not reference) and be default-constructible, (eg. numerics, chars), or fixed-size arrays of such types.
+			generic<typename T>
+#if !DOXYGEN
+			where T : value class, gcnew()
+#endif
 			inline bool tryConvert([Out] T %result)
 			{
 				if (data->Length == (int)sizeof(T)) {
@@ -349,7 +360,8 @@ namespace WASimCommander::CLI::Structs
 				return true;
 			}
 
-			// Implicit conversion operators for various types
+			/// \name Implicit conversion operators for various types.
+			/// \{
 			inline static operator double(DataRequestRecord ^dr) { return dr->toType<double>(); }
 			inline static operator float(DataRequestRecord ^dr) { return dr->toType<float>(); }
 			inline static operator int64_t(DataRequestRecord ^dr) { return dr->toType<int64_t>(); }
@@ -361,6 +373,7 @@ namespace WASimCommander::CLI::Structs
 			inline static operator int8_t(DataRequestRecord ^dr) { return dr->toType<int8_t>(); }
 			inline static operator uint8_t(DataRequestRecord ^dr) { return dr->toType<uint8_t>(); }
 			inline static operator String ^(DataRequestRecord ^dr) { return dr->toType<String ^>(); }
+			/// \}
 
 			// can't get generic to work
 			//generic<typename T> where T : value class, gcnew()
@@ -372,6 +385,8 @@ namespace WASimCommander::CLI::Structs
 			//	return ret;
 			//}
 
+			/// <summary>Serializes this `DataRequestRecord` to string for debugging purposes.</summary>
+			/// To return the request's _value_ as a string, see `tryConvert()` or the `String ^()` operator. \sa DataRequest::ToString()
 			String ^ToString() override {
 				return String::Format(
 					"{0}; DataRequestRecord {{Last Update: {1}; Data: {2}}}",
@@ -445,8 +460,10 @@ namespace WASimCommander::CLI::Structs
 			explicit ListResult(const WASimCommander::Client::ListResult &r) :
 				listType{(LookupItemType)r.listType}, result(r.result), list{gcnew ListCollectionType((int)r.list.size()) }
 			{
+#pragma diag_suppress 2242  // for list[] operator: expression must have pointer-to-object or handle-to-C++/CLI-array type but it has type "ListCollectionType ^"  (um... isn't `list`  a pointer?)
 				for (const auto &pr : r.list)
-					list->Add(pr.first, gcnew String(pr.second.c_str()));
+					list[pr.first] = gcnew String(pr.second.c_str());
+#pragma diag_default 2242
 			}
 	};
 
@@ -494,6 +511,7 @@ namespace WASimCommander::CLI::Structs
 			int variableId { -1 };
 			int unitId { -1 };
 			Byte simVarIndex { 0 };
+			bool createLVar = false;
 
 			VariableRequest() {}
 			/// <summary> Construct a variable request for specified variable type ('A', 'L', etc) and variable name. </summary>
@@ -517,6 +535,14 @@ namespace WASimCommander::CLI::Structs
 			/// <summary> Construct a variable request a Local variable ('L') with the specified name. </summary>
 			explicit VariableRequest(String ^localVariableName) :
 				variableType{'L'}, variableName{localVariableName} { }
+			/// <summary> Construct a variable request for a Local ('L') variable with the specified name. </summary>
+			/// `createVariable` will create the L var on the simulator if it doesn't exist yet (for "Get" as well as "Set" commands). An optional unit name can also be provided.
+			explicit VariableRequest(String ^localVariableName, bool createVariable) :
+				variableType{'L'}, variableName{localVariableName}, createLVar{createVariable} { }
+			/// <summary> Construct a variable request for a Local ('L') variable with the specified name. </summary>
+			/// `createVariable` will create the L var on the simulator if it doesn't exist yet (for "Get" as well as "Set" commands). An unit name can also be provided with this overload.
+			explicit VariableRequest(String ^localVariableName, bool createVariable, String ^unitName) :
+				variableType{'L'}, variableName{localVariableName}, unitName{unitName}, createLVar{createVariable} { }
 			/// <summary> Construct a variable request a Local variable ('L') with the specified numeric ID. </summary>
 			explicit VariableRequest(int localVariableId) :
 				variableType{'L'}, variableId{localVariableId} { }
@@ -532,7 +558,7 @@ namespace WASimCommander::CLI::Structs
 			inline operator WASimCommander::Client::VariableRequest()
 			{
 				marshal_context mc;
-				WASimCommander::Client::VariableRequest r((char)variableType, mc.marshal_as<std::string>(variableName), mc.marshal_as<std::string>(unitName), simVarIndex);
+				WASimCommander::Client::VariableRequest r((char)variableType, mc.marshal_as<std::string>(variableName), mc.marshal_as<std::string>(unitName), simVarIndex, createLVar);
 				r.variableId = variableId;
 				r.unitId = unitId;
 				return r;

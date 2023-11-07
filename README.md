@@ -1,6 +1,7 @@
 [![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/mpaperno/WASimCommander?include_prereleases)](https://github.com/mpaperno/WASimCommander/releases)
 [![GPLv3 License](https://img.shields.io/badge/license-GPLv3-blue.svg)](LICENSE.GPL.txt)
 [![LGPGv3 License](https://img.shields.io/badge/license-LGPLv3-blue.svg)](LICENSE.LGPL.txt)
+[![API Documentation](https://img.shields.io/badge/API-Documentation-07A7EC?labelColor=black)](https://wasimcommander.max.paperno.us/)
 [![Discord](https://img.shields.io/static/v1?style=flat&color=7289DA&&labelColor=7289DA&message=Discord%20Chat&label=&logo=discord&logoColor=white)](https://discord.gg/meWyE4dcAt)
 
 
@@ -15,7 +16,7 @@
 **A WASM module-based Server and a full Client API combination.**
 
 This project is geared towards other MSFS developers/coders who need a convenient way to remotely access parts of the Simulator which are normally
-inaccessible via _SimConnect_, such as locally-defined aircraft variables or custom events.
+inaccessible via _SimConnect_, such as some variable types and 'H' events, and running RPN "calculator code" directly on the sim.
 
 The Client API can be utilized natively from C++, or via .NET managed assembly from C#, Python, or other languages.
 
@@ -27,7 +28,7 @@ to _SimConnect_ for basic functionality like reading/setting Simulation Variable
 
 One of the motivations for this project was seeing multiple MSFS tool authors and casual hackers creating their own WASM modules and protocols just to support their
 own product or need. There is nothing wrong with this, of course, but for the Sim user it can be a disadvantage on several levels. They may end up running
-multiple versions of modules which all do eseentially the same thing, and it may be confusing which WASM module they need to support which tool,
+multiple versions of modules which all do essentially the same thing, and it may be confusing which WASM module they need to support which tool,
 just to name two obvious issues. For the developer, programming the WASM modules comes with its own quirks, too, not to mention the time involved.
 And regardless of the supposed isolated environment a WASM module is supposed to run in, it's still very easy to take down the whole Simulator with 
 some errant code... ;-)
@@ -60,7 +61,7 @@ On a more practical note, I am using it with the [MSFS Touch Portal Plugin](http
     - Any calculator code saved in subscriptions is **pre-compiled to a more efficient byte code** representation before being passed to the respective calculator
         functions. This significantly improves performance for recurring calculations.
 - **Register Named Events**:
-    - Save recurring "set events," like activiating controls using calculator code, for more efficient and simpler re-use. 
+    - Save recurring "set events," like activating controls using calculator code, for more efficient and simpler re-use. 
         Saved calculator code is pre-compiled to a more efficient byte code representation before being passed to the calculator function. 
         This significantly improves performance for recurring events.
     - Registered events can be executed "natively" via _WASim API_ by simply sending a short command with the saved event ID.
@@ -68,7 +69,7 @@ On a more practical note, I am using it with the [MSFS Touch Portal Plugin](http
     - Event names can be completely custom (including a `.` (period) as per SimConnect convention), or derive from the connected Client's name (to ensure uniqueness).
 - **Send Simulator "Key Events"** directly by ID or name (instead of going through the SimConnect mapping process or executing calculator code). Much more efficient than the other methods.
     - **New in v1.1.0:** Send Key Events with up to 5 values (like the new `SimConnect_TransmitClientEvent_EX1()`).
-- **Remote Logging**: Log messages (errors, warnings, debug, etc) can optionally be sent to the Client, with specific minimum level (eg. only warnings and errros).
+- **Remote Logging**: Log messages (errors, warnings, debug, etc) can optionally be sent to the Client, with specific minimum level (eg. only warnings and errors).
 - **Ping** the Server to check that the WASM module is installed and running before trying to connect or use its features.
 
 #### Core Components
@@ -77,9 +78,9 @@ On a more practical note, I am using it with the [MSFS Touch Portal Plugin](http
 - Well-defined message API for communication between Server module and any client implementation.
 - Uses standard SimConnect messages for the base network "transport" layer.
 - All data allocations are on client side, so SimConnect limits in WASM module are bypassed (can in theory support unlimited clients).
-- No wasted data allocations, each data/variable subscription is stored independently avoiding complications with offets or data overflows.
+- No wasted data allocations, each data/variable subscription is stored independently avoiding complications with offsets or data overflows.
 - Minimum possible impact on MSFS in terms of memory and CPU usage; practically zero effect for Sim user when no clients are connected (Server is idle).
-- Server periodically checks that a client is still connected by sending "hearbeat" ping requests and enforcing a timeout if no response is received.
+- Server periodically checks that a client is still connected by sending "heartbeat" ping requests and enforcing a timeout if no response is received.
 - Extensive logging at configurable levels (debug/info/warning/etc) to multiple destinations (file/console/remote) for both Server and Client. 
     - Uses an efficient **lazy logging** implementation which doesn't evaluate any arguments if the log message will be discarded anyway 
     (eg. a DEBUG level message when minimum logging level is INFO).
@@ -90,7 +91,9 @@ On a more practical note, I am using it with the [MSFS Touch Portal Plugin](http
 
 #### Desktop GUI
 - Includes a full-featured desktop application which demonstrates/tests all available features of the API.
-- Fully usable as a standalone application which saves preferences, imports/exports lists of data subscriptions/registered events, and other usabililty features.
+- Fully usable as a standalone application which saves preferences, imports/exports lists of data subscriptions/registered events, and other friendly features.
+- Very useful for "exploring" the simulator in general, like checking variable values, testing effects of key events and RPN calculator code.
+- Can be used with the [MSFS/SimConnect Touch Portal Plugin](https://github.com/mpaperno/MSFSTouchPortalPlugin) for import/export of custom variable request definitions.
 
 <p> &nbsp; </p>
 <div align="center">
@@ -100,7 +103,7 @@ On a more practical note, I am using it with the [MSFS Touch Portal Plugin](http
 
 
 -------------
-### Downloads
+### Downloads and Updates
 
 Over in the [Releases](https://github.com/mpaperno/WASimCommander/releases) there are 3 packages provided. (The actual file names have version numbers appended.)
 - `WASimCommander_SDK` - All header files, pre-built static and dynamic libs, packaged WASM module, pre-build GUI, reference documentation, and other tools/examples.
@@ -111,14 +114,16 @@ _Watch_ -> _Custom_ -> _Releases_ this repo (button at top) or subscribe to the 
 
 Update announcements are also posted on my Discord server's [WASimCommander release announcement channel](https://discord.gg/StbmZ2ZgsF).
 
+The SDK and updates are [published on Flightsim.to](https://flightsim.to/file/36474/wasimcommander) where one could "subscribe" to release notifications (account required).
+
 -------------
 ### Documentation & Examples
 
 There are three basic console-style tests/examples included for `C++`, `C#`, and `Python` in the [src/Testing](https://github.com/mpaperno/WASimCommander/tree/main/src/Testing) folder.
 If you like reading code, this is the place to start.
 
-API docuemntation generated from source comments is published here: https://mpaperno.github.io/WASimCommander/ <br/>
-A good place to start with the docs is probably the [`WASimClient`](https://mpaperno.github.io/WASimCommander/class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html) page.
+API documentation generated from source comments is published here: https://wasimcommander.max.paperno.us/ <br/>
+A good place to start with the docs is probably the [`WASimClient`](https://wasimcommander.max.paperno.us/class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html) page.
 
 The GUI is written in C++ (using Qt library for UI), and while not the simplest example, _is_ a full implementation of almost all the available
 API features. The main `WASimClient` interactions all happen in the `MainWindow::Private` class at the top of the 
@@ -141,7 +146,7 @@ The module also logs to a file, though it's a bit tricky to find. On my edition 
 `D:\WpSystem\S-1-5-21-611220451-769921231-644967174-1000\AppData\Local\Packages\Microsoft.FlightSimulator_8wekyb3d8bbwe\LocalState\packages\wasimcommander-module\work`
 
 To enable more verbose logging on the module at startup, edit the `server_conf.ini` file which is found in the module's install folder 
-(`Comunity\wasimcommander-module\modules`). There are comments in there indicating the options. 
+(`Community\wasimcommander-module\modules`). There are comments in there indicating the options. 
 
 Keep in mind that the server logging level can also be changed remotely at runtime, but
 of course that only works if you can establish a connection to the module in the first place.
@@ -185,12 +190,17 @@ Uses and includes [_IniPP_ by Matthias C. M. Troffaes](https://github.com/mcmtro
 
 Uses the _Microsoft SimConnect SDK_ under the terms of the _MS Flight Simulator SDK EULA (11/2019)_ document.
 
-The GUI component uses portions of the [_Qt Library_](http://qt.io) under the terms of the GPL v3 license.
+WASimUI (GUI):
+- Uses portions of the [_Qt Library_](http://qt.io) under the terms of the GPL v3 license.
+- Uses and includes the following symbol fonts for icons, under the terms of their respective licenses:
+  - [IcoMoon Free](https://icomoon.io/#icons-icomoon) - IcoMoon.io, GPL v3.
+  - [Material Icons](https://material.io/) - Google, Apache License v2.0.
+- Uses modified versions of `FilterTableHeader` and `FilterLineEdit` components from [DB Browser for SQLite](https://github.com/sqlitebrowser/sqlitebrowser) under GPL v3 license.
+- Uses modified version of `MultisortTableView` from <https://github.com/dimkanovikov/MultisortTableView> under GPL v3 license.
+- Uses Natural (alpha-numeric) sorting algorithm implementation for _Qt_ by Litkevich Yuriy (public domain).
 
-The GUI component uses and includes the following symbol fonts for icons, under the terms of their respective licenses:
-- [IcoMoon Free](https://icomoon.io/#icons-icomoon) - IcoMoon.io, GPL v3.
-- [Material Icons](https://material.io/) - Google, Apache License v2.0.
 
+Documentation generated with [Doxygen](https://www.doxygen.nl/) and styled with the most excellent [Doxygen Awesome](https://jothepro.github.io/doxygen-awesome-css).
 
 -------------
 ### Copyright, License, and Disclaimer

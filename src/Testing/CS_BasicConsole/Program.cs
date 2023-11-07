@@ -129,7 +129,8 @@ namespace CS_BasicConsole
 			// Test subscribing to a string type value. We'll use the Sim var "TITLE" (airplane name), which can only be retrieved using calculator code.
 			// We allocate 32 Bytes here to hold the result and we request this one with an update period of Once, which will return a result right away
 			// but will not be scheduled for regular updates. If we wanted to update this value later, we could call the client's `updateDataRequest(requestId)` method.
-			hr = client.saveDataRequest(new DataRequest(
+			// Also we can use the "async" version which doesn't wait for the server to respond before returning. We're going to wait for a result anyway after submitting the request.
+			hr = client.saveDataRequestAsync(new DataRequest(
 				requestId: (uint)Requests.REQUEST_ID_2_STR,
 				resultType: CalcResultType.String,
 				calculatorCode: "(A:TITLE, String)",
@@ -198,7 +199,8 @@ namespace CS_BasicConsole
 		// Event handler for showing listing results (eg. local vars list)
 		static void ListResultsHandler(ListResult lr)
 		{
-			Log(lr.ToString());  // just use the ToString() override
+			Log($"Got {lr.list.Count} results for list type {lr.listType}. (Uncomment next line in ListResultsHandler() to print them.)");
+			//Log(lr.ToString());  // To print all the items just use the ToString() override.
 			// signal completion
 			dataUpdateEvent.Set();
 		}
@@ -206,7 +208,7 @@ namespace CS_BasicConsole
 		// Event handler to process data value subscription updates.
 		static void DataSubscriptionHandler(DataRequestRecord dr)
 		{
-			Console.Write($"<< Got Data for request {(Requests)dr.requestId} \"{dr.nameOrCode}\" with Value: ");
+			Console.Write($"[{DateTime.Now.ToString("mm:ss.fff")}] << Got Data for request {(Requests)dr.requestId} \"{dr.nameOrCode}\" with Value: ");
 			// Convert the received data into a value using DataRequestRecord's tryConvert() methods.
 			// This could be more efficient in a "real" application, but it's good enough for our tests with only 2 value types.
 			if (dr.tryConvert(out float fVal))
@@ -215,14 +217,14 @@ namespace CS_BasicConsole
 				Console.WriteLine($"(string) \"{sVal}\"");
 			}
 			else
-				Console.WriteLine("Could not convert result data to value!");
+				Log("Could not convert result data to value!", "!!");
 			// signal completion
 			dataUpdateEvent.Set();
 		}
 
 		static void Log(string msg, string prfx = "=:")
 		{
-			Console.WriteLine(prfx + ' ' + msg);
+			Console.WriteLine("[{0}] {1} {2}", DateTime.Now.ToString("mm:ss.fff"), prfx, msg);
 		}
 
 	}

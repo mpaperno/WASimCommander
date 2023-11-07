@@ -47,18 +47,17 @@ struct RequestRecord : public WASimCommander::Client::DataRequestRecord
 	uint32_t interval;
 	UpdatePeriod period;
 	RequestType requestType;
-	union {
-		CalcResultType calcResultType;
-		uint8_t simVarIndex;
-	};
+	CalcResultType calcResultType;
+	uint8_t simVarIndex;
 	char varTypePrefix;
 	char nameOrCode[STRSZ_REQ];
 	char unitName[STRSZ_UNIT];
 	// From DataRequestRecord
 	time_t lastUpdate;
-	uint32_t dataSize;
+	std::vector<uint8_t> data;
 	*/
 	int metaType = QMetaType::UnknownType;
+	QVariantMap properties {};
 
 	using DataRequestRecord::DataRequestRecord;
 
@@ -117,7 +116,6 @@ struct RequestRecord : public WASimCommander::Client::DataRequestRecord
 			r.varTypePrefix = pfx.at(0).toLatin1();
 		return in;
 	}
-
 };
 Q_DECLARE_METATYPE(RequestRecord)
 
@@ -134,14 +132,49 @@ class RequestsModel : public QStandardItemModel
 private:
 	Q_OBJECT
 
-	enum Roles { DataRole = Qt::UserRole + 1, MetaTypeRole };
 
 public:
+	enum Roles { DataRole = Qt::UserRole + 1, MetaTypeRole, PropertiesRole };
 	enum Columns {
-		COL_ID,   COL_TYPE,   COL_RES_TYPE,       COL_NAME,           COL_SIZE,   COL_UNIT,   COL_IDX,   COL_PERIOD,   COL_INTERVAL, COL_EPSILON, COL_VALUE,   COL_TIMESATMP,   COL_ENUM_END
+		COL_ID,
+		COL_TYPE,
+		COL_RES_TYPE,
+		COL_NAME,
+		COL_IDX,
+		COL_UNIT,
+		COL_SIZE,
+		COL_PERIOD,
+		COL_INTERVAL,
+		COL_EPSILON,
+		COL_VALUE,
+		COL_TIMESATMP,
+		COL_META_ID,
+		COL_META_NAME,
+		COL_META_CAT,
+		COL_META_DEF,
+		COL_META_FMT,
+		COL_ENUM_END,
+		COL_FIRST_META = COL_META_ID,
+		COL_LAST_META = COL_META_FMT,
 	};
 	const QStringList columnNames = {
-		tr("ID"), tr("Type"), tr("Res/Var Type"), tr("Name or Code"), tr("Size"), tr("Unit"), tr("Idx"), tr("Period"), tr("Intvl"),   tr("ΔΕ"),   tr("Value"), tr("Last Updt.")
+		tr("ID"),
+		tr("Type"),
+		tr("Res/Var"),
+		tr("Name or Code"),
+		tr("Idx"),
+		tr("Unit"),
+		tr("Size"),
+		tr("Period"),
+		tr("Intvl"),
+		tr("ΔΕ"),
+		tr("Value"),
+		tr("Last Updt."),
+		tr("Export ID"),
+		tr("Display Name"),
+		tr("Category"),
+		tr("Default"),
+		tr("Format"),
 	};
 
 	RequestsModel(QObject *parent = nullptr) :
@@ -160,6 +193,21 @@ public:
 		return item(row, COL_ID)->data(DataRole).toUInt();
 	}
 
+	int findRequestRow(uint32_t requestId) const
+	{
+		if (rowCount()) {
+			const QModelIndexList src = match(index(0, COL_ID), DataRole, requestId, 1, Qt::MatchExactly);
+			//qDebug() << requestId << src << (!src.isEmpty() ? src.first() : QModelIndex());
+			if (!src.isEmpty())
+				return src.first().row();
+		}
+		return -1;
+	}
+
+	QModelIndexList allRequests() const {
+		return match(index(0, COL_ID), Qt::EditRole, "*", -1, Qt::MatchWildcard | Qt::MatchWrap);
+	}
+
 	void setRequestValue(const WASimCommander::Client::DataRequestRecord &res)
 	{
 		const int row = findRequestRow(res.requestId);
@@ -169,15 +217,19 @@ public:
 		// set data display
 		const int dataType = item(row, COL_ID)->data(MetaTypeRole).toInt();
 		QVariant v = Utils::convertValueToType(dataType, res);
-		item(row, COL_VALUE)->setText(v.toString());
-		item(row, COL_VALUE)->setData(v);
+		QStandardItem *itm = item(row, COL_VALUE);
+		itm->setText(v.toString());
+		itm->setData(v, DataRole);
+		itm->setToolTip(itm->text());
 
 		// update timestamp column
 		const auto ts = QDateTime::fromMSecsSinceEpoch(res.lastUpdate);
-		const auto lastts = item(row, COL_TIMESATMP)->data().toULongLong();
+		itm = item(row, COL_TIMESATMP);
+		const auto lastts = itm->data().toULongLong();
 		const uint64_t tsDelta = lastts ? res.lastUpdate - lastts : 0;
-		item(row, COL_TIMESATMP)->setText(QString("%1 (%2)").arg(ts.toString("hh:mm:ss.zzz")).arg(tsDelta));
-		item(row, COL_TIMESATMP)->setData(res.lastUpdate);
+		itm->setText(QString("%1 (%2)").arg(ts.toString("hh:mm:ss.zzz")).arg(tsDelta));
+		itm->setToolTip(itm->text());
+		itm->setData(res.lastUpdate, DataRole);
 		qDebug() << "Saved result" << v << "for request ID" << res.requestId << "ts" << res.lastUpdate << "size" << res.data.size() << "type" << (QMetaType::Type)dataType << "data : " << QByteArray((const char *)res.data.data(), res.data.size()).toHex(':');
 	}
 
@@ -205,82 +257,83 @@ public:
 
 		req.metaType = item(row, COL_ID)->data(MetaTypeRole).toInt();
 
+		req.properties["id"] = item(row, COL_META_ID)->data(Qt::EditRole).toString();
+		req.properties["name"] = item(row, COL_META_NAME)->data(Qt::EditRole).toString();
+		req.properties["categoryId"] = item(row, COL_META_CAT)->data(Qt::EditRole).toString();
+		req.properties["category"] = item(row, COL_META_CAT)->data(Qt::ToolTipRole).toString();
+		req.properties["default"] = item(row, COL_META_DEF)->data(Qt::EditRole).toString();
+		req.properties["format"] = item(row, COL_META_FMT)->data(Qt::EditRole).toString();
+
 		//std::cout << req << std::endl;
 		return req;
 	}
 
 	QModelIndex addRequest(const RequestRecord &req)
 	{
+		static const QString NA = tr("-", "Used for non-applicable column values, like 'N/A'.");  // tr("N/A")
+
 		int row = findRequestRow(req.requestId);
 		const bool newRow = row < 0;
 		if (newRow)
 			row = rowCount();
 
-		setItem(row, COL_ID, new QStandardItem(QString("%1").arg(req.requestId)));
-		item(row, COL_ID)->setData(req.requestId, DataRole);
-		item(row, COL_ID)->setData(req.metaType, MetaTypeRole);
+		QStandardItem *itm = setOrCreateItem(row, COL_ID, QString::number(req.requestId), req.requestId);
+		itm->setData(req.metaType, MetaTypeRole);
+		itm->setData(req.properties, PropertiesRole);
 
-		setItem(row, COL_TYPE, new QStandardItem(WSEnums::RequestTypeNames[+req.requestType]));
-		item(row, COL_TYPE)->setData(+req.requestType);
+		setOrCreateItem(row, COL_TYPE, WSEnums::RequestTypeNames[+req.requestType], +req.requestType);
 
 		if (req.requestType == WSEnums::RequestType::Calculated) {
-			setItem(row, COL_RES_TYPE, new QStandardItem(WSEnums::CalcResultTypeNames[+req.calcResultType]));
-			item(row, COL_RES_TYPE)->setData(+req.calcResultType);
-			setItem(row, COL_IDX, new QStandardItem(tr("N/A")));
-			setItem(row, COL_UNIT, new QStandardItem(tr("N/A")));
-			item(row, COL_IDX)->setEnabled(false);
-			item(row, COL_UNIT)->setEnabled(false);
+			setOrCreateItem(row, COL_RES_TYPE, WSEnums::CalcResultTypeNames[+req.calcResultType], +req.calcResultType);
+			setOrCreateItem(row, COL_IDX, NA, QString::number(req.simVarIndex), false);
+			setOrCreateItem(row, COL_UNIT, NA, QString(req.unitName), false);
 		}
 		else {
-			setItem(row, COL_RES_TYPE, new QStandardItem(QString(req.varTypePrefix)));
-			item(row, COL_RES_TYPE)->setData(req.varTypePrefix);
-			if (Utils::isUnitBasedVariableType(req.varTypePrefix)) {
-				setItem(row, COL_UNIT, new QStandardItem(QString(req.unitName)));
-			}
-			else {
-				setItem(row, COL_UNIT, new QStandardItem(tr("N/A")));
-				item(row, COL_UNIT)->setEnabled(false);
-			}
-			if (req.varTypePrefix == 'A') {
-				setItem(row, COL_IDX, new QStandardItem(QString("%1").arg(req.simVarIndex)));
-			}
-			else {
-				setItem(row, COL_IDX, new QStandardItem(tr("N/A")));
-				item(row, COL_IDX)->setEnabled(false);
-			}
+			setOrCreateItem(row, COL_RES_TYPE, QString(req.varTypePrefix), req.varTypePrefix);
+			if (Utils::isUnitBasedVariableType(req.varTypePrefix))
+				setOrCreateItem(row, COL_UNIT, req.unitName, QString(req.unitName));
+			else
+				setOrCreateItem(row, COL_UNIT, NA, QString(req.unitName), false);
+			if (req.varTypePrefix == 'A')
+				setOrCreateItem(row, COL_IDX, QString::number(req.simVarIndex));
+			else
+				setOrCreateItem(row, COL_IDX, NA, QString::number(req.simVarIndex), false);
 		}
-		item(row, COL_UNIT)->setData(QString(req.unitName));
 
 		if (req.metaType == QMetaType::UnknownType)
-			setItem(row, COL_SIZE, new QStandardItem(QString("%1").arg(req.valueSize)));
+			setOrCreateItem(row, COL_SIZE, QString::number(req.valueSize), req.valueSize);
 		else if (req.metaType > QMetaType::User)
-			setItem(row, COL_SIZE, new QStandardItem(QString("String (%1 B)").arg(req.metaType - QMetaType::User)));
+			setOrCreateItem(row, COL_SIZE, QString("String (%1 B)").arg(req.metaType - QMetaType::User), req.valueSize);
 		else
-			setItem(row, COL_SIZE, new QStandardItem(QString("%1 (%2 B)").arg(QString(QMetaType::typeName(req.metaType)).replace("q", "")).arg(QMetaType::sizeOf(req.metaType))));
-		item(row, COL_SIZE)->setData(req.valueSize);
+			setOrCreateItem(row, COL_SIZE, QString("%1 (%2 B)").arg(QString(QMetaType::typeName(req.metaType)).replace("q", "")).arg(QMetaType::sizeOf(req.metaType)), req.valueSize);
 
-		setItem(row, COL_PERIOD, new QStandardItem(WSEnums::UpdatePeriodNames[+req.period]));
-		item(row, COL_PERIOD)->setData(+req.period);
+		setOrCreateItem(row, COL_PERIOD, WSEnums::UpdatePeriodNames[+req.period], +req.period);
+		setOrCreateItem(row, COL_NAME, req.nameOrCode);
+		setOrCreateItem(row, COL_INTERVAL, QString::number(req.interval));
 
-		setItem(row, COL_NAME, new QStandardItem(QString(req.nameOrCode)));
-		setItem(row, COL_INTERVAL, new QStandardItem(QString("%1").arg(req.interval)));
-
-		if (req.metaType > QMetaType::UnknownType && req.metaType < QMetaType::User) {
-			setItem(row, COL_EPSILON, new QStandardItem(QString("%1").arg(req.deltaEpsilon, 0, 'f', 7)));
-		}
-		else  {
-			setItem(row, COL_EPSILON, new QStandardItem(tr("N/A")));
-			item(row, COL_EPSILON)->setEnabled(false);
-		}
-		item(row, COL_EPSILON)->setData(req.deltaEpsilon);
+		if (req.metaType > QMetaType::UnknownType && req.metaType < QMetaType::User)
+			setOrCreateItem(row, COL_EPSILON, QString::number(req.deltaEpsilon), req.deltaEpsilon);
+		else
+			setOrCreateItem(row, COL_EPSILON, NA, req.deltaEpsilon, false);
 
 		if (newRow) {
-			setItem(row, COL_VALUE, new QStandardItem("???"));
-			setItem(row, COL_TIMESATMP, new QStandardItem("Never"));
-			item(row, COL_TIMESATMP)->setData(0);
+			setOrCreateItem(row, COL_VALUE, tr("???"));
+			setOrCreateItem(row, COL_TIMESATMP, tr("Never"), 0);
 		}
 
+		updateFromMetaData(row, req);
+
 		return index(row, 0);
+	}
+
+	void updateFromMetaData(int row, const RequestRecord &req)
+	{
+		// Meta data for exports
+		setOrCreateEditableItem(row, COL_META_ID, req.properties.value("id").toString());
+		setOrCreateEditableItem(row, COL_META_NAME, req.properties.value("name").toString());
+		setOrCreateEditableItem(row, COL_META_CAT, req.properties.value("categoryId").toString(), req.properties.value("category").toString());
+		setOrCreateEditableItem(row, COL_META_DEF, req.properties.value("default").toString());
+		setOrCreateEditableItem(row, COL_META_FMT, req.properties.value("format").toString());
 	}
 
 	void removeRequest(const uint32_t requestId)
@@ -288,7 +341,6 @@ public:
 		const int row = findRequestRow(requestId);
 		if (row > -1)
 			removeRow(row);
-		qDebug() << requestId << row;
 	}
 
 	void removeRequests(const QList<uint32_t> requestIds)
@@ -341,34 +393,31 @@ public:
 		return ret;
 	}
 
-	static inline QModelIndexList flattenIndexList(const QModelIndexList &list)
-	{
-		QModelIndexList ret;
-		QModelIndex lastIdx;
-		for (const QModelIndex &idx : list) {
-			if (idx.column() == COL_ID && lastIdx.row() != idx.row() && idx.row() < idx.model()->rowCount())
-				ret.append(idx);
-			lastIdx = idx;
-		}
-		return ret;
-	}
-
 	signals:
 		void rowCountChanged(int rows);
 
+	protected:
+		QStandardItem *setOrCreateItem(int row, int col, const QString &text, const QVariant &data = QVariant(), bool en = true, bool edit = false, const QString &tt = QString())
+		{
+			QStandardItem *itm = item(row, col);
+			if (!itm){
+				setItem(row, col, new QStandardItem());
+				itm = item(row, col);
+			}
+			itm->setText(text);
+			itm->setToolTip(tt.isEmpty() ? text : tt);
+			itm->setEnabled(en);
+			itm->setEditable(edit);
+			if (data.isValid())
+				itm->setData(data, DataRole);
+			return itm;
+		}
+		QStandardItem *setOrCreateEditableItem(int row, int col, const QString &text, const QString &tt = QString()) {
+			return setOrCreateItem(row, col, text, QVariant(), true, true, tt);
+		}
+
 	private:
 		uint32_t m_nextRequestId = 0;
-
-		int findRequestRow(uint32_t requestId) const
-		{
-			if (rowCount()) {
-				const QModelIndexList src = match(index(0, COL_ID), DataRole, requestId, 1, Qt::MatchExactly);
-				//qDebug() << requestId << src << (!src.isEmpty() ? src.first() : QModelIndex());
-				if (!src.isEmpty())
-					return src.first().row();
-			}
-			return -1;
-		}
 
 };
 
