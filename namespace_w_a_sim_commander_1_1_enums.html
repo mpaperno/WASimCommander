@@ -35,7 +35,7 @@
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="Logo.png" title="WASimCommander - Remote access to the Microsoft Flight Simulator 2020 Gauge API."/></td>
   <td id="projectalign">
-   <div id="projectname"><!-- WASimCommander --><span id="projectnumber">&#160;v1.1.2.0</span>
+   <div id="projectname"><!-- WASimCommander --><span id="projectnumber">&#160;v1.2.0.0</span>
    </div>
   </td>
  </tr>
@@ -320,13 +320,16 @@ Variables</h2></td></tr>
  Other variables types can also be requested ('B', 'E', 'M', etc) but such requests are simply converted to a calculator string and processed as an <code>Exec</code> type command (using an <code>Exec</code> command directly may be more efficient).<br  />
  Result is returned with the <code>Ack</code> response in <code>fData</code> as a double-precision value. In case of failure a <code>Nak</code> is returned with possible error message in <code>sData</code>. </p>
 </td></tr>
-<tr><td class="fieldname"><a id="ae3b1cd5348286e86d8c64ce44734e039a1d5c1a7fde77e84c993d6fea61f88c2a" name="ae3b1cd5348286e86d8c64ce44734e039a1d5c1a7fde77e84c993d6fea61f88c2a"></a>GetCreate&#160;</td><td class="fielddoc"><p >Same as <code>Get</code> but creates the variable if it doesn't already exist (with <code>register_named_variable()</code> <em>Gauge API</em>). The returned value will be <code>0.0</code> (see <code>SetCreate</code> to assign a default value and <code>Lookup</code> to check if a variable exists). <b>This only works with <code>L</code> (local) type variables.</b> </p>
+<tr><td class="fieldname"><a id="ae3b1cd5348286e86d8c64ce44734e039a1d5c1a7fde77e84c993d6fea61f88c2a" name="ae3b1cd5348286e86d8c64ce44734e039a1d5c1a7fde77e84c993d6fea61f88c2a"></a>GetCreate&#160;</td><td class="fielddoc"><p >Same as <code>Get</code> but creates a local 'L' variable if it doesn't already exist (with <code>register_named_variable()</code> <em>Gauge API</em>). Use <code>Lookup</code> command to check if a variable exists. <br  />
+ <b>Since v1.2:</b> If a variable is created, the value provided in <code>fData</code> will be used as the initial value of the variable, and will be returned as the result (essentially providing a default value in this case). Previous versions would <em>not</em> set a value (or unit type) on the variable after creating it and would return the default of <code>0.0</code>. <br  />
+ <b>Creating variables only works with <code>L</code> (local) types.</b> Since v1.2, for all other types this command will be handled the same as <code>Get</code>. Previous versions would return a <code>Nak</code>. </p>
 </td></tr>
 <tr><td class="fieldname"><a id="ae3b1cd5348286e86d8c64ce44734e039a5d5b78699e57104f2fa03bbdf7b9197b" name="ae3b1cd5348286e86d8c64ce44734e039a5d5b78699e57104f2fa03bbdf7b9197b"></a>Set&#160;</td><td class="fielddoc"><p >Set a named local variable with optional unit type. <code>uData</code> is a char of the variable type, with default of 'L' for local vars. <code>sData</code> is the variable name or numeric ID (for local vars only), optionally followed by comma (<code>,</code>) and unit name (or numeric unit ID for local vars) (<b>no spaces</b>). The value to set is passed in <code>fData</code> member.<br  />
  For example, a SimVar: <code>uData = 'A'; sData = "PROP RPM:2,rpm"; fData = 2200;</code><br  />
  Other variables types can also be set this way ('A', 'H", 'K', etc) but such requests are simply converted to a calculator string and processed as an <code>Exec</code> type command (using an <code>Exec</code> command directly may be slightly more efficient). </p>
 </td></tr>
-<tr><td class="fieldname"><a id="ae3b1cd5348286e86d8c64ce44734e039a372978c0739253c563ef7cb07d0606f2" name="ae3b1cd5348286e86d8c64ce44734e039a372978c0739253c563ef7cb07d0606f2"></a>SetCreate&#160;</td><td class="fielddoc"><p >Same as <code>Set</code> but creates the variable first if it doesn't already exist (with <code>register_named_variable()</code> <em>Gauge API</em>). Use the <code>Lookup</code> command to check if a variable exists. <b>This only works with <code>L</code> (local) type variables.</b> </p>
+<tr><td class="fieldname"><a id="ae3b1cd5348286e86d8c64ce44734e039a372978c0739253c563ef7cb07d0606f2" name="ae3b1cd5348286e86d8c64ce44734e039a372978c0739253c563ef7cb07d0606f2"></a>SetCreate&#160;</td><td class="fielddoc"><p >Same as <code>Set</code> but creates a local 'L' variable if it doesn't already exist (with <code>register_named_variable()</code> <em>Gauge API</em>). Use the <code>Lookup</code> command to check if a variable exists. <br  />
+ <b>Creating variables only works with <code>L</code> (local) types.</b> Since v1.2, for all other types this command will be handled the same as <code>Get</code>. Previous versions would return a <code>Nak</code>. </p>
 </td></tr>
 <tr><td class="fieldname"><a id="ae3b1cd5348286e86d8c64ce44734e039a953feeff1e20f40677fb7f77c073b3be" name="ae3b1cd5348286e86d8c64ce44734e039a953feeff1e20f40677fb7f77c073b3be"></a>Exec&#160;</td><td class="fielddoc"><p >Run calculator code contained in <code>sData</code> with <code>WASimCommander::CalcResultType</code> in <code>uData</code>. Result, if any, is returned with the <code>Ack</code> response, numeric types in <code>fData</code> and strings in <code>sData</code>. (Due to the way the <em>Gauge API</em> calculator function works, a string result is typically also returned even when only a numeric result is requested.)<br  />
 <br  />
@@ -392,7 +395,7 @@ Variables</h2></td></tr>
 </td></tr>
 </table>
 
-<p class="definition">Definition at line <a class="el" href="enums__impl_8h_source.html#l00093">93</a> of file <a class="el" href="enums__impl_8h_source.html">enums_impl.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="enums__impl_8h_source.html#l00096">96</a> of file <a class="el" href="enums__impl_8h_source.html">enums_impl.h</a>.</p>
 
 </div>
 </div>
@@ -431,7 +434,7 @@ Variables</h2></td></tr>
 </td></tr>
 </table>
 
-<p class="definition">Definition at line <a class="el" href="enums__impl_8h_source.html#l00105">105</a> of file <a class="el" href="enums__impl_8h_source.html">enums_impl.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="enums__impl_8h_source.html#l00108">108</a> of file <a class="el" href="enums__impl_8h_source.html">enums_impl.h</a>.</p>
 
 </div>
 </div>
@@ -468,7 +471,7 @@ Variables</h2></td></tr>
 </td></tr>
 </table>
 
-<p class="definition">Definition at line <a class="el" href="enums__impl_8h_source.html#l00119">119</a> of file <a class="el" href="enums__impl_8h_source.html">enums_impl.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="enums__impl_8h_source.html#l00122">122</a> of file <a class="el" href="enums__impl_8h_source.html">enums_impl.h</a>.</p>
 
 </div>
 </div>
@@ -513,7 +516,7 @@ Variables</h2></td></tr>
 </td></tr>
 </table>
 
-<p class="definition">Definition at line <a class="el" href="enums__impl_8h_source.html#l00132">132</a> of file <a class="el" href="enums__impl_8h_source.html">enums_impl.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="enums__impl_8h_source.html#l00135">135</a> of file <a class="el" href="enums__impl_8h_source.html">enums_impl.h</a>.</p>
 
 </div>
 </div>
@@ -556,7 +559,7 @@ Variables</h2></td></tr>
 </td></tr>
 </table>
 
-<p class="definition">Definition at line <a class="el" href="enums__impl_8h_source.html#l00151">151</a> of file <a class="el" href="enums__impl_8h_source.html">enums_impl.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="enums__impl_8h_source.html#l00154">154</a> of file <a class="el" href="enums__impl_8h_source.html">enums_impl.h</a>.</p>
 
 </div>
 </div>
@@ -593,7 +596,7 @@ Variables</h2></td></tr>
 </td></tr>
 </table>
 
-<p class="definition">Definition at line <a class="el" href="enums__impl_8h_source.html#l00167">167</a> of file <a class="el" href="enums__impl_8h_source.html">enums_impl.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="enums__impl_8h_source.html#l00170">170</a> of file <a class="el" href="enums__impl_8h_source.html">enums_impl.h</a>.</p>
 
 </div>
 </div>
@@ -624,7 +627,7 @@ Variables</h2></td></tr>
 </div><!-- fragment -->
 <p><a class="el" href="namespace_w_a_sim_commander_1_1_enums.html#ae3b1cd5348286e86d8c64ce44734e039">Enums::CommandId</a> enum names. </p>
 
-<p class="definition">Definition at line <a class="el" href="enums__impl_8h_source.html#l00086">86</a> of file <a class="el" href="enums__impl_8h_source.html">enums_impl.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="enums__impl_8h_source.html#l00089">89</a> of file <a class="el" href="enums__impl_8h_source.html">enums_impl.h</a>.</p>
 
 </div>
 </div>
@@ -650,7 +653,7 @@ Variables</h2></td></tr>
 
 <p><a class="el" href="namespace_w_a_sim_commander_1_1_enums.html#ae50424beb90af18b8139f5a4f070e61b">Enums::RequestType</a> enum names. </p>
 
-<p class="definition">Definition at line <a class="el" href="enums__impl_8h_source.html#l00101">101</a> of file <a class="el" href="enums__impl_8h_source.html">enums_impl.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="enums__impl_8h_source.html#l00104">104</a> of file <a class="el" href="enums__impl_8h_source.html">enums_impl.h</a>.</p>
 
 </div>
 </div>
@@ -676,7 +679,7 @@ Variables</h2></td></tr>
 
 <p><a class="el" href="namespace_w_a_sim_commander_1_1_enums.html#ac056a41f7fdbf2fb2599ad86c3949922">Enums::CalcResultType</a> enum names. </p>
 
-<p class="definition">Definition at line <a class="el" href="enums__impl_8h_source.html#l00115">115</a> of file <a class="el" href="enums__impl_8h_source.html">enums_impl.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="enums__impl_8h_source.html#l00118">118</a> of file <a class="el" href="enums__impl_8h_source.html">enums_impl.h</a>.</p>
 
 </div>
 </div>
@@ -702,7 +705,7 @@ Variables</h2></td></tr>
 
 <p><a class="el" href="namespace_w_a_sim_commander_1_1_enums.html#a43b33b172f6f4b43947d3a6da9847044">Enums::UpdatePeriod</a> enum names. </p>
 
-<p class="definition">Definition at line <a class="el" href="enums__impl_8h_source.html#l00128">128</a> of file <a class="el" href="enums__impl_8h_source.html">enums_impl.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="enums__impl_8h_source.html#l00131">131</a> of file <a class="el" href="enums__impl_8h_source.html">enums_impl.h</a>.</p>
 
 </div>
 </div>
@@ -731,7 +734,7 @@ Variables</h2></td></tr>
 </div><!-- fragment -->
 <p><a class="el" href="namespace_w_a_sim_commander_1_1_enums.html#ab1b85706615bc0e57fa6d8d464bf8a3d">Enums::LookupItemType</a> enum names. </p>
 
-<p class="definition">Definition at line <a class="el" href="enums__impl_8h_source.html#l00145">145</a> of file <a class="el" href="enums__impl_8h_source.html">enums_impl.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="enums__impl_8h_source.html#l00148">148</a> of file <a class="el" href="enums__impl_8h_source.html">enums_impl.h</a>.</p>
 
 </div>
 </div>
@@ -757,7 +760,7 @@ Variables</h2></td></tr>
 
 <p><a class="el" href="namespace_w_a_sim_commander_1_1_enums.html#a7311e9d8f917bbcbb202497114e5f2c5">Enums::LogLevel</a> enum names. </p>
 
-<p class="definition">Definition at line <a class="el" href="enums__impl_8h_source.html#l00163">163</a> of file <a class="el" href="enums__impl_8h_source.html">enums_impl.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="enums__impl_8h_source.html#l00166">166</a> of file <a class="el" href="enums__impl_8h_source.html">enums_impl.h</a>.</p>
 
 </div>
 </div>
@@ -786,7 +789,7 @@ Variables</h2></td></tr>
 </div><!-- fragment -->
 <p><a class="el" href="namespace_w_a_sim_commander_1_1_enums.html#af3131943610c59d71d8b69dd7b2cab97">Enums::LogFacility</a> enum names. </p>
 
-<p class="definition">Definition at line <a class="el" href="enums__impl_8h_source.html#l00180">180</a> of file <a class="el" href="enums__impl_8h_source.html">enums_impl.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="enums__impl_8h_source.html#l00183">183</a> of file <a class="el" href="enums__impl_8h_source.html">enums_impl.h</a>.</p>
 
 </div>
 </div>
@@ -796,7 +799,7 @@ Variables</h2></td></tr>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="namespace_w_a_sim_commander.html">WASimCommander</a></li><li class="navelem"><a class="el" href="namespace_w_a_sim_commander_1_1_enums.html">Enums</a></li>
-    <li class="footer">Generated on Thu Oct 12 2023 22:53:28 for WASimCommander by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.4 </li>
+    <li class="footer">Generated on Tue Nov 7 2023 14:52:06 for WASimCommander by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.4 </li>
   </ul>
 </div>
 </body>

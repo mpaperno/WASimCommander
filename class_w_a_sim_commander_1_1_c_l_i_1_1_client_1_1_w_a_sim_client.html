@@ -35,7 +35,7 @@
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="Logo.png" title="WASimCommander - Remote access to the Microsoft Flight Simulator 2020 Gauge API."/></td>
   <td id="projectalign">
-   <div id="projectname"><!-- WASimCommander --><span id="projectnumber">&#160;v1.1.2.0</span>
+   <div id="projectname"><!-- WASimCommander --><span id="projectnumber">&#160;v1.2.0.0</span>
    </div>
   </td>
  </tr>
@@ -120,6 +120,16 @@ $(document).ready(function(){initNavTree('class_w_a_sim_commander_1_1_c_l_i_1_1_
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
+<tr class="memitem:a70804cfb580d90f2224e0db9da2e070f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a70804cfb580d90f2224e0db9da2e070f">WASimClient</a> (UInt32 clientId)</td></tr>
+<tr class="memdesc:a70804cfb580d90f2224e0db9da2e070f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a new client with the given ID. The ID must be unique among any other possible clients and cannot be zero.  <a href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a70804cfb580d90f2224e0db9da2e070f">More...</a><br /></td></tr>
+<tr class="separator:a70804cfb580d90f2224e0db9da2e070f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3f7465b02dd4e7ca79be44e2dd793070"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a3f7465b02dd4e7ca79be44e2dd793070">WASimClient</a> (UInt32 clientId, String ^ configFile)</td></tr>
+<tr class="memdesc:a3f7465b02dd4e7ca79be44e2dd793070"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a new client with the given ID and with initial settings read from the file specified in <code>configFile</code> (.ini format, see default file for example).  <a href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a3f7465b02dd4e7ca79be44e2dd793070">More...</a><br /></td></tr>
+<tr class="separator:a3f7465b02dd4e7ca79be44e2dd793070"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a28db1434322a500b7922148b4be17480"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a28db1434322a500b7922148b4be17480">Dispose</a> ()</td></tr>
+<tr class="memdesc:a28db1434322a500b7922148b4be17480"><td class="mdescLeft">&#160;</td><td class="mdescRight">This class implements a Disposable type object and should be disposed-of appropriately by calling <code>client.Dispose()</code> when the instance is no longer needed. Any open network connections are automatically closed upon destruction, though it is better to close them yourself before deleting the client.  <a href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a28db1434322a500b7922148b4be17480">More...</a><br /></td></tr>
+<tr class="separator:a28db1434322a500b7922148b4be17480"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr><td colspan="2"><div class="groupHeader">Event handler delegate types</div></td></tr>
 <tr class="memitem:af8feec438c150af9b2771d99add9ebcb"><td class="memItemLeft" align="right" valign="top">delegate void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#af8feec438c150af9b2771d99add9ebcb">ClientEventDelegate</a> (<a class="el" href="struct_w_a_sim_commander_1_1_c_l_i_1_1_structs_1_1_client_event.html">ClientEvent</a> ^)</td></tr>
 <tr class="memdesc:af8feec438c150af9b2771d99add9ebcb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Event delegate for <a class="el" href="namespace_w_a_sim_commander_1_1_c_l_i_1_1_client.html" title="WASimCommander::CLI::Client namespace. Implementation of the C++ WASimClient as a C++/CLI ....">Client</a> events (<code>OnClientEvent</code>)  <a href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#af8feec438c150af9b2771d99add9ebcb">More...</a><br /></td></tr>
 <tr class="separator:af8feec438c150af9b2771d99add9ebcb"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -138,16 +148,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a19559b4cf8682f1301996ad3b9dca15e"><td class="memItemLeft" align="right" valign="top">delegate void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a19559b4cf8682f1301996ad3b9dca15e">ResponseDelegate</a> (<a class="el" href="struct_w_a_sim_commander_1_1_c_l_i_1_1_structs_1_1_command.html">Command</a> ^)</td></tr>
 <tr class="memdesc:a19559b4cf8682f1301996ad3b9dca15e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Event delegate for all <a class="el" href="struct_w_a_sim_commander_1_1_command.html" title="Command data structure. The member contents depend on the command type as described in each command t...">Command</a> structures received from server (<code>OnResponseReceived</code>).  <a href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a19559b4cf8682f1301996ad3b9dca15e">More...</a><br /></td></tr>
 <tr class="separator:a19559b4cf8682f1301996ad3b9dca15e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a70804cfb580d90f2224e0db9da2e070f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a70804cfb580d90f2224e0db9da2e070f">WASimClient</a> (UInt32 clientId)</td></tr>
-<tr class="memdesc:a70804cfb580d90f2224e0db9da2e070f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a new client with the given ID. The ID must be unique among any other possible clients and cannot be zero.  <a href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a70804cfb580d90f2224e0db9da2e070f">More...</a><br /></td></tr>
-<tr class="separator:a70804cfb580d90f2224e0db9da2e070f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3f7465b02dd4e7ca79be44e2dd793070"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a3f7465b02dd4e7ca79be44e2dd793070">WASimClient</a> (UInt32 clientId, String ^ configFile)</td></tr>
-<tr class="memdesc:a3f7465b02dd4e7ca79be44e2dd793070"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a new client with the given ID and with initial settings read from the file specified in <code>configFile</code> (.ini format, see default file for example).  <a href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a3f7465b02dd4e7ca79be44e2dd793070">More...</a><br /></td></tr>
-<tr class="separator:a3f7465b02dd4e7ca79be44e2dd793070"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2f41d5a9f13477987a4d4eb326db96e4"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a2f41d5a9f13477987a4d4eb326db96e4">~WASimClient</a> ()</td></tr>
-<tr class="memdesc:a2f41d5a9f13477987a4d4eb326db96e4"><td class="mdescLeft">&#160;</td><td class="mdescRight">This class implements a Disposable type object and should be disposed-of appropriately. Any open network connections are automatically closed upon destruction, though it is better to close them yourself before deleting the client.  <a href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a2f41d5a9f13477987a4d4eb326db96e4">More...</a><br /></td></tr>
-<tr class="separator:a2f41d5a9f13477987a4d4eb326db96e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr><td colspan="2"><div class="groupHeader">Network actions, status, and settings</div></td></tr>
 <tr class="memitem:a32447603433a684fd228899355b560b0"><td class="memItemLeft" align="right" valign="top">ClientStatus&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a32447603433a684fd228899355b560b0">status</a> ()</td></tr>
+<tr class="memdesc:a32447603433a684fd228899355b560b0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get current connection status of this client.  <a href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a32447603433a684fd228899355b560b0">More...</a><br /></td></tr>
 <tr class="separator:a32447603433a684fd228899355b560b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2e6175ea2c2a0d6d577d53515ed81c64"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a2e6175ea2c2a0d6d577d53515ed81c64">isInitialized</a> ()</td></tr>
 <tr class="memdesc:a2e6175ea2c2a0d6d577d53515ed81c64"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns true if connected to the Simulator (SimConnect).  <a href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a2e6175ea2c2a0d6d577d53515ed81c64">More...</a><br /></td></tr>
@@ -168,73 +171,140 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a5fd243f7ff1ce54a81b418781a0d285d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Connect to the Simulator engine using a specific network configuration ID from a SimConnect.cfg file. The file must be in the same folder as the executable running the <a class="el" href="namespace_w_a_sim_commander_1_1_c_l_i_1_1_client.html" title="WASimCommander::CLI::Client namespace. Implementation of the C++ WASimClient as a C++/CLI ....">Client</a>.  <a href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a5fd243f7ff1ce54a81b418781a0d285d">More...</a><br /></td></tr>
 <tr class="separator:a5fd243f7ff1ce54a81b418781a0d285d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8062e572036d29ed4df9e25908d94a34"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a8062e572036d29ed4df9e25908d94a34">disconnectSimulator</a> ()</td></tr>
+<tr class="memdesc:a8062e572036d29ed4df9e25908d94a34"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#aa9fafdc4bca37ac75d58acc8f75d9f84">WASimClient::disconnectSimulator()</a>.  <a href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a8062e572036d29ed4df9e25908d94a34">More...</a><br /></td></tr>
 <tr class="separator:a8062e572036d29ed4df9e25908d94a34"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6d8e1ccee28077a2b6754c6743e38f6c"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a6d8e1ccee28077a2b6754c6743e38f6c">pingServer</a> ([Optional] Nullable&lt; uint32_t &gt; timeout)</td></tr>
+<tr class="memdesc:a6d8e1ccee28077a2b6754c6743e38f6c"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#ad36c715f1600be9590015bc429549077">WASimClient::pingServer()</a>.  <a href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a6d8e1ccee28077a2b6754c6743e38f6c">More...</a><br /></td></tr>
 <tr class="separator:a6d8e1ccee28077a2b6754c6743e38f6c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5b50e204769f0af89f3343bae53634f9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_w_a_sim_commander_1_1_c_l_i_1_1_enums.html#a54c5afbe79f156bc4bc22d65cf52f9fc">HR</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a5b50e204769f0af89f3343bae53634f9">connectServer</a> ([Optional] Nullable&lt; uint32_t &gt; timeout)</td></tr>
+<tr class="memdesc:a5b50e204769f0af89f3343bae53634f9"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a6dea7988fb87f798ab0dc4b4e2d8307a">WASimClient::connectServer()</a>.  <a href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a5b50e204769f0af89f3343bae53634f9">More...</a><br /></td></tr>
 <tr class="separator:a5b50e204769f0af89f3343bae53634f9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a662c08d136970e1e1aa22ba36ca2521b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a662c08d136970e1e1aa22ba36ca2521b">disconnectServer</a> ()</td></tr>
+<tr class="memdesc:a662c08d136970e1e1aa22ba36ca2521b"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#af54726709078ca8c8e0384fbad813975">WASimClient::disconnectServer()</a>.  <a href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a662c08d136970e1e1aa22ba36ca2521b">More...</a><br /></td></tr>
 <tr class="separator:a662c08d136970e1e1aa22ba36ca2521b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aac6cf53a8eed915b696273ff41c7b6f1"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#aac6cf53a8eed915b696273ff41c7b6f1">defaultTimeout</a> ()</td></tr>
+<tr class="memdesc:aac6cf53a8eed915b696273ff41c7b6f1"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a1e42faa467496da45a14d721454bb66f">WASimClient::defaultTimeout()</a>.  <a href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#aac6cf53a8eed915b696273ff41c7b6f1">More...</a><br /></td></tr>
 <tr class="separator:aac6cf53a8eed915b696273ff41c7b6f1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a64754a53d7bf398c20bc9601eb59f593"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a64754a53d7bf398c20bc9601eb59f593">setDefaultTimeout</a> (uint32_t ms)</td></tr>
+<tr class="memdesc:a64754a53d7bf398c20bc9601eb59f593"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#afc733727533140b748a5fd5a73b32d3f">WASimClient::setDefaultTimeout()</a>.  <a href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a64754a53d7bf398c20bc9601eb59f593">More...</a><br /></td></tr>
 <tr class="separator:a64754a53d7bf398c20bc9601eb59f593"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a415ff1c50fef52db171e57dacc7a2a1f"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a415ff1c50fef52db171e57dacc7a2a1f">networkConfigurationId</a> ()</td></tr>
+<tr class="memdesc:a415ff1c50fef52db171e57dacc7a2a1f"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#aecab5d50e285540699a3367a432e4e35">WASimClient::networkConfigurationId()</a>.  <a href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a415ff1c50fef52db171e57dacc7a2a1f">More...</a><br /></td></tr>
 <tr class="separator:a415ff1c50fef52db171e57dacc7a2a1f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aecc1f2522ae5b60e0474fc2cf0063c5c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#aecc1f2522ae5b60e0474fc2cf0063c5c">setNetworkConfigurationId</a> (int configId)</td></tr>
+<tr class="memdesc:aecc1f2522ae5b60e0474fc2cf0063c5c"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a77d7fb31081553650053d0ce43b64527">WASimClient::setNetworkConfigurationId()</a>.  <a href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#aecc1f2522ae5b60e0474fc2cf0063c5c">More...</a><br /></td></tr>
 <tr class="separator:aecc1f2522ae5b60e0474fc2cf0063c5c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr><td colspan="2"><div class="groupHeader">High level API</div></td></tr>
 <tr class="memitem:ab3ea700ef47b4323db3500b31d4e8512"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_w_a_sim_commander_1_1_c_l_i_1_1_enums.html#a54c5afbe79f156bc4bc22d65cf52f9fc">HR</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#ab3ea700ef47b4323db3500b31d4e8512">executeCalculatorCode</a> (String^ code)</td></tr>
 <tr class="memdesc:ab3ea700ef47b4323db3500b31d4e8512"><td class="mdescLeft">&#160;</td><td class="mdescRight">Execute calculator code without result  <a href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#ab3ea700ef47b4323db3500b31d4e8512">More...</a><br /></td></tr>
 <tr class="separator:ab3ea700ef47b4323db3500b31d4e8512"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a086e0a0fa3c11b7b71c7c36301bec279"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_w_a_sim_commander_1_1_c_l_i_1_1_enums.html#a54c5afbe79f156bc4bc22d65cf52f9fc">HR</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a086e0a0fa3c11b7b71c7c36301bec279">getVariable</a> (<a class="el" href="struct_w_a_sim_commander_1_1_c_l_i_1_1_structs_1_1_variable_request.html">VariableRequest</a> ^ var, [Out] double % pfResult)</td></tr>
-<tr class="separator:a086e0a0fa3c11b7b71c7c36301bec279"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3fc54902651b55a1edce436a3c39a0da"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_w_a_sim_commander_1_1_c_l_i_1_1_enums.html#a54c5afbe79f156bc4bc22d65cf52f9fc">HR</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a3fc54902651b55a1edce436a3c39a0da">executeCalculatorCode</a> (String^ code, CalcResultType resultType, [Out] double % pfResult)</td></tr>
+<tr class="memdesc:a3fc54902651b55a1edce436a3c39a0da"><td class="mdescLeft">&#160;</td><td class="mdescRight">Execute calculator code with a numeric result type.  <a href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a3fc54902651b55a1edce436a3c39a0da">More...</a><br /></td></tr>
+<tr class="separator:a3fc54902651b55a1edce436a3c39a0da"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a59ae7293efcb18b73407d25b3e02812e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_w_a_sim_commander_1_1_c_l_i_1_1_enums.html#a54c5afbe79f156bc4bc22d65cf52f9fc">HR</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a59ae7293efcb18b73407d25b3e02812e">executeCalculatorCode</a> (String^ code, CalcResultType resultType, [Out] String^ % psResult)</td></tr>
+<tr class="memdesc:a59ae7293efcb18b73407d25b3e02812e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Execute calculator code with a string result type.  <a href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a59ae7293efcb18b73407d25b3e02812e">More...</a><br /></td></tr>
+<tr class="separator:a59ae7293efcb18b73407d25b3e02812e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a012084def5296f9a14f44e62bab09d49"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_w_a_sim_commander_1_1_c_l_i_1_1_enums.html#a54c5afbe79f156bc4bc22d65cf52f9fc">HR</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a012084def5296f9a14f44e62bab09d49">executeCalculatorCode</a> (String^ code, CalcResultType resultType, [Out] double % pfResult, [Out] String^ % psResult)</td></tr>
+<tr class="memdesc:a012084def5296f9a14f44e62bab09d49"><td class="mdescLeft">&#160;</td><td class="mdescRight">Execute calculator code with both numeric and string results.  <a href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a012084def5296f9a14f44e62bab09d49">More...</a><br /></td></tr>
+<tr class="separator:a012084def5296f9a14f44e62bab09d49"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0cdb5e1a08cb7a1e1617651200184724"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_w_a_sim_commander_1_1_c_l_i_1_1_enums.html#a54c5afbe79f156bc4bc22d65cf52f9fc">HR</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a0cdb5e1a08cb7a1e1617651200184724">getVariable</a> (<a class="el" href="struct_w_a_sim_commander_1_1_c_l_i_1_1_structs_1_1_variable_request.html">VariableRequest</a> ^ var, [Out] double % pfResult)</td></tr>
+<tr class="memdesc:a0cdb5e1a08cb7a1e1617651200184724"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the value of a variable with a numeric result type. This is the most typical use case since most variable types are numeric.  <a href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a0cdb5e1a08cb7a1e1617651200184724">More...</a><br /></td></tr>
+<tr class="separator:a0cdb5e1a08cb7a1e1617651200184724"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3328fcb48f311b1d78d5b50c3024f087"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_w_a_sim_commander_1_1_c_l_i_1_1_enums.html#a54c5afbe79f156bc4bc22d65cf52f9fc">HR</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a3328fcb48f311b1d78d5b50c3024f087">getVariable</a> (<a class="el" href="struct_w_a_sim_commander_1_1_c_l_i_1_1_structs_1_1_variable_request.html">VariableRequest</a> ^ var, [Out] String^ % psResult)</td></tr>
+<tr class="memdesc:a3328fcb48f311b1d78d5b50c3024f087"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the value of a variable with a string result type. The request is executed as calculator code since that is the only way to get string results.  <a href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a3328fcb48f311b1d78d5b50c3024f087">More...</a><br /></td></tr>
+<tr class="separator:a3328fcb48f311b1d78d5b50c3024f087"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af75c7ff527cc6f09a6871ec7e16bbe97"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_w_a_sim_commander_1_1_c_l_i_1_1_enums.html#a54c5afbe79f156bc4bc22d65cf52f9fc">HR</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#af75c7ff527cc6f09a6871ec7e16bbe97">getVariable</a> (<a class="el" href="struct_w_a_sim_commander_1_1_c_l_i_1_1_structs_1_1_variable_request.html">VariableRequest</a> ^ var, [Out] double % pfResult, [Out] String^ % psResult)</td></tr>
+<tr class="memdesc:af75c7ff527cc6f09a6871ec7e16bbe97"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the value of a variable with <em>either</em> a numeric or string result based on the unit type of the requested variable.  <a href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#af75c7ff527cc6f09a6871ec7e16bbe97">More...</a><br /></td></tr>
+<tr class="separator:af75c7ff527cc6f09a6871ec7e16bbe97"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5be56175c905b14756f6a77330f07988"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_w_a_sim_commander_1_1_c_l_i_1_1_enums.html#a54c5afbe79f156bc4bc22d65cf52f9fc">HR</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a5be56175c905b14756f6a77330f07988">getLocalVariable</a> (String ^ variableName, [Out] double % pfResult)</td></tr>
+<tr class="memdesc:a5be56175c905b14756f6a77330f07988"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a25ef1d62f3ae142aa9619e93bd431cd1">WASimClient::getLocalVariable()</a>.  <a href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a5be56175c905b14756f6a77330f07988">More...</a><br /></td></tr>
 <tr class="separator:a5be56175c905b14756f6a77330f07988"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0730598e6397d05ab7bf985fcb4d56a9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_w_a_sim_commander_1_1_c_l_i_1_1_enums.html#a54c5afbe79f156bc4bc22d65cf52f9fc">HR</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a0730598e6397d05ab7bf985fcb4d56a9">getLocalVariable</a> (String ^ variableName, String ^ unitName, [Out] double % pfResult)</td></tr>
+<tr class="memdesc:a0730598e6397d05ab7bf985fcb4d56a9"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a25ef1d62f3ae142aa9619e93bd431cd1">WASimClient::getLocalVariable()</a>.  <a href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a0730598e6397d05ab7bf985fcb4d56a9">More...</a><br /></td></tr>
+<tr class="separator:a0730598e6397d05ab7bf985fcb4d56a9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a53d10281196791e5e424275ac869d08b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_w_a_sim_commander_1_1_c_l_i_1_1_enums.html#a54c5afbe79f156bc4bc22d65cf52f9fc">HR</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a53d10281196791e5e424275ac869d08b">getOrCreateLocalVariable</a> (String ^ variableName, double defaultValue, [Out] double % pfResult)</td></tr>
+<tr class="separator:a53d10281196791e5e424275ac869d08b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a93bb2e8129038408af1ff654000ad82c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_w_a_sim_commander_1_1_c_l_i_1_1_enums.html#a54c5afbe79f156bc4bc22d65cf52f9fc">HR</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a93bb2e8129038408af1ff654000ad82c">getOrCreateLocalVariable</a> (String ^ variableName, String ^ unitName, double defaultValue, [Out] double % pfResult)</td></tr>
+<tr class="separator:a93bb2e8129038408af1ff654000ad82c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3a047c0005d727b6df563488acb15b3c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_w_a_sim_commander_1_1_c_l_i_1_1_enums.html#a54c5afbe79f156bc4bc22d65cf52f9fc">HR</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a3a047c0005d727b6df563488acb15b3c">setVariable</a> (<a class="el" href="struct_w_a_sim_commander_1_1_c_l_i_1_1_structs_1_1_variable_request.html">VariableRequest</a> ^ var, const double value)</td></tr>
+<tr class="memdesc:a3a047c0005d727b6df563488acb15b3c"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a8a9f6943f86f904f1db38a4b77e288bb">WASimClient::setVariable()</a>.  <a href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a3a047c0005d727b6df563488acb15b3c">More...</a><br /></td></tr>
 <tr class="separator:a3a047c0005d727b6df563488acb15b3c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a63ab7fad4c6d4e29716cceeb75285c5c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_w_a_sim_commander_1_1_c_l_i_1_1_enums.html#a54c5afbe79f156bc4bc22d65cf52f9fc">HR</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a63ab7fad4c6d4e29716cceeb75285c5c">setLocalVariable</a> (String ^ variableName, const double value)</td></tr>
+<tr class="memdesc:a63ab7fad4c6d4e29716cceeb75285c5c"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#af7079d6f950285c7bf8bda6be1cdfb21">WASimClient::setLocalVariable()</a>.  <a href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a63ab7fad4c6d4e29716cceeb75285c5c">More...</a><br /></td></tr>
 <tr class="separator:a63ab7fad4c6d4e29716cceeb75285c5c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8905cb0bcb00f9d3b4980d58ad5a0e1f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_w_a_sim_commander_1_1_c_l_i_1_1_enums.html#a54c5afbe79f156bc4bc22d65cf52f9fc">HR</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a8905cb0bcb00f9d3b4980d58ad5a0e1f">setLocalVariable</a> (String ^ variableName, String ^ unitName, const double value)</td></tr>
+<tr class="memdesc:a8905cb0bcb00f9d3b4980d58ad5a0e1f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Execute calculator code without result  <a href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a8905cb0bcb00f9d3b4980d58ad5a0e1f">More...</a><br /></td></tr>
+<tr class="separator:a8905cb0bcb00f9d3b4980d58ad5a0e1f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad3db01c9f6fd95c084926c288ae31c57"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_w_a_sim_commander_1_1_c_l_i_1_1_enums.html#a54c5afbe79f156bc4bc22d65cf52f9fc">HR</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#ad3db01c9f6fd95c084926c288ae31c57">setOrCreateLocalVariable</a> (String ^ variableName, const double value)</td></tr>
+<tr class="memdesc:ad3db01c9f6fd95c084926c288ae31c57"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a8534d234863884d37f8dd90de8cc5fff">WASimClient::setOrCreateLocalVariable()</a>.  <a href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#ad3db01c9f6fd95c084926c288ae31c57">More...</a><br /></td></tr>
 <tr class="separator:ad3db01c9f6fd95c084926c288ae31c57"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1dd3d336a27832fdf0a51b4ef5c963b5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_w_a_sim_commander_1_1_c_l_i_1_1_enums.html#a54c5afbe79f156bc4bc22d65cf52f9fc">HR</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a1dd3d336a27832fdf0a51b4ef5c963b5">setOrCreateLocalVariable</a> (String ^ variableName, String ^ unitName, const double value)</td></tr>
+<tr class="memdesc:a1dd3d336a27832fdf0a51b4ef5c963b5"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a8534d234863884d37f8dd90de8cc5fff">WASimClient::setOrCreateLocalVariable()</a>.  <a href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a1dd3d336a27832fdf0a51b4ef5c963b5">More...</a><br /></td></tr>
+<tr class="separator:a1dd3d336a27832fdf0a51b4ef5c963b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a84d2238140e01fb0550bdb9bc31c6752"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_w_a_sim_commander_1_1_c_l_i_1_1_enums.html#a54c5afbe79f156bc4bc22d65cf52f9fc">HR</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a84d2238140e01fb0550bdb9bc31c6752">saveDataRequest</a> (<a class="el" href="struct_w_a_sim_commander_1_1_c_l_i_1_1_structs_1_1_data_request.html">DataRequest</a> ^ request)</td></tr>
+<tr class="memdesc:a84d2238140e01fb0550bdb9bc31c6752"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#af8882cc52796013b92dbee001de27bfe">WASimClient::saveDataRequest()</a> as used with <code>async = false</code>  <a href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a84d2238140e01fb0550bdb9bc31c6752">More...</a><br /></td></tr>
 <tr class="separator:a84d2238140e01fb0550bdb9bc31c6752"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4053e179fc7c08a0872aad934cd7c4b6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_w_a_sim_commander_1_1_c_l_i_1_1_enums.html#a54c5afbe79f156bc4bc22d65cf52f9fc">HR</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a4053e179fc7c08a0872aad934cd7c4b6">saveDataRequestAsync</a> (<a class="el" href="struct_w_a_sim_commander_1_1_c_l_i_1_1_structs_1_1_data_request.html">DataRequest</a> ^ request)</td></tr>
+<tr class="memdesc:a4053e179fc7c08a0872aad934cd7c4b6"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#af8882cc52796013b92dbee001de27bfe">WASimClient::saveDataRequest()</a> as used with <code>async = true</code>  <a href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a4053e179fc7c08a0872aad934cd7c4b6">More...</a><br /></td></tr>
+<tr class="separator:a4053e179fc7c08a0872aad934cd7c4b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a04c8b5c682fea06040e799820560f4e3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_w_a_sim_commander_1_1_c_l_i_1_1_enums.html#a54c5afbe79f156bc4bc22d65cf52f9fc">HR</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a04c8b5c682fea06040e799820560f4e3">removeDataRequest</a> (const uint32_t requestId)</td></tr>
+<tr class="memdesc:a04c8b5c682fea06040e799820560f4e3"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a64d455fb0bbc94e4eb6634fd648c58e7">WASimClient::removeDataRequest()</a>.  <a href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a04c8b5c682fea06040e799820560f4e3">More...</a><br /></td></tr>
 <tr class="separator:a04c8b5c682fea06040e799820560f4e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acfd2f4b43d91e01fc35ad23fc4bba300"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_w_a_sim_commander_1_1_c_l_i_1_1_enums.html#a54c5afbe79f156bc4bc22d65cf52f9fc">HR</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#acfd2f4b43d91e01fc35ad23fc4bba300">updateDataRequest</a> (uint32_t requestId)</td></tr>
+<tr class="memdesc:acfd2f4b43d91e01fc35ad23fc4bba300"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a4e9b08a6f6d21fa934f860dc6e259a9b">WASimClient::updateDataRequest()</a>.  <a href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#acfd2f4b43d91e01fc35ad23fc4bba300">More...</a><br /></td></tr>
 <tr class="separator:acfd2f4b43d91e01fc35ad23fc4bba300"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5182fa8f0a1fbd8140cabac9ddb7e266"><td class="memItemLeft" align="right" valign="top"><a class="el" href="struct_w_a_sim_commander_1_1_c_l_i_1_1_structs_1_1_data_request_record.html">DataRequestRecord</a> ^&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a5182fa8f0a1fbd8140cabac9ddb7e266">dataRequest</a> (uint32_t requestId)</td></tr>
+<tr class="memdesc:a5182fa8f0a1fbd8140cabac9ddb7e266"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a7a00dadc0046dd2d5a4b6346dfcbe68c">WASimClient::dataRequest()</a>.  <a href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a5182fa8f0a1fbd8140cabac9ddb7e266">More...</a><br /></td></tr>
 <tr class="separator:a5182fa8f0a1fbd8140cabac9ddb7e266"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5c8bc4bc4d480af0d61ea6746b713120"><td class="memItemLeft" align="right" valign="top">array&lt; <a class="el" href="struct_w_a_sim_commander_1_1_c_l_i_1_1_structs_1_1_data_request_record.html">DataRequestRecord</a> ^&gt; ^&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a5c8bc4bc4d480af0d61ea6746b713120">dataRequests</a> ()</td></tr>
+<tr class="memdesc:a5c8bc4bc4d480af0d61ea6746b713120"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a6851ac9c59355be4a16b0ca3647bbfa3">WASimClient::dataRequests()</a>.  <a href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a5c8bc4bc4d480af0d61ea6746b713120">More...</a><br /></td></tr>
 <tr class="separator:a5c8bc4bc4d480af0d61ea6746b713120"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2fce32fe51408faf79b980780b15df09"><td class="memItemLeft" align="right" valign="top">array&lt; UInt32 &gt; ^&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a2fce32fe51408faf79b980780b15df09">dataRequestIdsList</a> ()</td></tr>
+<tr class="memdesc:a2fce32fe51408faf79b980780b15df09"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#aa06f568d1b95b5a9458e66210871836c">WASimClient::dataRequestIdsList()</a>.  <a href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a2fce32fe51408faf79b980780b15df09">More...</a><br /></td></tr>
 <tr class="separator:a2fce32fe51408faf79b980780b15df09"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a56ff4796fd51171d2f12f65568a100fd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_w_a_sim_commander_1_1_c_l_i_1_1_enums.html#a54c5afbe79f156bc4bc22d65cf52f9fc">HR</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a56ff4796fd51171d2f12f65568a100fd">setDataRequestsPaused</a> (bool paused)</td></tr>
+<tr class="memdesc:a56ff4796fd51171d2f12f65568a100fd"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#aada3bbb0c070185754d04fe3a9137598">WASimClient::setDataRequestsPaused()</a>.  <a href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a56ff4796fd51171d2f12f65568a100fd">More...</a><br /></td></tr>
 <tr class="separator:a56ff4796fd51171d2f12f65568a100fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acdcd5e4988f27f15978d02763536f9a0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_w_a_sim_commander_1_1_c_l_i_1_1_enums.html#a54c5afbe79f156bc4bc22d65cf52f9fc">HR</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#acdcd5e4988f27f15978d02763536f9a0">registerEvent</a> (<a class="el" href="struct_w_a_sim_commander_1_1_c_l_i_1_1_structs_1_1_registered_event.html">RegisteredEvent</a> ^ eventData)</td></tr>
+<tr class="memdesc:acdcd5e4988f27f15978d02763536f9a0"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a098e51fad57fdbd62ef2a45385156c5f">WASimClient::registerEvent()</a>.  <a href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#acdcd5e4988f27f15978d02763536f9a0">More...</a><br /></td></tr>
 <tr class="separator:acdcd5e4988f27f15978d02763536f9a0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac92feeff96c9d5e793ea97163d4021d5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_w_a_sim_commander_1_1_c_l_i_1_1_enums.html#a54c5afbe79f156bc4bc22d65cf52f9fc">HR</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#ac92feeff96c9d5e793ea97163d4021d5">removeEvent</a> (uint32_t eventId)</td></tr>
+<tr class="memdesc:ac92feeff96c9d5e793ea97163d4021d5"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a6fcab53da1ed6149f524e921c72aa265">WASimClient::removeEvent()</a>.  <a href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#ac92feeff96c9d5e793ea97163d4021d5">More...</a><br /></td></tr>
 <tr class="separator:ac92feeff96c9d5e793ea97163d4021d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad5cd2effa7f0f72aeef59798b8d84239"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_w_a_sim_commander_1_1_c_l_i_1_1_enums.html#a54c5afbe79f156bc4bc22d65cf52f9fc">HR</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#ad5cd2effa7f0f72aeef59798b8d84239">transmitEvent</a> (uint32_t eventId)</td></tr>
+<tr class="memdesc:ad5cd2effa7f0f72aeef59798b8d84239"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a79df757ffd7e9c5d3a984475b79eeccc">WASimClient::transmitEvent()</a>.  <a href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#ad5cd2effa7f0f72aeef59798b8d84239">More...</a><br /></td></tr>
 <tr class="separator:ad5cd2effa7f0f72aeef59798b8d84239"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6be71938de296c47c82b14a5af8fe695"><td class="memItemLeft" align="right" valign="top"><a class="el" href="struct_w_a_sim_commander_1_1_c_l_i_1_1_structs_1_1_registered_event.html">RegisteredEvent</a> ^&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a6be71938de296c47c82b14a5af8fe695">registeredEvent</a> (uint32_t eventId)</td></tr>
+<tr class="memdesc:a6be71938de296c47c82b14a5af8fe695"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a180ebb86590c10e461fa842b5020739f">WASimClient::registeredEvent()</a>.  <a href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a6be71938de296c47c82b14a5af8fe695">More...</a><br /></td></tr>
 <tr class="separator:a6be71938de296c47c82b14a5af8fe695"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aecbc2e95863df33c8be5345966f95872"><td class="memItemLeft" align="right" valign="top">array&lt; <a class="el" href="struct_w_a_sim_commander_1_1_c_l_i_1_1_structs_1_1_registered_event.html">RegisteredEvent</a> ^&gt; ^&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#aecbc2e95863df33c8be5345966f95872">registeredEvents</a> ()</td></tr>
+<tr class="memdesc:aecbc2e95863df33c8be5345966f95872"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#afbedbb0c36870041106648f184e083f4">WASimClient::registeredEvents()</a>.  <a href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#aecbc2e95863df33c8be5345966f95872">More...</a><br /></td></tr>
 <tr class="separator:aecbc2e95863df33c8be5345966f95872"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab834549259a114150325e9ccf7d63cf7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_w_a_sim_commander_1_1_c_l_i_1_1_enums.html#a54c5afbe79f156bc4bc22d65cf52f9fc">HR</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#ab834549259a114150325e9ccf7d63cf7">sendKeyEvent</a> (uint32_t keyEventId, [Optional] Nullable&lt; uint32_t &gt; v1, [Optional] Nullable&lt; uint32_t &gt; v2, [Optional] Nullable&lt; uint32_t &gt; v3, [Optional] Nullable&lt; uint32_t &gt; v4, [Optional] Nullable&lt; uint32_t &gt; v5)</td></tr>
+<tr class="memdesc:ab834549259a114150325e9ccf7d63cf7"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#adf5b8df4cb657fefaa97f97b0ebea42c">WASimClient::sendKeyEvent(uint32_t, uint32_t, uint32_t, uint32_t, uint32_t, uint32_t) const</a>.  <a href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#ab834549259a114150325e9ccf7d63cf7">More...</a><br /></td></tr>
 <tr class="separator:ab834549259a114150325e9ccf7d63cf7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:affcd924c2f18290ef2ac8ff39713f1ec"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_w_a_sim_commander_1_1_c_l_i_1_1_enums.html#a54c5afbe79f156bc4bc22d65cf52f9fc">HR</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#affcd924c2f18290ef2ac8ff39713f1ec">sendKeyEvent</a> (String ^ keyEventName, [Optional] Nullable&lt; uint32_t &gt; v1, [Optional] Nullable&lt; uint32_t &gt; v2, [Optional] Nullable&lt; uint32_t &gt; v3, [Optional] Nullable&lt; uint32_t &gt; v4, [Optional] Nullable&lt; uint32_t &gt; v5)</td></tr>
+<tr class="memdesc:affcd924c2f18290ef2ac8ff39713f1ec"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#ab105921f6ba732ac7650b057ce4e06c0">WASimClient::sendKeyEvent(const std::string&amp;, uint32_t, uint32_t, uint32_t, uint32_t, uint32_t)</a>.  <a href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#affcd924c2f18290ef2ac8ff39713f1ec">More...</a><br /></td></tr>
 <tr class="separator:affcd924c2f18290ef2ac8ff39713f1ec"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a67905b55b85153b8fb65ae9943414fb4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_w_a_sim_commander_1_1_c_l_i_1_1_enums.html#a54c5afbe79f156bc4bc22d65cf52f9fc">HR</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a67905b55b85153b8fb65ae9943414fb4">list</a> (LookupItemType itemsType)</td></tr>
+<tr class="memdesc:a67905b55b85153b8fb65ae9943414fb4"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#ae34ec025c8965441cd9a178e8dac734e">WASimClient::list()</a>.  <a href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a67905b55b85153b8fb65ae9943414fb4">More...</a><br /></td></tr>
 <tr class="separator:a67905b55b85153b8fb65ae9943414fb4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8cefcddd5000aad963743faec43c2573"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_w_a_sim_commander_1_1_c_l_i_1_1_enums.html#a54c5afbe79f156bc4bc22d65cf52f9fc">HR</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a8cefcddd5000aad963743faec43c2573">lookup</a> (LookupItemType itemType, String ^ itemName, [Out] Int32 % piResult)</td></tr>
+<tr class="memdesc:a8cefcddd5000aad963743faec43c2573"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a602e0e104484dce8d22e572b3803e567">WASimClient::lookup()</a>.  <a href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a8cefcddd5000aad963743faec43c2573">More...</a><br /></td></tr>
 <tr class="separator:a8cefcddd5000aad963743faec43c2573"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr><td colspan="2"><div class="groupHeader">Low level API</div></td></tr>
 <tr class="memitem:a1700bfb3a3bd81ec2aad8328c9a2883e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_w_a_sim_commander_1_1_c_l_i_1_1_enums.html#a54c5afbe79f156bc4bc22d65cf52f9fc">HR</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a1700bfb3a3bd81ec2aad8328c9a2883e">sendCommand</a> (<a class="el" href="struct_w_a_sim_commander_1_1_c_l_i_1_1_structs_1_1_command.html">Command</a> ^ command)</td></tr>
+<tr class="memdesc:a1700bfb3a3bd81ec2aad8328c9a2883e"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a6bc18c8f4c2c06b3b32475903f5ecec3">WASimClient::sendCommand()</a>.  <a href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a1700bfb3a3bd81ec2aad8328c9a2883e">More...</a><br /></td></tr>
 <tr class="separator:a1700bfb3a3bd81ec2aad8328c9a2883e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5818ffc46fdd662e04bc39937a9932e5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_w_a_sim_commander_1_1_c_l_i_1_1_enums.html#a54c5afbe79f156bc4bc22d65cf52f9fc">HR</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a5818ffc46fdd662e04bc39937a9932e5">sendCommandWithResponse</a> (<a class="el" href="struct_w_a_sim_commander_1_1_c_l_i_1_1_structs_1_1_command.html">Command</a> ^ command, [Out] <a class="el" href="struct_w_a_sim_commander_1_1_c_l_i_1_1_structs_1_1_command.html">Command</a>^ % response, [Optional] Nullable&lt; uint32_t &gt; timeout)</td></tr>
+<tr class="memdesc:a5818ffc46fdd662e04bc39937a9932e5"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a1557301902d583251df803c85306cbbc">WASimClient::sendCommandWithResponse()</a>.  <a href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a5818ffc46fdd662e04bc39937a9932e5">More...</a><br /></td></tr>
 <tr class="separator:a5818ffc46fdd662e04bc39937a9932e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr><td colspan="2"><div class="groupHeader">Logging settings</div></td></tr>
 <tr class="memitem:aae0707e83dd0a9a2d05a15e9d288f233"><td class="memItemLeft" align="right" valign="top">LogLevel&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#aae0707e83dd0a9a2d05a15e9d288f233">logLevel</a> (LogFacility facility, LogSource source)</td></tr>
+<tr class="memdesc:aae0707e83dd0a9a2d05a15e9d288f233"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#ae44caeef730336ca4bc65509295fdede">WASimClient::logLevel()</a>.  <a href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#aae0707e83dd0a9a2d05a15e9d288f233">More...</a><br /></td></tr>
 <tr class="separator:aae0707e83dd0a9a2d05a15e9d288f233"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5eb4293ef05a0613dc44a3b401969b9e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a5eb4293ef05a0613dc44a3b401969b9e">setLogLevel</a> (LogLevel level, LogFacility facility, LogSource source)</td></tr>
+<tr class="memdesc:a5eb4293ef05a0613dc44a3b401969b9e"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a568048640b4b1fb9e965af60c9cd4520">WASimClient::setLogLevel()</a>.  <a href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a5eb4293ef05a0613dc44a3b401969b9e">More...</a><br /></td></tr>
 <tr class="separator:a5eb4293ef05a0613dc44a3b401969b9e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="events" name="events"></a>
@@ -243,7 +313,7 @@ Events</h2></td></tr>
 <tr class="memdesc:ac9ca0781678bc357db6cbd459e34bbf7"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html" title="C+/CLI wrapper implementation of WASimCommander::Client::WASimClient. See documentation for the C++ c...">WASimClient</a> events like connection and disconnection.  <a href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#ac9ca0781678bc357db6cbd459e34bbf7">More...</a><br /></td></tr>
 <tr class="separator:ac9ca0781678bc357db6cbd459e34bbf7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a66425115b14e1e8c719d2ee391f567cd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a1ac635f35a2a1565c2f987c30a9b7f29">ListResultsDelegate</a>^&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a66425115b14e1e8c719d2ee391f567cd">OnListResults</a><code> [add, remove]</code></td></tr>
-<tr class="memdesc:a66425115b14e1e8c719d2ee391f567cd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Delivers list results after a successful <code>WASimClient.list()</code> command.  <a href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a66425115b14e1e8c719d2ee391f567cd">More...</a><br /></td></tr>
+<tr class="memdesc:a66425115b14e1e8c719d2ee391f567cd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Delivers list results after a successful <code><a class="el" href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a67905b55b85153b8fb65ae9943414fb4" title="See WASimClient::list().">WASimClient.list()</a></code> command.  <a href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a66425115b14e1e8c719d2ee391f567cd">More...</a><br /></td></tr>
 <tr class="separator:a66425115b14e1e8c719d2ee391f567cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adf00fbd483d10068f322572833b99c6b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#aceb8ac5da8c9a40950b17b5182e3a9cc">DataDelegate</a>^&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#adf00fbd483d10068f322572833b99c6b">OnDataReceived</a><code> [add, remove]</code></td></tr>
 <tr class="memdesc:adf00fbd483d10068f322572833b99c6b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Delivers data value subscription updates as they arrive from the Server.  <a href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#adf00fbd483d10068f322572833b99c6b">More...</a><br /></td></tr>
@@ -261,9 +331,11 @@ Events</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p >C+/CLI wrapper implementation of <code><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html" title="WASimCommander Client implementation. Handles all aspects of communication with the WASimCommander Se...">WASimCommander::Client::WASimClient</a></code>. See documentation for the C++ class for most of the details. Only implementation differences are documented here. </p>
 <p >This is pretty much a method-for-method version of the C++ version, with parameter types adjusted accordingly, and using the <a class="el" href="namespace_w_a_sim_commander_1_1_c_l_i.html" title="WASimCommander::CLI namespace. Container for implementation of the C++ WASimCommander API and WASimCl...">CLI</a> versions of relevant data structures and enum types.</p>
-<p >The main difference is that callbacks from the C++ version are delivered here as managed Events, with defined delegate types to handle them. And unlike the callback system, the events can have multiple subscribers if needed. </p>
+<p >The main difference is that callbacks from the C++ version are delivered here as managed Events, with defined delegate types to handle them. And unlike the callback system, the events can have multiple subscribers if needed.</p>
+<dl class="section note"><dt>Note</dt><dd>Events are delivered asyncronously from a separtely running thread. The event handlers should be reentrant since they could be callled at any time. <br  />
+Typically, interactions with GUI components will not be possible directly from inside the event handlers &ndash; use a <code>Dispatcher</code> to marshal GUI interactions back to the main thread. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00055">55</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00059">59</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a70804cfb580d90f2224e0db9da2e070f" name="a70804cfb580d90f2224e0db9da2e070f"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a70804cfb580d90f2224e0db9da2e070f">&#9670;&nbsp;</a></span>WASimClient() <span class="overload">[1/2]</span></h2>
@@ -292,7 +364,7 @@ Events</h2></td></tr>
 <p>Construct a new client with the given ID. The ID must be unique among any other possible clients and cannot be zero. </p>
 <p >See <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a841d29a23c0108179059dae49051c362">WASimClient::WASimClient()</a> for more details. </p>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8cpp_source.html#l00182">182</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8cpp_source.html">WASimClient_CLI.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8cpp_source.html#l00200">200</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8cpp_source.html">WASimClient_CLI.cpp</a>.</p>
 
 </div>
 </div>
@@ -333,28 +405,7 @@ Events</h2></td></tr>
 <p>Construct a new client with the given ID and with initial settings read from the file specified in <code>configFile</code> (.ini format, see default file for example). </p>
 <p >The client ID must be unique among any other possible clients and cannot be zero. See <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a841d29a23c0108179059dae49051c362">WASimClient::WASimClient()</a> for more details. </p>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8cpp_source.html#l00177">177</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8cpp_source.html">WASimClient_CLI.cpp</a>.</p>
-
-</div>
-</div>
-<a id="a2f41d5a9f13477987a4d4eb326db96e4" name="a2f41d5a9f13477987a4d4eb326db96e4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2f41d5a9f13477987a4d4eb326db96e4">&#9670;&nbsp;</a></span>~WASimClient()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">WASimClient::~WASimClient </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>This class implements a Disposable type object and should be disposed-of appropriately. Any open network connections are automatically closed upon destruction, though it is better to close them yourself before deleting the client. </p>
-
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8cpp_source.html#l00185">185</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8cpp_source.html">WASimClient_CLI.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8cpp_source.html#l00195">195</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8cpp_source.html">WASimClient_CLI.cpp</a>.</p>
 
 </div>
 </div>
@@ -489,6 +540,25 @@ Events</h2></td></tr>
 
 </div>
 </div>
+<a id="a28db1434322a500b7922148b4be17480" name="a28db1434322a500b7922148b4be17480"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a28db1434322a500b7922148b4be17480">&#9670;&nbsp;</a></span>Dispose()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void WASimCommander::CLI::Client::WASimClient::Dispose </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>This class implements a Disposable type object and should be disposed-of appropriately by calling <code>client.Dispose()</code> when the instance is no longer needed. Any open network connections are automatically closed upon destruction, though it is better to close them yourself before deleting the client. </p>
+
+</div>
+</div>
 <a id="a32447603433a684fd228899355b560b0" name="a32447603433a684fd228899355b560b0"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a32447603433a684fd228899355b560b0">&#9670;&nbsp;</a></span>status()</h2>
 
@@ -512,7 +582,10 @@ Events</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00098">98</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
+<p>Get current connection status of this client. </p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="namespace_w_a_sim_commander_1_1_client.html#afd4f3e93b7e8dc26cd2d99ad61584521" title="Client status flags.">WASimCommander::Client::ClientStatus</a> </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00113">113</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
 
 </div>
 </div>
@@ -541,7 +614,7 @@ Events</h2></td></tr>
 
 <p>Returns true if connected to the Simulator (SimConnect). </p>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00100">100</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00115">115</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
 
 </div>
 </div>
@@ -570,7 +643,7 @@ Events</h2></td></tr>
 
 <p>Returns true if connected to WASimModule server. </p>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00102">102</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00117">117</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
 
 </div>
 </div>
@@ -599,7 +672,7 @@ Events</h2></td></tr>
 
 <p>Returns version number of the <a class="el" href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html" title="C+/CLI wrapper implementation of WASimCommander::Client::WASimClient. See documentation for the C++ c...">WASimClient</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00104">104</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00119">119</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
 
 </div>
 </div>
@@ -628,7 +701,7 @@ Events</h2></td></tr>
 
 <p>Returns version number of the WASimModule server, if known. The version is populated after a successful Ping command or server connection. </p>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00106">106</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00121">121</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
 
 </div>
 </div>
@@ -657,9 +730,9 @@ Events</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Connect to the Simulator engine on a local connection. </p>
-<p ><em>timeout</em>  (optional) Maximum time to wait for response, in milliseconds. Zero (default) means to use the <code>defaultTimeout()</code> value.  </p><dl class="section return"><dt>Returns</dt><dd>See connectSimulator(uint32_t) </dd></dl>
+<p ><em>timeout</em>  (optional) Maximum time to wait for response, in milliseconds. Zero (default) means to use the <code><a class="el" href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#aac6cf53a8eed915b696273ff41c7b6f1" title="See WASimClient::defaultTimeout().">defaultTimeout()</a></code> value.  </p><dl class="section return"><dt>Returns</dt><dd>See <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a63e0680ef8577c67435b93dd6087604e">WASimClient::connectSimulator(uint32_t)</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00113">113</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00128">128</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
 
 </div>
 </div>
@@ -699,9 +772,9 @@ Events</h2></td></tr>
 
 <p>Connect to the Simulator engine using a specific network configuration ID from a SimConnect.cfg file. The file must be in the same folder as the executable running the <a class="el" href="namespace_w_a_sim_commander_1_1_c_l_i_1_1_client.html" title="WASimCommander::CLI::Client namespace. Implementation of the C++ WASimClient as a C++/CLI ....">Client</a>. </p>
 <p ><em>networkConfigId</em>  network configuration ID from a SimConnect.cfg file. The file must be in the same folder as the executable running the <a class="el" href="namespace_w_a_sim_commander_1_1_c_l_i_1_1_client.html" title="WASimCommander::CLI::Client namespace. Implementation of the C++ WASimClient as a C++/CLI ....">Client</a>. <br  />
-<em>timeout</em>  (optional) Maximum time to wait for response, in milliseconds. Zero (default) means to use the <code>defaultTimeout()</code> value.  </p><dl class="section return"><dt>Returns</dt><dd>See connectSimulator(int,uint32_t) </dd></dl>
+<em>timeout</em>  (optional) Maximum time to wait for response, in milliseconds. Zero (default) means to use the <code><a class="el" href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#aac6cf53a8eed915b696273ff41c7b6f1" title="See WASimClient::defaultTimeout().">defaultTimeout()</a></code> value.  </p><dl class="section return"><dt>Returns</dt><dd>See <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a1416b7453c56a87f5597af1201d220c8">WASimClient::connectSimulator(int,uint32_t)</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00118">118</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00133">133</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
 
 </div>
 </div>
@@ -728,7 +801,9 @@ Events</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00119">119</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
+<p>See <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#aa9fafdc4bca37ac75d58acc8f75d9f84">WASimClient::disconnectSimulator()</a>. </p>
+
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00135">135</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
 
 </div>
 </div>
@@ -756,7 +831,9 @@ Events</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00121">121</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
+<p>See <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#ad36c715f1600be9590015bc429549077">WASimClient::pingServer()</a>. </p>
+
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00138">138</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
 
 </div>
 </div>
@@ -784,7 +861,9 @@ Events</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00122">122</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
+<p>See <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a6dea7988fb87f798ab0dc4b4e2d8307a">WASimClient::connectServer()</a>. </p>
+
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00140">140</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
 
 </div>
 </div>
@@ -811,7 +890,9 @@ Events</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00123">123</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
+<p>See <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#af54726709078ca8c8e0384fbad813975">WASimClient::disconnectServer()</a>. </p>
+
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00141">141</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
 
 </div>
 </div>
@@ -838,7 +919,9 @@ Events</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00127">127</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
+<p>See <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a1e42faa467496da45a14d721454bb66f">WASimClient::defaultTimeout()</a>. </p>
+
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00145">145</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
 
 </div>
 </div>
@@ -866,7 +949,9 @@ Events</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00128">128</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
+<p>See <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#afc733727533140b748a5fd5a73b32d3f">WASimClient::setDefaultTimeout()</a>. </p>
+
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00146">146</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
 
 </div>
 </div>
@@ -893,7 +978,9 @@ Events</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00129">129</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
+<p>See <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#aecab5d50e285540699a3367a432e4e35">WASimClient::networkConfigurationId()</a>. </p>
+
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00147">147</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
 
 </div>
 </div>
@@ -921,12 +1008,14 @@ Events</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00130">130</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
+<p>See <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a77d7fb31081553650053d0ce43b64527">WASimClient::setNetworkConfigurationId()</a>. </p>
+
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00148">148</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
 
 </div>
 </div>
 <a id="ab3ea700ef47b4323db3500b31d4e8512" name="ab3ea700ef47b4323db3500b31d4e8512"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab3ea700ef47b4323db3500b31d4e8512">&#9670;&nbsp;</a></span>executeCalculatorCode()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ab3ea700ef47b4323db3500b31d4e8512">&#9670;&nbsp;</a></span>executeCalculatorCode() <span class="overload">[1/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -950,13 +1039,131 @@ Events</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Execute calculator code without result </p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a289fcb4566f6f44714412e8e27bbd361">WASimClient::executeCalculatorCode()</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00135">135</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00157">157</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
 
 </div>
 </div>
-<a id="a086e0a0fa3c11b7b71c7c36301bec279" name="a086e0a0fa3c11b7b71c7c36301bec279"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a086e0a0fa3c11b7b71c7c36301bec279">&#9670;&nbsp;</a></span>getVariable()</h2>
+<a id="a3fc54902651b55a1edce436a3c39a0da" name="a3fc54902651b55a1edce436a3c39a0da"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3fc54902651b55a1edce436a3c39a0da">&#9670;&nbsp;</a></span>executeCalculatorCode() <span class="overload">[2/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespace_w_a_sim_commander_1_1_c_l_i_1_1_enums.html#a54c5afbe79f156bc4bc22d65cf52f9fc">HR</a> WASimCommander::CLI::Client::WASimClient::executeCalculatorCode </td>
+          <td>(</td>
+          <td class="paramtype">String^&#160;</td>
+          <td class="paramname"><em>code</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">CalcResultType&#160;</td>
+          <td class="paramname"><em>resultType</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">[Out] double %&#160;</td>
+          <td class="paramname"><em>pfResult</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Execute calculator code with a numeric result type. </p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a289fcb4566f6f44714412e8e27bbd361">WASimClient::executeCalculatorCode()</a> </dd></dl>
+
+</div>
+</div>
+<a id="a59ae7293efcb18b73407d25b3e02812e" name="a59ae7293efcb18b73407d25b3e02812e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a59ae7293efcb18b73407d25b3e02812e">&#9670;&nbsp;</a></span>executeCalculatorCode() <span class="overload">[3/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespace_w_a_sim_commander_1_1_c_l_i_1_1_enums.html#a54c5afbe79f156bc4bc22d65cf52f9fc">HR</a> WASimCommander::CLI::Client::WASimClient::executeCalculatorCode </td>
+          <td>(</td>
+          <td class="paramtype">String^&#160;</td>
+          <td class="paramname"><em>code</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">CalcResultType&#160;</td>
+          <td class="paramname"><em>resultType</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">[Out] String^ %&#160;</td>
+          <td class="paramname"><em>psResult</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Execute calculator code with a string result type. </p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a289fcb4566f6f44714412e8e27bbd361">WASimClient::executeCalculatorCode()</a> </dd></dl>
+
+</div>
+</div>
+<a id="a012084def5296f9a14f44e62bab09d49" name="a012084def5296f9a14f44e62bab09d49"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a012084def5296f9a14f44e62bab09d49">&#9670;&nbsp;</a></span>executeCalculatorCode() <span class="overload">[4/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespace_w_a_sim_commander_1_1_c_l_i_1_1_enums.html#a54c5afbe79f156bc4bc22d65cf52f9fc">HR</a> WASimCommander::CLI::Client::WASimClient::executeCalculatorCode </td>
+          <td>(</td>
+          <td class="paramtype">String^&#160;</td>
+          <td class="paramname"><em>code</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">CalcResultType&#160;</td>
+          <td class="paramname"><em>resultType</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">[Out] double %&#160;</td>
+          <td class="paramname"><em>pfResult</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">[Out] String^ %&#160;</td>
+          <td class="paramname"><em>psResult</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Execute calculator code with both numeric and string results. </p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a289fcb4566f6f44714412e8e27bbd361">WASimClient::executeCalculatorCode()</a> </dd></dl>
+
+</div>
+</div>
+<a id="a0cdb5e1a08cb7a1e1617651200184724" name="a0cdb5e1a08cb7a1e1617651200184724"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0cdb5e1a08cb7a1e1617651200184724">&#9670;&nbsp;</a></span>getVariable() <span class="overload">[1/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -965,7 +1172,7 @@ Events</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="namespace_w_a_sim_commander_1_1_c_l_i_1_1_enums.html#a54c5afbe79f156bc4bc22d65cf52f9fc">HR</a> WASimCommander::CLI::Client::WASimClient::getVariable </td>
+          <td class="memname"><a class="el" href="namespace_w_a_sim_commander_1_1_c_l_i_1_1_enums.html#a54c5afbe79f156bc4bc22d65cf52f9fc">HR</a> WASimClient::getVariable </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="struct_w_a_sim_commander_1_1_c_l_i_1_1_structs_1_1_variable_request.html">VariableRequest</a> ^&#160;</td>
           <td class="paramname"><em>var</em>, </td>
@@ -989,12 +1196,103 @@ Events</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00145">145</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
+<p>Get the value of a variable with a numeric result type. This is the most typical use case since most variable types are numeric. </p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a3f66a5571f44d59d2eb4557f3a63d337">WASimClient::getVariable()</a> </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8cpp_source.html#l00230">230</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8cpp_source.html">WASimClient_CLI.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a3328fcb48f311b1d78d5b50c3024f087" name="a3328fcb48f311b1d78d5b50c3024f087"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3328fcb48f311b1d78d5b50c3024f087">&#9670;&nbsp;</a></span>getVariable() <span class="overload">[2/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespace_w_a_sim_commander_1_1_c_l_i_1_1_enums.html#a54c5afbe79f156bc4bc22d65cf52f9fc">HR</a> WASimClient::getVariable </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="struct_w_a_sim_commander_1_1_c_l_i_1_1_structs_1_1_variable_request.html">VariableRequest</a> ^&#160;</td>
+          <td class="paramname"><em>var</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">[Out] String^ %&#160;</td>
+          <td class="paramname"><em>psResult</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the value of a variable with a string result type. The request is executed as calculator code since that is the only way to get string results. </p>
+<p >Note that only some 'A', 'C', and 'T' type variables can have a string value type in the first place. </p><dl class="section see"><dt>See also</dt><dd><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a3f66a5571f44d59d2eb4557f3a63d337">WASimClient::getVariable()</a> </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8cpp_source.html#l00234">234</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8cpp_source.html">WASimClient_CLI.cpp</a>.</p>
+
+</div>
+</div>
+<a id="af75c7ff527cc6f09a6871ec7e16bbe97" name="af75c7ff527cc6f09a6871ec7e16bbe97"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af75c7ff527cc6f09a6871ec7e16bbe97">&#9670;&nbsp;</a></span>getVariable() <span class="overload">[3/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespace_w_a_sim_commander_1_1_c_l_i_1_1_enums.html#a54c5afbe79f156bc4bc22d65cf52f9fc">HR</a> WASimClient::getVariable </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="struct_w_a_sim_commander_1_1_c_l_i_1_1_structs_1_1_variable_request.html">VariableRequest</a> ^&#160;</td>
+          <td class="paramname"><em>var</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">[Out] double %&#160;</td>
+          <td class="paramname"><em>pfResult</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">[Out] String^ %&#160;</td>
+          <td class="paramname"><em>psResult</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the value of a variable with <em>either</em> a numeric or string result based on the unit type of the requested variable. </p>
+<p >The request is executed as calculator code since that is the only way to get string results. Unlike <code><a class="el" href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#ab3ea700ef47b4323db3500b31d4e8512" title="Execute calculator code without result">executeCalculatorCode()</a></code>, this method will not return a string representation of a numeric value. Note that only some 'A', 'C', and 'T' type variables can have a string value type in the first place. </p><dl class="section see"><dt>See also</dt><dd><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a3f66a5571f44d59d2eb4557f3a63d337">WASimClient::getVariable()</a> See <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a3f66a5571f44d59d2eb4557f3a63d337">WASimClient::getVariable()</a> </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8cpp_source.html#l00238">238</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8cpp_source.html">WASimClient_CLI.cpp</a>.</p>
 
 </div>
 </div>
 <a id="a5be56175c905b14756f6a77330f07988" name="a5be56175c905b14756f6a77330f07988"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5be56175c905b14756f6a77330f07988">&#9670;&nbsp;</a></span>getLocalVariable()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a5be56175c905b14756f6a77330f07988">&#9670;&nbsp;</a></span>getLocalVariable() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1027,7 +1325,151 @@ Events</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00149">149</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
+<p>See <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a25ef1d62f3ae142aa9619e93bd431cd1">WASimClient::getLocalVariable()</a>. </p>
+
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00178">178</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
+
+</div>
+</div>
+<a id="a0730598e6397d05ab7bf985fcb4d56a9" name="a0730598e6397d05ab7bf985fcb4d56a9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0730598e6397d05ab7bf985fcb4d56a9">&#9670;&nbsp;</a></span>getLocalVariable() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespace_w_a_sim_commander_1_1_c_l_i_1_1_enums.html#a54c5afbe79f156bc4bc22d65cf52f9fc">HR</a> WASimCommander::CLI::Client::WASimClient::getLocalVariable </td>
+          <td>(</td>
+          <td class="paramtype">String ^&#160;</td>
+          <td class="paramname"><em>variableName</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">String ^&#160;</td>
+          <td class="paramname"><em>unitName</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">[Out] double %&#160;</td>
+          <td class="paramname"><em>pfResult</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>See <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a25ef1d62f3ae142aa9619e93bd431cd1">WASimClient::getLocalVariable()</a>. </p>
+
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00180">180</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
+
+</div>
+</div>
+<a id="a53d10281196791e5e424275ac869d08b" name="a53d10281196791e5e424275ac869d08b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a53d10281196791e5e424275ac869d08b">&#9670;&nbsp;</a></span>getOrCreateLocalVariable() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespace_w_a_sim_commander_1_1_c_l_i_1_1_enums.html#a54c5afbe79f156bc4bc22d65cf52f9fc">HR</a> WASimClient::getOrCreateLocalVariable </td>
+          <td>(</td>
+          <td class="paramtype">String ^&#160;</td>
+          <td class="paramname"><em>variableName</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>defaultValue</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">[Out] double %&#160;</td>
+          <td class="paramname"><em>pfResult</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a32ad00cf4e49f41379e4b52e5f6ccdf8">WASimClient::getOrCreateLocalVariable()</a> </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8cpp_source.html#l00242">242</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8cpp_source.html">WASimClient_CLI.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a93bb2e8129038408af1ff654000ad82c" name="a93bb2e8129038408af1ff654000ad82c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a93bb2e8129038408af1ff654000ad82c">&#9670;&nbsp;</a></span>getOrCreateLocalVariable() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespace_w_a_sim_commander_1_1_c_l_i_1_1_enums.html#a54c5afbe79f156bc4bc22d65cf52f9fc">HR</a> WASimClient::getOrCreateLocalVariable </td>
+          <td>(</td>
+          <td class="paramtype">String ^&#160;</td>
+          <td class="paramname"><em>variableName</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">String ^&#160;</td>
+          <td class="paramname"><em>unitName</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>defaultValue</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">[Out] double %&#160;</td>
+          <td class="paramname"><em>pfResult</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a32ad00cf4e49f41379e4b52e5f6ccdf8">WASimClient::getOrCreateLocalVariable()</a> </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8cpp_source.html#l00246">246</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8cpp_source.html">WASimClient_CLI.cpp</a>.</p>
 
 </div>
 </div>
@@ -1065,12 +1507,14 @@ Events</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00151">151</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
+<p>See <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a8a9f6943f86f904f1db38a4b77e288bb">WASimClient::setVariable()</a>. </p>
+
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00187">187</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
 
 </div>
 </div>
 <a id="a63ab7fad4c6d4e29716cceeb75285c5c" name="a63ab7fad4c6d4e29716cceeb75285c5c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a63ab7fad4c6d4e29716cceeb75285c5c">&#9670;&nbsp;</a></span>setLocalVariable()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a63ab7fad4c6d4e29716cceeb75285c5c">&#9670;&nbsp;</a></span>setLocalVariable() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1103,12 +1547,61 @@ Events</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00152">152</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
+<p>See <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#af7079d6f950285c7bf8bda6be1cdfb21">WASimClient::setLocalVariable()</a>. </p>
+
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00189">189</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
+
+</div>
+</div>
+<a id="a8905cb0bcb00f9d3b4980d58ad5a0e1f" name="a8905cb0bcb00f9d3b4980d58ad5a0e1f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8905cb0bcb00f9d3b4980d58ad5a0e1f">&#9670;&nbsp;</a></span>setLocalVariable() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespace_w_a_sim_commander_1_1_c_l_i_1_1_enums.html#a54c5afbe79f156bc4bc22d65cf52f9fc">HR</a> WASimCommander::CLI::Client::WASimClient::setLocalVariable </td>
+          <td>(</td>
+          <td class="paramtype">String ^&#160;</td>
+          <td class="paramname"><em>variableName</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">String ^&#160;</td>
+          <td class="paramname"><em>unitName</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const double&#160;</td>
+          <td class="paramname"><em>value</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Execute calculator code without result </p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a289fcb4566f6f44714412e8e27bbd361">WASimClient::executeCalculatorCode()</a> </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00190">190</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
 
 </div>
 </div>
 <a id="ad3db01c9f6fd95c084926c288ae31c57" name="ad3db01c9f6fd95c084926c288ae31c57"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad3db01c9f6fd95c084926c288ae31c57">&#9670;&nbsp;</a></span>setOrCreateLocalVariable()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ad3db01c9f6fd95c084926c288ae31c57">&#9670;&nbsp;</a></span>setOrCreateLocalVariable() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1141,7 +1634,55 @@ Events</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00153">153</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
+<p>See <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a8534d234863884d37f8dd90de8cc5fff">WASimClient::setOrCreateLocalVariable()</a>. </p>
+
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00194">194</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
+
+</div>
+</div>
+<a id="a1dd3d336a27832fdf0a51b4ef5c963b5" name="a1dd3d336a27832fdf0a51b4ef5c963b5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1dd3d336a27832fdf0a51b4ef5c963b5">&#9670;&nbsp;</a></span>setOrCreateLocalVariable() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespace_w_a_sim_commander_1_1_c_l_i_1_1_enums.html#a54c5afbe79f156bc4bc22d65cf52f9fc">HR</a> WASimCommander::CLI::Client::WASimClient::setOrCreateLocalVariable </td>
+          <td>(</td>
+          <td class="paramtype">String ^&#160;</td>
+          <td class="paramname"><em>variableName</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">String ^&#160;</td>
+          <td class="paramname"><em>unitName</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const double&#160;</td>
+          <td class="paramname"><em>value</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>See <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a8534d234863884d37f8dd90de8cc5fff">WASimClient::setOrCreateLocalVariable()</a>. </p>
+
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00196">196</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
 
 </div>
 </div>
@@ -1169,7 +1710,39 @@ Events</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00157">157</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
+<p>See <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#af8882cc52796013b92dbee001de27bfe">WASimClient::saveDataRequest()</a> as used with <code>async = false</code> </p>
+
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00202">202</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
+
+</div>
+</div>
+<a id="a4053e179fc7c08a0872aad934cd7c4b6" name="a4053e179fc7c08a0872aad934cd7c4b6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4053e179fc7c08a0872aad934cd7c4b6">&#9670;&nbsp;</a></span>saveDataRequestAsync()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespace_w_a_sim_commander_1_1_c_l_i_1_1_enums.html#a54c5afbe79f156bc4bc22d65cf52f9fc">HR</a> WASimCommander::CLI::Client::WASimClient::saveDataRequestAsync </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="struct_w_a_sim_commander_1_1_c_l_i_1_1_structs_1_1_data_request.html">DataRequest</a> ^&#160;</td>
+          <td class="paramname"><em>request</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>See <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#af8882cc52796013b92dbee001de27bfe">WASimClient::saveDataRequest()</a> as used with <code>async = true</code> </p>
+
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00203">203</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
 
 </div>
 </div>
@@ -1197,7 +1770,9 @@ Events</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00158">158</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
+<p>See <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a64d455fb0bbc94e4eb6634fd648c58e7">WASimClient::removeDataRequest()</a>. </p>
+
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00204">204</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
 
 </div>
 </div>
@@ -1225,7 +1800,9 @@ Events</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00159">159</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
+<p>See <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a4e9b08a6f6d21fa934f860dc6e259a9b">WASimClient::updateDataRequest()</a>. </p>
+
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00205">205</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
 
 </div>
 </div>
@@ -1253,7 +1830,9 @@ Events</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00161">161</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
+<p>See <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a7a00dadc0046dd2d5a4b6346dfcbe68c">WASimClient::dataRequest()</a>. </p>
+
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00207">207</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
 
 </div>
 </div>
@@ -1280,7 +1859,9 @@ Events</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8cpp_source.html#l00212">212</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8cpp_source.html">WASimClient_CLI.cpp</a>.</p>
+<p>See <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a6851ac9c59355be4a16b0ca3647bbfa3">WASimClient::dataRequests()</a>. </p>
+
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8cpp_source.html#l00250">250</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8cpp_source.html">WASimClient_CLI.cpp</a>.</p>
 
 </div>
 </div>
@@ -1307,7 +1888,9 @@ Events</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8cpp_source.html#l00222">222</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8cpp_source.html">WASimClient_CLI.cpp</a>.</p>
+<p>See <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#aa06f568d1b95b5a9458e66210871836c">WASimClient::dataRequestIdsList()</a>. </p>
+
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8cpp_source.html#l00260">260</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8cpp_source.html">WASimClient_CLI.cpp</a>.</p>
 
 </div>
 </div>
@@ -1335,7 +1918,9 @@ Events</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00165">165</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
+<p>See <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#aada3bbb0c070185754d04fe3a9137598">WASimClient::setDataRequestsPaused()</a>. </p>
+
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00211">211</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
 
 </div>
 </div>
@@ -1363,7 +1948,9 @@ Events</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00169">169</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
+<p>See <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a098e51fad57fdbd62ef2a45385156c5f">WASimClient::registerEvent()</a>. </p>
+
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00215">215</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
 
 </div>
 </div>
@@ -1391,7 +1978,9 @@ Events</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00170">170</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
+<p>See <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a6fcab53da1ed6149f524e921c72aa265">WASimClient::removeEvent()</a>. </p>
+
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00216">216</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
 
 </div>
 </div>
@@ -1419,7 +2008,9 @@ Events</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00171">171</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
+<p>See <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a79df757ffd7e9c5d3a984475b79eeccc">WASimClient::transmitEvent()</a>. </p>
+
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00217">217</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
 
 </div>
 </div>
@@ -1447,7 +2038,9 @@ Events</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00173">173</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
+<p>See <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a180ebb86590c10e461fa842b5020739f">WASimClient::registeredEvent()</a>. </p>
+
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00219">219</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
 
 </div>
 </div>
@@ -1474,7 +2067,9 @@ Events</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8cpp_source.html#l00233">233</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8cpp_source.html">WASimClient_CLI.cpp</a>.</p>
+<p>See <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#afbedbb0c36870041106648f184e083f4">WASimClient::registeredEvents()</a>. </p>
+
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8cpp_source.html#l00271">271</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8cpp_source.html">WASimClient_CLI.cpp</a>.</p>
 
 </div>
 </div>
@@ -1536,7 +2131,9 @@ Events</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00178">178</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
+<p>See <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#adf5b8df4cb657fefaa97f97b0ebea42c">WASimClient::sendKeyEvent(uint32_t, uint32_t, uint32_t, uint32_t, uint32_t, uint32_t) const</a>. </p>
+
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00225">225</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
 
 </div>
 </div>
@@ -1598,7 +2195,9 @@ Events</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00182">182</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
+<p>See <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#ab105921f6ba732ac7650b057ce4e06c0">WASimClient::sendKeyEvent(const std::string&amp;, uint32_t, uint32_t, uint32_t, uint32_t, uint32_t)</a>. </p>
+
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00230">230</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
 
 </div>
 </div>
@@ -1626,7 +2225,9 @@ Events</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00188">188</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
+<p>See <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#ae34ec025c8965441cd9a178e8dac734e">WASimClient::list()</a>. </p>
+
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00237">237</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
 
 </div>
 </div>
@@ -1670,7 +2271,9 @@ Events</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00189">189</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
+<p>See <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a602e0e104484dce8d22e572b3803e567">WASimClient::lookup()</a>. </p>
+
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00239">239</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
 
 </div>
 </div>
@@ -1698,7 +2301,9 @@ Events</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00197">197</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
+<p>See <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a6bc18c8f4c2c06b3b32475903f5ecec3">WASimClient::sendCommand()</a>. </p>
+
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00250">250</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
 
 </div>
 </div>
@@ -1742,7 +2347,9 @@ Events</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00198">198</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
+<p>See <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a1557301902d583251df803c85306cbbc">WASimClient::sendCommandWithResponse()</a>. </p>
+
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00252">252</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
 
 </div>
 </div>
@@ -1780,7 +2387,9 @@ Events</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00208">208</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
+<p>See <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#ae44caeef730336ca4bc65509295fdede">WASimClient::logLevel()</a>. </p>
+
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00265">265</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
 
 </div>
 </div>
@@ -1824,7 +2433,9 @@ Events</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00211">211</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
+<p>See <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a568048640b4b1fb9e965af60c9cd4520">WASimClient::setLogLevel()</a>. </p>
+
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00269">269</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
 
 </div>
 </div>
@@ -1851,7 +2462,7 @@ Events</h2></td></tr>
 
 <p><a class="el" href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html" title="C+/CLI wrapper implementation of WASimCommander::Client::WASimClient. See documentation for the C++ c...">WASimClient</a> events like connection and disconnection. </p>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00066">66</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00072">72</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
 
 </div>
 </div>
@@ -1875,9 +2486,9 @@ Events</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Delivers list results after a successful <code>WASimClient.list()</code> command. </p>
+<p>Delivers list results after a successful <code><a class="el" href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a67905b55b85153b8fb65ae9943414fb4" title="See WASimClient::list().">WASimClient.list()</a></code> command. </p>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00066">66</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00072">72</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
 
 </div>
 </div>
@@ -1903,7 +2514,7 @@ Events</h2></td></tr>
 
 <p>Delivers data value subscription updates as they arrive from the Server. </p>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00066">66</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00072">72</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
 
 </div>
 </div>
@@ -1929,7 +2540,7 @@ Events</h2></td></tr>
 
 <p>Log records delivered from <a class="el" href="namespace_w_a_sim_commander_1_1_c_l_i_1_1_client.html" title="WASimCommander::CLI::Client namespace. Implementation of the C++ WASimClient as a C++/CLI ....">Client</a> and/or Server. </p>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00066">66</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00072">72</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
 
 </div>
 </div>
@@ -1955,7 +2566,7 @@ Events</h2></td></tr>
 
 <p>This event is triggered whenever any response to a <a class="el" href="struct_w_a_sim_commander_1_1_command.html" title="Command data structure. The member contents depend on the command type as described in each command t...">Command</a> is returned from the Server. Responses are <a class="el" href="struct_w_a_sim_commander_1_1_command.html" title="Command data structure. The member contents depend on the command type as described in each command t...">Command</a> objects of <code>Ack</code> or <code>Nak</code> type. </p>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00066">66</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00072">72</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
 
 </div>
 </div>
@@ -1981,7 +2592,7 @@ Events</h2></td></tr>
 
 <p>This event is triggered whenever <em>any</em> <a class="el" href="struct_w_a_sim_commander_1_1_command.html" title="Command data structure. The member contents depend on the command type as described in each command t...">Command</a> is received from the server. This is typically <code>Ack</code> or <code>Nak</code> responses but may also include things list results, pings, or disconnection notices.</p>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00066">66</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html#l00072">72</a> of file <a class="el" href="_w_a_sim_client___c_l_i_8h_source.html">WASimClient_CLI.h</a>.</p>
 
 </div>
 </div>
@@ -1995,7 +2606,7 @@ Events</h2></td></tr>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="namespace_w_a_sim_commander.html">WASimCommander</a></li><li class="navelem"><a class="el" href="namespace_w_a_sim_commander_1_1_c_l_i.html">CLI</a></li><li class="navelem"><a class="el" href="namespace_w_a_sim_commander_1_1_c_l_i_1_1_client.html">Client</a></li><li class="navelem"><a class="el" href="class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html">WASimClient</a></li>
-    <li class="footer">Generated on Thu Oct 12 2023 22:53:28 for WASimCommander by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.4 </li>
+    <li class="footer">Generated on Tue Nov 7 2023 14:52:06 for WASimCommander by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.4 </li>
   </ul>
 </div>
 </body>

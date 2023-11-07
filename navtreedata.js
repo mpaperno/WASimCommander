@@ -33,7 +33,7 @@ var NAVTREE =
           [ "Core Components", "index.html#autotoc_md6", null ],
           [ "Desktop GUI", "index.html#autotoc_md7", null ]
         ] ],
-        [ "Downloads", "index.html#autotoc_md9", null ],
+        [ "Downloads and Updates", "index.html#autotoc_md9", null ],
         [ "Documentation & Examples", "index.html#autotoc_md11", null ],
         [ "Troubleshooting", "index.html#autotoc_md13", [
           [ "WASM Module", "index.html#autotoc_md14", null ],
@@ -49,38 +49,44 @@ var NAVTREE =
       ] ]
     ] ],
     [ "WASimCommander - Change Log", "md__c_h_a_n_g_e_l_o_g.html", [
-      [ "1.1.2.0 (23-Feb-2023)", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md26", [
+      [ "1.2.0.0 (next)", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md26", [
         [ "WASimModule", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md27", null ],
-        [ "WASimUI", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md28", null ]
+        [ "WASimClient and WASimClient_CLI (managed .NET)", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md28", null ],
+        [ "WASimClient_CLI (managed .NET)", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md29", null ],
+        [ "WASimUI", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md30", null ]
       ] ],
-      [ "1.1.1.0 (31-Jan-2023)", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md30", [
-        [ "WASimModule", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md31", null ],
-        [ "WASimClient and WASimClient_CLI", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md32", null ],
-        [ "WASimUI", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md33", null ]
+      [ "1.1.2.0 (23-Feb-2023)", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md32", [
+        [ "WASimModule", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md33", null ],
+        [ "WASimUI", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md34", null ]
       ] ],
-      [ "1.1.0.0 (2-Nov-2022)", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md35", [
-        [ "WASimModule", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md36", null ],
-        [ "WASimClient", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md37", null ],
-        [ "WASimClient_CLI", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md38", null ],
-        [ "WASimUI", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md39", null ],
-        [ "Shared Components", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md40", null ]
+      [ "1.1.1.0 (31-Jan-2023)", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md36", [
+        [ "WASimModule", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md37", null ],
+        [ "WASimClient and WASimClient_CLI", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md38", null ],
+        [ "WASimUI", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md39", null ]
       ] ],
-      [ "1.0.0.9 (unpublished)", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md42", null ],
-      [ "1.0.0.8-rc1 (2-Aug-2022)", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md44", [
-        [ "WASimClient (and dependents)", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md45", null ],
-        [ "WASIMClient_CLI", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md46", null ],
-        [ "General", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md47", null ]
+      [ "1.1.0.0 (2-Nov-2022)", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md41", [
+        [ "WASimModule", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md42", null ],
+        [ "WASimClient", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md43", null ],
+        [ "WASimClient_CLI", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md44", null ],
+        [ "WASimUI", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md45", null ],
+        [ "Shared Components", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md46", null ]
       ] ],
-      [ "1.0.0.7-beta3 (12-Jul-2022)", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md49", [
-        [ "WASimClient, WASimClient_CLI, WASimUI", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md50", null ]
+      [ "1.0.0.9 (unpublished)", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md48", null ],
+      [ "1.0.0.8-rc1 (2-Aug-2022)", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md50", [
+        [ "WASimClient (and dependents)", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md51", null ],
+        [ "WASIMClient_CLI", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md52", null ],
+        [ "General", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md53", null ]
       ] ],
-      [ "1.0.0.6-beta2 (11-Jul-2022)", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md52", [
-        [ "WASimModule", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md53", null ],
-        [ "WASimClient", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md54", null ],
-        [ "WASimClient_CLI", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md55", null ],
-        [ "WASimUI", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md56", null ]
+      [ "1.0.0.7-beta3 (12-Jul-2022)", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md55", [
+        [ "WASimClient, WASimClient_CLI, WASimUI", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md56", null ]
       ] ],
-      [ "1.0.0.5-beta1 (04-Jul-2022)", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md58", null ]
+      [ "1.0.0.6-beta2 (11-Jul-2022)", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md58", [
+        [ "WASimModule", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md59", null ],
+        [ "WASimClient", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md60", null ],
+        [ "WASimClient_CLI", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md61", null ],
+        [ "WASimUI", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md62", null ]
+      ] ],
+      [ "1.0.0.5-beta1 (04-Jul-2022)", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md64", null ]
     ] ],
     [ "LICENSE.txt", "_l_i_c_e_n_s_e_8txt.html", null ],
     [ "LICENSE.GPL.txt", "_l_i_c_e_n_s_e_8_g_p_l_8txt.html", null ],
@@ -100,7 +106,7 @@ var NAVTREE =
       [ "Class Index", "classes.html", null ],
       [ "Class Hierarchy", "hierarchy.html", "hierarchy" ],
       [ "Class Members", "functions.html", [
-        [ "All", "functions.html", null ],
+        [ "All", "functions.html", "functions_dup" ],
         [ "Functions", "functions_func.html", null ],
         [ "Variables", "functions_vars.html", null ],
         [ "Typedefs", "functions_type.html", null ],
@@ -121,8 +127,8 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "_assembly_info_8cpp_source.html",
-"md__c_h_a_n_g_e_l_o_g.html#autotoc_md31",
-"struct_w_a_sim_commander_1_1_client_1_1_variable_request.html#a1c4b5f45fb8a3844883e2a29159010a5"
+"class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a9981685b5b7a5c452daa9e3186290384",
+"namespace_w_a_sim_commander_1_1_enums.html#ae3b1cd5348286e86d8c64ce44734e039a953feeff1e20f40677fb7f77c073b3be"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';
