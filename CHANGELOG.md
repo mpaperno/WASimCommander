@@ -1,6 +1,6 @@
 # WASimCommander - Change Log
 
-## 1.2.0.0 (next)
+## 1.2.0.0 (07-Nov-2022)
 
 ### WASimModule
 * Fix binary data representation in results for named variable requests with 1-4 byte integer value sizes (`int8` - `int32` types) -- the result data would be encoded as a float type instead. ([8c7724e6])
@@ -86,7 +86,7 @@
 * When loading data requests from a file while connected to the server, the requests are now sent asynchronously, improving UI responsiveness.
 * More minor quality-of-life improvements!
 
-**Full log:** [v1.1.2.0...HEAD](https://github.com/mpaperno/WASimCommander/compare/1.1.2.0...next)
+**Full log:** [v1.1.2.0...1.2.0.0](https://github.com/mpaperno/WASimCommander/compare/1.1.2.0...1.2.0.0)
 
 ---
 ## 1.1.2.0 (23-Feb-2023)
