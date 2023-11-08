@@ -46,6 +46,24 @@ class MultisortTableView : public QTableView
 		bool isSortingEnabled() const { return m_isSortingEnabled; }
 		/// Returns the custom proxy model used for sorting and filtering.
 		MultiColumnProxyModel *proxyModel() const { return m_proxyModel; }
+		/// Returns the original source model.
+		QAbstractItemModel *sourceModel() const { return m_proxyModel->sourceModel(); }
+
+		virtual QModelIndex mapToSource(const QModelIndex &proxyIndex) const { return m_proxyModel->mapToSource(proxyIndex); }
+		virtual QModelIndex mapFromSource(const QModelIndex &sourceIndex) const { return m_proxyModel->mapFromSource(sourceIndex); }
+		virtual QItemSelection mapSelectionToSource(const QItemSelection &proxySelection) const { return m_proxyModel->mapSelectionToSource(proxySelection); }
+		virtual QItemSelection mapSelectionFromSource(const QItemSelection &sourceSelection) const { return m_proxyModel->mapSelectionFromSource(sourceSelection); }
+
+		bool hasSelection() const { return selectionModel()->hasSelection(); }
+		QItemSelection selection() const { mapSelectionToSource(selectionModel()->selection()); }
+
+		QModelIndexList selectedRows(int column = 0) const
+		{
+			QModelIndexList sel = selectionModel()->selectedRows(column);
+			for (QModelIndex &i : sel)
+				i = mapToSource(i);
+			return sel;
+		}
 
 	public Q_SLOTS:
 		/// Set key modifier to handle multicolumn sorting.
