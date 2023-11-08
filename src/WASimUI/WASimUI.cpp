@@ -441,7 +441,7 @@ public:
 
 		if (FAILED(client->saveDataRequest(req)) && row < 0)
 			return;
-		const QModelIndex idx = reqModel->addRequest(req);
+		const QModelIndex idx = ui->requestsView->mapFromSource(reqModel->addRequest(req));
 		ui->requestsView->selectRow(idx.row());
 		ui->requestsView->scrollTo(idx);
 	}
@@ -493,7 +493,7 @@ public:
 	}
 
 	void removeSelectedRequests() {
-		removeRequests(ui->requestsView->selectionModel()->selectedRows(RequestsModel::COL_ID));
+		removeRequests(ui->requestsView->selectedRows(RequestsModel::COL_ID));
 	}
 
 	void removeAllRequests() {
@@ -509,7 +509,7 @@ public:
 	{
 		if (!checkConnected())
 			return;
-		const QModelIndexList list = ui->requestsView->selectionModel()->selectedRows(RequestsModel::COL_ID);
+		const QModelIndexList list = ui->requestsView->selectedRows(RequestsModel::COL_ID);
 		for (const QModelIndex &idx : list)
 			client->updateDataRequest(reqModel->requestId(idx.row()));
 	}
@@ -660,7 +660,7 @@ public:
 	}
 
 	void removeSelectedEvents() {
-		removeEvents(ui->eventsView->selectionModel()->selectedRows(EventsModel::COL_ID));
+		removeEvents(ui->eventsView->selectedRows(EventsModel::COL_ID));
 	}
 
 	void removeAllEvents() {
@@ -677,7 +677,7 @@ public:
 	{
 		if (!checkConnected())
 			return;
-		const QModelIndexList list = ui->eventsView->selectionModel()->selectedRows(EventsModel::COL_ID);
+		const QModelIndexList list = ui->eventsView->selectedRows(EventsModel::COL_ID);
 		for (const QModelIndex &idx : list)
 			client->transmitEvent(eventsModel->eventId(idx.row()));
 	}
@@ -975,7 +975,7 @@ WASimUI::WASimUI(QWidget *parent) :
 	for (int i = RequestsModel::COL_FIRST_META; i <= RequestsModel::COL_LAST_META; ++i)
 		hdr->hideSection(i);
 	// connect double click action to populate the request editor form
-	connect(ui.requestsView, &QTableView::doubleClicked, this, [this](const QModelIndex &idx) { d->populateRequestForm(idx); });
+	connect(ui.requestsView, &QTableView::doubleClicked, this, [this](const QModelIndex &idx) { d->populateRequestForm(ui.requestsView->mapToSource(idx)); });
 	// Connect to table view selection model to en/disable the remove/update actions when selection changes.
 	connect(ui.requestsView->selectionModel(), &QItemSelectionModel::selectionChanged, this, [=]() { d->toggleRequestButtonsState(); });
 
@@ -986,7 +986,7 @@ WASimUI::WASimUI(QWidget *parent) :
 	ui.eventsView->horizontalHeader()->resizeSection(EventsModel::COL_ID, 45);
 	ui.eventsView->horizontalHeader()->resizeSection(EventsModel::COL_CODE, 140);
 	// connect double click action to populate the event editor form
-	connect(ui.eventsView, &QTableView::doubleClicked, this, [this](const QModelIndex &idx) { d->populateEventForm(idx); });
+	connect(ui.eventsView, &QTableView::doubleClicked, this, [this](const QModelIndex &idx) { d->populateEventForm(ui.eventsView->mapToSource(idx)); });
 	// Connect to table view selection model to en/disable the remove/update actions when selection changes.
 	connect(ui.eventsView->selectionModel(), &QItemSelectionModel::selectionChanged, this, [=]() { d->toggleEventButtonsState(); });
 
