@@ -143,7 +143,7 @@ void RequestsExportWidget::setModel(RequestsModel *model) {
 
 	ensureDefaultValues();
 
-	connect(ui.tableView->selectionModel(), &QItemSelectionModel::selectionChanged, this, [=](const QItemSelection &sel, const QItemSelection &) {
+	connect(ui.tableView->selectionModel(), &QItemSelectionModel::selectionChanged, this, [=](const QItemSelection &, const QItemSelection &) {
 		toggleEditFormBtn(ui);
 		int cnt = ui.tableView->selectionModel()->selectedRows().count();
 		const QString txt(tr("Update %1 %2").arg(cnt).arg(cnt == 1 ? tr("Record") : tr("Records")));
@@ -177,19 +177,28 @@ void RequestsExportWidget::exportRecords(bool all)
 		Q_EMIT lastUsedFileChanged(fname);
 	}
 
-	const QModelIndexList list = all ? m_model->allRequests() : ui.tableView->selectionModel()->selectedRows(RequestsModel::COL_ID);
+	const QModelIndexList list = all ? m_model->allRequests() : ui.tableView->selectedRows(RequestsModel::COL_ID);
 	RequestsFormat::exportToPluginFormat(m_model, list, fname);
 }
 
 void RequestsExportWidget::updateBulk()
 {
-	const QModelIndexList &list = ui.tableView->selectionModel()->selectedRows();
+	const QModelIndexList &list = ui.tableView->selectedRows();
 	if (list.isEmpty() || editFormEmpty(ui))
 		return;
 	QString cid = ui.cbDefaultCategory->currentData().toString();
 	QString idp = ui.cbIdPrefix->currentText();
 	QString fmt = ui.cbFormat->currentText();
 	QString def = ui.cbDefault->currentText();
+	bool clrFmt = false, clrDef = false;
+	if (fmt == "''" || fmt == "\"\"") {
+		fmt.clear();
+		clrFmt = true;
+	}
+	if (def == "''" || def == "\"\"") {
+		def.clear();
+		clrDef = true;
+	}
 
 	for (const QModelIndex &r : list) {
 		if (!cid.isEmpty()) {
@@ -197,16 +206,12 @@ void RequestsExportWidget::updateBulk()
 			m_model->setData(m_model->index(r.row(), RequestsModel::COL_META_CAT), ui.cbDefaultCategory->currentText(), Qt::ToolTipRole);
 		}
 
-		if (!fmt.isEmpty()) {
-			if (fmt == "''" || fmt == "\"\"")
-				fmt.clear();
+		if (clrFmt || !fmt.isEmpty()) {
 			m_model->setData(m_model->index(r.row(), RequestsModel::COL_META_FMT), fmt, Qt::EditRole);
 			m_model->setData(m_model->index(r.row(), RequestsModel::COL_META_FMT), fmt, Qt::ToolTipRole);
 		}
 
-		if (!def.isEmpty()) {
-			if (def == "''" || def == "\"\"")
-				def.clear();
+		if (clrDef || !def.isEmpty()) {
 			m_model->setData(m_model->index(r.row(), RequestsModel::COL_META_DEF), def, Qt::EditRole);
 			m_model->setData(m_model->index(r.row(), RequestsModel::COL_META_DEF), def, Qt::ToolTipRole);
 		}
