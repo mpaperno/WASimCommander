@@ -85,7 +85,7 @@ public:
 			connect(ui.tableView->selectionModel(), &QItemSelectionModel::currentRowChanged, this, &DocImportsBrowser::onCurrentRowChanged);
 
 		connect(ui.tableView, &QTableView::doubleClicked, this, [=](const QModelIndex &idx)  {
-			emit itemSelected(ui.tableView->proxyModel()->mapToSource(idx));
+			emit itemSelected(ui.tableView->mapToSource(idx));
 		});
 
 		setRecordType(type);
@@ -113,6 +113,7 @@ public Q_SLOTS:
 			ui.lblTitle->setText(
 				tr("Double-click to select a record and return to the main window. Press <tt>Escape</tt> key to close. Use the filters to search.")
 			);
+			QMetaObject::invokeMethod(ui.tableView, "setFilterFocus", Qt::QueuedConnection, Q_ARG(int, 2));
 		}
 	}
 
@@ -139,10 +140,11 @@ public Q_SLOTS:
 		if (m_model->recordType() == RecordType::Unknown || !key.isValid())
 			return;
 
-		const QAbstractItemModel *model = ui.tableView->model();
+		const QAbstractItemModel *model = ui.tableView->sourceModel();
+		const int srcRow = ui.tableView->mapToSource(key).row();
 		QString sb(QStringLiteral("<dl>"));
 		for (int i = 0; i < model->columnCount(); ++i) {
-			const QVariant &d = model->data(model->index(key.row(), i), Qt::DisplayRole);
+			const QVariant &d = model->data(model->index(srcRow, i), Qt::DisplayRole);
 			if (d.isValid())
 				sb.append(QStringLiteral("<dt>%1</dt><dd>%2</dd>").arg(model->headerData(i, Qt::Horizontal).toString(), toHtml(d.toString())));
 		}
@@ -205,12 +207,6 @@ protected:
 		saveSettings();
 		saveTypeSettings();
 		ev->accept();
-	}
-
-	void showEvent(QShowEvent *ev) override {
-		QWidget::showEvent(ev);
-		if (m_viewMode == ViewMode::PopupViewMode)
-			ui.tableView->setFilterFocus(2);
 	}
 
 private Q_SLOTS:
