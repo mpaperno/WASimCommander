@@ -487,7 +487,7 @@ $(document).ready(function(){initNavTree('_w_a_sim_client_8h_source.html',''); i
 <div class="line"><a id="l00377" name="l00377"></a><span class="lineno">  377</span><span class="comment"></span> </div>
 <div class="line"><a id="l00378" name="l00378"></a><span class="lineno">  378</span><span class="comment">    /// Add a new `WASimCommander::DataRequest` or update an existing one with the same `DataRequest::requestId`. If the client is not currently connected to the server, the request is queued until the next connection is established.</span></div>
 <div class="line"><a id="l00379" name="l00379"></a><span class="lineno">  379</span><span class="comment">    /// \param request The `WASimCommander::DataRequest` structure to process. See `WASimCommander::DataRequest` documentation for details of the structure members.</span></div>
-<div class="line"><a id="l00380" name="l00380"></a><span class="lineno">  380</span><span class="comment">    /// \param async `true` to wait for a response from the server before returning, or `false` (default) to wait for an `Ack`/`Nak` response. See return values and the Note below for more details.</span></div>
+<div class="line"><a id="l00380" name="l00380"></a><span class="lineno">  380</span><span class="comment">    /// \param async Set to `false` (default) to wait for an `Ack`/`Nak` response from the server before returning from this method, or `true` to return without waiting for a response. See return values and the Note below for more details.</span></div>
 <div class="line"><a id="l00381" name="l00381"></a><span class="lineno">  381</span><span class="comment">    /// \return `S_OK` on success, `E_INVALIDARG` if there is a problem with the `DataRequest` contents. \n</span></div>
 <div class="line"><a id="l00382" name="l00382"></a><span class="lineno">  382</span><span class="comment">    /// If currently connected to the server and `async` is `false`, may also return `E_FAIL` if the server returned `Nak` response, or `E_TIMEOUT` on general server communication failure.</span></div>
 <div class="line"><a id="l00383" name="l00383"></a><span class="lineno">  383</span><span class="comment">    /// \note If currently connected to the server and the `async` param is `false`, this method will block until either the Server responds or the timeout has expired (see `defaultTimeout()`).</span></div>
@@ -786,11 +786,12 @@ $(document).ready(function(){initNavTree('_w_a_sim_client_8h_source.html',''); i
 <div class="ttc" id="astruct_w_a_sim_commander_1_1_log_record_html"><div class="ttname"><a href="struct_w_a_sim_commander_1_1_log_record.html">WASimCommander::LogRecord</a></div><div class="ttdoc">Log record structure.</div><div class="ttdef"><b>Definition:</b> <a href="_w_a_sim_commander_8h_source.html#l00239">WASimCommander.h:240</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
+<!-- HTML footer for doxygen 1.9.4-->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dir_b0856f6b0d80ccb263b2f415c91f9e17.html">include</a></li><li class="navelem"><a class="el" href="dir_46e873e9de9fedca8b86b802c8909ebf.html">client</a></li><li class="navelem"><a class="el" href="_w_a_sim_client_8h.html">WASimClient.h</a></li>
-    <li class="footer">Generated on Tue Nov 7 2023 14:52:05 for WASimCommander by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.4 </li>
+    <li class="footer">Generated for WASimCommander &#160;v1.2.0.0 by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.4 </li>
   </ul>
 </div>
 </body>

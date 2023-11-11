@@ -49,7 +49,7 @@ var NAVTREE =
       ] ]
     ] ],
     [ "WASimCommander - Change Log", "md__c_h_a_n_g_e_l_o_g.html", [
-      [ "1.2.0.0 (next)", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md26", [
+      [ "1.2.0.0 (07-Nov-2022)", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md26", [
         [ "WASimModule", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md27", null ],
         [ "WASimClient and WASimClient_CLI (managed .NET)", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md28", null ],
         [ "WASimClient_CLI (managed .NET)", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md29", null ],
