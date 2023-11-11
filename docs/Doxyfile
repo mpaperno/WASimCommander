@@ -183,12 +183,14 @@ CLANG_OPTIONS          = -std=c++17 \
 GENERATE_HTML          = YES
 HTML_OUTPUT            = html
 HTML_HEADER            = header.html
-HTML_FOOTER            =
+HTML_FOOTER            = footer.html
 HTML_EXTRA_STYLESHEET  = doxyawesome/doxygen-awesome.css \
                          customdoxygen.css
 HTML_EXTRA_FILES       = doxyawesome/doxygen-awesome-darkmode-toggle.js \
                          doxyawesome/doxygen-awesome-paragraph-link.js \
-                         .nojekyll
+                         .nojekyll \
+                         CNAME
+
 HTML_COLORSTYLE_HUE    = 235
 HTML_COLORSTYLE_SAT    = 19
 HTML_COLORSTYLE_GAMMA  = 185
