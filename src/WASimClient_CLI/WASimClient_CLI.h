@@ -210,7 +210,7 @@ namespace WASimCommander::CLI::Client
 
 		HR setDataRequestsPaused(bool paused) { return (HR)m_client->setDataRequestsPaused(paused); }  ///< See \refwccc{setDataRequestsPaused()}
 
-		// Custom Event registration --------------------------
+		// Calculator Custom Event registration --------------------------
 
 		HR registerEvent(RegisteredEvent ^eventData) { return (HR)m_client->registerEvent(eventData); }  ///< See \refwccc{registerEvent()}
 		HR removeEvent(uint32_t eventId) { return (HR)m_client->removeEvent(eventId); }  ///< See \refwccc{removeEvent()}
@@ -218,6 +218,19 @@ namespace WASimCommander::CLI::Client
 
 		RegisteredEvent ^registeredEvent(uint32_t eventId) { return gcnew RegisteredEvent(m_client->registeredEvent(eventId)); }  ///< See \refwccc{registeredEvent()}
 		array<RegisteredEvent ^> ^registeredEvents();  ///< See \refwccc{registeredEvents()}
+
+		// SimConnect Custom Events registration ------------------------------
+
+		/// See \refwccc{registerCustomEvent(const std::string&, uint32_t)}
+		HR registerCustomEvent(String ^customEventName, [Out] uint32_t% puiCustomEventId) {
+			pin_ptr<UInt32> pui = &puiCustomEventId;
+			return (HR)m_client->registerCustomEvent(marshal_as<std::string>(customEventName), pui);
+		}
+
+		/// See \refwccc{registerCustomEvent(const std::string&)}
+		HR registerCustomEvent(String^ customEventName) {
+			return (HR)m_client->registerCustomEvent(marshal_as<std::string>(customEventName));
+		}
 
 		// Simulator Key Events ------------------------------
 

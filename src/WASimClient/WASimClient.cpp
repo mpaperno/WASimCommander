@@ -45,6 +45,11 @@ prior written authorization from the authors.
 
 #define LOGFAULT_THREAD_NAME  WSMCMND_CLIENT_NAME
 
+// Third parties can use Simulator Custom Events in this range to communicate between 3D VC's and 2D C++ gauges.
+// these defines can be found in gauges.h
+#define THIRD_PARTY_EVENT_ID_MIN        		0x00011000
+#define THIRD_PARTY_EVENT_ID_MAX        		0x0001FFFF
+
 #include "client/WASimClient.h"
 //#include "private/wasimclient_p.h"
 #include "utilities.h"
@@ -230,6 +235,7 @@ class WASimClient::Private
 	atomic_size_t totalDataAlloc = 0;
 	atomic_uint32_t nextDefId = SIMCONNECTID_LAST;
 	atomic_uint32_t nextCmdToken = 1;
+	atomic_uint32_t nextCustomEventID = THIRD_PARTY_EVENT_ID_MIN;
 	atomic_bool runDispatchLoop = false;
 	atomic_bool simConnected = false;
 	atomic_bool serverConnected = false;
@@ -257,7 +263,11 @@ class WASimClient::Private
 	eventMap_t events {};
 	using eventNameCache_t = unordered_map<std::string, int32_t>;
 	eventNameCache_t keyEventNameCache {};
-
+	using customEventNameCache_t = unordered_map<std::string, uint32_t>; // keeps a mapping between the registered Simulator Custom Events and their Id's
+	customEventNameCache_t customEventNameCache{};
+	using customEventIdCache_t = unordered_map<uint32_t, std::string>; // keeps track of which Id's have successfully been registered (avoid exception when triggering non-registered events)
+	customEventIdCache_t customEventIdCache{};
+	
 #pragma endregion
 #pragma region  Callback handling templates  ----------------------------------------------
 
@@ -598,6 +608,8 @@ class WASimClient::Private
 
 		// possibly re-register SimConnect CDAs for any existing data requests
 		registerAllDataRequestAreas();
+		// re-register all Simulator Custom Events
+		registerAllCustomEvents();
 
 		setStatus(ClientStatus::SimConnected);
 		return S_OK;
@@ -1200,6 +1212,21 @@ class WASimClient::Private
 		return sendEventRegistration(findTrackedEvent(eventId));
 	}
 
+	// called from connectSimulator()
+	void registerAllCustomEvents()
+	{
+		customEventIdCache.clear();
+		for (auto& [name, id] : customEventNameCache) {
+			HRESULT hr;
+			if FAILED(hr = INVOKE_SIMCONNECT(MapClientEventToSimEvent, hSim, (SIMCONNECT_CLIENT_EVENT_ID)id, name.c_str()))
+				LOG_ERR << "registerAllCustomEvents: Custom Event name " << quoted(name) << " with id " << id << " failed";
+			else {
+				LOG_INF << "registerAllCustomEvents: Custom Event name " << quoted(name) << " with id " << id << " succeeded";
+				customEventIdCache.insert(std::pair{ id, name });
+			}
+		}
+	}
+
 	// called from connectServer()
 	void registerAllEvents()
 	{
@@ -1218,16 +1245,59 @@ class WASimClient::Private
 
 #pragma endregion
 
+#pragma region Simulator Custom Events -------------------------------------------
+
+	// Sends Custom Event using TransmitClientEvent(_EX1)
+	HRESULT writeCustomEvent(uint32_t keyEventId, uint32_t v1, uint32_t v2, uint32_t v3, uint32_t v4, uint32_t v5)
+	{
+		if (!simConnected)
+		{
+			LOG_ERR << "writeCustomEvent: Simulator not connected, cannot send Simulator Custom Event.";
+			return E_NOT_CONNECTED;
+		}
+		const Private::customEventIdCache_t::iterator pos = customEventIdCache.find(keyEventId);
+		if (pos == customEventIdCache.cend())
+		{
+			LOG_ERR << "writeCustomEvent: customEvent " << keyEventId << " has not successfully been registered.";
+			return E_FAIL;
+		}
+		LOG_DBG << "writeCustomEvent: Sending Simulator Custom Event: EventId: " << keyEventId << "; v1: " << v1 << "; v2: " << v2 << "; v3: " << v3 << "; v4: " << v4 << "; v5: " << v5;
+		return INVOKE_SIMCONNECT(
+			TransmitClientEvent,
+			hSim,
+			(DWORD)0,
+			(SIMCONNECT_CLIENT_EVENT_ID)keyEventId,
+			(DWORD)v1,
+			SIMCONNECT_GROUP_PRIORITY_HIGHEST,
+			SIMCONNECT_EVENT_FLAG_GROUPID_IS_PRIORITY);
+
+		// Note: Below is the correct implementation. But because FBW A32NX does not support the '_EX1' version, the normal version is currently used, allowing only 1 parameter.
+		//return INVOKE_SIMCONNECT(
+		//	TransmitClientEvent_EX1,
+		//	hSim,
+		//	(DWORD)0,
+		//	(SIMCONNECT_CLIENT_EVENT_ID)keyEventId,
+		//	SIMCONNECT_GROUP_PRIORITY_HIGHEST,
+		//	SIMCONNECT_EVENT_FLAG_GROUPID_IS_PRIORITY,
+		//	(DWORD)v1,
+		//	(DWORD)v2,
+		//	(DWORD)v3,
+		//	(DWORD)v4,
+		//	(DWORD)v5);
+	}
+
+#pragma endregion
+
 #pragma region Simulator Key Events -------------------------------------------
 
 	// Writes KeyEvent data to the corresponding CDA.
 	HRESULT writeKeyEvent(const KeyEvent &kev)
 	{
 		if (!isConnected()) {
-			LOG_ERR << "Server not connected, cannot send KeyEvent " << kev;
+			LOG_ERR << "Server not connected, cannot send Simulator Key Event " << kev;
 			return E_NOT_CONNECTED;
 		}
-		LOG_DBG << "Sending Key Event: " << kev;
+		LOG_DBG << "Sending Simulator Key Event: " << kev;
 		return INVOKE_SIMCONNECT(SetClientData, hSim, (SIMCONNECT_CLIENT_DATA_ID)CLI_DATA_KEYEVENT, (SIMCONNECT_CLIENT_DATA_DEFINITION_ID)CLI_DATA_KEYEVENT, SIMCONNECT_CLIENT_DATA_SET_FLAG_DEFAULT, 0UL, (DWORD)sizeof(KeyEvent), (void *)&kev);
 	}
 
@@ -1728,20 +1798,77 @@ vector<RegisteredEvent> WASimClient::registeredEvents() const
 
 #pragma endregion Calculator Events
 
+#pragma region Custom Events ----------------------------------------------
+
+HRESULT WASimClient::registerCustomEvent(const std::string& customEventName, uint32_t* puiCustomEventId)
+{
+	if (customEventName[0] == '\0') {
+		LOG_ERR << "registerCustomEvent: Parameter 'customEventName' cannot be empty.";
+		return E_INVALIDARG;
+	}
+
+	if (customEventName.find('.') == string::npos) {
+		LOG_ERR << "registerCustomEvent: " << quoted(customEventName) << " is not a Custom Event (doen't include '.').";
+		return E_INVALIDARG;
+	}
+
+	uint32_t keyId;
+	// check the cache first
+	const Private::customEventNameCache_t::iterator pos = d->customEventNameCache.find(customEventName);
+	if (pos != d->customEventNameCache.cend())
+		keyId = pos->second;
+	else {
+		if (d->nextCustomEventID == THIRD_PARTY_EVENT_ID_MAX) {
+			LOG_ERR << "registerCustomEvent: customEventID exceeds THIRD_PARTY_EVENT_ID_MAX.";
+			return E_FAIL;
+		}
+		keyId = d->nextCustomEventID++;
+		// try to register the Custom Event
+		if (d->simConnected) {
+			HRESULT hr;
+			if FAILED(hr = INVOKE_SIMCONNECT(MapClientEventToSimEvent, d->hSim, (SIMCONNECT_CLIENT_EVENT_ID)keyId, customEventName.c_str()))
+				return hr;
+			else
+				d->customEventIdCache.insert(std::pair{ keyId, customEventName }); // successful registration, from now on the customEventId is valid
+		}
+		else
+			LOG_DBG << "registerCustomEvent: customEventName " << quoted(customEventName) << " with customEventId " << keyId << " is pending.";
+
+		d->customEventNameCache.insert(std::pair{ customEventName, keyId }); // used to retrieve the customEventId through the customEventName - Id might not be in customEventIdCache if not registered yet
+	}
+
+	if (puiCustomEventId)
+		*puiCustomEventId = keyId;
+
+	return S_OK;
+}
+
+#pragma endregion Custom Events
+
 #pragma region Key Events ----------------------------------------------
 
 HRESULT WASimClient::sendKeyEvent(uint32_t keyEventId, uint32_t v1, uint32_t v2, uint32_t v3, uint32_t v4, uint32_t v5) const
 {
-	return d->writeKeyEvent(KeyEvent(keyEventId, { v1, v2, v3, v4, v5 }, d->nextCmdToken++));
+	if (keyEventId >= THIRD_PARTY_EVENT_ID_MIN)
+		// we're dealing with a Simulator Key Event
+		return d->writeCustomEvent(keyEventId, v1, v2, v3, v4, v5);
+	else
+		// we're dealing with a Simulator Key Event
+		return d->writeKeyEvent(KeyEvent(keyEventId, { v1, v2, v3, v4, v5 }, d->nextCmdToken++));
 }
 
 HRESULT WASimClient::sendKeyEvent(const std::string & keyEventName, uint32_t v1, uint32_t v2, uint32_t v3, uint32_t v4, uint32_t v5)
 {
+	// check the customEventNameCache
+	Private::customEventNameCache_t::iterator posCE = d->customEventNameCache.find(keyEventName);
+	if (posCE != d->customEventNameCache.cend())
+		return sendKeyEvent(posCE->second, v1, v2, v3, v4, v5);
+
+	// check the keyEventNameCache
 	int32_t keyId;
-	// check the cache first
-	const Private::eventNameCache_t::iterator pos = d->keyEventNameCache.find(keyEventName);
-	if (pos != d->keyEventNameCache.cend()) {
-		keyId = pos->second;
+	Private::eventNameCache_t::iterator posKE = d->keyEventNameCache.find(keyEventName);
+	if (posKE != d->keyEventNameCache.cend()) {
+		keyId = posKE->second;
 	}
 	else {
 		// try a lookup
