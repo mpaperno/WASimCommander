@@ -1263,27 +1263,17 @@ class WASimClient::Private
 		}
 		LOG_DBG << "writeCustomEvent: Sending Simulator Custom Event: EventId: " << keyEventId << "; v1: " << v1 << "; v2: " << v2 << "; v3: " << v3 << "; v4: " << v4 << "; v5: " << v5;
 		return INVOKE_SIMCONNECT(
-			TransmitClientEvent,
+			TransmitClientEvent_EX1,
 			hSim,
 			(DWORD)0,
 			(SIMCONNECT_CLIENT_EVENT_ID)keyEventId,
-			(DWORD)v1,
 			SIMCONNECT_GROUP_PRIORITY_HIGHEST,
-			SIMCONNECT_EVENT_FLAG_GROUPID_IS_PRIORITY);
-
-		// Note: Below is the correct implementation. But because FBW A32NX does not support the '_EX1' version, the normal version is currently used, allowing only 1 parameter.
-		//return INVOKE_SIMCONNECT(
-		//	TransmitClientEvent_EX1,
-		//	hSim,
-		//	(DWORD)0,
-		//	(SIMCONNECT_CLIENT_EVENT_ID)keyEventId,
-		//	SIMCONNECT_GROUP_PRIORITY_HIGHEST,
-		//	SIMCONNECT_EVENT_FLAG_GROUPID_IS_PRIORITY,
-		//	(DWORD)v1,
-		//	(DWORD)v2,
-		//	(DWORD)v3,
-		//	(DWORD)v4,
-		//	(DWORD)v5);
+			SIMCONNECT_EVENT_FLAG_GROUPID_IS_PRIORITY,
+			(DWORD)v1,
+			(DWORD)v2,
+			(DWORD)v3,
+			(DWORD)v4,
+			(DWORD)v5);
 	}
 
 #pragma endregion
