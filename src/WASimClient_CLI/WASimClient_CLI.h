@@ -221,7 +221,7 @@ namespace WASimCommander::CLI::Client
 
 		// SimConnect Custom Events registration ------------------------------
 
-		/// See \refwccc{registerCustomEvent(const std::string&, uint32_t)}
+		/// See \refwccc{registerCustomEvent(const std::string&, uint32_t*)};
 		HR registerCustomEvent(String ^customEventName, [Out] uint32_t% puiCustomEventId) {
 			pin_ptr<UInt32> pui = &puiCustomEventId;
 			return (HR)m_client->registerCustomEvent(marshal_as<std::string>(customEventName), pui);
@@ -231,6 +231,11 @@ namespace WASimCommander::CLI::Client
 		HR registerCustomEvent(String^ customEventName) {
 			return (HR)m_client->registerCustomEvent(marshal_as<std::string>(customEventName));
 		}
+
+		/// See \refwccc{removeCustomEvent(uint32_t)}
+		HR removeCustomEvent(uint32_t eventId) { return (HR)m_client->removeCustomEvent(eventId); }
+		/// See \refwccc{removeCustomEvent(const std::string&)}
+		HR removeCustomEvent(String^ customEventName) { return (HR)m_client->removeCustomEvent(marshal_as<std::string>(customEventName)); }
 
 		// Simulator Key Events ------------------------------
 

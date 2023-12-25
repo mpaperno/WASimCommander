@@ -257,6 +257,7 @@ class WASimClient::Private
 	mutable shared_mutex mtxResponses;
 	mutable shared_mutex mtxRequests;
 	mutable shared_mutex mtxEvents;
+	mutable shared_mutex mtxCustomEvents;
 
 	responseMap_t reponses {};
 	requestMap_t requests {};
@@ -1215,6 +1216,7 @@ class WASimClient::Private
 	// called from connectSimulator()
 	void registerAllCustomEvents()
 	{
+		unique_lock lock(mtxCustomEvents);
 		customEventIdCache.clear();
 		for (auto& [name, id] : customEventNameCache) {
 			HRESULT hr;
@@ -1803,33 +1805,76 @@ HRESULT WASimClient::registerCustomEvent(const std::string& customEventName, uin
 	}
 
 	uint32_t keyId;
-	// check the cache first
+
+	// Protect the below code with a unique_lock to guarantee correct behavior when 2 threads register the same Custom Event at the same time (unlikely to happen)
+	// If not using a unique_lock, both threads might not find the Custom Event in the customEventNameCache yet, and each register the (same) Custom Event
+	unique_lock lock(d->mtxCustomEvents);
 	const Private::customEventNameCache_t::iterator pos = d->customEventNameCache.find(customEventName);
 	if (pos != d->customEventNameCache.cend())
+		// Custom Event already exists - return the eventId if required
 		keyId = pos->second;
 	else {
+		// get a new eventId
 		if (d->nextCustomEventID == THIRD_PARTY_EVENT_ID_MAX) {
 			LOG_ERR << "registerCustomEvent: customEventID exceeds THIRD_PARTY_EVENT_ID_MAX.";
 			return E_FAIL;
 		}
 		keyId = d->nextCustomEventID++;
-		// try to register the Custom Event
+
+		// Try to register the new Custom Event
 		if (d->simConnected) {
 			HRESULT hr;
 			if FAILED(hr = INVOKE_SIMCONNECT(MapClientEventToSimEvent, d->hSim, (SIMCONNECT_CLIENT_EVENT_ID)keyId, customEventName.c_str()))
 				return hr;
 			else
-				d->customEventIdCache.insert(std::pair{ keyId, customEventName }); // successful registration, from now on the customEventId is valid
+				// Successful registration, add customEventId in the customEventIdCache
+				d->customEventIdCache.insert(std::pair{ keyId, customEventName });
 		}
 		else
 			LOG_DBG << "registerCustomEvent: customEventName " << quoted(customEventName) << " with customEventId " << keyId << " is pending.";
 
-		d->customEventNameCache.insert(std::pair{ customEventName, keyId }); // used to retrieve the customEventId through the customEventName - Id might not be in customEventIdCache if not registered yet
+		// Even if not connected, we add the Custom Event in the customEventNameCache
+		// When re-connecting, customEventNameCache is the (only) cache used to register Custom Events later when re-connecting
+		d->customEventNameCache.insert(std::pair{ customEventName, keyId });
 	}
 
 	if (puiCustomEventId)
 		*puiCustomEventId = keyId;
 
+	return S_OK;
+}
+
+HRESULT WASimClient::removeCustomEvent(uint32_t eventId)
+{
+	// We need a unique_lock, because more then 1 thread might remove the same Custom Event at the same time
+	unique_lock lock(d->mtxCustomEvents);
+	const Private::customEventIdCache_t::iterator pos = d->customEventIdCache.find(eventId);
+	if (pos == d->customEventIdCache.cend()) {
+		LOG_ERR << "registerCustomEvent: customEventID " << eventId << " doesn't exist.";
+		return E_INVALIDARG;
+	}
+	else
+	{
+		d->customEventNameCache.erase(pos->second);
+		d->customEventIdCache.erase(pos->first);
+	}
+	return S_OK;
+}
+
+HRESULT WASimClient::removeCustomEvent(const std::string& customEventName)
+{
+	// We need a unique_lock, because more then 1 thread might remove the same Custom Event at the same time
+	unique_lock lock(d->mtxCustomEvents);
+	const Private::customEventNameCache_t::iterator pos = d->customEventNameCache.find(customEventName);
+	if (pos == d->customEventNameCache.cend()) {
+		LOG_ERR << "registerCustomEvent: customEventName " << customEventName << " doesn't exist.";
+		return E_INVALIDARG;
+	}
+	else
+	{
+		d->customEventIdCache.erase(pos->second);
+		d->customEventNameCache.erase(pos->first);
+	}
 	return S_OK;
 }
 

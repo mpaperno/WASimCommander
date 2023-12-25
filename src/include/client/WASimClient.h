@@ -451,6 +451,18 @@ static const HRESULT E_TIMEOUT       = /*ERROR_TIMEOUT*/       1460L | (/*FACILI
 		/// \param customEventId Pointer to 32-bit unsigned integer variable to hold the customEventId. The range is within THIRD_PARTY_EVENT_ID_MIN and THIRD_PARTY_EVENT_ID_MAX.
 		/// \return `S_OK` on success, `E_INVALIDARG` if the Simulator Custom Event name doesn't contain a '.' (which implies that it is a Simulator Key Event)
 		HRESULT registerCustomEvent(const std::string &customEventName, uint32_t* puiCustomEventId = nullptr);
+		/// Remove a Custom Event previously registered with `registerCustomEvent()` method by using the 'eventId'
+		/// SimConnect provides no way to remove an earlier registered Custom Event with the SimConnect method MapClientEventToSimEvent.
+		/// All 'removeCustomEvent()' is doing, is removing the Custom Event from the maps 'customEventNameCache' and 'customEventIdCache'.
+		/// \param eventId ID of the previously registered event.
+		/// \return `S_OK` on success, `E_INVALIDARG` if the eventId wasn't found.
+		HRESULT removeCustomEvent(uint32_t eventId);
+		/// Remove a Custom Event previously registered with `registerCustomEvent()` method using the 'customEventName'
+		/// SimConnect provides no way to remove an earlier registered Custom Event with the SimConnect method MapClientEventToSimEvent.
+		/// All 'removeCustomEvent()' is doing, is removing the Custom Event from the maps 'customEventNameCache' and 'customEventIdCache'.
+		/// \param customEventName Name of the previously registered event.
+		/// \return `S_OK` on success, `E_INVALIDARG` if the customEventName wasn't found.
+		HRESULT removeCustomEvent(const std::string& customEventName);
 
 		// Simulator Custom Events and Simulator Key Events --------------------------
 
