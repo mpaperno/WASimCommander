@@ -262,10 +262,13 @@ class WASimClient::Private
 	responseMap_t reponses {};
 	requestMap_t requests {};
 	eventMap_t events {};
+
+	// Cached mapping of Key Event names to actual IDs, used in `sendKeyEvent(string)` convenience overload.
 	using eventNameCache_t = unordered_map<std::string, int32_t>;
 	eventNameCache_t keyEventNameCache {};
-	using customEventNameCache_t = unordered_map<std::string, uint32_t>; // keeps a mapping between the registered Simulator Custom Events and their Id's
-	customEventNameCache_t customEventNameCache{};
+	shared_mutex mtxKeyEventNames;
+
+	eventNameCache_t customEventNameCache{};
 	using customEventIdCache_t = unordered_map<uint32_t, std::string>; // keeps track of which Id's have successfully been registered (avoid exception when triggering non-registered events)
 	customEventIdCache_t customEventIdCache{};
 	
@@ -1097,8 +1100,7 @@ class WASimClient::Private
 
 		if (isNewRequest) {
 			unique_lock lock{mtxRequests};
-			requests.try_emplace(req.requestId, req, nextDefId++);
-			tr = &requests.at(req.requestId);
+			tr = &requests.try_emplace(req.requestId, req, nextDefId++).first->second;
 		}
 		else {
 			if (actualValSize > tr->dataSize) {
@@ -1901,6 +1903,7 @@ HRESULT WASimClient::sendKeyEvent(const std::string & keyEventName, uint32_t v1,
 
 	// check the keyEventNameCache
 	int32_t keyId;
+	shared_lock rdlock(d_const->mtxKeyEventNames);
 	Private::eventNameCache_t::iterator posKE = d->keyEventNameCache.find(keyEventName);
 	if (posKE != d->keyEventNameCache.cend()) {
 		keyId = posKE->second;
@@ -1910,6 +1913,8 @@ HRESULT WASimClient::sendKeyEvent(const std::string & keyEventName, uint32_t v1,
 		HRESULT hr;
 		if ((hr = lookup(LookupItemType::KeyEventId, keyEventName, &keyId)) != S_OK)
 			return hr == E_FAIL ? E_INVALIDARG : hr;
+		rdlock.unlock();
+		unique_lock rwlock(d_const->mtxKeyEventNames);
 		d->keyEventNameCache.insert(std::pair{keyEventName, keyId});
 	}
 	return sendKeyEvent((uint32_t)keyId, v1, v2, v3, v4, v5);
