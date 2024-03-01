@@ -255,8 +255,11 @@ class WASimClient::Private
 	responseMap_t reponses {};
 	requestMap_t requests {};
 	eventMap_t events {};
+
+	// Cached mapping of Key Event names to actual IDs, used in `sendKeyEvent(string)` convenience overload.
 	using eventNameCache_t = unordered_map<std::string, int32_t>;
 	eventNameCache_t keyEventNameCache {};
+	shared_mutex mtxKeyEventNames;
 
 #pragma endregion
 #pragma region  Callback handling templates  ----------------------------------------------
@@ -1739,6 +1742,7 @@ HRESULT WASimClient::sendKeyEvent(const std::string & keyEventName, uint32_t v1,
 {
 	int32_t keyId;
 	// check the cache first
+	shared_lock rdlock(d_const->mtxKeyEventNames);
 	const Private::eventNameCache_t::iterator pos = d->keyEventNameCache.find(keyEventName);
 	if (pos != d->keyEventNameCache.cend()) {
 		keyId = pos->second;
@@ -1748,6 +1752,8 @@ HRESULT WASimClient::sendKeyEvent(const std::string & keyEventName, uint32_t v1,
 		HRESULT hr;
 		if ((hr = lookup(LookupItemType::KeyEventId, keyEventName, &keyId)) != S_OK)
 			return hr == E_FAIL ? E_INVALIDARG : hr;
+		rdlock.unlock();
+		unique_lock rwlock(d_const->mtxKeyEventNames);
 		d->keyEventNameCache.insert(std::pair{keyEventName, keyId});
 	}
 	return sendKeyEvent((uint32_t)keyId, v1, v2, v3, v4, v5);
