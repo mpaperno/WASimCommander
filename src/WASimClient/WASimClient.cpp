@@ -1087,8 +1087,7 @@ class WASimClient::Private
 
 		if (isNewRequest) {
 			unique_lock lock{mtxRequests};
-			requests.try_emplace(req.requestId, req, nextDefId++);
-			tr = &requests.at(req.requestId);
+			tr = &requests.try_emplace(req.requestId, req, nextDefId++).first->second;
 		}
 		else {
 			if (actualValSize > tr->dataSize) {
