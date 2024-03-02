@@ -42,11 +42,11 @@ namespace WSMCMND_ENUM_NAMESPACE
 		Nak,          ///< Last command failure. `CommandId` of the original command (which failed) is sent in `uData`. `sData` _may_ contain a reason for failure. The `token` value from the original command is also sent back in the `token` member.
 		Ping,         ///< Query for a response from remote server/client. The remote should respond with an `Ack` command.
 		Connect,      ///< Reconnect a previously-established client (same as "WASimCommander.Connect" custom event). This CommandId is also sent back in an Ack/Nak response after a client connects (or tries to). In this case the `token` of the Ack/Nak is the client ID.
-		Disconnect,   ///< Stop data updates for this client. Use the `Connect` command to resume updates. The server may also spontaneously send a Disconnect command in case it is shuttong down or otherwise terminating connections.
+		Disconnect,   ///< Stop data updates for this client. Use the `Connect` command to resume updates. The server may also spontaneously send a Disconnect command in case it is shutting down or otherwise terminating connections.
 		List,         ///< Request a listing of items like local variables. `uData` should be one of `WASimCommander::LookupItemType` enum values (Sim and Token vars currently cannot be listed).
 		              ///  List is returned as a series of `List` type response commands with `sData` as var name and `uData` is var ID, followed by an `Ack` at the end. A `Nak` response is returned if the item type cannot be listed for any reason.
 		Lookup,       ///< Get information about an item, such as the ID of a variable or unit name. `uData` should be one of `WASimCommander::LookupItemType` enum values and `sData` is the name of the thing to look up.
-		              ///  `Ack` is returned on success with the ID of the variable/unit in the `fData` member (as an `INT32`) and the original requested string name echoed back in `sData`. In case of lookup failure, a `Nak` reponse is returned with possible reason in `sData`.
+		              ///  `Ack` is returned on success with the ID of the variable/unit in the `fData` member (as an `INT32`) and the original requested string name echoed back in `sData`. In case of lookup failure, a `Nak` response is returned with possible reason in `sData`.
 		Get,          ///< Get a named variable value with optional unit type. `uData` is a char of the variable type, eg. 'L' for local, 'A' for SimVar, or 'T' for Token. Only 'L', 'A' and 'E' types support unit specifiers.\n
 		              ///  `sData` is the variable name or numeric ID, optionally followed by comma (`,`) and unit name or numeric ID (**no spaces**). For indexed SimVars, include the index after the variable name, separated by a colon (`:`).\n
 		              ///  For example, a SimVar: ```uData = 'A'; sData = "PROP BETA:2,degrees";``` \n
@@ -75,7 +75,7 @@ namespace WSMCMND_ENUM_NAMESPACE
 		Subscribe,    ///< Sending this command to the server with a `uData` value of `0` (zero) will suspend (pause) any and all data subscription request value updates. Updates can be resumed again by sending any non-zero value in `uData`.\n
 		              ///  This command ID is also used as an `Ack/Nak` response to new Data Request records being processed. The client must write a `DataRequest` struct to the shared data area and the server should respond with this command to indicate success/failure.
 		Update,       ///< Trigger data update of a previously-added Data Request, with the request ID in `uData`. This is used primarily to request updates for subscription types where the `UpdatePeriod` is `Never` or `Once`. The data is sent in the usual
-		              ///  manner for subscriptions, by writing the new value to the related client data area. Note also that this command will force an upate of the data, without comparing the result to any (potentially) cached value from previous lookup.
+		              ///  manner for subscriptions, by writing the new value to the related client data area. Note also that this command will force an update of the data, without comparing the result to any (potentially) cached value from previous lookup.
 		SendKey,      ///< `send_key_event(event_id, value)` with `event_id` in `uData` and an optional `UINT32` type `value` in `fData` (default is `0`).\n\n
 		              ///  "The send_key_event function transmits a WM_COMMAND application event. This function transmits a message with the following syntax: `PostMessage(hwndMain, WM_COMMAND, event_id, (LPARAM) value);`"\n\n
 		              ///  In practice this means you can send a KEY Event ID directly to the simulator, bypassing SimConnect event name mappings or calculator code evaluation. The event IDs can be found in the MSFS SDK's `MSFS/Legacy/gauges.h` header file as `KEY_*` macros,
@@ -169,7 +169,7 @@ namespace WSMCMND_ENUM_NAMESPACE
 	/// Logging destination type. \sa CommandId::Log command.
 	WSMCMND_ENUM_EXPORT enum class LogFacility : uint8_t
 	{
-		None    = 0x00,  ///< Invalid or default logging facilty. For the `Enums::CommandId::Log` command this is same as `Remote`.
+		None    = 0x00,  ///< Invalid or default logging facility. For the `Enums::CommandId::Log` command this is same as `Remote`.
 		Console = 0x01,  ///< Console logging, eg. stderr/stdout.
 		File    = 0x02,  ///< Log file destination.
 		Remote  = 0x04,   ///< Remote destination, eg. network transmission or a callback event.

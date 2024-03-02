@@ -43,7 +43,7 @@ struct WSMCMND_API ListResult
 	using listResult_t = std::vector<std::pair<int, std::string>>;  ///< A mapping of IDs to names.
 
 	WASimCommander::Enums::LookupItemType listType;  ///< the type of items being listed
-	HRESULT result;           ///< Excecution result, one of: `S_OK`, `E_FAIL`, `E_TIMEOUT`
+	HRESULT result;           ///< Execution result, one of: `S_OK`, `E_FAIL`, `E_TIMEOUT`
 	listResult_t list;        ///< Mapping of numeric item IDs to name strings.
 };
 
@@ -97,8 +97,8 @@ struct WSMCMND_API DataRequestRecord : public DataRequest
 
 	// The c'tors and assignments are primarily for internal use and container storage requirements, but may also be useful for subclasses.
 	using DataRequest::DataRequest;   ///< Inherits DataRequest constructors.
-	using DataRequest::operator=;     ///< Inherits DataRequest assignement operators.
-	DataRequestRecord();              ///< Default c'tor creates an invalid instance with reqiest ID of -1, zero size, and `RequestType::None`.
+	using DataRequest::operator=;     ///< Inherits DataRequest assignment operators.
+	DataRequestRecord();              ///< Default c'tor creates an invalid instance with request ID of -1, zero size, and `RequestType::None`.
 	DataRequestRecord(const DataRequest &request);  ///< Constructs new instance from a `DataRequest` instance by lvalue/copy. The data array is initialized to the corresponding size with 0xFF value for all bytes.
 	DataRequestRecord(DataRequest &&request);       ///< Constructs new instance from a `DataRequest` instance by rvalue/move. The data array is initialized to the corresponding size with 0xFF value for all bytes.
 };
@@ -116,7 +116,7 @@ struct WSMCMND_API VariableRequest
 	///  The unit name is ignored for all other variable types, and the `unitId` field is preferred if it is greater than -1.
 	int variableId = -1;           ///< Numeric ID of the variable to get/set. Overrides the `variableName` field if greater than -1. Only 'A', 'L', 'T' variable types can be referenced by numeric IDs.
 	int unitId = -1;               ///< Numeric ID of the Unit type to use in the get/set command. Overrides the `unitName` field if greater than -1. See usage notes for `unitName` about applicable variable types.
-	uint8_t simVarIndex = 0;       ///< Optional index number for SimVars ('A') which require them. If using named variables, yhe index can also be included in the variable name string (after a colon `:`, as would be used in a calculator string).
+	uint8_t simVarIndex = 0;       ///< Optional index number for SimVars ('A') which require them. If using named variables, the index can also be included in the variable name string (after a colon `:`, as would be used in a calculator string).
 	bool createLVar = false;       ///< This flag indicates that the L var should be created if it doesn't already exist in the simulator. This applies for both "Set" and "Get" commands.
 
 	/// Default constructor, with optional parameters for variable type, name, unit name, SimVar index and `createLVar` flag.
