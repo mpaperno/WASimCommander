@@ -474,14 +474,14 @@ namespace WASimCommander::CLI::Structs
 	{
 		public:
 			UInt32 eventId;
-			String ^code;
-			String ^name;
+			String ^ code { String::Empty };
+			String ^ name { String::Empty };
 
 			RegisteredEvent() {}
 			explicit RegisteredEvent(UInt32 eventId, String ^code) :
-				eventId{eventId}, code{code}, name{""} {}
+				eventId{eventId}, code{code} { }
 			explicit RegisteredEvent(UInt32 eventId, String ^code, String ^name) :
-				eventId{eventId}, code{code}, name{name} {}
+				eventId{eventId}, code{code}, name{name} { }
 
 			String ^ToString() override {
 				return String::Format("RegisteredEvent {{{0}; code: {1}; name: {2}}}", eventId, code, name);
@@ -506,8 +506,8 @@ namespace WASimCommander::CLI::Structs
 	{
 		public:
 			SByte variableType { 'L' };
-			String ^ variableName;
-			String ^ unitName;
+			String ^ variableName { String::Empty };
+			String ^ unitName { String::Empty };
 			int variableId { -1 };
 			int unitId { -1 };
 			Byte simVarIndex { 0 };
