@@ -1,4 +1,4 @@
-﻿/*
+/*
 This file is part of the WASimCommander project.
 https://github.com/mpaperno/WASimCommander
 
@@ -1635,7 +1635,10 @@ void CALLBACK dispatchMessage(SIMCONNECT_RECV* pData, DWORD cbData, void*)
 			break;
 
 		case SIMCONNECT_RECV_ID_EVENT:
+		case SIMCONNECT_RECV_ID_EVENT_EX1:
 		{
+			// The difference between SIMCONNECT_RECV_EVENT and SIMCONNECT_RECV_EVENT_EX1 is 4 extra DWORD values tacked onto the end of the latter
+			// (dwData is _not_ an array as the SDK docs claim). Since we're only using the first value anyway, this is safe to cast.
 			SIMCONNECT_RECV_EVENT* data = (SIMCONNECT_RECV_EVENT*)pData;
 			LOG_TRC << LOG_SC_RECV_EVENT(data);
 
