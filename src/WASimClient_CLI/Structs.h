@@ -474,8 +474,8 @@ namespace WASimCommander::CLI::Structs
 	{
 		public:
 			UInt32 eventId;
-			String ^ code {};
-			String ^ name {};
+			String ^code;
+			String ^name;
 
 			RegisteredEvent() {}
 			explicit RegisteredEvent(UInt32 eventId, String ^code) :
@@ -506,8 +506,8 @@ namespace WASimCommander::CLI::Structs
 	{
 		public:
 			SByte variableType { 'L' };
-			String ^ variableName {};
-			String ^ unitName {};
+			String ^ variableName;
+			String ^ unitName;
 			int variableId { -1 };
 			int unitId { -1 };
 			Byte simVarIndex { 0 };
