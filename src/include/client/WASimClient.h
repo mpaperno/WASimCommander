@@ -104,7 +104,7 @@ static const uint32_t CUSTOM_KEY_EVENT_ID_MIN = 0x00020000;
 		uint32_t clientVersion() const;  ///< Return the current WASimClient version number. Version numbers are in "BCD" format:  `MAJOR << 24 | MINOR << 16 | PATCH << 8 | BUILD`, eg: `1.23.45.67 = 0x01234567`
 		uint32_t serverVersion() const;  ///< Return the version number of the last-connected, or successfully pinged, WASimModule (sever), or zero if unknown. See `clientVersion()` for numbering details.
 
-		/// Initialize the simulator network link and set up minimum necessary for WASimCommander server ping or connection. Uses default newtwork SimConnect configuration ID.
+		/// Initialize the simulator network link and set up minimum necessary for WASimCommander server ping or connection. Uses default network SimConnect configuration ID.
 		/// \param timeout Maximum time to wait for response, in milliseconds. Zero (default) means to use the `defaultTimeout()` value.
 		/// \return `S_OK` (0) - Success;\n
 		///  `E_FAIL` (0x80004005) - General failure (most likely simulator is not running);\n
@@ -148,7 +148,7 @@ static const uint32_t CUSTOM_KEY_EVENT_ID_MIN = 0x00020000;
 		/// Get the current default server response timeout value, which is used in all network requests.
 		/// The initial default setting is read from the `client_conf.ini` file or set to 1000ms if no config file was found. \sa setDefaultTimeout().
 		uint32_t defaultTimeout() const;
-		///< Set the default timeout period for server reponses. The default may be inadequate on slow network links or a very busy simulator. \sa defaultTimeout()
+		///< Set the default timeout period for server responses. The default may be inadequate on slow network links or a very busy simulator. \sa defaultTimeout()
 		void setDefaultTimeout(uint32_t ms);
 
 		/// SimConnect is used for the network layer. This setting specifies the SimConnect.cfg index to use. The value of -1 forces a local connection.
@@ -159,10 +159,8 @@ static const uint32_t CUSTOM_KEY_EVENT_ID_MIN = 0x00020000;
 		void setNetworkConfigurationId(int configId);
 
 		/// \}
-		/// \name High level API
+		/// \name RPN calculator code execution and reusable events
 		/// \{
-
-		// Calculator code -----------------------------------
 
 		/// Run a string of MSFS _Gauge API_ calculator code in RPN format, possibly with some kind of result expected.
 		/// \param code The text of the code to execute.  See https://docs.flightsimulator.com/html/Additional_Information/Reverse_Polish_Notation.htm
@@ -180,11 +178,13 @@ static const uint32_t CUSTOM_KEY_EVENT_ID_MIN = 0x00020000;
 		/// If you need to execute the same code multiple times, it would be more efficient to save the code as either a data request (for code returning values) or a registered event (for code not returning values).
 		/// The advantage is that in those cases the calculator string is pre-compiled to byte code and saved once, then each invocation of the _Gauge API_ calculator functions uses the more efficient byte code version.
 		/// (To prevent automatic data updates for data requests, just set the data request period to `Enums::UpdatePeriod::Never` or `Enums::UpdatePeriod::Once` and use the `updateDataRequest()` method to poll for value updates as needed.)
-		/// See `saveDataRequest()` and `registerEvent()` respecitvely for details.
+		/// See `saveDataRequest()` and `registerEvent()` respectively for details.
 		/// \sa \refwce{CommandId::Exec}, defaultTimeout(), setDefaultTimeout()
 		HRESULT executeCalculatorCode(const std::string &code, WASimCommander::Enums::CalcResultType resultType = WASimCommander::Enums::CalcResultType::None, double *pfResult = nullptr, std::string *psResult = nullptr) const;
 
-		// Variables accessors ------------------------------
+		/// \}
+		/// \name Variables accessor methods
+		/// \{
 
 		/// Get a Variable value by name, with optional named unit type. This is primarily useful for local ('L') variables, SimVars ('A') and token variables ('T') which can be read via dedicated _Gauge API_ functions
 		/// (`get_named_variable_value()`/`get_named_variable_typed_value()`, `aircraft_varget()`,  and `lookup_var()` respectively). \n
@@ -239,18 +239,23 @@ static const uint32_t CUSTOM_KEY_EVENT_ID_MIN = 0x00020000;
 		/// \sa \refwce{CommandId::SetCreate}
 		HRESULT setOrCreateLocalVariable(const std::string &variableName, const double value, const std::string &unitName = std::string());
 
-		// Data subscriptions -------------------------------
+		/// \}
+		/// \name Data change subscriptions (variables and calculated results)
+		/// \{
 
-		/// Add a new `WASimCommander::DataRequest` or update an existing one with the same `DataRequest::requestId`. If the client is not currently connected to the server, the request is queued until the next connection is established.
+		/// Add a new `WASimCommander::DataRequest` for a variable or calculated result, or update an existing data request with the same `DataRequest::requestId`.
+		/// Data changes (updates) are delivered asynchronously via the callback function set with `setDataCallback()`, which then passes a `DataRequestRecord` structure as the callback argument
+		/// (this provides both a reference to the original `DataRequest` registered here, as well as result data).
 		/// \param request The `WASimCommander::DataRequest` structure to process. See `WASimCommander::DataRequest` documentation for details of the structure members.
 		/// \param async Set to `false` (default) to wait for an `Ack`/`Nak` response from the server before returning from this method, or `true` to return without waiting for a response. See return values and the Note below for more details.
 		/// \return `S_OK` on success, `E_INVALIDARG` if there is a problem with the `DataRequest` contents. \n
 		/// If currently connected to the server and `async` is `false`, may also return `E_FAIL` if the server returned `Nak` response, or `E_TIMEOUT` on general server communication failure.
 		/// \note If currently connected to the server and the `async` param is `false`, this method will block until either the Server responds or the timeout has expired (see `defaultTimeout()`).
+		/// If the client is _not_ currently connected to the server, the request is queued until the next connection is established (and this method is non-blocking regardless of `async` argument).
 		/// \par Tracking async calls
 		/// To track the status of an async request, set a callback function with `setCommandResultCallback()`. The server should respond with an \refwce{CommandId::Ack} or \refwce{CommandId::Nak}
 		/// \refwc{Command} where the `uData` value is \refwce{CommandId::Subscribe} and the \refwc{Command::token} will be the `requestId` value from the given `request` struct.
-		/// \sa  \refwc{DataRequest} \refwce{CommandId::Subscribe}, removeDataRequest(), updateDataRequest()
+		/// \sa  \refwc{DataRequest} \refwce{CommandId::Subscribe}, removeDataRequest(), updateDataRequest(), setDataCallback(), DataRequestRecord
 		HRESULT saveDataRequest(const DataRequest &request, bool async = false);
 		/// Remove a previously-added `DataRequest`. This clears the subscription and any tracking/meta data from both server and client sides.
 		/// Using this method is effectively the same as calling `dataRequest()` with a `DataRequest` of type `RequestType::None`.
@@ -283,9 +288,11 @@ static const uint32_t CUSTOM_KEY_EVENT_ID_MIN = 0x00020000;
 		/// \return `S_OK` on success; If currently connected to the server, may also return `E_TIMEOUT` on general server communication failure.
 		HRESULT setDataRequestsPaused(bool paused) const;
 
-		// Custom Calculator Events --------------------------
+		/// \}
+		/// \name RPN calculator code execution and reusable events
+		/// \{
 
-		/// Register a reusable event which executes a pre-set calculator string. The code is pre-compiled and stored on the server for quicker execution.
+		/// Register a reusable event which executes a pre-set RPN calculator code string. The code is pre-compiled and stored on the server for quicker execution.
 		/// The event can have an optional custom name for direct use with any SimConnect client. Registered events can also be triggered by using the `transmitEvent()` method.
 		/// If the server is not currently connected, the event registration will be queued and sent next time a connection is established.
 		/// \return `S_OK` on success, `E_INVALIDARG` if the resulting code string is too long or if trying to change the name of an already registered event.
@@ -309,7 +316,9 @@ static const uint32_t CUSTOM_KEY_EVENT_ID_MIN = 0x00020000;
 		/// Returns a list of all registered events which have been added to the Client with `registerEvent()`. The list members are created by copy.
 		std::vector<RegisteredEvent> registeredEvents() const;
 
-		// Simulator Key Events --------------------------
+		/// \}
+		/// \name Simulator Key Events
+		/// \{
 
 		/// Can be used to trigger standard Simulator "Key Events" as well as "custom" _Gauge API/SimConnect_ events. Up to 5 optional values can be passed onto the event handler.
 		/// This provides functionality similar to the _Gauge API_ function `trigger_key_event_EX1()` and `SimConnect_TransmitClientEvent[_EX1()]`.  \n\n
@@ -376,7 +385,9 @@ static const uint32_t CUSTOM_KEY_EVENT_ID_MIN = 0x00020000;
 		/// \since v1.3.0
 		HRESULT removeCustomKeyEvent(uint32_t eventId);
 
-		// Meta data retrieval --------------------------------
+		/// \}
+		/// \name Metadata retrieval
+		/// \{
 
 		/// Send a request for a list update to the server. The results are delivered using the callback set in `setListResultsCallback()`.
 		/// \param itemsType The type of thing to list. Supported types are local variables (`Enums::LookupItemType::LocalVariable`, default), subscribed Data Requests (`Enums::LookupItemType::DataRequest`), and Registered Events (`Enums::LookupItemType::RegisteredEvent`).
@@ -403,7 +414,7 @@ static const uint32_t CUSTOM_KEY_EVENT_ID_MIN = 0x00020000;
 		/// \return `S_OK` on success, `E_NOT_CONNECTED` if not connected to server, `E_TIMEOUT` on server communication failure.
 		HRESULT sendCommand(const Command &command) const;
 		/// Sends a command, in the form of a `WASimCommander::Command` structure, to the server for processing and waits for a reply (an `Ack/Nak` response `Command`).
-		///  The various command types and the data requirements for each are described in the `WASimCommander::Enums::CommandId` documentation.
+		/// The various command types and the data requirements for each are described in the `WASimCommander::Enums::CommandId` documentation.
 		/// \param command The `Command` struct defining the command and associated data to send.
 		/// \param response Pointer to an initialised `Command` structure for storing the resulting response (a Command with a `commandId` of `Ack` or `Nak`), if any.
 		/// \param timeout The maximum time to wait for a response, in milliseconds. If `0` (default) then the default network timeout value is used (`defaultTimeout()`, `setDefaultTimeout()`).
@@ -428,10 +439,18 @@ static const uint32_t CUSTOM_KEY_EVENT_ID_MIN = 0x00020000;
 
 		/// \}
 		/// \name Callbacks
+		/// \note In general, callbacks _may_ be invoked concurrently (and possibly from different threads).
+		/// The callback handler functions should at least be reentrant (if not thread-safe) since they could be called at any time.
+		/// Check the individual method documentation for more details about possible concurrency and threading. \n
+		/// The client can be built with \ref WSMCMND_CLIENT_USE_CONCURRENT_CALLBACKS macro/definition set to `0` to disable concurrency.
+		///
+		/// <hr>
 		/// \{
 
 		/// Sets a callback for Client event updates which indicate status changes. Pass a `nullptr` value to remove a previously set callback.
-		/// \n Usage: \code client->setClientEventCallback(std::bind(&MyClass::onClientEvent, this, std::placeholders::_1)); \endcode \sa ClientEventType, ClientEvent, WSMCMND_CLIENT_USE_CONCURRENT_CALLBACKS
+		/// \n Usage: \code client->setClientEventCallback(std::bind(&MyClass::onClientEvent, this, std::placeholders::_1)); \endcode
+		/// This callback may be invoked from the main thread (where WASimClient was created), the dedicated "dispatch" thread the client maintains, or a temporary thread in one specific case when SimConnect sends a "Quit" command.
+		/// \sa ClientEventType, ClientEvent, WSMCMND_CLIENT_USE_CONCURRENT_CALLBACKS
 		void setClientEventCallback(clientEventCallback_t cb);
 		/// Same as `setClientEventCallback(clientEventCallback_t)`. Convenience for avoiding a std::bind expression.
 		/// \n Usage: \code client->setClientEventCallback(&MyClass::onClientEvent, this); \endcode \sa ClientEvent, WSMCMND_CLIENT_USE_CONCURRENT_CALLBACKS
@@ -439,7 +458,10 @@ static const uint32_t CUSTOM_KEY_EVENT_ID_MIN = 0x00020000;
 		inline void setClientEventCallback(void(__stdcall Tcaller::* const member)(const ClientEvent &), Tcaller *const caller);
 
 		/// Sets a callback for list results arriving from the server. Pass a `nullptr` value to remove a previously set callback.
-		/// \n Usage: \code client->setListResultsCallback(std::bind(&MyClass::onListResult, this, std::placeholders::_1)); \endcode  \sa ListResult, list(), \refwce{CommandId::List}, WSMCMND_CLIENT_USE_CONCURRENT_CALLBACKS
+		/// \n Usage: \code client->setListResultsCallback(std::bind(&MyClass::onListResult, this, std::placeholders::_1)); \endcode
+		/// This callback is invoked from temporary thread which accumulates incoming list results until the listing is complete (or times out).
+		/// Currently, only one pending list request can be active at any time, though this may change in the future.
+		/// \sa ListResult, list(), \refwce{CommandId::List}, WSMCMND_CLIENT_USE_CONCURRENT_CALLBACKS
 		void setListResultsCallback(listResultsCallback_t cb);
 		/// Same as `setListResultsCallback(listResultsCallback_t)`. Convenience for avoiding a `std::bind` expression.
 		/// \n Usage: \code client->setListResultsCallback(&MyClass::onListResult, this); \endcode \sa list(), \refwce{CommandId::List}, WSMCMND_CLIENT_USE_CONCURRENT_CALLBACKS
@@ -447,7 +469,9 @@ static const uint32_t CUSTOM_KEY_EVENT_ID_MIN = 0x00020000;
 		inline void setListResultsCallback(void(__stdcall Tcaller::* const member)(const ListResult &), Tcaller *const caller);
 
 		/// Sets a callback for value update data arriving from the server. Pass a `nullptr` value to remove a previously set callback.
-		/// \n Usage: \code client->setDataCallback(std::bind(&MyClass::onDataResult, this, std::placeholders::_1)); \endcode  \sa DataRequestRecord, saveDataRequest(), WSMCMND_CLIENT_USE_CONCURRENT_CALLBACKS
+		/// \n Usage: \code client->setDataCallback(std::bind(&MyClass::onDataResult, this, std::placeholders::_1)); \endcode
+		/// This callback is invoked from the dedicated "dispatch" thread the client maintains.
+		/// \sa DataRequestRecord, saveDataRequest(), WSMCMND_CLIENT_USE_CONCURRENT_CALLBACKS
 		void setDataCallback(dataCallback_t cb);
 		/// Same as `setDataCallback(dataCallback_t)`. Convenience overload template for avoiding a std::bind expression.
 		/// \n Usage: \code client->setDataCallback(&MyClass::onDataResult, this) \endcode \sa dataCallback_t, DataRequestRecord, saveDataRequest(), WSMCMND_CLIENT_USE_CONCURRENT_CALLBACKS
@@ -455,7 +479,9 @@ static const uint32_t CUSTOM_KEY_EVENT_ID_MIN = 0x00020000;
 		inline void setDataCallback(void(__stdcall Tcaller::* const member)(const DataRequestRecord &), Tcaller *const caller);
 
 		/// Sets a callback for logging activity, both from the server and the client itself. Pass a `nullptr` value to remove a previously set callback.
-		/// \n Usage: \code client->setLogCallback(std::bind(&MyClass::onLogMessage, this, std::placeholders::_1)); \endcode  \sa setLogLevel(), WSMCMND_CLIENT_USE_CONCURRENT_CALLBACKS
+		/// \n Usage: \code client->setLogCallback(std::bind(&MyClass::onLogMessage, this, std::placeholders::_1)); \endcode
+		/// This callback may be invoked from either the main thread (where WASimClient was created), or the dedicated "dispatch" thread which the client maintains.
+		/// \sa setLogLevel(), WSMCMND_CLIENT_USE_CONCURRENT_CALLBACKS
 		void setLogCallback(logCallback_t cb);
 		/// Same as `setLogCallback(logCallback_t)`. Convenience template for avoiding a std::bind expression.
 		/// \n Usage: \code client->setLogCallback(&MyClass::onLogMessage, this) \endcode  \sa setLogLevel(), WSMCMND_CLIENT_USE_CONCURRENT_CALLBACKS
@@ -467,7 +493,9 @@ static const uint32_t CUSTOM_KEY_EVENT_ID_MIN = 0x00020000;
 		/// If you would like to be notified about _all_ command responses, set this callback. The `Command` type delivered will have the `Command::commandId` of type
 		/// `CommandId::Ack` or `CommandId::Nak`. The `Command::uData` member is set to the `commandId` of the original command being responded to.
 		/// Other `Command` struct members may have other meanings, depending on the actual command being responded to. See documentation for `WASimCommander::Enums::CommandId` for details.
-		/// \n Usage: \code client->setCommandResultCallback(std::bind(&MyClass::onCommandResult, this, std::placeholders::_1)); \endcode  \sa \refwce{CommandId}, WASimCommander::Command, WSMCMND_CLIENT_USE_CONCURRENT_CALLBACKS
+		/// \n Usage: \code client->setCommandResultCallback(std::bind(&MyClass::onCommandResult, this, std::placeholders::_1)); \endcode
+		/// This callback is invoked from the dedicated "dispatch" thread the client maintains.
+		/// \sa \refwce{CommandId}, WASimCommander::Command, WSMCMND_CLIENT_USE_CONCURRENT_CALLBACKS
 		void setCommandResultCallback(commandCallback_t cb);
 		/// Same as `setCommandResultCallback(commandCallback_t)`. Convenience overload template for avoiding a std::bind expression.
 		/// \n Usage: \code client->setCommandResultCallback(&MyClass::onCommandResult, this); \endcode \sa setCommandResultCallback(commandCallback_t), WSMCMND_CLIENT_USE_CONCURRENT_CALLBACKS
@@ -477,7 +505,9 @@ static const uint32_t CUSTOM_KEY_EVENT_ID_MIN = 0x00020000;
 		/// Sets a callback for delivering response commands sent to this client by the server module. Note that the server may also initiate a few types of commands (not in response to client commands)
 		/// such as `Ping`, `List`, and `Disconnect`. In contrast to `setCommandResultCallback(commandCallback_t)`, this one will report on _all_ commands from the server, not just `Ack/Nak`.
 		/// This callback is meant for low-level API usage.
-		/// \n Usage: \code client->setResponseCallback(std::bind(&MyClass::onServerResponse, this, std::placeholders::_1)); \endcode  \sa sendServerCommand(), WSMCMND_CLIENT_USE_CONCURRENT_CALLBACKS
+		/// \n Usage: \code client->setResponseCallback(std::bind(&MyClass::onServerResponse, this, std::placeholders::_1)); \endcode
+		/// This callback is invoked from the dedicated "dispatch" thread the client maintains.
+		/// \sa sendServerCommand(), WSMCMND_CLIENT_USE_CONCURRENT_CALLBACKS
 		void setResponseCallback(commandCallback_t cb);
 		/// Same as `setResponseCallback(commandCallback_t)`. Convenience overload template for avoiding a std::bind expression.
 		/// \n Usage: \code client->setResponseCallback(&MyClass::onServerResponse, this); \endcode \sa setResponseCallback(responseCallback_t), WSMCMND_CLIENT_USE_CONCURRENT_CALLBACKS

@@ -148,10 +148,8 @@ namespace WASimCommander::CLI::Client
 		void setNetworkConfigurationId(int configId) { m_client->setNetworkConfigurationId(configId); }  ///< See \refwccc{setNetworkConfigurationId()}
 
 		/// \}
-		/// \name High level API
+		/// \name RPN calculator code execution and reusable events
 		/// \{
-
-		// Calculator code -----------------------------------
 
 		/// <summary> Execute calculator code without result </summary> \sa \refwccc{executeCalculatorCode()}
 		HR executeCalculatorCode(String^ code) { return (HR)m_client->executeCalculatorCode(marshal_as<std::string>(code)); }
@@ -162,7 +160,9 @@ namespace WASimCommander::CLI::Client
 		/// <summary> Execute calculator code with both numeric and string results. </summary>  \sa \refwccc{executeCalculatorCode()}
 		HR executeCalculatorCode(String^ code, CalcResultType resultType, [Out] double %pfResult, [Out] String^ %psResult);
 
-		// Variables accessors ------------------------------
+		/// \}
+		/// \name Variables accessor methods
+		/// \{
 
 		/// <summary> Get the value of a variable with a numeric result type. This is the most typical use case since most variable types are numeric. </summary> \sa \refwccc{getVariable()}
 		HR getVariable(VariableRequest ^var, [Out] double %pfResult);
@@ -197,7 +197,9 @@ namespace WASimCommander::CLI::Client
 			return (HR)m_client->setOrCreateLocalVariable(marshal_as<std::string>(variableName), value, marshal_as<std::string>(unitName));
 		}
 
-		// Data subscriptions -------------------------------
+		/// \}
+		/// \name Data change subscriptions (variables and calculated results)
+		/// \{
 
 		HR saveDataRequest(DataRequest ^request) { return (HR)m_client->saveDataRequest(request); }  ///< See \refwccc{saveDataRequest()} as used with `async = false`
 		HR saveDataRequestAsync(DataRequest ^request) { return (HR)m_client->saveDataRequest(request, true); }  ///< See \refwccc{saveDataRequest()} as used with `async = true`
@@ -210,7 +212,9 @@ namespace WASimCommander::CLI::Client
 
 		HR setDataRequestsPaused(bool paused) { return (HR)m_client->setDataRequestsPaused(paused); }  ///< See \refwccc{setDataRequestsPaused()}
 
-		// Custom Calculator Events --------------------------
+		/// \}
+		/// \name RPN calculator code execution and reusable events
+		/// \{
 
 		HR registerEvent(RegisteredEvent ^eventData) { return (HR)m_client->registerEvent(eventData); }  ///< See \refwccc{registerEvent()}
 		HR removeEvent(uint32_t eventId) { return (HR)m_client->removeEvent(eventId); }  ///< See \refwccc{removeEvent()}
@@ -219,7 +223,9 @@ namespace WASimCommander::CLI::Client
 		RegisteredEvent ^registeredEvent(uint32_t eventId) { return gcnew RegisteredEvent(m_client->registeredEvent(eventId)); }  ///< See \refwccc{registeredEvent()}
 		array<RegisteredEvent ^> ^registeredEvents();  ///< See \refwccc{registeredEvents()}
 
-		// Simulator Key Events ------------------------------
+		/// \}
+		/// \name Simulator Key Events
+		/// \{
 
 		/// See \refwccc{sendKeyEvent(uint32_t, uint32_t, uint32_t, uint32_t, uint32_t, uint32_t) const}
 		HR sendKeyEvent(uint32_t keyEventId, [Optional] Nullable<uint32_t> v1, [Optional] Nullable<uint32_t> v2, [Optional] Nullable<uint32_t> v3, [Optional] Nullable<uint32_t> v4, [Optional] Nullable<uint32_t> v5) {
@@ -246,7 +252,9 @@ namespace WASimCommander::CLI::Client
 		/// See \refwccc{removeCustomKeyEvent(const std::string&)}
 		HR removeCustomKeyEvent(String ^customEventName) { return (HR)m_client->removeCustomKeyEvent(marshal_as<std::string>(customEventName)); }
 
-		// Meta data retrieval --------------------------------
+		/// \}
+		/// \name Metadata retrieval
+		/// \{
 
 		/// See \refwccc{list()}
 		HR list(LookupItemType itemsType) { return (HR)m_client->list((WSE::LookupItemType)itemsType); }
