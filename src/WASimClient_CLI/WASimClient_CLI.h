@@ -210,7 +210,7 @@ namespace WASimCommander::CLI::Client
 
 		HR setDataRequestsPaused(bool paused) { return (HR)m_client->setDataRequestsPaused(paused); }  ///< See \refwccc{setDataRequestsPaused()}
 
-		// Custom Event registration --------------------------
+		// Custom Calculator Events --------------------------
 
 		HR registerEvent(RegisteredEvent ^eventData) { return (HR)m_client->registerEvent(eventData); }  ///< See \refwccc{registerEvent()}
 		HR removeEvent(uint32_t eventId) { return (HR)m_client->removeEvent(eventId); }  ///< See \refwccc{removeEvent()}
@@ -230,6 +230,21 @@ namespace WASimCommander::CLI::Client
 		HR sendKeyEvent(String ^keyEventName, [Optional] Nullable<uint32_t> v1, [Optional] Nullable<uint32_t> v2, [Optional] Nullable<uint32_t> v3, [Optional] Nullable<uint32_t> v4, [Optional] Nullable<uint32_t> v5) {
 			return (HR)m_client->sendKeyEvent(marshal_as<std::string>(keyEventName), v1.GetValueOrDefault(0), v2.GetValueOrDefault(0), v3.GetValueOrDefault(0), v4.GetValueOrDefault(0), v5.GetValueOrDefault(0));
 		}
+
+		/// See \refwccc{registerCustomKeyEvent()};
+		HR registerCustomKeyEvent(String ^customEventName, [Out] UInt32 %puiCustomEventId, [Optional] Nullable<bool> useLegacyTransmit) {
+			pin_ptr<UInt32> pui = &puiCustomEventId;
+			return (HR)m_client->registerCustomKeyEvent(marshal_as<std::string>(customEventName), pui, useLegacyTransmit.GetValueOrDefault(false));
+		}
+		/// See \refwccc{registerCustomKeyEvent()}. This method overload doesn't provide the generated event ID as a return value.
+		HR registerCustomKeyEvent(String ^customEventName, [Optional] Nullable<bool> useLegacyTransmit) {
+			return (HR)m_client->registerCustomKeyEvent(marshal_as<std::string>(customEventName), nullptr, useLegacyTransmit.GetValueOrDefault(false));
+		}
+
+		/// See \refwccc{removeCustomKeyEvent(uint32_t)}
+		HR removeCustomKeyEvent(UInt32 eventId) { return (HR)m_client->removeCustomKeyEvent(eventId); }
+		/// See \refwccc{removeCustomKeyEvent(const std::string&)}
+		HR removeCustomKeyEvent(String ^customEventName) { return (HR)m_client->removeCustomKeyEvent(marshal_as<std::string>(customEventName)); }
 
 		// Meta data retrieval --------------------------------
 

@@ -86,7 +86,7 @@ namespace CS_BasicConsole
 			const string simVarUnit = "percent";
 
 			// Execute a calculator string with result. We'll try to read the value of the SimVar defined above.
-			const string calcCode = $"(A:{simVarName},{simVarUnit})";
+			string calcCode = $"(A:{simVarName},{simVarUnit})";
 			if (client.executeCalculatorCode(calcCode, CalcResultType.Double, out double fResult, out string sResult) == HR.OK)
 				Log($"Calculator code '{calcCode}' returned: {fResult} and '{sResult}'", "<<");
 
@@ -120,30 +120,26 @@ namespace CS_BasicConsole
 				else
 					break;
 				// wait for updates to process asynchronously and our event handler to get called, or time out
-				if (!dataUpdateEvent.WaitOne(1000)) {
-					Log("Data subscription update timed out!", "!!");
+				if (!AwaitData())
 					break;
-				}
 			}
 
 			// Test subscribing to a string type value. We'll use the Sim var "TITLE" (airplane name), which can only be retrieved using calculator code.
-			// We allocate 32 Bytes here to hold the result and we request this one with an update period of Once, which will return a result right away
+			// We allocate 64 Bytes here to hold the result and we request this one with an update period of Once, which will return a result right away
 			// but will not be scheduled for regular updates. If we wanted to update this value later, we could call the client's `updateDataRequest(requestId)` method.
 			// Also we can use the "async" version which doesn't wait for the server to respond before returning. We're going to wait for a result anyway after submitting the request.
+			Log($"Requesting TITLE variable....", ">>");
 			hr = client.saveDataRequestAsync(new DataRequest(
 				requestId: (uint)Requests.REQUEST_ID_2_STR,
 				resultType: CalcResultType.String,
 				calculatorCode: "(A:TITLE, String)",
-				valueSize: 32,
+				valueSize: 64,
 				period: UpdatePeriod.Once,
 				interval: 0,
 				deltaEpsilon: 0.0f)
 			);
-			if (hr == HR.OK) {
-				Log($"Requested TITLE variable.", ">>");
-				if (!dataUpdateEvent.WaitOne(1000))
-					Log("Data subscription update timed out!", "!!");
-			}
+			if (hr == HR.OK)
+				AwaitData();
 
 			// Test getting a list of our data requests back from the Client.
 			Log("Saved Data Requests:", "::");
@@ -151,11 +147,10 @@ namespace CS_BasicConsole
 			foreach (DataRequestRecord dr in requests)
 				Log(dr.ToString());  // Another convenient ToString() override for logging
 
-			// OK, that was fun... now remove the data subscriptions. We could have done it in the loop above but we're testing things here...
-			// The server will also remove all our subscriptions when we disconnect, but it's nice to be polite!
-			var requestIds = client.dataRequestIdsList();
-			foreach (uint id in requestIds)
-				client.removeDataRequest(id);
+			// Test removing a data subscription.
+			hr = client.removeDataRequest((uint)Requests.REQUEST_ID_2_STR);
+			if (hr != HR.OK)
+				Log($"removeDataRequest() for TITLE var returned error result {hr}", "!!");
 
 			// Get a list of all local variables...
 			// Connect to the list results Event
@@ -163,18 +158,76 @@ namespace CS_BasicConsole
 			// Request the list.
 			client.list(LookupItemType.LocalVariable);
 			// Results will arrive asynchronously, so we wait a bit.
-			if (!dataUpdateEvent.WaitOne(3000))
-				Log("List results timed out!", "!!");
+			AwaitData(3000);
 
 			// Look up a Key Event ID by name;
 			const string eventName = "ATC_MENU_OPEN";  // w/out the "KEY_" prefix.
-			if (client.lookup(LookupItemType.KeyEventId, eventName, out var varId) == HR.OK)
-				Log($"Got lookup ID: 0x{varId:X} for {eventName}", "<<");
+			if (client.lookup(LookupItemType.KeyEventId, eventName, out var keyId) == HR.OK)
+				Log($"Got lookup ID: 0x{keyId:X} for {eventName}", "<<");
+
+			// Trigger the event we just looked up (it won't actually work since all the "ATC_MENU" events are broken in MSFS).
+			client.sendKeyEvent((uint)keyId);
 
 			// Try sending a Command directly to the server and wait for a response (Ack/Nak).
 			// In this case we'll use a "SendKey" command to activate a Key Event by the ID which we just looked up
-			if (client.sendCommandWithResponse(new Command() { commandId = CommandId.SendKey, uData = (uint)varId }, out var cmdResp) == HR.OK)
+			// (which does the same thing we just did above with `sendKeyEvent()`).
+			if (client.sendCommandWithResponse(new Command() { commandId = CommandId.SendKey, uData = (uint)keyId }, out var cmdResp) == HR.OK)
 				Log($"Got response for SendKey command: {cmdResp}", "<<");
+
+			// Custom calculator event tests.
+
+			// Let's say we want a simple way to toggle a variable value using some RPN code (or repeatedly execute any kind of calculator code).
+			// We could use `executeCalculatorCode()` each time, but this isn't very efficient because the code string has to be built, sent,
+			// parsed, compiled on the sim side, and then finally executed. Using pre-defined "calculator events" we can skip all the preliminary
+			// steps and simply trigger the execution of pre-compiled RPN code via a numeric event ID.
+			//
+			// For this test we're just going to toggle the test Local variable we created earlier between the values of 0 and 1 based on its current value,
+			// using the following basic RPN code:
+			// (L:WASIM_TEST_VAR_1) 1 == if{ 0 (>L:WASIM_TEST_VAR_1) } els{ 1 (>L:WASIM_TEST_VAR_1) }
+			calcCode = "(L:" + variableName + ") 1 == if{ 0 (>L:" + variableName + ") } els{ 1 (>L:" + variableName + ") }";
+
+			// We need to register that calculator code with the WASim client/server, and we'll use a unique ID to refer to this event later on.
+			// The ID is arbitrary (just like request IDs) -- it could be an const enum value, dynamically generated, or whatever else ensures a unique number per event.
+			const uint customEventId = 1;
+			// We can, optionally, also provide our own name for this custom event when we register it.
+			// This name could be used to trigger this custom event from _any_ standard SimConnect client (by mapping to the name using `SimConnect_MapClientEventToSimEvent()`
+			// and then triggering with `SimConnect_TransmitClientEvent[_EX1]()`).
+			// We don't really need a custom name for this example, but we can actually make use of this later to test another feature.
+			hr = client.registerEvent(new RegisteredEvent(customEventId, calcCode, "MyEvents.ToggleTestVariable"));
+			if (hr == HR.OK) {
+				// Assuming that worked, we can now trigger the custom event in various ways. Since we're still "watching" the test local variable for changes,
+				// we should see a new value every time we trigger this event.
+				if ((hr = client.transmitEvent(customEventId)) == HR.OK)
+					AwaitData();
+				else
+					Log($"transmitEvent() returned error result 0x{hr:X}", "!!");
+			}
+			else {
+				Log($"Registration of custom calculator event ID {customEventId} with RPN code '{calcCode}' failed with error 0x{hr:X}", "!!");
+			}
+
+			// Custom named event registration and triggering test (new for v1.3.0).
+			// This tests setting up a custom-named simulator event, which are typically created by 3rd-party aircraft models, such as the FlyByWire A32NX.
+			// Here we're (redundantly) using our own custom-named "calculator event" we set up above, just because we know it exists (vs. relying on some specific model to be installed).
+
+			// First the custom-named event needs to be registered with the client. Note we're using the same event name here as we used in the `registerEvent()` call above.
+			// This sets up a SimConnect mapping to a generated unique ID. We want to save this ID and use it later to trigger the event efficiently (w/out needing to use the event name again).
+			hr = client.registerCustomKeyEvent("MyEvents.ToggleTestVariable", out uint customNamedEventId);
+			if (hr == HR.OK) {
+				// A successful registration means we can now use the generated event ID to trigger the custom event,
+				// using the same `sendKeyEvent()` method as we'd use for a "standard" Key Event.
+				Log($"registerCustomKeyEvent() succeeded, returned Event ID {customNamedEventId}");
+				// Trigger the event. Should get a variable value change message after this, or a timeout if something went wrong.
+				if ((hr = client.sendKeyEvent(customNamedEventId)) == HR.OK)
+					AwaitData();
+				else
+					Log($"sendKeyEvent() returned error result 0x{hr:X}", "!!");
+			}
+			else {
+				Log($"registerCustomKeyEvent() returned error result 0x{hr:X}", "!!");
+			}
+
+			// Finished, disconnect.
 
 			// Shutdown (really just the Dispose() will close any/all connections anyway, but this is for example).
 			client.disconnectServer();
@@ -201,6 +254,8 @@ namespace CS_BasicConsole
 		{
 			Log($"Got {lr.list.Count} results for list type {lr.listType}. (Uncomment next line in ListResultsHandler() to print them.)");
 			//Log(lr.ToString());  // To print all the items just use the ToString() override.
+			//Log("End of list results.");
+
 			// signal completion
 			dataUpdateEvent.Set();
 		}
@@ -220,6 +275,15 @@ namespace CS_BasicConsole
 				Log("Could not convert result data to value!", "!!");
 			// signal completion
 			dataUpdateEvent.Set();
+		}
+
+		// Helper function to wait for data to arrive or time out with a log message.
+		static bool AwaitData(int ms = 1000)
+		{
+			if (dataUpdateEvent.WaitOne(ms))
+				return true;
+			Log("Data update timed out!", "!!");
+			return false;
 		}
 
 		static void Log(string msg, string prfx = "=:")
