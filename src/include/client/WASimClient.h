@@ -339,17 +339,25 @@ static const uint32_t CUSTOM_KEY_EVENT_ID_MIN = 0x00020000;
 		///   A 'Nak' means the event ID is clearly not valid (eg. zero), but otherwise the simulator provides no feedback about event execution
 		///   (from [their docs](https://docs.flightsimulator.com/html/Programming_Tools/WASM/Gauge_API/trigger_key_event_EX1.htm#return_values): "If the event requested is not appropriate, it will simply not happen."). \n\n
 		///   For _custom named_ events, triggered via `SimConnect_TransmitClientEvent[_EX1()]`, SimConnect may asynchronously send EXCEPTION type response messages if the ID isn't valid
-		///   (likely because the event hasn't been successfully registered with `registerCustomKeyEvent()`). These messages are passed through to WASimClient's logging facilities at the \refwce{LogLevel.Warning} level.
+		///   (likely because the event hasn't been successfully registered with `registerCustomKeyEvent()`). These messages are passed through to WASimClient's logging facilities at the `Warning` level.
+		///   But again there is no actual confirmation that the event is going to do anything.
 		/// \since v1.3.0 - Added ability to trigger custom named events.
 		HRESULT sendKeyEvent(uint32_t keyEventId, uint32_t v1 = 0, uint32_t v2 = 0, uint32_t v3 = 0, uint32_t v4 = 0, uint32_t v5 = 0) const;
 
-		/// This is an overloaded method. See `sendKeyEvent(uint32_t, uint32_t, uint32_t, uint32_t, uint32_t, uint32_t) const` for main details. This version allows triggering Key Events by name instead of an ID. \n
-		/// For _standard_ Key Events, on first usage the name is resolved to an ID (using the 'lookup()' method) and the resulting ID (if valid) is cached for future uses. \n\n
-		/// For _custom_ events, the event name **must** have already been registered with `registerCustomKeyEvent()` (which also inserts the name-to-ID mapping into the cache). \n\n
-		/// \note The cache is kept as a simple `std::unordered_map` type, so if you have a better way to save the event IDs from `lookup()` or `registerCustomKeyEvent()`, use that and call the more efficient `sendKeyEvent(uint32_t, ...) const` overload directly.
+		/// This is an overloaded method. See `sendKeyEvent(uint32_t, uint32_t, uint32_t, uint32_t, uint32_t, uint32_t) const` for main details.
+		/// This version allows triggering Key Events by name instead of an ID. \n\n
+		/// All simulator event names must be resolved, or mapped, to a numeric ID before they can be triggered (used).
+		/// The first time this method is invoked with a particular event name, it tries to associate that name with an ID (based on the event name, as described below).
+		/// If successful, the ID is cached, so subsequent calls to this method, with the same event name, will use the cached ID instead of trying to resolve the name again.
+		/// - For _standard_ Key Events, the name is resolved to an ID using the 'lookup()' method and the resulting ID (if valid) is cached for future uses. There **must** be an active server connection for this to work.
+		/// - For _custom_ events (names that contain a "." (period) or start with a "#"), the event is first registered using `registerCustomKeyEvent()` and the resulting ID is cached if that succeeds.
+		///
 		/// \param keyEventName Name of the Event to trigger.
 		/// \param v1,v2,v3,v4,v5 Optional values to pass to the event handler. Defaults are all zeros.
-		/// \return `S_OK` on success, `E_INVALIDARG` if event name could not be resolved to an ID, `E_NOT_CONNECTED` if not connected (server or simulator), `E_TIMEOUT` on server communication failure, or `E_FAIL` on unexpected SimConnect error.
+		/// \return `S_OK` on success, `E_INVALIDARG` if event name could not be resolved to an ID, `E_NOT_CONNECTED` if not connected (server or sim, depending on event type),
+		/// `E_TIMEOUT` on server communication failure, or `E_FAIL` on unexpected SimConnect error.
+		/// \note The name-to-ID cache is kept as a simple `std::unordered_map` type, so if you have a better way to save the event IDs from `lookup()` or `registerCustomKeyEvent()`,
+		/// use that instead, and call the more efficient `sendKeyEvent(eventId, ...)` overload directly.
 		/// \since v1.3.0 - Added ability to trigger custom named events.
 		HRESULT sendKeyEvent(const std::string &keyEventName, uint32_t v1 = 0, uint32_t v2 = 0, uint32_t v3 = 0, uint32_t v4 = 0, uint32_t v5 = 0);
 
@@ -357,7 +365,7 @@ static const uint32_t CUSTOM_KEY_EVENT_ID_MIN = 0x00020000;
 		/// It can also be used to look up a previous registration's ID if the event name has already been registered. \n\n
 		/// Custom event names are mapped to internally-generated unique IDs using a standard SimConnect call to
 		/// [`MapClientEventToSimEvent`](https://docs.flightsimulator.com/html/Programming_Tools/SimConnect/API_Reference/Events_And_Data/SimConnect_MapClientEventToSimEvent.htm#parameters),
-		/// which briefly describes custom event usage and name syntax in the `EventName` parameter description. \n\n
+		/// which briefly describes custom event usage and name syntax in the `EventName` parameter description. This method serves a similar purpose (and in fact eventually calls that same SimConnect function). \n\n
 		/// The mappings must be re-established every time a new connection with SimConnect is made, which WASimClient takes care of automatically. If currently connected to the simulator, the event is immediately mapped,
 		/// otherwise it will be mapped upon the next connection. An event registration can be removed with `removeCustomKeyEvent()` which will prevent any SimConnect mapping from being created upon the _next_ connection. \n\n
 		/// Note that the custom event mapping/triggering feature is actually just a convenience for the WASimClient user and doesn't involve the usual Server interactions (WASimModule) at all. \n
