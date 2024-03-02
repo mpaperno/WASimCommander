@@ -59,6 +59,10 @@ static const HRESULT E_TIMEOUT       = /*ERROR_TIMEOUT*/       1460L | (/*FACILI
 #endif
 /// \}
 
+/// Starting ID range for "Custom Key Events" for use with `registerCustomKeyEvent()` generated IDs.
+/// (This corresponds to the value of `1 + THIRD_PARTY_EVENT_ID_MAX` from SimConnect SDK header file 'MSFS/Legacy/gauges.h'.)
+static const uint32_t CUSTOM_KEY_EVENT_ID_MIN = 0x00020000;
+
 //----------------------------------------------------------------------------
 //        Struct definitions
 //----------------------------------------------------------------------------
@@ -417,7 +421,7 @@ static const HRESULT E_TIMEOUT       = /*ERROR_TIMEOUT*/       1460L | (/*FACILI
 		/// \return `S_OK` on success; If currently connected to the server, may also return `E_TIMEOUT` on general server communication failure.
 		HRESULT setDataRequestsPaused(bool paused) const;
 
-		// Calculator Custom Events --------------------------
+		// Custom Calculator Events --------------------------
 
 		/// Register a reusable event which executes a pre-set calculator string. The code is pre-compiled and stored on the server for quicker execution.
 		/// The event can have an optional custom name for direct use with any SimConnect client. Registered events can also be triggered by using the `transmitEvent()` method.
@@ -443,54 +447,72 @@ static const HRESULT E_TIMEOUT       = /*ERROR_TIMEOUT*/       1460L | (/*FACILI
 		/// Returns a list of all registered events which have been added to the Client with `registerEvent()`. The list members are created by copy.
 		std::vector<RegisteredEvent> registeredEvents() const;
 
-		// Simulator Custom Events --------------------------
+		// Simulator Key Events --------------------------
 
-		/// Register a Simulator Custom Event by providing the Custom Event name. The method optionally returns the Custom Event ID after registration if successful.
-		/// Simulator Custom Event names contain a '.'. If not, it is a Simulator Key Event and doesn't require registration as WASimCommander already knows their names and ID's.
-		/// \param customEventName Name of the Event to register.
-		/// \param customEventId Pointer to 32-bit unsigned integer variable to hold the customEventId. The range is within THIRD_PARTY_EVENT_ID_MIN and THIRD_PARTY_EVENT_ID_MAX.
-		/// \return `S_OK` on success, `E_INVALIDARG` if the Simulator Custom Event name doesn't contain a '.' (which implies that it is a Simulator Key Event)
-		HRESULT registerCustomEvent(const std::string &customEventName, uint32_t* puiCustomEventId = nullptr);
-		/// Remove a Custom Event previously registered with `registerCustomEvent()` method by using the 'eventId'
-		/// SimConnect provides no way to remove an earlier registered Custom Event with the SimConnect method MapClientEventToSimEvent.
-		/// All 'removeCustomEvent()' is doing, is removing the Custom Event from the maps 'customEventNameCache' and 'customEventIdCache'.
-		/// \param eventId ID of the previously registered event.
-		/// \return `S_OK` on success, `E_INVALIDARG` if the eventId wasn't found.
-		HRESULT removeCustomEvent(uint32_t eventId);
-		/// Remove a Custom Event previously registered with `registerCustomEvent()` method using the 'customEventName'
-		/// SimConnect provides no way to remove an earlier registered Custom Event with the SimConnect method MapClientEventToSimEvent.
-		/// All 'removeCustomEvent()' is doing, is removing the Custom Event from the maps 'customEventNameCache' and 'customEventIdCache'.
-		/// \param customEventName Name of the previously registered event.
-		/// \return `S_OK` on success, `E_INVALIDARG` if the customEventName wasn't found.
-		HRESULT removeCustomEvent(const std::string& customEventName);
-
-		// Simulator Custom Events and Simulator Key Events --------------------------
-
-		/// Can be used to trigger both Simulator Key Events or Simulator Custom Events with up to 5 optional values which are passed onto the event handler.
-		/// This is equivalent to the MSFS Gauge API function `trigger_key_event_EX1()` and similar to `SimConnect_TransmitClientEvent_EX1()` (MSFS SU10 and above).
-		/// Simulator Key Events don't need registration. Event names can be resolved to IDs using the 'lookup()' method and can also be found in the header file 'MSFS/Legacy/gauges.h'
-		/// Simulator Custom Events first need to be registered with 'registerCustomEvent()', which returns the ID.
-		/// Simulator Key Events need server connection. Simulator Custom Events only need simulator connection. If the required connection is not made, the return value is E_NOT_CONNECTED.
+		/// Can be used to trigger standard Simulator "Key Events" as well as "custom" _Gauge API/SimConnect_ events. Up to 5 optional values can be passed onto the event handler.
+		/// This provides functionality similar to the _Gauge API_ function `trigger_key_event_EX1()` and `SimConnect_TransmitClientEvent[_EX1()]`.  \n\n
+		/// *Standard* Key Event IDs can be found in the SimConnect SDK header file 'MSFS/Legacy/gauges.h' in the form of `KEY_*` macro values, and event names can also be
+		/// resolved to IDs programmatically using the `lookup()` method. No preliminary setup is required to trigger these events, but a full connection to WASimModule ("Server") is needed.
+		/// These are triggered on the simulator side using `trigger_key_event_EX1()` function calls. \n\n
+		/// *Custom Events* for which a numeric ID is already known (typically in the _Gauge API_ `THIRD_PARTY_EVENT_ID_MIN`/`THIRD_PARTY_EVENT_ID_MAX` ID range)
+		/// can also be triggered directly as with standard events. These types of events are also passed directly to `trigger_key_event_EX1()`. \n\n
+		/// *Named Custom Events*, for which an ID is not known or predefined, **must** first be registered with `registerCustomKeyEvent()`, which creates and maps (and optionally returns)
+		/// a unique ID corresponding to the custom event name. An active simulator (SimConnect) connection is required to trigger these types of events.
+		/// They are invoked via `SimConnect_TransmitClientEvent[_EX1()]` method directly from this client (this is actually just a convenience for the WASimClient user to avoid needing a separate SimConnect session).
+		/// Which actual SimConnect function is used depends on how the custom event was registered (default is to use the newer "_EX1" version which allows up to 5 event values). \n
+		/// See docs for `registerCustomKeyEvent()` for further details on using custom simulator events.
 		/// \param keyEventId Numeric ID of the Event to trigger.
-		/// \param v1-v5 Optional values to pass to the event handler. Defaults are all zeros.
-		/// \return `S_OK` on success, `E_NOT_CONNECTED` if not connected (see above), `E_TIMEOUT` on server communication failure, or `E_FAIL` on unexpected SimConnect error.
-		/// \note For Simulator Key Events, Server responds asynchronously with an Ack/Nak response to `CommandId::SendKey` command type; A Nak means the event ID is not valid.
-		/// \since v1.1.0 - Simulator Custom Events added since v1.2.1
+		/// \param v1,v2,v3,v4,v5 Optional values to pass to the event handler. Defaults are all zeros.
+		/// \return `S_OK` on success, `E_NOT_CONNECTED` if not connected (server or sim, see above), `E_TIMEOUT` on server communication failure, or `E_FAIL` on unexpected SimConnect error.
+		/// \note For Key Events triggered via `trigger_key_event_EX1()`, Server responds asynchronously with an Ack/Nak response to \refwce{CommandId::SendKey} command type;
+		///   A 'Nak' means the event ID is clearly not valid (eg. zero), but otherwise the simulator provides no feedback about event execution
+		///   (from [their docs](https://docs.flightsimulator.com/html/Programming_Tools/WASM/Gauge_API/trigger_key_event_EX1.htm#return_values): "If the event requested is not appropriate, it will simply not happen."). \n\n
+		///   For _custom named_ events, triggered via `SimConnect_TransmitClientEvent[_EX1()]`, SimConnect may asynchronously send EXCEPTION type response messages if the ID isn't valid
+		///   (likely because the event hasn't been successfully registered with `registerCustomKeyEvent()`). These messages are passed through to WASimClient's logging facilities at the \refwce{LogLevel.Warning} level.
+		/// \since v1.3.0 - Added ability to trigger custom named events.
 		HRESULT sendKeyEvent(uint32_t keyEventId, uint32_t v1 = 0, uint32_t v2 = 0, uint32_t v3 = 0, uint32_t v4 = 0, uint32_t v5 = 0) const;
 
-		/// Can be used to trigger both Simulator Key Events or Simulator Custom Events by name with up to 5 optional values which are passed onto the event handler.
-		/// This is equivalent to the MSFS Gauge API function `trigger_key_event_EX1()` and similar to `SimConnect_TransmitClientEvent_EX1()` (MSFS SU10 and above).
-		/// For Simulator Key Events, on first usage, then name is resolved to an ID (using the 'lookup()' method) and the resulting ID (if valid) is cached for future uses at that moment.
-		/// The cache is kept as a simple `std::unordered_map` type, so if you have a better way to save the event IDs from `lookup()`, use that and call the `sendKeyEvent(uint32_t keyEventId, ...)` overload directly.
-		/// For Simulator Custom events, the name has already been registered (using the 'registerCustomEvent()' method) and the resulting ID is already cached for future uses at that moment.
-		/// You have to keep your own mapping for Simulator Custom Events.
+		/// This is an overloaded method. See `sendKeyEvent(uint32_t, uint32_t, uint32_t, uint32_t, uint32_t, uint32_t) const` for main details. This version allows triggering Key Events by name instead of an ID. \n
+		/// For _standard_ Key Events, on first usage the name is resolved to an ID (using the 'lookup()' method) and the resulting ID (if valid) is cached for future uses. \n\n
+		/// For _custom_ events, the event name **must** have already been registered with `registerCustomKeyEvent()` (which also inserts the name-to-ID mapping into the cache). \n\n
+		/// \note The cache is kept as a simple `std::unordered_map` type, so if you have a better way to save the event IDs from `lookup()` or `registerCustomKeyEvent()`, use that and call the more efficient `sendKeyEvent(uint32_t, ...) const` overload directly.
 		/// \param keyEventName Name of the Event to trigger.
-		/// \param v1-v5 Optional values to pass to the event handler. Defaults are all zeros (same as for `trigger_key_event_EX1()`).
+		/// \param v1,v2,v3,v4,v5 Optional values to pass to the event handler. Defaults are all zeros.
 		/// \return `S_OK` on success, `E_INVALIDARG` if event name could not be resolved to an ID, `E_NOT_CONNECTED` if not connected (server or simulator), `E_TIMEOUT` on server communication failure, or `E_FAIL` on unexpected SimConnect error.
-		/// \note For Simulator Key Events, Server responds asynchronously with an Ack resonse to `CommandId::SendKey` command type.
-		/// \since v1.1.0 - Simulator Custom Events added since v1.2.1
+		/// \since v1.3.0 - Added ability to trigger custom named events.
 		HRESULT sendKeyEvent(const std::string &keyEventName, uint32_t v1 = 0, uint32_t v2 = 0, uint32_t v3 = 0, uint32_t v4 = 0, uint32_t v5 = 0);
 
+		/// Register a "Custom Simulator [Key] Event" by providing an event name. The method optionally returns the generated event ID, which can later be used with `sendKeyEvent()` method instead of the event name.
+		/// It can also be used to look up a previous registration's ID if the event name has already been registered. \n\n
+		/// Custom event names are mapped to internally-generated unique IDs using a standard SimConnect call to
+		/// [`MapClientEventToSimEvent`](https://docs.flightsimulator.com/html/Programming_Tools/SimConnect/API_Reference/Events_And_Data/SimConnect_MapClientEventToSimEvent.htm#parameters),
+		/// which briefly describes custom event usage and name syntax in the `EventName` parameter description. \n\n
+		/// The mappings must be re-established every time a new connection with SimConnect is made, which WASimClient takes care of automatically. If currently connected to the simulator, the event is immediately mapped,
+		/// otherwise it will be mapped upon the next connection. An event registration can be removed with `removeCustomKeyEvent()` which will prevent any SimConnect mapping from being created upon the _next_ connection. \n\n
+		/// Note that the custom event mapping/triggering feature is actually just a convenience for the WASimClient user and doesn't involve the usual Server interactions (WASimModule) at all. \n
+		/// \param customEventName Name of the Event to register. The event name _must_ contain a "." (period) or start with a "#", otherwise an `E_INVALIDARG` result is returned. \n
+		///   If an event with the same name has already been registered, the method returns `S_OK` and no further actions are performed (besides setting the optional `puiCustomEventId` pointer value, see below).
+		/// \param puiCustomEventId Optional pointer to 32-bit unsigned integer variable to return the generated event ID. This ID can be used to trigger the event later using `sendKeyEvent()` (which is more efficient than using the event name each time).
+		///   The ID will always be unique per given event name, and is always equal to or greater than the `Client::CUSTOM_KEY_EVENT_ID_MIN` constant value. \n
+		///   The pointer's value will be populated even if the event name was already registered (with the result of the previously generated ID).
+		/// \param useLegacyTransmit Optional, default `false`. Boolean value indicating that the deprecated `SimConnect_TransmitClientEvent()` function should be used to trigger the event instead of the newer `SimConnect_TransmitClientEvent_EX1()`.
+		///   This may be necessary to support models which haven't updated to the newer version of the event handler. Note that the old `TransmitClientEvent()` function only supports sending 1 event value (vs. 5 for the "_EX1" version). \n
+		///   To re-register the same event name but with a different value for `useLegacyTransmit` parameter, first remove the initial registration with `removeCustomKeyEvent()` and then call this method again.
+		/// \return `S_OK` on success, `E_INVALIDARG` if the event name is invalid.
+		/// \since v1.3.0
+		HRESULT registerCustomKeyEvent(const std::string &customEventName, uint32_t *puiCustomEventId = nullptr, bool useLegacyTransmit = false);
+		/// Remove a Custom Event previously registered with `registerCustomEvent()` method using the event's name.
+		/// This will prevent the custom event from being mapped _next_ time the client connects to SimConnect.
+		/// \note SimConnect provides no way to remove a registered Custom event. Any active SimConnect mapping will remain in effect until SimConnect is disconnected (and can still be invoked with the corresponding ID, but not by name).
+		/// \param customEventName full name of the previously registered event. Must be the same name as used with `registerCustomKeyEvent()`.
+		/// \return `S_OK` on success, `E_INVALIDARG` if the eventId wasn't found.
+		/// \since v1.3.0
+		HRESULT removeCustomKeyEvent(const std::string &customEventName);
+		/// This is an overloaded method. Same as `removeCustomKeyEvent(const string &)` but the event can be specified using the associated numeric event ID (originally returned from `registerCustomKeyEvent()`) instead of the name.
+		/// \param eventId ID of the previously registered event.
+		/// \return `S_OK` on success, `E_INVALIDARG` if the eventId wasn't found.
+		/// \since v1.3.0
+		HRESULT removeCustomKeyEvent(uint32_t eventId);
 
 		// Meta data retrieval --------------------------------
 

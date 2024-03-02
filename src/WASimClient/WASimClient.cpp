@@ -45,11 +45,6 @@ prior written authorization from the authors.
 
 #define LOGFAULT_THREAD_NAME  WSMCMND_CLIENT_NAME
 
-// Third parties can use Simulator Custom Events in this range to communicate between 3D VC's and 2D C++ gauges.
-// these defines can be found in gauges.h
-#define THIRD_PARTY_EVENT_ID_MIN        		0x00011000
-#define THIRD_PARTY_EVENT_ID_MAX        		0x0001FFFF
-
 #include "client/WASimClient.h"
 //#include "private/wasimclient_p.h"
 #include "utilities.h"
@@ -64,6 +59,8 @@ using namespace WASimCommander::Utilities;
 using namespace WASimCommander::Enums;
 /// \private
 using Clock = std::chrono::steady_clock;
+
+static const uint32_t CUSTOM_KEY_EVENT_LEGACY_TRIGGER_FLAG = 0x80000000;
 
 // -------------------------------------------------------------
 #pragma region DataRequestRecord struct
@@ -235,7 +232,6 @@ class WASimClient::Private
 	atomic_size_t totalDataAlloc = 0;
 	atomic_uint32_t nextDefId = SIMCONNECTID_LAST;
 	atomic_uint32_t nextCmdToken = 1;
-	atomic_uint32_t nextCustomEventID = THIRD_PARTY_EVENT_ID_MIN;
 	atomic_bool runDispatchLoop = false;
 	atomic_bool simConnected = false;
 	atomic_bool serverConnected = false;
@@ -257,21 +253,17 @@ class WASimClient::Private
 	mutable shared_mutex mtxResponses;
 	mutable shared_mutex mtxRequests;
 	mutable shared_mutex mtxEvents;
-	mutable shared_mutex mtxCustomEvents;
 
 	responseMap_t reponses {};
 	requestMap_t requests {};
 	eventMap_t events {};
 
-	// Cached mapping of Key Event names to actual IDs, used in `sendKeyEvent(string)` convenience overload.
-	using eventNameCache_t = unordered_map<std::string, int32_t>;
-	eventNameCache_t keyEventNameCache {};
+	// Cached mapping of Key Event names to actual IDs, used in `sendKeyEvent(string)` convenience overload,
+	// and also to track registered (mapped) custom-named sim Events as used in `registerCustomKeyEvent()` and related methods.
+	unordered_map<std::string, uint32_t> keyEventNameCache {};
 	shared_mutex mtxKeyEventNames;
+	uint32_t nextCustomEventID = CUSTOM_KEY_EVENT_ID_MIN;  // auto-generated IDs for custom event registrations
 
-	eventNameCache_t customEventNameCache{};
-	using customEventIdCache_t = unordered_map<uint32_t, std::string>; // keeps track of which Id's have successfully been registered (avoid exception when triggering non-registered events)
-	customEventIdCache_t customEventIdCache{};
-	
 #pragma endregion
 #pragma region  Callback handling templates  ----------------------------------------------
 
@@ -613,7 +605,7 @@ class WASimClient::Private
 		// possibly re-register SimConnect CDAs for any existing data requests
 		registerAllDataRequestAreas();
 		// re-register all Simulator Custom Events
-		registerAllCustomEvents();
+		registerAllCustomKeyEvents();
 
 		setStatus(ClientStatus::SimConnected);
 		return S_OK;
@@ -1215,22 +1207,6 @@ class WASimClient::Private
 		return sendEventRegistration(findTrackedEvent(eventId));
 	}
 
-	// called from connectSimulator()
-	void registerAllCustomEvents()
-	{
-		unique_lock lock(mtxCustomEvents);
-		customEventIdCache.clear();
-		for (auto& [name, id] : customEventNameCache) {
-			HRESULT hr;
-			if FAILED(hr = INVOKE_SIMCONNECT(MapClientEventToSimEvent, hSim, (SIMCONNECT_CLIENT_EVENT_ID)id, name.c_str()))
-				LOG_ERR << "registerAllCustomEvents: Custom Event name " << quoted(name) << " with id " << id << " failed";
-			else {
-				LOG_INF << "registerAllCustomEvents: Custom Event name " << quoted(name) << " with id " << id << " succeeded";
-				customEventIdCache.insert(std::pair{ id, name });
-			}
-		}
-	}
-
 	// called from connectServer()
 	void registerAllEvents()
 	{
@@ -1249,50 +1225,53 @@ class WASimClient::Private
 
 #pragma endregion
 
-#pragma region Simulator Custom Events -------------------------------------------
-
-	// Sends Custom Event using TransmitClientEvent(_EX1)
-	HRESULT writeCustomEvent(uint32_t keyEventId, uint32_t v1, uint32_t v2, uint32_t v3, uint32_t v4, uint32_t v5)
-	{
-		if (!simConnected)
-		{
-			LOG_ERR << "writeCustomEvent: Simulator not connected, cannot send Simulator Custom Event.";
-			return E_NOT_CONNECTED;
-		}
-		const Private::customEventIdCache_t::iterator pos = customEventIdCache.find(keyEventId);
-		if (pos == customEventIdCache.cend())
-		{
-			LOG_ERR << "writeCustomEvent: customEvent " << keyEventId << " has not successfully been registered.";
-			return E_FAIL;
-		}
-		LOG_DBG << "writeCustomEvent: Sending Simulator Custom Event: EventId: " << keyEventId << "; v1: " << v1 << "; v2: " << v2 << "; v3: " << v3 << "; v4: " << v4 << "; v5: " << v5;
-		return INVOKE_SIMCONNECT(
-			TransmitClientEvent_EX1,
-			hSim,
-			(DWORD)0,
-			(SIMCONNECT_CLIENT_EVENT_ID)keyEventId,
-			SIMCONNECT_GROUP_PRIORITY_HIGHEST,
-			SIMCONNECT_EVENT_FLAG_GROUPID_IS_PRIORITY,
-			(DWORD)v1,
-			(DWORD)v2,
-			(DWORD)v3,
-			(DWORD)v4,
-			(DWORD)v5);
-	}
-
-#pragma endregion
-
 #pragma region Simulator Key Events -------------------------------------------
 
 	// Writes KeyEvent data to the corresponding CDA.
-	HRESULT writeKeyEvent(const KeyEvent &kev)
+	HRESULT writeKeyEvent(const KeyEvent &kev) const
 	{
 		if (!isConnected()) {
-			LOG_ERR << "Server not connected, cannot send Simulator Key Event " << kev;
+			LOG_ERR << "Server not connected, cannot send " << kev;
 			return E_NOT_CONNECTED;
 		}
-		LOG_DBG << "Sending Simulator Key Event: " << kev;
+		LOG_TRC << "Sending: " << kev;
 		return INVOKE_SIMCONNECT(SetClientData, hSim, (SIMCONNECT_CLIENT_DATA_ID)CLI_DATA_KEYEVENT, (SIMCONNECT_CLIENT_DATA_DEFINITION_ID)CLI_DATA_KEYEVENT, SIMCONNECT_CLIENT_DATA_SET_FLAG_DEFAULT, 0UL, (DWORD)sizeof(KeyEvent), (void *)&kev);
+	}
+
+	// Custom Events
+
+	HRESULT registerCustomKeyEvent(uint32_t id, const std::string &name) const
+	{
+		const HRESULT hr = SimConnectHelper::newClientEvent(hSim, id, name);
+		if SUCCEEDED(hr)
+			LOG_DBG << "Registered custom simulator key event " << quoted(name) << " with id " << id << ".";
+		else
+			LOG_ERR << "Registration custom simulator key event " << quoted(name) << " for id " << id << " failed with HRESULT " << LOG_HR(hr);
+		return hr;
+	}
+
+	// called from connectSimulator()
+	void registerAllCustomKeyEvents()
+	{
+		shared_lock lock(mtxKeyEventNames);
+		for (const auto& [name, id] : keyEventNameCache) {
+			if (id >= CUSTOM_KEY_EVENT_ID_MIN)
+				registerCustomKeyEvent(id, name);
+		}
+	}
+
+	// Sends a registered Custom Event using TransmitClientEvent(_EX1)
+	HRESULT sendSimCustomKeyEvent(uint32_t keyEventId, DWORD v1, DWORD v2, DWORD v3, DWORD v4, DWORD v5) const
+	{
+		if (!simConnected) {
+			LOG_ERR << "Simulator not connected, cannot send a Custom Key Event.";
+			return E_NOT_CONNECTED;
+		}
+
+		LOG_TRC << "Invoking " << ((keyEventId & CUSTOM_KEY_EVENT_LEGACY_TRIGGER_FLAG) ? "TransmitClientEvent" : "TransmitClientEvent_EX1") << " with Event ID " << keyEventId << "; values: " << v1 << "; " << v2 << "; " << v3 << "; " << v4 << "; " << v5 << ';';
+		if (keyEventId & CUSTOM_KEY_EVENT_LEGACY_TRIGGER_FLAG)
+			return INVOKE_SIMCONNECT(TransmitClientEvent, hSim, SIMCONNECT_OBJECT_ID_USER, (SIMCONNECT_CLIENT_EVENT_ID)keyEventId, v1, SIMCONNECT_GROUP_PRIORITY_HIGHEST, SIMCONNECT_EVENT_FLAG_GROUPID_IS_PRIORITY);
+		return INVOKE_SIMCONNECT(TransmitClientEvent_EX1, hSim, SIMCONNECT_OBJECT_ID_USER, (SIMCONNECT_CLIENT_EVENT_ID)keyEventId, SIMCONNECT_GROUP_PRIORITY_HIGHEST, SIMCONNECT_EVENT_FLAG_GROUPID_IS_PRIORITY, v1, v2, v3, v4, v5);
 	}
 
 #pragma endregion
@@ -1792,132 +1771,92 @@ vector<RegisteredEvent> WASimClient::registeredEvents() const
 
 #pragma endregion Calculator Events
 
-#pragma region Custom Events ----------------------------------------------
-
-HRESULT WASimClient::registerCustomEvent(const std::string& customEventName, uint32_t* puiCustomEventId)
-{
-	if (customEventName[0] == '\0') {
-		LOG_ERR << "registerCustomEvent: Parameter 'customEventName' cannot be empty.";
-		return E_INVALIDARG;
-	}
-
-	if (customEventName.find('.') == string::npos) {
-		LOG_ERR << "registerCustomEvent: " << quoted(customEventName) << " is not a Custom Event (doen't include '.').";
-		return E_INVALIDARG;
-	}
-
-	uint32_t keyId;
-
-	// Protect the below code with a unique_lock to guarantee correct behavior when 2 threads register the same Custom Event at the same time (unlikely to happen)
-	// If not using a unique_lock, both threads might not find the Custom Event in the customEventNameCache yet, and each register the (same) Custom Event
-	unique_lock lock(d->mtxCustomEvents);
-	const Private::customEventNameCache_t::iterator pos = d->customEventNameCache.find(customEventName);
-	if (pos != d->customEventNameCache.cend())
-		// Custom Event already exists - return the eventId if required
-		keyId = pos->second;
-	else {
-		// get a new eventId
-		if (d->nextCustomEventID == THIRD_PARTY_EVENT_ID_MAX) {
-			LOG_ERR << "registerCustomEvent: customEventID exceeds THIRD_PARTY_EVENT_ID_MAX.";
-			return E_FAIL;
-		}
-		keyId = d->nextCustomEventID++;
-
-		// Try to register the new Custom Event
-		if (d->simConnected) {
-			HRESULT hr;
-			if FAILED(hr = INVOKE_SIMCONNECT(MapClientEventToSimEvent, d->hSim, (SIMCONNECT_CLIENT_EVENT_ID)keyId, customEventName.c_str()))
-				return hr;
-			else
-				// Successful registration, add customEventId in the customEventIdCache
-				d->customEventIdCache.insert(std::pair{ keyId, customEventName });
-		}
-		else
-			LOG_DBG << "registerCustomEvent: customEventName " << quoted(customEventName) << " with customEventId " << keyId << " is pending.";
-
-		// Even if not connected, we add the Custom Event in the customEventNameCache
-		// When re-connecting, customEventNameCache is the (only) cache used to register Custom Events later when re-connecting
-		d->customEventNameCache.insert(std::pair{ customEventName, keyId });
-	}
-
-	if (puiCustomEventId)
-		*puiCustomEventId = keyId;
-
-	return S_OK;
-}
-
-HRESULT WASimClient::removeCustomEvent(uint32_t eventId)
-{
-	// We need a unique_lock, because more then 1 thread might remove the same Custom Event at the same time
-	unique_lock lock(d->mtxCustomEvents);
-	const Private::customEventIdCache_t::iterator pos = d->customEventIdCache.find(eventId);
-	if (pos == d->customEventIdCache.cend()) {
-		LOG_ERR << "registerCustomEvent: customEventID " << eventId << " doesn't exist.";
-		return E_INVALIDARG;
-	}
-	else
-	{
-		d->customEventNameCache.erase(pos->second);
-		d->customEventIdCache.erase(pos->first);
-	}
-	return S_OK;
-}
-
-HRESULT WASimClient::removeCustomEvent(const std::string& customEventName)
-{
-	// We need a unique_lock, because more then 1 thread might remove the same Custom Event at the same time
-	unique_lock lock(d->mtxCustomEvents);
-	const Private::customEventNameCache_t::iterator pos = d->customEventNameCache.find(customEventName);
-	if (pos == d->customEventNameCache.cend()) {
-		LOG_ERR << "registerCustomEvent: customEventName " << customEventName << " doesn't exist.";
-		return E_INVALIDARG;
-	}
-	else
-	{
-		d->customEventIdCache.erase(pos->second);
-		d->customEventNameCache.erase(pos->first);
-	}
-	return S_OK;
-}
-
-#pragma endregion Custom Events
-
 #pragma region Key Events ----------------------------------------------
 
 HRESULT WASimClient::sendKeyEvent(uint32_t keyEventId, uint32_t v1, uint32_t v2, uint32_t v3, uint32_t v4, uint32_t v5) const
 {
-	if (keyEventId >= THIRD_PARTY_EVENT_ID_MIN)
-		// we're dealing with a Simulator Key Event
-		return d->writeCustomEvent(keyEventId, v1, v2, v3, v4, v5);
+	if (keyEventId < CUSTOM_KEY_EVENT_ID_MIN)
+		return d_const->writeKeyEvent(KeyEvent(keyEventId, { v1, v2, v3, v4, v5 }, d->nextCmdToken++));
 	else
-		// we're dealing with a Simulator Key Event
-		return d->writeKeyEvent(KeyEvent(keyEventId, { v1, v2, v3, v4, v5 }, d->nextCmdToken++));
+		return d_const->sendSimCustomKeyEvent(keyEventId, v1, v2, v3, v4, v5);
 }
 
 HRESULT WASimClient::sendKeyEvent(const std::string & keyEventName, uint32_t v1, uint32_t v2, uint32_t v3, uint32_t v4, uint32_t v5)
 {
-	// check the customEventNameCache
-	Private::customEventNameCache_t::iterator posCE = d->customEventNameCache.find(keyEventName);
-	if (posCE != d->customEventNameCache.cend())
-		return sendKeyEvent(posCE->second, v1, v2, v3, v4, v5);
-
-	// check the keyEventNameCache
-	int32_t keyId;
-	shared_lock rdlock(d_const->mtxKeyEventNames);
-	Private::eventNameCache_t::iterator posKE = d->keyEventNameCache.find(keyEventName);
-	if (posKE != d->keyEventNameCache.cend()) {
-		keyId = posKE->second;
+	uint32_t keyId;
+	// check the cache first -- this stores both standard key events and custom (mapped) types.
+	shared_lock rdlock(d->mtxKeyEventNames);
+	const auto pos = d_const->keyEventNameCache.find(keyEventName);
+	if (pos != d_const->keyEventNameCache.cend()) {
+		keyId = pos->second;
 	}
 	else {
-		// try a lookup
-		HRESULT hr;
-		if ((hr = lookup(LookupItemType::KeyEventId, keyEventName, &keyId)) != S_OK)
+		// try a lookup -- this will only work for standard Key Events, not custom ones (those must be registered first).
+		int32_t id;
+		const HRESULT hr = lookup(LookupItemType::KeyEventId, keyEventName, &id);
+		if FAILED(hr)
 			return hr == E_FAIL ? E_INVALIDARG : hr;
+		keyId = (uint32_t)id;
 		rdlock.unlock();
-		unique_lock rwlock(d_const->mtxKeyEventNames);
+		unique_lock rwlock(d->mtxKeyEventNames);
 		d->keyEventNameCache.insert(std::pair{keyEventName, keyId});
 	}
-	return sendKeyEvent((uint32_t)keyId, v1, v2, v3, v4, v5);
+
+	return sendKeyEvent(keyId, v1, v2, v3, v4, v5);
+}
+
+// Custom-named Key Event registration
+
+HRESULT WASimClient::registerCustomKeyEvent(const std::string &customEventName, uint32_t *puiCustomEventId, bool useLegacyTransmit)
+{
+	if (customEventName[0] != '#' && customEventName.find('.') == string::npos) {
+		LOG_ERR << "Custom event name " << quoted(customEventName) << " must start with '#' or include a period.";
+		return E_INVALIDARG;
+	}
+
+	// Prevent multiple threads from registering the same Event
+	unique_lock lock(d->mtxKeyEventNames);
+	// Check for duplicates.
+	const auto pos = d_const->keyEventNameCache.find(customEventName);
+	if (pos != d_const->keyEventNameCache.cend()) {
+		// Custom Event already exists - return the eventId if required
+		if (puiCustomEventId)
+			*puiCustomEventId = pos->second;
+		return S_OK;
+	}
+
+	// Register a new event mapping with a unique ID. These start at CUSTOM_KEY_EVENT_ID_MIN.
+	uint32_t keyId = d->nextCustomEventID++;
+	// Use high bit as flag of ID for forcing "legacy" SimConnect_TransmitClientEvent() usage as trigger.
+	if (useLegacyTransmit)
+			keyId |= CUSTOM_KEY_EVENT_LEGACY_TRIGGER_FLAG;
+	// Cache the event name and ID. This is possibly used for lookups later in `sendKeyEvent(string)` and/or to register event mappings when (re)connecting to SimConnect.
+	d->keyEventNameCache.insert(std::pair{ customEventName, keyId });
+
+	if (puiCustomEventId)
+		*puiCustomEventId = keyId;
+
+	// Try to register the new Event now if already connected to SimConnect.
+	if (d_const->simConnected)
+		return d_const->registerCustomKeyEvent(keyId, customEventName);
+	LOG_DBG << "Queued registration of custom simulator key event " << quoted(customEventName) << " with ID " << keyId << ".";
+	return S_OK;
+}
+
+HRESULT WASimClient::removeCustomKeyEvent(uint32_t eventId)
+{
+	unique_lock lock(d->mtxKeyEventNames);
+	const auto pos = find_if(cbegin(d_const->keyEventNameCache), cend(d_const->keyEventNameCache), [eventId](const auto &p) { return p.second == eventId; });
+	if (pos == d_const->keyEventNameCache.cend())
+		return E_INVALIDARG;
+	d->keyEventNameCache.erase(pos);
+	return S_OK;
+}
+
+HRESULT WASimClient::removeCustomKeyEvent(const std::string &customEventName)
+{
+	unique_lock lock(d->mtxKeyEventNames);
+	return d->keyEventNameCache.erase(customEventName) > 0 ? S_OK : E_INVALIDARG;
 }
 
 #pragma endregion Key Events
