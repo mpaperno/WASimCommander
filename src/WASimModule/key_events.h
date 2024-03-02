@@ -1910,6 +1910,20 @@ namespace WASimCommander {
 			{ "3RD_PARTY_WINDOW_VALIDATE",     KEY_3RD_PARTY_WINDOW_VALIDATE },
 			{ "HELI_BEEP_SET",     KEY_HELI_BEEP_SET },
 
+			// SDK 0.23.1.0
+			{ "WING_FOLD_OFF",    KEY_WING_FOLD_OFF },
+			{ "WING_FOLD_ON",    KEY_WING_FOLD_ON },
+			{ "WING_FOLD_SET",    KEY_WING_FOLD_SET },  // there's already a KEY_SET_WING_FOLD... ??
+			{ "ORNI_DIVE_MODE_OFF",    KEY_ORNI_DIVE_MODE_OFF },
+			{ "ORNI_DIVE_MODE_ON",    KEY_ORNI_DIVE_MODE_ON },
+			{ "ORNI_DIVE_MODE_TOGGLE",    KEY_ORNI_DIVE_MODE_TOGGLE },
+			{ "ORNI_GLIDE_MODE_OFF",    KEY_ORNI_GLIDE_MODE_OFF },
+			{ "ORNI_GLIDE_MODE_ON",    KEY_ORNI_GLIDE_MODE_ON },
+			{ "ORNI_GLIDE_MODE_TOGGLE",    KEY_ORNI_GLIDE_MODE_TOGGLE },
+			{ "ORNI_BOOST_SET",    KEY_ORNI_BOOST_SET },
+			{ "ORNI_WINGS_BRAKE_SET",    KEY_ORNI_WINGS_BRAKE_SET },
+			// ID of KEY_HELI_BEEP_SET changed to follow KEY_ORNI_WINGS_BRAKE_SET
+
 			// Aliases for published Event IDs which do not match KEY IDs
 			{ "ADF1_WHOLE_DEC",                       KEY_ADF_WHOLE_DEC },
 			{ "ADF1_WHOLE_INC",                       KEY_ADF_WHOLE_INC },
@@ -1979,4 +1993,5 @@ namespace WASimCommander {
 		return el == namesMap.cend() ? -1 : el->second;
 	}
 
-};};
+	}; // ns Utilities
+};  // ns WASimCommander
