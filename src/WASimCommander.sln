@@ -27,6 +27,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "client", "client", "{0BFE83
 		include\client\enums.h = include\client\enums.h
 		include\client\enums_impl.h = include\client\enums_impl.h
 		include\client\exports.h = include\client\exports.h
+		include\client\structs.h = include\client\structs.h
 		include\client\WASimClient.h = include\client\WASimClient.h
 	EndProjectSection
 EndProject

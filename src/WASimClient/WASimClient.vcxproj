@@ -253,6 +253,7 @@
   <ItemGroup>
     <ClInclude Include="..\include\client\enums.h" />
     <ClInclude Include="..\include\client\exports.h" />
+    <ClInclude Include="..\include\client\structs.h" />
     <ClInclude Include="..\include\client\WASimClient.h" />
     <ClInclude Include="..\include\enums.h" />
     <ClInclude Include="..\include\enums_impl.h" />
