@@ -35,7 +35,7 @@
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="Logo.png" title="WASimCommander - Remote access to the Microsoft Flight Simulator 2020 Gauge API."/></td>
   <td id="projectalign">
-   <div id="projectname"><!-- WASimCommander --><span id="projectnumber">&#160;v1.2.0.0</span>
+   <div id="projectname"><!-- WASimCommander --><span id="projectnumber">&#160;v1.3.0.0</span>
    </div>
   </td>
  </tr>
@@ -113,10 +113,10 @@ $(document).ready(function(){initNavTree('struct_w_a_sim_commander_1_1_client_1_
 </div><!--header-->
 <div class="contents">
 
-<p>Structure to hold data for registered (reusable) calculator events. Used to submit events with <code><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a098e51fad57fdbd62ef2a45385156c5f" title="Register a reusable event which executes a pre-set calculator string. The code is pre-compiled and st...">WASimClient::registerEvent()</a></code>.  
+<p>Structure to hold data for registered (reusable) calculator events. Used to submit events with <code><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a098e51fad57fdbd62ef2a45385156c5f" title="Register a reusable event which executes a pre-set RPN calculator code string. The code is pre-compil...">WASimClient::registerEvent()</a></code>.  
  <a href="struct_w_a_sim_commander_1_1_client_1_1_registered_event.html#details">More...</a></p>
 
-<p><code>#include &quot;<a class="el" href="_w_a_sim_client_8h_source.html">WASimClient.h</a>&quot;</code></p>
+<p><code>#include &quot;<a class="el" href="include_2client_2structs_8h_source.html">structs.h</a>&quot;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
@@ -140,10 +140,10 @@ Public Attributes</h2></td></tr>
 <tr class="separator:a4fc8ad1b32e699be03c666c8c8165cf0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p >Structure to hold data for registered (reusable) calculator events. Used to submit events with <code><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a098e51fad57fdbd62ef2a45385156c5f" title="Register a reusable event which executes a pre-set calculator string. The code is pre-compiled and st...">WASimClient::registerEvent()</a></code>. </p>
-<p ><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html" title="WASimCommander Client implementation. Handles all aspects of communication with the WASimCommander Se...">WASimClient</a> also holds a list of all registered events which have been added using <code><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a098e51fad57fdbd62ef2a45385156c5f" title="Register a reusable event which executes a pre-set calculator string. The code is pre-compiled and st...">WASimClient::registerEvent()</a></code>. These requests are available for reference using <code><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a180ebb86590c10e461fa842b5020739f" title="Returns a copy of a RegisteredEvent which has been previously added with registerEvent()....">WASimClient::registeredEvent()</a></code> and <code><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#afbedbb0c36870041106648f184e083f4" title="Returns a list of all registered events which have been added to the Client with registerEvent()....">WASimClient::registeredEvents()</a></code> methods. </p><dl class="section see"><dt>See also</dt><dd><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a098e51fad57fdbd62ef2a45385156c5f" title="Register a reusable event which executes a pre-set calculator string. The code is pre-compiled and st...">WASimClient::registerEvent()</a>, WASimCommander::CommandId::Register </dd></dl>
+<div class="textblock"><p >Structure to hold data for registered (reusable) calculator events. Used to submit events with <code><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a098e51fad57fdbd62ef2a45385156c5f" title="Register a reusable event which executes a pre-set RPN calculator code string. The code is pre-compil...">WASimClient::registerEvent()</a></code>. </p>
+<p ><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html" title="WASimCommander Client implementation. Handles all aspects of communication with the WASimCommander Se...">WASimClient</a> also holds a list of all registered events which have been added using <code><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a098e51fad57fdbd62ef2a45385156c5f" title="Register a reusable event which executes a pre-set RPN calculator code string. The code is pre-compil...">WASimClient::registerEvent()</a></code>. These requests are available for reference using <code><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a180ebb86590c10e461fa842b5020739f" title="Returns a copy of a RegisteredEvent which has been previously added with registerEvent()....">WASimClient::registeredEvent()</a></code> and <code><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#afbedbb0c36870041106648f184e083f4" title="Returns a list of all registered events which have been added to the Client with registerEvent()....">WASimClient::registeredEvents()</a></code> methods. </p><dl class="section see"><dt>See also</dt><dd><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a098e51fad57fdbd62ef2a45385156c5f" title="Register a reusable event which executes a pre-set RPN calculator code string. The code is pre-compil...">WASimClient::registerEvent()</a>, WASimCommander::CommandId::Register </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8h_source.html#l00187">187</a> of file <a class="el" href="_w_a_sim_client_8h_source.html">WASimClient.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="include_2client_2structs_8h_source.html#l00149">149</a> of file <a class="el" href="include_2client_2structs_8h_source.html">structs.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="aa23b7f270375bfc1a9561751d12c33c8" name="aa23b7f270375bfc1a9561751d12c33c8"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aa23b7f270375bfc1a9561751d12c33c8">&#9670;&nbsp;</a></span>RegisteredEvent()</h2>
@@ -179,7 +179,7 @@ Public Attributes</h2></td></tr>
 
 <p>Default implicit constructor. </p>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l00085">85</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l00087">87</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
 
 </div>
 </div>
@@ -198,7 +198,7 @@ Public Attributes</h2></td></tr>
 
 <p>A unique ID for this event. The ID can later be used to modify, trigger, or remove this event. </p>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8h_source.html#l00189">189</a> of file <a class="el" href="_w_a_sim_client_8h_source.html">WASimClient.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="include_2client_2structs_8h_source.html#l00151">151</a> of file <a class="el" href="include_2client_2structs_8h_source.html">structs.h</a>.</p>
 
 </div>
 </div>
@@ -216,7 +216,7 @@ Public Attributes</h2></td></tr>
 
 <p>The calculator code string to execute as the event action. The code is pre-compiled and stored on the server for quicker execution. Maximum length is <code><a class="el" href="namespace_w_a_sim_commander.html#ac284312c438e79345d3ccb1bbdc2e327" title="Maximum size of Command::sData member. Size optimizes alignment of Command struct.">WASimCommander::STRSZ_CMD</a></code> value minus the <code>name</code> string length, if one is used. </p>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8h_source.html#l00190">190</a> of file <a class="el" href="_w_a_sim_client_8h_source.html">WASimClient.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="include_2client_2structs_8h_source.html#l00152">152</a> of file <a class="el" href="include_2client_2structs_8h_source.html">structs.h</a>.</p>
 
 </div>
 </div>
@@ -235,12 +235,12 @@ Public Attributes</h2></td></tr>
 <p>Optional custom name for this event. The name is for use with <code>SimConnect_MapClientEventToSimEvent(id, "event_name")</code> and <code>SimConnect_TransmitClientEvent(id)</code>. Default is to use the event ID as a string. If the custom event name contains a period (<code>.</code>) then it is used as-is. Otherwise "WASimCommander.[client_name]." will be prepended to the name. </p>
 <dl class="section note"><dt>Note</dt><dd>The event name <b>cannot be changed</b> after the initial registration (it is essentially equivalent to the <code>eventId</code>). When updating an existing event on the server, it is not necessary to include the name again, only the <code>eventId</code> is required (and the code to execute, of course). Maximum length for the name string is the value of <code><a class="el" href="namespace_w_a_sim_commander.html#a25fbad35e2857e3047170469c199810d" title="Maximum size of custom event name in Enums::CommandId::Register command.">WASimCommander::STRSZ_ENAME</a></code>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8h_source.html#l00192">192</a> of file <a class="el" href="_w_a_sim_client_8h_source.html">WASimClient.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="include_2client_2structs_8h_source.html#l00154">154</a> of file <a class="el" href="include_2client_2structs_8h_source.html">structs.h</a>.</p>
 
 </div>
 </div>
 <hr/>The documentation for this struct was generated from the following files:<ul>
-<li>src/include/client/<a class="el" href="_w_a_sim_client_8h_source.html">WASimClient.h</a></li>
+<li>src/include/client/<a class="el" href="include_2client_2structs_8h_source.html">structs.h</a></li>
 <li>src/WASimClient/<a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a></li>
 </ul>
 </div><!-- contents -->
@@ -250,7 +250,7 @@ Public Attributes</h2></td></tr>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="namespace_w_a_sim_commander.html">WASimCommander</a></li><li class="navelem"><a class="el" href="namespace_w_a_sim_commander_1_1_client.html">Client</a></li><li class="navelem"><a class="el" href="struct_w_a_sim_commander_1_1_client_1_1_registered_event.html">RegisteredEvent</a></li>
-    <li class="footer">Generated for WASimCommander &#160;v1.2.0.0 by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.4 </li>
+    <li class="footer">Generated for WASimCommander &#160;v1.3.0.0 by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.4 </li>
   </ul>
 </div>
 </body>

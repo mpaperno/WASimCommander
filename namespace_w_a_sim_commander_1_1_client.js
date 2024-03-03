@@ -38,5 +38,6 @@ var namespace_w_a_sim_commander_1_1_client =
     [ "ClientEventTypeNames", "namespace_w_a_sim_commander_1_1_client.html#aca8ed18a02bdb57d45886be0d19485cb", null ],
     [ "LogSourceNames", "namespace_w_a_sim_commander_1_1_client.html#ab2aee7671e0d5c0c577a6e28dd3bdde0", null ],
     [ "E_NOT_CONNECTED", "namespace_w_a_sim_commander_1_1_client.html#aaed3e026d9bf1ef254d300587e4dbdb5", null ],
-    [ "E_TIMEOUT", "namespace_w_a_sim_commander_1_1_client.html#a23b8cf1733162a35a02159b38c3af217", null ]
+    [ "E_TIMEOUT", "namespace_w_a_sim_commander_1_1_client.html#a23b8cf1733162a35a02159b38c3af217", null ],
+    [ "CUSTOM_KEY_EVENT_ID_MIN", "namespace_w_a_sim_commander_1_1_client.html#ab1bd21185e813b2cdb9622bb49b34ff8", null ]
 ];

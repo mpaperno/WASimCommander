@@ -35,7 +35,7 @@
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="Logo.png" title="WASimCommander - Remote access to the Microsoft Flight Simulator 2020 Gauge API."/></td>
   <td id="projectalign">
-   <div id="projectname"><!-- WASimCommander --><span id="projectnumber">&#160;v1.2.0.0</span>
+   <div id="projectname"><!-- WASimCommander --><span id="projectnumber">&#160;v1.3.0.0</span>
    </div>
   </td>
  </tr>
@@ -148,7 +148,7 @@ Public Attributes</h2></td></tr>
 <tr class="memdesc:aa2dd2b40458cc54969289a3d96bc4173"><td class="mdescLeft">&#160;</td><td class="mdescRight">Byte size of stored value; can also be one of the predefined DATA_TYPE_* constants.  <a href="struct_w_a_sim_commander_1_1_data_request.html#aa2dd2b40458cc54969289a3d96bc4173">More...</a><br /></td></tr>
 <tr class="separator:aa2dd2b40458cc54969289a3d96bc4173"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab2bd74a4e4251de9d624030c0f9a7adc"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_w_a_sim_commander_1_1_data_request.html#ab2bd74a4e4251de9d624030c0f9a7adc">deltaEpsilon</a></td></tr>
-<tr class="memdesc:ab2bd74a4e4251de9d624030c0f9a7adc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Minimum change in numeric value required to trigger an update. The default of <code>0.0</code> is to send updates only if the value changes, but even on the smallest changes. Setting this to some positive value can be especially useful for high-precision floating-point numbers which may fluctuate within an insignifcant range, but may be used with any numeric value (for integer value types, only the integer part of the epsilon value is considered). Conversely, to send data updates <em>every time</em> the value is read, and skip any comparison check altogether, set this to a negative value like <code>-1.0</code>.  <a href="struct_w_a_sim_commander_1_1_data_request.html#ab2bd74a4e4251de9d624030c0f9a7adc">More...</a><br /></td></tr>
+<tr class="memdesc:ab2bd74a4e4251de9d624030c0f9a7adc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Minimum change in numeric value required to trigger an update. The default of <code>0.0</code> is to send updates only if the value changes, but even on the smallest changes. Setting this to some positive value can be especially useful for high-precision floating-point numbers which may fluctuate within an insignificant range, but may be used with any numeric value (for integer value types, only the integer part of the epsilon value is considered). Conversely, to send data updates <em>every time</em> the value is read, and skip any comparison check altogether, set this to a negative value like <code>-1.0</code>.  <a href="struct_w_a_sim_commander_1_1_data_request.html#ab2bd74a4e4251de9d624030c0f9a7adc">More...</a><br /></td></tr>
 <tr class="separator:ab2bd74a4e4251de9d624030c0f9a7adc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adbf6778bebda3a5555c0ca85724151bc"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_w_a_sim_commander_1_1_data_request.html#adbf6778bebda3a5555c0ca85724151bc">interval</a></td></tr>
 <tr class="memdesc:adbf6778bebda3a5555c0ca85724151bc"><td class="mdescLeft">&#160;</td><td class="mdescRight">How many <code>UpdatePeriod</code> period's should elapse between checks. eg. 500ms or 10 ticks. Zero means to check at every <code>period</code>, <code>1</code> means every other <code>period</code>, etc.  <a href="struct_w_a_sim_commander_1_1_data_request.html#adbf6778bebda3a5555c0ca85724151bc">More...</a><br /></td></tr>
@@ -166,7 +166,7 @@ Public Attributes</h2></td></tr>
 <tr class="memdesc:a2887a2704cbe5a7b5c995a80331c3b62"><td class="mdescLeft">&#160;</td><td class="mdescRight">Some SimVars require an index for access, default is 0.  <a href="struct_w_a_sim_commander_1_1_data_request.html#a2887a2704cbe5a7b5c995a80331c3b62">More...</a><br /></td></tr>
 <tr class="separator:a2887a2704cbe5a7b5c995a80331c3b62"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af120104d3c6fb0588620ac97b57a58f6"><td class="memItemLeft" align="right" valign="top">char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_w_a_sim_commander_1_1_data_request.html#af120104d3c6fb0588620ac97b57a58f6">varTypePrefix</a></td></tr>
-<tr class="memdesc:af120104d3c6fb0588620ac97b57a58f6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Variable type prefix for named variables. Types: 'L' (local), 'A' (SimVar) and 'T' (Token, not an actual GaugeAPI prefix) are checked using respecitive GaugeAPI methods.  <a href="struct_w_a_sim_commander_1_1_data_request.html#af120104d3c6fb0588620ac97b57a58f6">More...</a><br /></td></tr>
+<tr class="memdesc:af120104d3c6fb0588620ac97b57a58f6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Variable type prefix for named variables. Types: 'L' (local), 'A' (SimVar) and 'T' (Token, not an actual GaugeAPI prefix) are checked using respective GaugeAPI methods.  <a href="struct_w_a_sim_commander_1_1_data_request.html#af120104d3c6fb0588620ac97b57a58f6">More...</a><br /></td></tr>
 <tr class="separator:af120104d3c6fb0588620ac97b57a58f6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab43b0b59bb30e13a8e9552bd8a142acd"><td class="memItemLeft" align="right" valign="top">char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_w_a_sim_commander_1_1_data_request.html#ab43b0b59bb30e13a8e9552bd8a142acd">nameOrCode</a> [<a class="el" href="namespace_w_a_sim_commander.html#a84f75f0850267ae220de5e318b3579eb">STRSZ_REQ</a>] = {0}</td></tr>
 <tr class="memdesc:ab43b0b59bb30e13a8e9552bd8a142acd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Variable name or full calculator string.  <a href="struct_w_a_sim_commander_1_1_data_request.html#ab43b0b59bb30e13a8e9552bd8a142acd">More...</a><br /></td></tr>
@@ -602,7 +602,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Minimum change in numeric value required to trigger an update. The default of <code>0.0</code> is to send updates only if the value changes, but even on the smallest changes. Setting this to some positive value can be especially useful for high-precision floating-point numbers which may fluctuate within an insignifcant range, but may be used with any numeric value (for integer value types, only the integer part of the epsilon value is considered). Conversely, to send data updates <em>every time</em> the value is read, and skip any comparison check altogether, set this to a negative value like <code>-1.0</code>. </p>
+<p>Minimum change in numeric value required to trigger an update. The default of <code>0.0</code> is to send updates only if the value changes, but even on the smallest changes. Setting this to some positive value can be especially useful for high-precision floating-point numbers which may fluctuate within an insignificant range, but may be used with any numeric value (for integer value types, only the integer part of the epsilon value is considered). Conversely, to send data updates <em>every time</em> the value is read, and skip any comparison check altogether, set this to a negative value like <code>-1.0</code>. </p>
 <dl class="section note"><dt>Note</dt><dd>For the positive epsilon settings to work, the <code>valueSize</code> must be set to one of the predefined <code>DATA_TYPE_*</code> constants. </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="_w_a_sim_commander_8h_source.html#l00131">131</a> of file <a class="el" href="_w_a_sim_commander_8h_source.html">WASimCommander.h</a>.</p>
@@ -711,7 +711,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Variable type prefix for named variables. Types: 'L' (local), 'A' (SimVar) and 'T' (Token, not an actual GaugeAPI prefix) are checked using respecitive GaugeAPI methods. </p>
+<p>Variable type prefix for named variables. Types: 'L' (local), 'A' (SimVar) and 'T' (Token, not an actual GaugeAPI prefix) are checked using respective GaugeAPI methods. </p>
 
 <p class="definition">Definition at line <a class="el" href="_w_a_sim_commander_8h_source.html#l00142">142</a> of file <a class="el" href="_w_a_sim_commander_8h_source.html">WASimCommander.h</a>.</p>
 
@@ -763,7 +763,7 @@ Public Attributes</h2></td></tr>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="namespace_w_a_sim_commander.html">WASimCommander</a></li><li class="navelem"><a class="el" href="struct_w_a_sim_commander_1_1_data_request.html">DataRequest</a></li>
-    <li class="footer">Generated for WASimCommander &#160;v1.2.0.0 by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.4 </li>
+    <li class="footer">Generated for WASimCommander &#160;v1.3.0.0 by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.4 </li>
   </ul>
 </div>
 </body>

@@ -35,7 +35,7 @@
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="Logo.png" title="WASimCommander - Remote access to the Microsoft Flight Simulator 2020 Gauge API."/></td>
   <td id="projectalign">
-   <div id="projectname"><!-- WASimCommander --><span id="projectnumber">&#160;v1.2.0.0</span>
+   <div id="projectname"><!-- WASimCommander --><span id="projectnumber">&#160;v1.3.0.0</span>
    </div>
   </td>
  </tr>
@@ -109,7 +109,8 @@ $(document).ready(function(){initNavTree('_w_a_sim_client_8h.html',''); initResi
 <a href="#nested-classes">Classes</a> &#124;
 <a href="#namespaces">Namespaces</a> &#124;
 <a href="#define-members">Macros</a> &#124;
-<a href="#typedef-members">Typedefs</a>  </div>
+<a href="#typedef-members">Typedefs</a> &#124;
+<a href="#var-members">Variables</a>  </div>
   <div class="headertitle"><div class="title">WASimClient.h File Reference</div></div>
 </div><!--header-->
 <div class="contents">
@@ -123,26 +124,12 @@ $(document).ready(function(){initNavTree('_w_a_sim_client_8h.html',''); initResi
 <code>#include &quot;<a class="el" href="_w_a_sim_commander_8h_source.html">WASimCommander.h</a>&quot;</code><br />
 <code>#include &quot;client/exports.h&quot;</code><br />
 <code>#include &quot;client/enums.h&quot;</code><br />
+<code>#include &quot;client/structs.h&quot;</code><br />
 </div>
 <p><a href="_w_a_sim_client_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="nested-classes" name="nested-classes"></a>
 Classes</h2></td></tr>
-<tr class="memitem:struct_w_a_sim_commander_1_1_client_1_1_client_event"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_w_a_sim_commander_1_1_client.html#struct_w_a_sim_commander_1_1_client_1_1_client_event">WASimCommander::Client::ClientEvent</a></td></tr>
-<tr class="memdesc:struct_w_a_sim_commander_1_1_client_1_1_client_event"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="namespace_w_a_sim_commander_1_1_client.html" title="WASimCommander::Client namespace. Defines/declares everything needed to interact with the WASimComman...">Client</a> Event data, delivered via callback.  <a href="namespace_w_a_sim_commander_1_1_client.html#struct_w_a_sim_commander_1_1_client_1_1_client_event">More...</a><br /></td></tr>
-<tr class="separator:struct_w_a_sim_commander_1_1_client_1_1_client_event"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:struct_w_a_sim_commander_1_1_client_1_1_list_result"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_w_a_sim_commander_1_1_client.html#struct_w_a_sim_commander_1_1_client_1_1_list_result">WASimCommander::Client::ListResult</a></td></tr>
-<tr class="memdesc:struct_w_a_sim_commander_1_1_client_1_1_list_result"><td class="mdescLeft">&#160;</td><td class="mdescRight">Structure for delivering list results, eg. of local variables sent from Server.  <a href="namespace_w_a_sim_commander_1_1_client.html#struct_w_a_sim_commander_1_1_client_1_1_list_result">More...</a><br /></td></tr>
-<tr class="separator:struct_w_a_sim_commander_1_1_client_1_1_list_result"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_w_a_sim_commander_1_1_client_1_1_data_request_record.html">WASimCommander::Client::DataRequestRecord</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight"><code><a class="el" href="struct_w_a_sim_commander_1_1_client_1_1_data_request_record.html" title="DataRequestRecord inherits and extends WASimCommander::DataRequest with data pertinent for use by a d...">DataRequestRecord</a></code> inherits and extends <code><a class="el" href="struct_w_a_sim_commander_1_1_data_request.html" title="Structure for variable value subscription requests.">WASimCommander::DataRequest</a></code> with data pertinent for use by a data consumer/Client. In particular, any value data sent from the server is stored here as a byte array in the <code>data</code> member (a <code>std::vector</code> of <code>unsigned char</code>).  <a href="struct_w_a_sim_commander_1_1_client_1_1_data_request_record.html#details">More...</a><br /></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_w_a_sim_commander_1_1_client_1_1_variable_request.html">WASimCommander::Client::VariableRequest</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Structure for using with <code><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a3f66a5571f44d59d2eb4557f3a63d337" title="Get a Variable value by name, with optional named unit type. This is primarily useful for local (&#39;L&#39;)...">WASimClient::getVariable()</a></code> and <code><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a8a9f6943f86f904f1db38a4b77e288bb" title="Set a Variable value by name, with optional named unit type. Although any settable variable type can ...">WASimClient::setVariable()</a></code> to specify information about the variable to set or get. Variables and Units can be specified by name or by numeric ID. Only some variable types have an associated numeric ID ('A', 'L', 'T' types) and only some variable types accept a Unit specifier ('A', 'C', 'E', 'L' types). Using numeric IDs, if already known, is more efficient on the server side since it saves the lookup step.  <a href="struct_w_a_sim_commander_1_1_client_1_1_variable_request.html#details">More...</a><br /></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_w_a_sim_commander_1_1_client_1_1_registered_event.html">WASimCommander::Client::RegisteredEvent</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Structure to hold data for registered (reusable) calculator events. Used to submit events with <code><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a098e51fad57fdbd62ef2a45385156c5f" title="Register a reusable event which executes a pre-set calculator string. The code is pre-compiled and st...">WASimClient::registerEvent()</a></code>.  <a href="struct_w_a_sim_commander_1_1_client_1_1_registered_event.html#details">More...</a><br /></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html">WASimCommander::Client::WASimClient</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="namespace_w_a_sim_commander.html" title="WASimCommander main namespace. Defines constants and structs used in Client-Server interactions....">WASimCommander</a> <a class="el" href="namespace_w_a_sim_commander_1_1_client.html" title="WASimCommander::Client namespace. Defines/declares everything needed to interact with the WASimComman...">Client</a> implementation. Handles all aspects of communication with the <a class="el" href="namespace_w_a_sim_commander.html" title="WASimCommander main namespace. Defines constants and structs used in Client-Server interactions....">WASimCommander</a> Server WASM module.  <a href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -163,8 +150,6 @@ Macros</h2></td></tr>
 <tr class="memitem:a322d2a2abb9d43f7c3f0a6ddd9d3adee"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_w_a_sim_client_8h.html#a322d2a2abb9d43f7c3f0a6ddd9d3adee">WSMCMND_CLIENT_USE_CONCURRENT_CALLBACKS</a>&#160;&#160;&#160;1</td></tr>
 <tr class="memdesc:a322d2a2abb9d43f7c3f0a6ddd9d3adee"><td class="mdescLeft">&#160;</td><td class="mdescRight">Define with value of 0 (zero) to invoke all callbacks consecutively, using a mutex lock. Default is (possible) concurrent invocation. Callbacks may still arrive from different threads.  <a href="_w_a_sim_client_8h.html#a322d2a2abb9d43f7c3f0a6ddd9d3adee">More...</a><br /></td></tr>
 <tr class="separator:a322d2a2abb9d43f7c3f0a6ddd9d3adee"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2738cae3d3d4c60db4707ae883d865c9"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_w_a_sim_client_8h.html#a2738cae3d3d4c60db4707ae883d865c9">WSE</a>&#160;&#160;&#160;WASimCommander::Enums</td></tr>
-<tr class="separator:a2738cae3d3d4c60db4707ae883d865c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="typedef-members" name="typedef-members"></a>
 Typedefs</h2></td></tr>
@@ -186,6 +171,9 @@ Typedefs</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
+<tr class="memitem:ab1bd21185e813b2cdb9622bb49b34ff8"><td class="memItemLeft" align="right" valign="top">static const uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_w_a_sim_commander_1_1_client.html#ab1bd21185e813b2cdb9622bb49b34ff8">WASimCommander::Client::CUSTOM_KEY_EVENT_ID_MIN</a> = 0x00020000</td></tr>
+<tr class="memdesc:ab1bd21185e813b2cdb9622bb49b34ff8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Starting ID range for "Custom Key Events" for use with <code>registerCustomKeyEvent()</code> generated IDs. (This corresponds to the value of <code>1 + THIRD_PARTY_EVENT_ID_MAX</code> constant from SimConnect SDK header file 'MSFS/Legacy/gauges.h'.)  <a href="namespace_w_a_sim_commander_1_1_client.html#ab1bd21185e813b2cdb9622bb49b34ff8">More...</a><br /></td></tr>
+<tr class="separator:ab1bd21185e813b2cdb9622bb49b34ff8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">Return result values</div></td></tr>
 <tr class="memitem:aaed3e026d9bf1ef254d300587e4dbdb5"><td class="memItemLeft" align="right" valign="top">static const HRESULT&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_w_a_sim_commander_1_1_client.html#aaed3e026d9bf1ef254d300587e4dbdb5">WASimCommander::Client::E_NOT_CONNECTED</a> = 2250L | ( 7 &lt;&lt; 16) | 0x80000000</td></tr>
 <tr class="memdesc:aaed3e026d9bf1ef254d300587e4dbdb5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Error result: server not connected.  <a href="namespace_w_a_sim_commander_1_1_client.html#aaed3e026d9bf1ef254d300587e4dbdb5">More...</a><br /></td></tr>
@@ -194,94 +182,6 @@ Variables</h2></td></tr>
 <tr class="memdesc:a23b8cf1733162a35a02159b38c3af217"><td class="mdescLeft">&#160;</td><td class="mdescRight">Error result: timeout communicating with server.  <a href="namespace_w_a_sim_commander_1_1_client.html#a23b8cf1733162a35a02159b38c3af217">More...</a><br /></td></tr>
 <tr class="separator:a23b8cf1733162a35a02159b38c3af217"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<hr/><h2 class="groupheader">Class Documentation</h2>
-<a name="struct_w_a_sim_commander_1_1_client_1_1_client_event" id="struct_w_a_sim_commander_1_1_client_1_1_client_event"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#struct_w_a_sim_commander_1_1_client_1_1_client_event">&#9670;&nbsp;</a></span>WASimCommander::Client::ClientEvent</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">struct WASimCommander::Client::ClientEvent</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<div class="textblock"><p ><a class="el" href="namespace_w_a_sim_commander_1_1_client.html" title="WASimCommander::Client namespace. Defines/declares everything needed to interact with the WASimComman...">Client</a> Event data, delivered via callback. </p>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#af5abc2650cf635077f8c75810f89d2f3" title="Sets a callback for Client event updates which indicate status changes. Pass a nullptr value to remov...">WASimClient::setClientEventCallback()</a>, <a class="el" href="namespace_w_a_sim_commander_1_1_client.html#af0c0e090f7c4f26992daf57de64ca526" title="Client event type enumeration.">ClientEventType</a>, <a class="el" href="namespace_w_a_sim_commander_1_1_client.html#afd4f3e93b7e8dc26cd2d99ad61584521" title="Client status flags.">ClientStatus</a> </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8h_source.html#l00069">69</a> of file <a class="el" href="_w_a_sim_client_8h_source.html">WASimClient.h</a>.</p>
-</div><table class="fieldtable">
-<tr><th colspan="3">Class Members</th></tr>
-<tr><td class="fieldtype">
-<a id="a7e59de719690dfbf4e3f3fb0c9885b67" name="a7e59de719690dfbf4e3f3fb0c9885b67"></a><a class="el" href="namespace_w_a_sim_commander_1_1_client.html#af0c0e090f7c4f26992daf57de64ca526">ClientEventType</a></td>
-<td class="fieldname">
-eventType</td>
-<td class="fielddoc">
-The type of event. See enum docs for details. </td></tr>
-<tr><td class="fieldtype">
-<a id="adc8ea5255b487ee93df27d88b4cf2bd8" name="adc8ea5255b487ee93df27d88b4cf2bd8"></a><a class="el" href="namespace_w_a_sim_commander_1_1_client.html#afd4f3e93b7e8dc26cd2d99ad61584521">ClientStatus</a></td>
-<td class="fieldname">
-status</td>
-<td class="fielddoc">
-Current status flag(s). See enum docs for details. </td></tr>
-<tr><td class="fieldtype">
-<a id="a8773e1c80550819b43855e7c60f94b11" name="a8773e1c80550819b43855e7c60f94b11"></a>string</td>
-<td class="fieldname">
-message</td>
-<td class="fielddoc">
-A short message about the event (eg. "Server Connected") </td></tr>
-</table>
-
-</div>
-</div>
-<a name="struct_w_a_sim_commander_1_1_client_1_1_list_result" id="struct_w_a_sim_commander_1_1_client_1_1_list_result"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#struct_w_a_sim_commander_1_1_client_1_1_list_result">&#9670;&nbsp;</a></span>WASimCommander::Client::ListResult</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">struct WASimCommander::Client::ListResult</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<div class="textblock"><p >Structure for delivering list results, eg. of local variables sent from Server. </p>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#ae34ec025c8965441cd9a178e8dac734e" title="Send a request for a list update to the server. The results are delivered using the callback set in s...">WASimClient::list()</a>, <a class="el" href="namespace_w_a_sim_commander_1_1_client.html#a58cba5c3dda6fb308904f9b238c4eef8" title="Callback function for delivering list results, eg. of local variables sent from Server.">listResultsCallback_t</a>, WASimCommander::LookupItemType, WASimCommander::CommandId::List command. </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8h_source.html#l00079">79</a> of file <a class="el" href="_w_a_sim_client_8h_source.html">WASimClient.h</a>.</p>
-</div><table class="fieldtable">
-<tr><th colspan="3">Class Members</th></tr>
-<tr><td class="fieldtype">
-<a id="a9cddb580386d316bf63f7f606612662e" name="a9cddb580386d316bf63f7f606612662e"></a>typedef vector&lt; pair&lt; int, string &gt; &gt;</td>
-<td class="fieldname">
-listResult_t</td>
-<td class="fielddoc">
-A mapping of IDs to names. </td></tr>
-</table>
-<table class="fieldtable">
-<tr><th colspan="3">Class Members</th></tr>
-<tr><td class="fieldtype">
-<a id="a4f9221e2d8bc2fa9445b9002bd3ec55f" name="a4f9221e2d8bc2fa9445b9002bd3ec55f"></a><a class="el" href="namespace_w_a_sim_commander_1_1_enums.html#ab1b85706615bc0e57fa6d8d464bf8a3d">LookupItemType</a></td>
-<td class="fieldname">
-listType</td>
-<td class="fielddoc">
-the type of items being listed </td></tr>
-<tr><td class="fieldtype">
-<a id="a0843c42b1baa1b3e13871cedaf476ed1" name="a0843c42b1baa1b3e13871cedaf476ed1"></a>HRESULT</td>
-<td class="fieldname">
-result</td>
-<td class="fielddoc">
-Excecution result, one of: <code>S_OK</code>, <code>E_FAIL</code>, <code>E_TIMEOUT</code> </td></tr>
-<tr><td class="fieldtype">
-<a id="a9482ca7c98511c25ffef10803a68e25e" name="a9482ca7c98511c25ffef10803a68e25e"></a><a class="el" href="namespace_w_a_sim_commander_1_1_client.html#a9cddb580386d316bf63f7f606612662e">listResult_t</a></td>
-<td class="fieldname">
-list</td>
-<td class="fielddoc">
-Mapping of numeric item IDs to name strings. </td></tr>
-</table>
-
-</div>
-</div>
 <h2 class="groupheader">Macro Definition Documentation</h2>
 <a id="ac7bef5d85e3dcd73eef56ad39ffc84a9" name="ac7bef5d85e3dcd73eef56ad39ffc84a9"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ac7bef5d85e3dcd73eef56ad39ffc84a9">&#9670;&nbsp;</a></span>WIN32_LEAN_AND_MEAN</h2>
@@ -313,23 +213,7 @@ Mapping of numeric item IDs to name strings. </td></tr>
 
 <p>Define with value of 0 (zero) to invoke all callbacks consecutively, using a mutex lock. Default is (possible) concurrent invocation. Callbacks may still arrive from different threads. </p>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8h_source.html#l00040">40</a> of file <a class="el" href="_w_a_sim_client_8h_source.html">WASimClient.h</a>.</p>
-
-</div>
-</div>
-<a id="a2738cae3d3d4c60db4707ae883d865c9" name="a2738cae3d3d4c60db4707ae883d865c9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2738cae3d3d4c60db4707ae883d865c9">&#9670;&nbsp;</a></span>WSE</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define WSE&#160;&#160;&#160;WASimCommander::Enums</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8h_source.html#l00066">66</a> of file <a class="el" href="_w_a_sim_client_8h_source.html">WASimClient.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8h_source.html#l00041">41</a> of file <a class="el" href="_w_a_sim_client_8h_source.html">WASimClient.h</a>.</p>
 
 </div>
 </div>
@@ -340,7 +224,7 @@ Mapping of numeric item IDs to name strings. </td></tr>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dir_b0856f6b0d80ccb263b2f415c91f9e17.html">include</a></li><li class="navelem"><a class="el" href="dir_46e873e9de9fedca8b86b802c8909ebf.html">client</a></li><li class="navelem"><a class="el" href="_w_a_sim_client_8h.html">WASimClient.h</a></li>
-    <li class="footer">Generated for WASimCommander &#160;v1.2.0.0 by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.4 </li>
+    <li class="footer">Generated for WASimCommander &#160;v1.3.0.0 by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.4 </li>
   </ul>
 </div>
 </body>

@@ -35,7 +35,7 @@
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="Logo.png" title="WASimCommander - Remote access to the Microsoft Flight Simulator 2020 Gauge API."/></td>
   <td id="projectalign">
-   <div id="projectname"><!-- WASimCommander --><span id="projectnumber">&#160;v1.2.0.0</span>
+   <div id="projectname"><!-- WASimCommander --><span id="projectnumber">&#160;v1.3.0.0</span>
    </div>
   </td>
  </tr>
@@ -116,7 +116,7 @@ $(document).ready(function(){initNavTree('struct_w_a_sim_commander_1_1_c_l_i_1_1
 <p><code><a class="el" href="struct_w_a_sim_commander_1_1_c_l_i_1_1_structs_1_1_data_request_record.html" title="DataRequestRecord inherits and extends WASimCommander::CLI::Structs::DataRequest with data pertinent ...">DataRequestRecord</a></code> inherits and extends <code><a class="el" href="struct_w_a_sim_commander_1_1_c_l_i_1_1_structs_1_1_data_request.html" title="Structure for value update subscription requests.">WASimCommander::CLI::Structs::DataRequest</a></code> with data pertinent for use by a data consumer/Client. In particular, any value data sent from the server is stored here as a byte array in the <code>data</code> member (a byte array).  
  <a href="struct_w_a_sim_commander_1_1_c_l_i_1_1_structs_1_1_data_request_record.html#details">More...</a></p>
 
-<p><code>#include &quot;<a class="el" href="_structs_8h_source.html">Structs.h</a>&quot;</code></p>
+<p><code>#include &quot;<a class="el" href="_w_a_sim_client___c_l_i_2structs_8h_source.html">Structs.h</a>&quot;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
@@ -225,7 +225,7 @@ Public Attributes</h2></td></tr>
 <p >There are also implicit conversion operators for all numeric types and String. If conversion fails, these return a default-constructed instance, typically zero or an empty string.</p>
 <p >Also note that the size of the data array may or <em>may not</em> be the same as the inherited <code>DataRequest::valueSize</code> member, since that may contain special values for preset types. Always check the actual data array size (<code>data.Length</code>) if you need to know the storage requirements. </p>
 
-<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00323">323</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_2structs_8h_source.html#l00323">323</a> of file <a class="el" href="_w_a_sim_client___c_l_i_2structs_8h_source.html">Structs.h</a>.</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
 <a id="a370e8a1e2368ca0df484f2fd7d4fe700" name="a370e8a1e2368ca0df484f2fd7d4fe700"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a370e8a1e2368ca0df484f2fd7d4fe700">&#9670;&nbsp;</a></span>tryConvert() <span class="overload">[1/2]</span></h2>
@@ -256,7 +256,7 @@ template&lt;typename T &gt; </div>
 <p>Tries to populate a value reference of the desired type <code>T</code> and returns true or false depending on if the conversion was valid (meaning the size of requested type matches the data size). </p>
 <p >If the conversion fails, result is default-initialized. The requested type (<code>T</code>) must be a <code>value</code> type (not reference) and be default-constructible, (eg. numerics, chars), or fixed-size arrays of such types. </p>
 
-<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00338">338</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_2structs_8h_source.html#l00338">338</a> of file <a class="el" href="_w_a_sim_client___c_l_i_2structs_8h_source.html">Structs.h</a>.</p>
 
 </div>
 </div>
@@ -286,7 +286,7 @@ template&lt;typename T &gt; </div>
 
 <p>Overload for String type results. This will simply load whatever bytes are in the <code>data</code> array into a String, and only returns <code>false</code> (and an empty String) if the data array is empty or starts with a null character byte (<code>0x00</code>). </p>
 
-<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00352">352</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_2structs_8h_source.html#l00352">352</a> of file <a class="el" href="_w_a_sim_client___c_l_i_2structs_8h_source.html">Structs.h</a>.</p>
 
 </div>
 </div>
@@ -314,7 +314,7 @@ template&lt;typename T &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00365">365</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_2structs_8h_source.html#l00365">365</a> of file <a class="el" href="_w_a_sim_client___c_l_i_2structs_8h_source.html">Structs.h</a>.</p>
 
 </div>
 </div>
@@ -342,7 +342,7 @@ template&lt;typename T &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00366">366</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_2structs_8h_source.html#l00366">366</a> of file <a class="el" href="_w_a_sim_client___c_l_i_2structs_8h_source.html">Structs.h</a>.</p>
 
 </div>
 </div>
@@ -370,7 +370,7 @@ template&lt;typename T &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00367">367</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_2structs_8h_source.html#l00367">367</a> of file <a class="el" href="_w_a_sim_client___c_l_i_2structs_8h_source.html">Structs.h</a>.</p>
 
 </div>
 </div>
@@ -398,7 +398,7 @@ template&lt;typename T &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00368">368</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_2structs_8h_source.html#l00368">368</a> of file <a class="el" href="_w_a_sim_client___c_l_i_2structs_8h_source.html">Structs.h</a>.</p>
 
 </div>
 </div>
@@ -426,7 +426,7 @@ template&lt;typename T &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00369">369</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_2structs_8h_source.html#l00369">369</a> of file <a class="el" href="_w_a_sim_client___c_l_i_2structs_8h_source.html">Structs.h</a>.</p>
 
 </div>
 </div>
@@ -454,7 +454,7 @@ template&lt;typename T &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00370">370</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_2structs_8h_source.html#l00370">370</a> of file <a class="el" href="_w_a_sim_client___c_l_i_2structs_8h_source.html">Structs.h</a>.</p>
 
 </div>
 </div>
@@ -482,7 +482,7 @@ template&lt;typename T &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00371">371</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_2structs_8h_source.html#l00371">371</a> of file <a class="el" href="_w_a_sim_client___c_l_i_2structs_8h_source.html">Structs.h</a>.</p>
 
 </div>
 </div>
@@ -510,7 +510,7 @@ template&lt;typename T &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00372">372</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_2structs_8h_source.html#l00372">372</a> of file <a class="el" href="_w_a_sim_client___c_l_i_2structs_8h_source.html">Structs.h</a>.</p>
 
 </div>
 </div>
@@ -538,7 +538,7 @@ template&lt;typename T &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00373">373</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_2structs_8h_source.html#l00373">373</a> of file <a class="el" href="_w_a_sim_client___c_l_i_2structs_8h_source.html">Structs.h</a>.</p>
 
 </div>
 </div>
@@ -566,7 +566,7 @@ template&lt;typename T &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00374">374</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_2structs_8h_source.html#l00374">374</a> of file <a class="el" href="_w_a_sim_client___c_l_i_2structs_8h_source.html">Structs.h</a>.</p>
 
 </div>
 </div>
@@ -594,7 +594,7 @@ template&lt;typename T &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00375">375</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_2structs_8h_source.html#l00375">375</a> of file <a class="el" href="_w_a_sim_client___c_l_i_2structs_8h_source.html">Structs.h</a>.</p>
 
 </div>
 </div>
@@ -624,7 +624,7 @@ template&lt;typename T &gt; </div>
 <p>Serializes this <code><a class="el" href="struct_w_a_sim_commander_1_1_c_l_i_1_1_structs_1_1_data_request_record.html" title="DataRequestRecord inherits and extends WASimCommander::CLI::Structs::DataRequest with data pertinent ...">DataRequestRecord</a></code> to string for debugging purposes.</p>
 <p >To return the request's <em>value</em> as a string, see <code><a class="el" href="struct_w_a_sim_commander_1_1_c_l_i_1_1_structs_1_1_data_request_record.html#a370e8a1e2368ca0df484f2fd7d4fe700" title="Tries to populate a value reference of the desired type T and returns true or false depending on if t...">tryConvert()</a></code> or the <code>String ^()</code> operator. </p><dl class="section see"><dt>See also</dt><dd><a class="el" href="struct_w_a_sim_commander_1_1_c_l_i_1_1_structs_1_1_data_request.html#a2c17f26d273db9fd02e99dc75fdf7248" title="Serializes this DataRequest to a string for debugging purposes.">DataRequest::ToString()</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00390">390</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_2structs_8h_source.html#l00390">390</a> of file <a class="el" href="_w_a_sim_client___c_l_i_2structs_8h_source.html">Structs.h</a>.</p>
 
 </div>
 </div>
@@ -643,7 +643,7 @@ template&lt;typename T &gt; </div>
 
 <p>Timestamp of last data update in ms since epoch. </p>
 
-<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00326">326</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_2structs_8h_source.html#l00326">326</a> of file <a class="el" href="_w_a_sim_client___c_l_i_2structs_8h_source.html">Structs.h</a>.</p>
 
 </div>
 </div>
@@ -661,12 +661,12 @@ template&lt;typename T &gt; </div>
 
 <p>Value data array. </p>
 
-<p class="definition">Definition at line <a class="el" href="_structs_8h_source.html#l00327">327</a> of file <a class="el" href="_structs_8h_source.html">Structs.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client___c_l_i_2structs_8h_source.html#l00327">327</a> of file <a class="el" href="_w_a_sim_client___c_l_i_2structs_8h_source.html">Structs.h</a>.</p>
 
 </div>
 </div>
 <hr/>The documentation for this struct was generated from the following file:<ul>
-<li>src/WASimClient_CLI/<a class="el" href="_structs_8h_source.html">Structs.h</a></li>
+<li>src/WASimClient_CLI/<a class="el" href="_w_a_sim_client___c_l_i_2structs_8h_source.html">Structs.h</a></li>
 </ul>
 </div><!-- contents -->
 </div><!-- doc-content -->
@@ -675,7 +675,7 @@ template&lt;typename T &gt; </div>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="namespace_w_a_sim_commander.html">WASimCommander</a></li><li class="navelem"><a class="el" href="namespace_w_a_sim_commander_1_1_c_l_i.html">CLI</a></li><li class="navelem"><a class="el" href="namespace_w_a_sim_commander_1_1_c_l_i_1_1_structs.html">Structs</a></li><li class="navelem"><a class="el" href="struct_w_a_sim_commander_1_1_c_l_i_1_1_structs_1_1_data_request_record.html">DataRequestRecord</a></li>
-    <li class="footer">Generated for WASimCommander &#160;v1.2.0.0 by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.4 </li>
+    <li class="footer">Generated for WASimCommander &#160;v1.3.0.0 by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.4 </li>
   </ul>
 </div>
 </body>
