@@ -918,11 +918,11 @@ class WASimClient::Private
 #pragma endregion
 #pragma region  Remote Variables accessors  ----------------------------------------------
 
-	const string buildVariableCommandString(const VariableRequest &v, bool forSet) const
+	// shared for getVariable() and setLocalVariable()
+	const string buildVariableCommandString(const VariableRequest &v, bool isLocal) const
 	{
-		// only L vars can be set by an index value
-		const bool isIndexed = forSet ? (v.variableType == 'L') : Utilities::isIndexedVariableType(v.variableType);
-		const bool hasUnits = Utilities::isUnitBasedVariableType(v.variableType);
+		const bool isIndexed = isLocal || Utilities::isIndexedVariableType(v.variableType);
+		const bool hasUnits = isLocal || Utilities::isUnitBasedVariableType(v.variableType);
 		string sValue = (isIndexed && v.variableId > -1 ? to_string(v.variableId) : v.variableName);
 		if (sValue.empty())
 			return sValue;
@@ -958,16 +958,48 @@ class WASimClient::Private
 		return S_OK;
 	}
 
+	HRESULT setLocalVariable(const VariableRequest &v, const double value)
+	{
+		const string sValue = buildVariableCommandString(v, true);
+		if (sValue.empty() || sValue.length() >= STRSZ_CMD)
+			return E_INVALIDARG;
+		return sendServerCommand(Command(v.createLVar ? CommandId::SetCreate : CommandId::Set, 'L', sValue.c_str(), value));
+	}
+
 	HRESULT setVariable(const VariableRequest &v, const double value)
 	{
-		if (Utilities::isSettableVariableType(v.variableType)) {
-			const string sValue = buildVariableCommandString(v, true);
-			if (sValue.empty() || sValue.length() >= STRSZ_CMD)
-				return E_INVALIDARG;
-			return sendServerCommand(Command(v.createLVar && v.variableType == 'L' ? CommandId::SetCreate : CommandId::Set, v.variableType, sValue.c_str(), value));
+		if (v.variableType == 'L')
+			return setLocalVariable(v, value);
+
+		if (!Utilities::isSettableVariableType(v.variableType)) {
+			LOG_WRN << "Cannot Set a variable of type '" << v.variableType << "'.";
+			return E_INVALIDARG;
 		}
-		LOG_WRN << "Cannot Set a variable of type '" << v.variableType << "'.";
-		return E_INVALIDARG;
+		// All other variable types can only be set via calculator code and require a string-based name
+		if (v.variableName.empty()) {
+			LOG_WRN << "A variable name is required to set variable of type '" << v.variableType << "'.";
+			return E_INVALIDARG;
+		}
+		if (v.unitId > -1 && v.unitName.empty()) {
+			LOG_WRN << "A variable of type '" << v.variableType << "' unit ID; use a unit name instead.";
+			return E_INVALIDARG;
+		}
+
+		// Build the RPN code string.
+		ostringstream codeStr = ostringstream();
+		codeStr << fixed << setprecision(7) << value;
+		codeStr << " (>" << v.variableType << ':' << v.variableName;
+		if (v.variableType == 'A' && v.simVarIndex)
+			codeStr << ':' << (uint16_t)v.simVarIndex;
+		if (!v.unitName.empty())
+			codeStr << ',' << v.unitName;
+		codeStr << ')';
+
+		if (codeStr.tellp() == -1 || (size_t)codeStr.tellp() >= STRSZ_CMD)
+			return E_INVALIDARG;
+
+		// Send it.
+		return sendServerCommand(Command(CommandId::Exec, +CalcResultType::None, codeStr.str().c_str()));
 	}
 
 #pragma endregion
@@ -1646,11 +1678,11 @@ HRESULT WASimClient::setVariable(const VariableRequest & variable, const double 
 }
 
 HRESULT WASimClient::setLocalVariable(const std::string &variableName, const double value, const std::string &unitName) {
-	return d->setVariable(VariableRequest(variableName, false, unitName), value);
+	return d->setLocalVariable(VariableRequest(variableName, false, unitName), value);
 }
 
 HRESULT WASimClient::setOrCreateLocalVariable(const std::string &variableName, const double value, const std::string &unitName) {
-	return d->setVariable(VariableRequest(variableName, true, unitName), value);
+	return d->setLocalVariable(VariableRequest(variableName, true, unitName), value);
 }
 
 #pragma endregion

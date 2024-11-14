@@ -214,11 +214,20 @@ static const uint32_t CUSTOM_KEY_EVENT_ID_MIN = 0x00020000;
 		/// \note This method blocks until either the Server responds or the timeout has expired. \sa \refwce{CommandId::GetCreate}, defaultTimeout(), setDefaultTimeout()
 		HRESULT getOrCreateLocalVariable(const std::string &variableName, double *pfResult, double defaultValue = 0.0, const std::string &unitName = std::string());
 
-		/// Set a Variable value by name, with optional named unit type. Although any settable variable type can set this way, it is primarily useful for local (`L`) variables which can be set via dedicated _Gauge API_ functions
-		/// (`set_named_variable_value()` and `set_named_variable_typed_value()`). Other variables types can also be set this way ('A', 'H", 'K', etc) but such requests are simply converted to a calculator string and
-		/// evaluated via the _Gauge API_ `execute_calculator_code()`. Using `WASimClient::executeCalculatorCode()` directly may be more efficient.
+		/// Set a Variable value by name, with optional named unit type. Although any settable variable type can set this way, it is primarily useful for local (`L`)
+		/// variables which can be set via dedicated _Gauge API_ functions (`set_named_variable_value()` and `set_named_variable_typed_value()`). \n\n
+		/// Other variables types can also be set this way but such requests are simply converted to a calculator string and
+		/// evaluated via the _Gauge API_ `execute_calculator_code()`. Using `WASimClient::executeCalculatorCode()` directly may be more efficient. \n
+		/// The following conditions must be observed:
+		/// - The variable type in `VariableRequest::variableType` must be "settable" ('A', 'C', 'H', 'K', 'L', or 'Z'), otherwise an `E_INVALIDARG` result is returned.
+		/// - Setting an 'A' type variable this way _requires_ the actual variable name in `VariableRequest::variableName` -- using just an ID returns `E_INVALIDARG`. \n
+		///   (Other settable variable types don't have any associated ID anyway, so this is not an issue.)
+		/// - For any variable type _other than_ 'L', a Unit can only be specified as a string (in `VariableRequest::unitName`), not an ID.
+		///   Using only an ID will not cause an error, but the unit will not be included in the generated RPN code. \n
+		///   For 'L' variable types, if both a name and ID are provided, the numeric ID is used insted of the name (this avoids a lookup on the server side).
+		///
 		/// \param variable See `VariableRequest` documentation for descriptions of the individual fields.
-		/// \param value The value to set.
+		/// \param value The numeric value to set.
 		/// \return `S_OK` on success, `E_INVALIDARG` on parameter validation errors, `E_NOT_CONNECTED` if not connected to server, or `E_FAIL` on general failure (unlikely).
 		/// \sa \refwce{CommandId::Set}
 		HRESULT setVariable(const VariableRequest &variable, const double value);
