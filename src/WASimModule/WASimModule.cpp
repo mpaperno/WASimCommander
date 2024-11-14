@@ -224,7 +224,7 @@ struct calcResult_t
 	int8_t resultMemberIndex = -1;
 	FLOAT64 fVal = 0.0;
 	SINT32 iVal = 0;
-	string sVal;
+	string sVal {};
 	void setF(const FLOAT64 val) { fVal = val; resultSize = sizeof(FLOAT64); resultMemberIndex = 0; }
 	void setI(const SINT32  val) { iVal = val; resultSize = sizeof(SINT32); resultMemberIndex = 1; }
 	void setS(const string &&val) { sVal = std::move(val); sVal.resize(strSize); resultSize = strSize; resultMemberIndex = 2; }
@@ -643,10 +643,25 @@ bool execCalculatorCode(const char *code, calcResult_t &result, bool precompiled
 	}
 	PCSTRINGZ cVal = nullptr;
 	if ((ok = execute_calculator_code(code, &result.fVal, &result.iVal, &cVal))) {
-		result.setS(string(cVal, strnlen(cVal, result.strSize)));
-		if (result.type != CalcResultType::String) {
-			result.resultMemberIndex = (int8_t)result.type - 1;
-			result.resultSize = 8 / (int8_t)result.type;
+		// exec_calc always produces a string, so store that in the result regardless of the requested type (unlikely to be null but check JIC)
+		if (!!cVal)
+			result.setS(string(cVal, strnlen(cVal, result.strSize)));
+		switch (result.type) {
+			case CalcResultType::Double:
+				result.resultMemberIndex = 0;
+				result.resultSize = 8;
+				break;
+			case CalcResultType::Integer:
+				result.resultMemberIndex = 1;
+				result.resultSize = 4;
+				break;
+			case CalcResultType::String:
+				// in case the string result was null (unlikely), set an empty string
+				if (!cVal)
+					result.setS(string());
+				break;
+			default:
+				break;
 		}
 	}
 	LOG_TRC << "execute_calculator_code() returned: ok: " << boolalpha << ok << "; fVal: " << result.fVal << "; iVal: " << result.iVal << "; sVal: " << quoted(result.sVal);
