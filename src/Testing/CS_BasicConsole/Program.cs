@@ -1,4 +1,4 @@
-﻿/*
+/*
 This file is part of the WASimCommander project.
 https://github.com/mpaperno/WASimCommander
 
@@ -82,17 +82,25 @@ namespace CS_BasicConsole
 			}
 
 			// set up a Simulator Variable for testing.
-			const string simVarName = "CG PERCENT";
+			const string simVarName = "COCKPIT CAMERA ZOOM";
 			const string simVarUnit = "percent";
+			// containers for result values
+			double fResult = 0;
 
-			// Execute a calculator string with result. We'll try to read the value of the SimVar defined above.
+			// Get a named Sim Variable value directly using the Gauge API function aircraft_varget()
+			if (client.getVariable(new VariableRequest(simVarName, simVarUnit, 0), out fResult) == HR.OK)
+				Log($"Get SimVar '{simVarName}, {simVarUnit}' returned: {fResult}", "<<");
+
+			// Set the Sim Var to a new value (increase the percentage if it is <= 50%, decrease otherwise).
+			double fNewValue = fResult <= 50.0 ? Math.Max(fResult, 1.0) * 1.05 : fResult * 0.95;
+			if (client.setVariable(new VariableRequest(simVarName, simVarUnit, 0), fNewValue) == HR.OK)
+				Log($"Set SimVar '{simVarName}, {simVarUnit}' to: {fNewValue}", "<<");
+
+			// Execute a calculator string with a result.
+			// We'll try to read the same value of the SimVar defined above, which should now have changed.
 			string calcCode = $"(A:{simVarName},{simVarUnit})";
-			if (client.executeCalculatorCode(calcCode, CalcResultType.Double, out double fResult, out string sResult) == HR.OK)
-				Log($"Calculator code '{calcCode}' returned: {fResult} and '{sResult}'", "<<");
-
-			// Get a named Sim Variable value, same one as before, but directly using the Gauge API function aircraft_varget()
-			if (client.getVariable(new VariableRequest(simVarName, simVarUnit, 0), out double varResult) == HR.OK)
-				Log($"Get SimVar '{simVarName}, {simVarUnit}' returned: {varResult}", "<<");
+			if (client.executeCalculatorCode(calcCode, CalcResultType.Double, out fResult) == HR.OK)
+				Log($"Calculator code '{calcCode}' returned: {fResult}", "<<");
 
 			// Create and/or Set a Local variable to play with (will be created if it doesn't exist yet, will exist if this program has run during the current simulator session).
 			const string variableName = "WASIM_CS_TEST_VAR_1";

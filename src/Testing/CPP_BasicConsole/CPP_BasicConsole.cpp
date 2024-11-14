@@ -177,19 +177,26 @@ int main()
 	}
 
 	// set up a Simulator Variable for testing.
-	const string simVarName = "CG PERCENT";
-	const string simVarUnit = "percent";
-
-	// Execute a calculator string with result. We'll try to read the value of the SimVar defined above.
-	string calcCode = (ostringstream() << "(A:" << simVarName << ',' << simVarUnit << ')').str();  // "(A:CG PERCENT,percent)"
+	string simVarName = "COCKPIT CAMERA ZOOM";
+	string simVarUnit = "percent";
+	// containers for result values
 	double fResult = 0.;
 	string sResult {};
-	if (client.executeCalculatorCode(calcCode, CalcResultType::Double, &fResult, &sResult) == S_OK)
-		Log("<<")() << "Calculator code " << quoted(calcCode) << " returned: " << fResult << " and " << quoted(sResult);
 
-	// Get a named Sim Variable value, same one as before, but directly using the Gauge API function aircraft_varget()
-	if (client.getVariable(VariableRequest(simVarName, simVarUnit, 0), &fResult) == S_OK)
+	// Get a named Sim Variable value directly using the Gauge API function aircraft_varget()
+	if (client.getVariable(VariableRequest(simVarName, simVarUnit), &fResult) == S_OK)
 		Log("<<")() << "Get SimVar '" << simVarName << ',' << simVarUnit << "' returned: " << fResult;
+
+	// Set the Sim Var to a new value (increase the percentage if it is <= 50%, decrease otherwise).
+	const double fNewValue = fResult <= 50.0 ? std::max(fResult, 1.0) * 1.05 : fResult * 0.95;
+	if (client.setVariable(VariableRequest(simVarName, simVarUnit), fNewValue) == S_OK)
+		Log("<<")() << "Set SimVar '" << simVarName << ',' << simVarUnit << "' to " << fNewValue;
+
+	// Execute a calculator string with a result.
+	// We'll try to read the same value of the SimVar defined above, which should now have changed.
+	string calcCode = (ostringstream() << "(A:" << simVarName << ',' << simVarUnit << ')').str();  // "(A:COCKPIT CAMERA ZOOM,percent)"
+	if (client.executeCalculatorCode(calcCode, CalcResultType::Double, &fResult, &sResult) == S_OK)
+		Log("<<")() << "Calculator code " << quoted(calcCode) << " returned: " << fResult;
 
 	// Create and/or Set a Local variable to play with (will be created if it doesn't exist yet, will exist if this program has run during the current simulator session).
 	const string variableName = "WASIM_TEST_VAR_1";
