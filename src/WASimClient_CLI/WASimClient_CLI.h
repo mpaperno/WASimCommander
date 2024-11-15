@@ -200,6 +200,23 @@ namespace WASimCommander::CLI::Client
 			return (HR)m_client->setOrCreateLocalVariable(marshal_as<std::string>(variableName), value, marshal_as<std::string>(unitName));
 		}
 
+		/// See \refwccc{setSimVarVariable(const std::string &, const std::string &, double)}
+		HR setSimVarVariable(String ^variableName, String ^unitName, const double value) {
+			return (HR)m_client->setSimVarVariable(marshal_as<std::string>(variableName), marshal_as<std::string>(unitName), value);
+		}
+		/// See \refwccc{setSimVarVariable(const std::string &, uint8_t, const std::string &, double)}
+		HR setSimVarVariable(String ^variableName, uint8_t index, String ^unitName, const double value) {
+			return (HR)m_client->setSimVarVariable(marshal_as<std::string>(variableName), index, marshal_as<std::string>(unitName), value);
+		}
+		/// See \refwccc{setSimVarVariable(const std::string &, const std::string &)}
+		HR setSimVarVariable(String ^variableName, String ^stringValue) {
+			return (HR)m_client->setSimVarVariable(marshal_as<std::string>(variableName), marshal_as<std::string>(stringValue));
+		}
+		/// See \refwccc{setSimVarVariable(const std::string &, uint8_t, const std::string &)}
+		HR setSimVarVariable(String ^variableName, uint8_t index, String ^stringValue) {
+			return (HR)m_client->setSimVarVariable(marshal_as<std::string>(variableName), index, marshal_as<std::string>(stringValue));
+		}
+
 		/// \}
 		/// \name Data change subscriptions (variables and calculated results)
 		/// \{

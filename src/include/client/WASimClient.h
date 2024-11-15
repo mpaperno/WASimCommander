@@ -254,6 +254,25 @@ static const uint32_t CUSTOM_KEY_EVENT_ID_MIN = 0x00020000;
 		/// \sa \refwce{CommandId::SetCreate}
 		HRESULT setOrCreateLocalVariable(const std::string &variableName, const double value, const std::string &unitName = std::string());
 
+		/// Sets a numeric value on an 'A' (aka "SimVar" / "Simulator Variable") type variable. \n
+		/// This is a convenience version of `setVariable()`, equivalent to `setVariable(VariableRequest(variableName, unitName), value)`. See `setVariable()` and `VariableRequest` for details.\n
+		/// Note that `variableName` can optionally contain an index after a colon (eg. `VAR NAME:1`), or the `setSimVarVariable(const string& name, uint8_t index, const string& unit, double value)`
+		/// overload could be used to provide the index separately.
+		/// \since v1.3.0
+		inline HRESULT setSimVarVariable(const std::string &variableName, const std::string &unitName, double value) { return setVariable(VariableRequest(variableName, unitName), value); }
+		/// Sets a numeric value on an indexed 'A' (aka "SimVar" / "Simulator Variable") type variable. \n
+		/// This is a convenience version of `setVariable()`, equivalent to `setVariable(VariableRequest(variableName, unitName, simVarIndex), value)`. See `setVariable()` and `VariableRequest` for details.
+		/// \since v1.3.0
+		inline HRESULT setSimVarVariable(const std::string &variableName, uint8_t simVarIndex, const std::string &unitName, double value) { return setVariable(VariableRequest(variableName, unitName, simVarIndex), value); }
+		/// Sets a string value on an 'A' (aka "SimVar" / "Simulator Variable") type variable. \n
+		/// This is a convenience version of `setVariable()`, equivalent to `setVariable(VariableRequest('A', variableName), stringValue)`. See `setVariable(const VariableRequest &, const std::string &)` for details.
+		/// \since v1.3.0
+		inline HRESULT setSimVarVariable(const std::string &variableName, const std::string &stringValue) { return setVariable(VariableRequest('A', variableName), stringValue); }
+		/// Sets a string value on an indexed 'A' (aka "SimVar" / "Simulator Variable") type variable. \n
+		/// This is a convenience version of `setVariable()`, equivalent to `setVariable(VariableRequest(variableName, {}, index), stringValue)`. See `setVariable(const VariableRequest &, const std::string &)` for details.
+		/// \since v1.3.0
+		inline HRESULT setSimVarVariable(const std::string &variableName, uint8_t index, const std::string &stringValue) { return setVariable(VariableRequest(variableName, {}, index), stringValue); }
+
 		/// \}
 		/// \name Data change subscriptions (variables and calculated results)
 		/// \{
