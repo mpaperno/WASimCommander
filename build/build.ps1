@@ -158,7 +158,7 @@ if ($LastExitCode -ge 8) { Write-Output($LastExitCode); Exit 1  }
 robocopy "$BuildPath\${CLIENT_NAME}_CLI\Release-net7-$Platform" "${csLibPath}\net7" *.dll *.pdb *.xml *.ini $copyOptions
 if ($LastExitCode -ge 8) { Write-Output($LastExitCode); Exit 1  }
 # .NET 8 (default Release build)
-robocopy "$BuildPath\${CLIENT_NAME}_CLI\Release-$Platform" "${csLibPath}\net8" *.dll *.pdb *.xml *.ini $copyOptions
+robocopy "$BuildPath\${CLIENT_NAME}_CLI\Release-net8-$Platform" "${csLibPath}\net8" *.dll *.pdb *.xml *.ini $copyOptions
 if ($LastExitCode -ge 8) { Write-Output($LastExitCode); Exit 1  }
 # .NET Framework
 robocopy "$BuildPath\${CLIENT_NAME}_CLI\Release-netfw-$Platform" "${csLibPath}\net46" *.dll *.pdb *.xml *.ini $copyOptions
