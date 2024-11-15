@@ -1,10 +1,10 @@
 # WASimCommander - Change Log
 
-## 1.3.0.0 (next)
+## 1.3.0.0 (15-Nov-2024)
 
 ### WASimModule
 * The server will now handle connection, ping, and custom calculator events initiated with `SimConnect_TransmitClientEvent_EX1()` (as well as the older `TransmitClientEvent()` version). ([8f42b51d])
-* Updated reference list of KEY event names for MSFS SDK v0.23.1.0. ([b115d8b6])
+* Updated reference list of KEY event names for MSFS SDK v0.23.1.0 ([b115d8b6]) and v0.24.3.0 ([495274d5]).
 
 ### WASimClient (C++) and WASimClient_CLI (managed .NET)
 * Added ability to use "custom named simulator events" (such as "Custom.Event") directly from `WASimClient`, w/out needing a separate `SimConnect` session ([61912e66]):
@@ -13,19 +13,28 @@
   * Note: This is a client-side feature, not involving the server-side `WASimModule` at all, provided for convenience.
   * Added basic test/example of usage in `CPP_BasicConsole` and `CS_BasicConsole` project code.
   * Many thanks to [Hans Billiet] for the motivation and [original code][hb-custom-events]!
+* Added ability to set Sim Vars using `string` values using the new [setVariable(var, stringValue)] overload or `setSimVarVariable()` methods (see below). ([9603c9f4])
+  This is also a client-only side feature since the only way to set string values is with SimConnect (or the in-game JS API).
+* Added convenience methods for setting Sim Vars ('A' type) specifically. There are 4 overloads of [setSimVarVariable()] for setting numeric or string values, with or w/out an index. ([62991392])
 * Fixed that the key event name lookup cache used with `sendKeyEvent(eventName)` string overload wasn't entirely thread-safe. Thanks to [Hans Billiet] for reporting! ([03753d8b])
+* Added new [`DataRequest()` constructor][DataRequest_5] overloads for calculated result type w/out `valueSize` argument where the size is determined based on the desired calculation result type. ([9f7aa9c5])
 
 ### WASimClient_CLI (managed .NET)
 * Fixed possible `null` `String` references in `RegisteredEvent` and `VariableRequest` structs when created with some constructor overloads (for example when attempting to send a `new VariableRequest(localVariableId)`). Thanks to [Hans Billiet] for reporting! ([1632ed18])
+* Added .NET8 builds to SDK distribution. This is also now the default .NET version for the VS solution's Release & Debug build configurations.
 
 ### WASimUI
+* Can now set Sim Var string type values in the "Variables" section. The "string" unit type must be selected to show the text value entry box. ([8616c608])
 * Updated database of imported Event IDs and Simulator Variables from published online SDK docs as of Mar-1-2024. ([35a495c6])
 
 ### Documentation
 * Split [WASimClient's][WASimClient_docs] "high level API" methods overview into more specific groups.
 * Added/improved some details about `WASimClient`'s event callbacks and possible concurrency issues. ([e474c7fd])
 
-**[Full Change Log](https://github.com/mpaperno/WASimCommander/compare/v1.2.0.0...next)**
+### Other
+* All distributed pre-built libraries and module are built against MSFS SDK v0.24.3.0.
+
+**[Full Change Log](https://github.com/mpaperno/WASimCommander/compare/v1.2.0.0...v1.3.0.0)**
 
 [8f42b51d]: https://github.com/mpaperno/WASimCommander/commit/8f42b51d1d94f704e001940abe2ff3f1434a9481
 [b115d8b6]: https://github.com/mpaperno/WASimCommander/commit/b115d8b64e77eaf8112de7a15c9d0dfc2fa29904
@@ -34,10 +43,18 @@
 [35a495c6]: https://github.com/mpaperno/WASimCommander/commit/35a495c6a3dc9beb13ffc05bdeab105f3b7a9fae
 [61912e66]: https://github.com/mpaperno/WASimCommander/commit/61912e66f5e51791d51fce42bb96de38f7d5b6a0
 [e474c7fd]: https://github.com/mpaperno/WASimCommander/commit/e474c7fdb9074d29064392354e2829c3d2267dee
+[9603c9f4]: https://github.com/mpaperno/WASimCommander/commit/9603c9f4fffed62be94a44a42a0ae8fda7c218c6
+[62991392]: https://github.com/mpaperno/WASimCommander/commit/62991392226c05a972b4db7b3f8aaaf5329a60e8
+[8616c608]: https://github.com/mpaperno/WASimCommander/commit/8616c6080308f4dbb1963ce6787ab0221babab20
+[9f7aa9c5]: https://github.com/mpaperno/WASimCommander/commit/9f7aa9c588fb5976363692c3ca160cfe4bbd97fd
+[495274d5]: https://github.com/mpaperno/WASimCommander/commit/495274d5ca509d6663f7575f8888360ccd6907f8
 [custom-key-events]: https://github.com/mpaperno/WASimCommander/compare/dbd4c469611750a8a9e7222740428fd4851b516f..e98fbd42b8e6aea34e0e013d261c8a48ebd47fcf
 [hb-custom-events]: https://github.com/HansBilliet/WASimCommander/compare/b1519c988bf44ce43af8a50880092391566af48a...83adc91fb73fa29dcc07f1461435dafe41f7d366
 [registerCustomKeyEvent]: https://wasimcommander.max.paperno.us/class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a6e7bf0b7c6b741081bc2ce43d937ba11
 [sendKeyEvent]: https://wasimcommander.max.paperno.us/class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#adf5b8df4cb657fefaa97f97b0ebea42c
+[setVariable(var, stringValue)]: https://wasimcommander.max.paperno.us/class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a725be5c00b1d6861826c898d095db118
+[setSimVarVariable()]: https://wasimcommander.max.paperno.us/class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a5f0f7e3575c605a44516a407251567fe
+[DataRequest_5]: https://wasimcommander.max.paperno.us/struct_w_a_sim_commander_1_1_data_request.html#a5d2d8f43b6e0aeb0de5771af73a995da
 [WASimClient_docs]: https://wasimcommander.max.paperno.us/class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html
 [Hans Billiet]: https://github.com/HansBilliet
 

@@ -46,10 +46,10 @@ On a more practical note, I am using it with the [MSFS Touch Portal Plugin](http
     - With or without a returned result; Result returned as numeric and string types.
     - Formatted results from `format_calculator_string()` using 
       [RPN String Formatting](https://docs.flightsimulator.com/html/Additional_Information/Reverse_Polish_Notation.htm#strings)
-- **Get Variable**: Return numeric result from any type of variable accessible to a standalone WASM module 
+- **Get Variable**: Return value result from any type of variable accessible to a standalone WASM module 
     (basically everything but Gauge and Instrument types, but also including Token vars). 
     - With optional Unit specifier for variable types which support it.
-- **Set Variable**: Set the numeric value of any settable variable type, with optional Unit specifier for variable types which support it.
+- **Set Variable**: Set the value of any settable variable type, with optional Unit specifier for variable types which support it.
 - **Create Variable**: Create (and get/set) a new Local variable if it doesn't already exist.
 - **List Local Variables**: Get a list of all available 'L' variables with their names and current IDs.
 - **Lookup**: Return a numeric ID for a SimVar/Local/Token variable, Unit, or Key Event name.
@@ -69,6 +69,7 @@ On a more practical note, I am using it with the [MSFS Touch Portal Plugin](http
     - Event names can be completely custom (including a `.` (period) as per SimConnect convention), or derive from the connected Client's name (to ensure uniqueness).
 - **Send Simulator "Key Events"** directly by ID or name (instead of going through the SimConnect mapping process or executing calculator code). Much more efficient than the other methods.
     - **New in v1.1.0:** Send Key Events with up to 5 values (like the new `SimConnect_TransmitClientEvent_EX1()`).
+    - **New in v1.3.0:** Send Custom Key Events (the ones with a "." in the name that are defined by particular models) by name or ID with up to 5 values.
 - **Remote Logging**: Log messages (errors, warnings, debug, etc) can optionally be sent to the Client, with specific minimum level (eg. only warnings and errors).
 - **Ping** the Server to check that the WASM module is installed and running before trying to connect or use its features.
 
@@ -130,6 +131,30 @@ API features. The main `WASimClient` interactions all happen in the `MainWindow:
 [WASimUi.cpp](https://github.com/mpaperno/WASimCommander/tree/main/src/WASimUI/WASimUI.cpp#L80) file.
 
 More to come... or [Just Read The Source](https://github.com/mpaperno/WASimCommander/tree/main/src) :-)
+
+#### Using .NET Libraries
+
+Please note that when using the .NET builds in your project, it is **vital to include the `Ijwhost.dll`** in your runtime directory along with `WASimCommander.WASimClient.dll`.
+
+While the latter will get copied to your build output automatically as a dependency, the `Ijwhost.dll` will *not*. This will result in a runtime error that says
+`Could not load file or assembly 'WASimCommander.WASimClient.dll'. The specified module could not be found.` even though it is clearly there in the runtime directory.
+
+Likewise you will probably want to copy the default `client_conf.ini` configuration file to your build output/runtime as well (this file defines some default options like logging).
+
+Both files should be included in the build as "content" files. This can be done via the VS UI or by editing the project file directly.
+As an example, assuming you copied the WASimCommander managed libraries to a `./lib` folder of your source, the following two entries
+from a .csproj file illustrate the settings:
+
+```xml
+  <ContentWithTargetPath Include=".\lib\WASimCommander\Ijwhost.dll">
+    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    <TargetPath>Ijwhost.dll</TargetPath>
+  </ContentWithTargetPath>
+  <ContentWithTargetPath Include=".\lib\WASimCommander\client_conf.ini">
+    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    <TargetPath>client_conf.ini</TargetPath>
+  </ContentWithTargetPath>
+```
 
 -------------
 ### Troubleshooting
