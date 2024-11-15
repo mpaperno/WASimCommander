@@ -233,6 +233,11 @@ class Utils
 			return find(VAR_TYPES_UNIT_BASED.cbegin(), VAR_TYPES_UNIT_BASED.cend(), type) != VAR_TYPES_UNIT_BASED.cend();
 		}
 
+		static bool isSettableVariableType(const char type) {
+			static const std::vector<char> VAR_TYPES_SETTABLE = { 'A', 'C', 'H', 'K', 'L', 'Z' };
+			return find(VAR_TYPES_SETTABLE.cbegin(), VAR_TYPES_SETTABLE.cend(), type) != VAR_TYPES_SETTABLE.cend();
+		}
+
 		static QString hresultErrorMessage(HRESULT hr)
 		{
 			// QString("Error: 0x%1").arg(hr, 8, 16, QChar('0'))
