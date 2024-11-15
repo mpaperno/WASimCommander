@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<AssetPackage Version="1.2.0">
+<AssetPackage Version="1.3.0">
 	<ItemSettings>
 		<ContentType>MISC</ContentType>
 		<Title>WASimCommander WASM Module</Title>

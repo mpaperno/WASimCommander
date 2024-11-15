@@ -10,17 +10,23 @@
     <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
     <ErrorReport>none</ErrorReport>
     <Platforms>x64</Platforms>
-    <Configurations>Debug;Release;Release-net7</Configurations>
+    <Configurations>Debug;Release-net5;Release-net6;Release-net7;Release-net8</Configurations>
     <AssemblyVersion>1.1.0.0</AssemblyVersion>
     <FileVersion>1.1.0.0</FileVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <TargetFramework>net6.0-windows</TargetFramework>
+    <TargetFramework>net8.0-windows</TargetFramework>
     <DebugType>embedded</DebugType>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-net5|x64'">
+    <TargetFramework>net5.0-windows</TargetFramework>
+    <DebugType>embedded</DebugType>
+    <Optimize>True</Optimize>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-net6|x64'">
     <TargetFramework>net6.0-windows</TargetFramework>
     <DebugType>embedded</DebugType>
     <Optimize>True</Optimize>
@@ -28,6 +34,12 @@
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-net7|x64'">
     <TargetFramework>net7.0-windows</TargetFramework>
+    <DebugType>embedded</DebugType>
+    <Optimize>True</Optimize>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-net8|x64'">
+    <TargetFramework>net8.0-windows</TargetFramework>
     <DebugType>embedded</DebugType>
     <Optimize>True</Optimize>
   </PropertyGroup>

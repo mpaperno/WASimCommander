@@ -18,6 +18,7 @@ and is also available at <http://www.gnu.org/licenses/>.
 */
 
 
+#include <ctime>
 #include <iomanip>
 #include <iostream>
 #include <string>
@@ -44,7 +45,6 @@ enum Requests : char {
 
 // A wait handle is used in this test/demo to keep the program alive while data processes in the background.
 static const HANDLE g_dataUpdateEvent = CreateEvent(nullptr, false, false, nullptr);
-
 
 // -----------------------------
 // Logging output helpers
@@ -80,21 +80,24 @@ static const auto getEnumName(Enum e, const Range &range) noexcept
 // This is an event handler for printing Client and Server log messages.
 static void LogHandler(const LogRecord &lr, LogSource src)
 {
-	Log("@@")() << getEnumName(src, LogSourceNames) << ": " << lr;  // LogRecord has a convenient  stream operator
+	Log("@@")() << getEnumName(src, LogSourceNames) << ": " << lr;  // LogRecord has a convenient stream operator
 }
 
 // Handler to print the current Client status (connecting, disconnected, etc).
 static void ClientStatusHandler(const ClientEvent &ev)
 {
-	Log("^^")() << "Client event "  << getEnumName(ev.eventType, ClientEventTypeNames) << " - " << quoted(ev.message) << "; Client status: " << hex << setw(2) << setfill('0') << (uint16_t)ev.status;
+	Log("^^")() << "Client event "  << getEnumName(ev.eventType, ClientEventTypeNames) << " - " << quoted(ev.message)
+		<< "; Client status: " << hex << setw(2) << setfill('0') << (uint16_t)ev.status;
 }
 
 // Event handler for showing listing results (eg. local vars list)
 static void ListResultsHandler(const ListResult &lr)
 {
-	Log()() << "ListResult{ " << getEnumName(lr.listType, LookupItemTypeNames) << "; status: " << hex << setw(8) << setfill('0') << lr.result << " Values: ";
-	for (const auto & [k, v] : lr.list)
-		Log("\t")() << k << " = " << v;
+	Log()() << "Got " << lr.list.size() << " results for list type " << getEnumName(lr.listType, LookupItemTypeNames) << ". (Uncomment next line in ListResultsHandler() to print them.)";
+	// uncomment below to print list results (may be long)
+	// for (const auto & [k, v] : lr.list) Log("\t")() << k << " = " << v;
+	// Log()() << "End of list results.";
+
 	// signal completion
 	SetEvent(g_dataUpdateEvent);
 }
@@ -118,6 +121,15 @@ static void DataSubscriptionHandler(const DataRequestRecord &dr)
 	SetEvent(g_dataUpdateEvent);
 }
 
+// Helper function to wait for data to arrive or time out with a log message.
+static bool AwaitData(DWORD ms = 1000)
+{
+	if (WaitForSingleObject(g_dataUpdateEvent, ms) == WAIT_OBJECT_0)
+		return true;
+	Log("!!")() << "Data subscription update timed out!";
+	return false;
+}
+
 // -----------------------------
 // Main
 // -----------------------------
@@ -125,6 +137,9 @@ static void DataSubscriptionHandler(const DataRequestRecord &dr)
 int main()
 {
 	Log()() << "Initializing WASimClient...";
+
+	// init random generator
+	srand((int)time(0));
 
 	// Create
 	WASimClient client = WASimClient(0x0C997E57);  // "CPPTEST"  :)
@@ -143,7 +158,7 @@ int main()
 
 	HRESULT hr;  // store method invocation results for logging
 
-					// Connect to Simulator (SimConnect) using default timeout period and network configuration (local Simulator)
+	// Connect to Simulator (SimConnect) using default timeout period and network configuration (local Simulator)
 	if ((hr = client.connectSimulator()) != S_OK) {
 		Log("XX")() << "Cannot connect to Simulator, quitting. Error Code: " << hr;
 		return -1;
@@ -165,19 +180,26 @@ int main()
 	}
 
 	// set up a Simulator Variable for testing.
-	const string simVarName = "CG PERCENT";
-	const string simVarUnit = "percent";
-
-	// Execute a calculator string with result. We'll try to read the value of the SimVar defined above.
-	const string calcCode = (ostringstream() << "(A:" << simVarName << ',' << simVarUnit).str();
+	string simVarName = "COCKPIT CAMERA ZOOM";
+	string simVarUnit = "percent";
+	// containers for result values
 	double fResult = 0.;
 	string sResult {};
-	if (client.executeCalculatorCode(calcCode, CalcResultType::Double, &fResult, &sResult) == S_OK)
-		Log("<<")() << "Calculator code " << quoted(calcCode) << " returned: " << fResult << " and " << quoted(sResult);
 
-	// Get a named Sim Variable value, same one as before, but directly using the Gauge API function aircraft_varget()
-	if (client.getVariable(VariableRequest(simVarName, simVarUnit, 0), &fResult) == S_OK)
+	// Get a named Sim Variable value directly using the Gauge API function aircraft_varget()
+	if (client.getVariable(VariableRequest(simVarName, simVarUnit), &fResult) == S_OK)
 		Log("<<")() << "Get SimVar '" << simVarName << ',' << simVarUnit << "' returned: " << fResult;
+
+	// Set the Sim Var to a new value (increase the percentage if it is <= 50%, decrease otherwise).
+	const double fNewValue = fResult <= 50.0 ? std::max(fResult, 1.0) * 1.05 : fResult * 0.95;
+	if (client.setVariable(VariableRequest(simVarName, simVarUnit), fNewValue) == S_OK)
+		Log("<<")() << "Set SimVar '" << simVarName << ',' << simVarUnit << "' to " << fNewValue;
+
+	// Execute a calculator string with a result.
+	// We'll try to read the same value of the SimVar defined above, which should now have changed.
+	string calcCode = (ostringstream() << "(A:" << simVarName << ',' << simVarUnit << ')').str();  // "(A:COCKPIT CAMERA ZOOM,percent)"
+	if (client.executeCalculatorCode(calcCode, CalcResultType::Double, &fResult, &sResult) == S_OK)
+		Log("<<")() << "Calculator code " << quoted(calcCode) << " returned: " << fResult;
 
 	// Create and/or Set a Local variable to play with (will be created if it doesn't exist yet, will exist if this program has run during the current simulator session).
 	const string variableName = "WASIM_TEST_VAR_1";
@@ -194,7 +216,8 @@ int main()
 	// Assuming our variable was created/exists, lets "subscribe" to notifications about when its value changes.
 	// First set up the event handler to get the updates.
 	client.setDataCallback(DataSubscriptionHandler);
-	// We subscribe to it using a "data request" and set it up to return as a float value, using a predefined value type (we could also use `4` here, for the number of bytes in a float).
+
+	// We subscribe to it using a "data request" and set it up to return as a float value, using a predefined value type (DATA_TYPE_FLOAT).
 	// This should also immediately return the current value, which will be delivered to the DataSubscriptionHandler we assigned earlier.
 	if (client.saveDataRequest(DataRequest(REQUEST_ID_1_FLOAT, 'L', variableName.c_str(), DATA_TYPE_FLOAT)) == S_OK)
 		Log()() << "Subscribed to value changes for local variable " << quoted(variableName);
@@ -206,26 +229,41 @@ int main()
 		else
 			break;
 		// wait for updates to process asynchronously and our event handler to get called, or time out
-		if (WaitForSingleObject(g_dataUpdateEvent, 1000) != WAIT_OBJECT_0) {
-			Log("!!")() << "Data subscription update timed out!";
+		if (!AwaitData())
 			break;
-		}
 	}
 
-	// Test subscribing to a string type value. We'll use the Sim var "TITLE" (airplane name), which can only be retrieved using calculator code.
+	// Test subscribing to a string type value. We'll use a string-type Sim var, which can only be retrieved using calculator code.
 	// We allocate 32 Bytes here to hold the result and we request this one with an update period of Once, which will return a result right away
 	// but will not be scheduled for regular updates. If we wanted to update this value later, we could call the client's `updateDataRequest(requestId)` method.
+	simVarName = "ATC AIRLINE";
+	simVarUnit = "string";
+	Log(">>")() << "Requesting " << simVarName << " variable...";
 	hr = client.saveDataRequest(DataRequest(
 		/*requestId*/      REQUEST_ID_2_STR,
 		/*resultType*/     CalcResultType::String,
-		/*calculatorCode*/ "(A:TITLE, String)",
+		/*calculatorCode*/ string("(A:" + simVarName + "," + simVarUnit + ")").c_str(),
 		/*valueSize*/      32,
 		/*period*/         UpdatePeriod::Once)
 	);
+	if (hr == S_OK)
+		AwaitData();
+	else
+		Log("!!")() << "saveDataRequest() for " << simVarName << " var returned error result " << hr;
+
+	// Test setting the variable. This test the `setVariable()` overload which takes a string value, though it would be a little more efficient to use `executeCalculatorCode()` directly.
+	// I'm adding a semi-random string here, otherwise this test will only work the first time it runs.
+	string stringValue = string("Blue Heron Airlines ") + string(1, 'A' + rand() % 26) + string(1, 'A' + rand() % 26);
+	Log("<<")() << "calling setVariable(" << simVarName << ", " << simVarUnit << ", " << quoted(stringValue) << ")";
+	hr = client.setVariable(VariableRequest(simVarName, simVarUnit), stringValue);
 	if (hr == S_OK) {
-		Log(">>")() << "Requested TITLE variable.";
-		if (WaitForSingleObject(g_dataUpdateEvent, 1000) != WAIT_OBJECT_0)
-			Log("!!")() << "Data subscription update timed out!";
+		// Since we registered the variable request with "Once" period, we should request an update now.
+		client.updateDataRequest(REQUEST_ID_2_STR);
+		// And wait for the update to come in.
+		AwaitData();
+	}
+	else {
+		Log("!!")() << "setVariable(" << simVarName << ", " << simVarUnit << ", " << quoted(stringValue) << ") returned error result " << hr;
 	}
 
 	// Test getting a list of our data requests back from the Client.
@@ -234,11 +272,9 @@ int main()
 	for (const DataRequestRecord &dr : requests)
 		Log()() << dr;  // Another convenient stream operator for logging
 
-	// OK, that was fun... now remove the data subscriptions. We could have done it in the loop above but we're testing things here...
-	// The server will also remove all our subscriptions when we disconnect, but it's nice to be polite!
-	const vector<uint32_t> &requestIds = client.dataRequestIdsList();
-	for (const uint32_t &id :requestIds)
-		client.removeDataRequest(id);
+	// Test removing a data subscriptions.
+	if ((hr = client.removeDataRequest(REQUEST_ID_2_STR)) != S_OK)
+		Log("!!")() << "removeDataRequest() for " << simVarName << " var returned error result " << hr;
 
 	// Get a list of all local variables...
 	// Connect to the list results Event
@@ -246,8 +282,7 @@ int main()
 	// Request the list.
 	client.list(LookupItemType::LocalVariable);
 	// Results will arrive asynchronously, so we wait a bit.
-	if (WaitForSingleObject(g_dataUpdateEvent, 3000) != WAIT_OBJECT_0)
-		Log("!!")() << "List results timed out!";
+	AwaitData(3000);
 
 	// Look up a Key Event ID by name;
 	const string eventName = "ATC_MENU_OPEN";  // w/out the "KEY_" prefix.
@@ -255,16 +290,78 @@ int main()
 	if (client.lookup(LookupItemType::KeyEventId, eventName, &keyId) == S_OK)
 		Log("<<")() << "Got lookup ID: 0x " << hex << setw(8) << setfill('0') << keyId << " for " << quoted(eventName);
 
+	// Trigger the event we just looked up (it won't actually work since all the "ATC_MENU" events are broken in MSFS).
+	client.sendKeyEvent(keyId);
+
 	// Try sending a Command directly to the server and wait for a response (Ack/Nak).
 	// In this case we'll use a "SendKey" command to activate a Key Event by the ID which we just looked up
+	// (which does the same thing we just did above with `sendKeyEvent()`).
 	Command response;
 	if (client.sendCommandWithResponse(Command(CommandId::SendKey, keyId), &response) == S_OK)
 		Log("<<")() << "Got response for SendKey command: " << response;   // another custom stream op
+
+	// Custom calculator event tests.
+
+	// Let's say we want a simple way to toggle a variable value using some RPN code (or repeatedly execute any kind of calculator code).
+	// We could use `executeCalculatorCode()` each time, but this isn't very efficient because the code string has to be built, sent,
+	// parsed, compiled on the sim side, and then finally executed. Using pre-defined "calculator events" we can skip all the preliminary
+	// steps and simply trigger the execution of pre-compiled RPN code via a numeric event ID.
+	//
+	// For this test we're just going to toggle the test Local variable we created earlier between the values of 0 and 1 based on its current value,
+	// using the following basic RPN code:
+	// (L:WASIM_TEST_VAR_1) 1 == if{ 0 (>L:WASIM_TEST_VAR_1) } els{ 1 (>L:WASIM_TEST_VAR_1) }
+	calcCode = (ostringstream() <<
+		"(L:" << variableName << ") 1 == if{ 0 (>L:" << variableName << ") } els{ 1 (>L:" << variableName << ") }"
+	).str();
+
+	// We need to register that calculator code with the WASim client/server, and we'll use a unique ID to refer to this event later on.
+	// The ID is arbitrary (just like request IDs) -- it could be an const enum value, dynamically generated, or whatever else ensures a unique number per event.
+	const uint32_t customEventId = 1;
+	// We can, optionally, also provide our own name for this custom event when we register it.
+	// This name could be used to trigger this custom event from _any_ standard SimConnect client (by mapping to the name using `SimConnect_MapClientEventToSimEvent()`
+	// and then triggering with `SimConnect_TransmitClientEvent[_EX1]()`).
+	// We don't really need a custom name for this example, but we can actually make use of this later to test another feature.
+	hr = client.registerEvent(RegisteredEvent(customEventId, calcCode, "MyEvents.ToggleTestVariable"));
+	if (hr == S_OK) {
+		// Assuming that worked, we can now trigger the custom event in various ways. Since we're still "watching" the test local variable for changes,
+		// we should see a new value every time we trigger this event.
+		if ((hr = client.transmitEvent(customEventId)) == S_OK)
+			AwaitData();
+		else
+			Log("!!")() << "transmitEvent() returned error result " << hr;
+	}
+	else {
+		Log("!!")() << "Registration of custom calculator event ID " << customEventId << " with RPN code " << quoted(calcCode) << " failed with error: " << hr;
+	}
+
+	// Custom named event registration and triggering test (new for v1.3.0).
+	// This tests setting up a custom-named simulator event, which are typically created by 3rd-party aircraft models, such as the FlyByWire A32NX.
+	// Here we're (redundantly) using our own custom-named "calculator event" we set up above, just because we know it exists (vs. relying on some specific model to be installed).
+
+	// First the custom-named event needs to be registered with the client. Note we're using the same event name here as we used in the `registerEvent()` call above.
+	// This sets up a SimConnect mapping to a generated unique ID. We want to save this ID and use it later to trigger the event efficiently (w/out needing to use the event name again).
+	uint32_t customNamedEventId = 0;
+	hr = client.registerCustomKeyEvent("MyEvents.ToggleTestVariable", &customNamedEventId);
+	if (hr == S_OK) {
+		// A successful registration means we can now use the generated event ID to trigger the custom event,
+		// using the same `sendKeyEvent()` method as we'd use for a "standard" Key Event.
+		Log()() << "registerCustomKeyEvent() succeeded, returned Event ID " << customNamedEventId;
+		// Trigger the event. Should get a variable value change message after this, or a timeout if something went wrong.
+		if ((hr = client.sendKeyEvent(customNamedEventId)) == S_OK)
+			AwaitData();
+		else
+			Log("!!")() << "sendKeyEvent() returned error result " << hr;
+	}
+	else {
+		Log("!!")() << "registerCustomKeyEvent() returned error result " << hr;
+	}
+
+	// Finished, disconnect.
 
 	// Shutdown (really the destructor will close any/all connections anyway, but this is for example).
 	client.disconnectServer();
 	client.disconnectSimulator();
 
+	CloseHandle(g_dataUpdateEvent);
 	return 0;
 }
-

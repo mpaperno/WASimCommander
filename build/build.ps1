@@ -8,7 +8,7 @@
 Param(
   [string[]]$Targets = "all",
   [string]$RootPath = "..",
-  [string[]]$Configuration = @("Debug", "Debug-DLL", "Release-DLL", "Release-net6", "Release-net7", "Release-netfw", "Release"),
+  [string[]]$Configuration = @("Debug", "Debug-DLL", "Release-DLL", "Release-net5", "Release-net6", "Release-net7", "Release-netfw", "Release"),
   [string]$Platform = "x64",
   [string[]]$Projects = "all",
   [string]$BuildType = "Clean,Rebuild",
@@ -35,7 +35,7 @@ $ModulePackage = "${PackagePath}\module"
 $DocsDistroPath = "$RootPath\..\gh-pages"
 
 $testApps = @{
-	"$BuildPath\CS_BasicConsole\Release-$Platform\$Platform\Release\net6.0-windows" = "$PackagePath\bin\CS_BasicConsole";
+	"$BuildPath\CS_BasicConsole\Release-net8-$Platform\$Platform\Release-net8\net8.0-windows" = "$PackagePath\bin\CS_BasicConsole";
 	"$BuildPath\CPP_BasicConsole\Release-$Platform" = "$PackagePath\bin\CPP_BasicConsole"
 	"$SrcPath\Testing\Py_BasicConsole" = "$PackagePath\bin\Py_BasicConsole"
 }
@@ -148,14 +148,17 @@ if ($LastExitCode -ge 8) { Write-Output($LastExitCode); Exit 1  }
 # Managed DLL
 $csLibPath = "${LibPath}\managed"
 
-# .NET 5 (default Release build)
-robocopy "$BuildPath\${CLIENT_NAME}_CLI\Release-$Platform" "${csLibPath}\net5" *.dll *.pdb *.xml *.ini $copyOptions
+# .NET 5
+robocopy "$BuildPath\${CLIENT_NAME}_CLI\Release-net5-$Platform" "${csLibPath}\net5" *.dll *.pdb *.xml *.ini $copyOptions
 if ($LastExitCode -ge 8) { Write-Output($LastExitCode); Exit 1  }
 # .NET 6
 robocopy "$BuildPath\${CLIENT_NAME}_CLI\Release-net6-$Platform" "${csLibPath}\net6" *.dll *.pdb *.xml *.ini $copyOptions
 if ($LastExitCode -ge 8) { Write-Output($LastExitCode); Exit 1  }
 # .NET 7
 robocopy "$BuildPath\${CLIENT_NAME}_CLI\Release-net7-$Platform" "${csLibPath}\net7" *.dll *.pdb *.xml *.ini $copyOptions
+if ($LastExitCode -ge 8) { Write-Output($LastExitCode); Exit 1  }
+# .NET 8 (default Release build)
+robocopy "$BuildPath\${CLIENT_NAME}_CLI\Release-$Platform" "${csLibPath}\net8" *.dll *.pdb *.xml *.ini $copyOptions
 if ($LastExitCode -ge 8) { Write-Output($LastExitCode); Exit 1  }
 # .NET Framework
 robocopy "$BuildPath\${CLIENT_NAME}_CLI\Release-netfw-$Platform" "${csLibPath}\net46" *.dll *.pdb *.xml *.ini $copyOptions

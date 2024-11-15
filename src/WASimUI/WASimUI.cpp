@@ -262,24 +262,32 @@ public:
 			logUiMessage(tr("Variable name is empty."), CommandId::Set);
 			return;
 		}
-		if (vtype == 'L' && create)
+		if (vtype == 'L' && create) {
 			client->setOrCreateLocalVariable(varName.toStdString(), ui->dsbSetVarValue->value(), ui->cbSetVarUnitName->currentText().toStdString());
-		else
-			client->setVariable(VariableRequest(vtype, varName.toStdString(), ui->cbSetVarUnitName->currentText().toStdString(), ui->sbGetSetSimVarIndex->value()), ui->dsbSetVarValue->value());
+		}
+		else {
+			const VariableRequest vr(vtype, varName.toStdString(), ui->cbSetVarUnitName->currentText().toStdString(), ui->sbGetSetSimVarIndex->value());
+			if (ui->dsbSetVarValue->isVisible())
+				client->setVariable(vr, ui->dsbSetVarValue->value());
+			else
+				client->setVariable(vr, ui->leSetVarValue->text().toStdString());
+		}
 	}
 
 	void toggleSetGetVariableType()
 	{
 		const QChar vtype = ui->cbGetSetVarType->currentData().toChar();
-		bool isLocal = vtype == 'L', isSimVar = vtype == 'A';
+		bool isLocal = vtype == 'L',
+			isSimVar = vtype == 'A',
+			hasUnit = Utils::isUnitBasedVariableType(vtype.toLatin1()),
+			settable = Utils::isSettableVariableType(vtype.toLatin1());
 		ui->wLocalVarsForm->setVisible(isLocal);
 		ui->wOtherVarsForm->setVisible(!isLocal);
 		ui->wGetSetSimVarIndex->setVisible(isSimVar);
 		ui->btnSetCreate->setVisible(isLocal);
 		ui->btnGetCreate->setVisible(isLocal);
-		bool hasUnit = ui->cbGetSetVarType->currentText().contains('*');
-		ui->cbSetVarUnitName->setVisible(hasUnit);
-		ui->lblSetVarUnit->setVisible(hasUnit);
+		ui->wGetSetVarUnit->setEnabled(hasUnit);
+		ui->wSetVarValue->setEnabled(settable);
 		if (isSimVar) {
 			ui->cbVariableName->setCompleter(new DocImports::NameCompleter(DocImports::RecordType::SimVars, ui->cbNameOrCode));
 			ui->cbVariableName->lineEdit()->addAction(ui->btnFindSimVar->defaultAction(), QLineEdit::TrailingPosition);
@@ -1004,6 +1012,13 @@ WASimUI::WASimUI(QWidget *parent) :
 	connect(ui.cbGetSetVarType, &DataComboBox::currentDataChanged, this, [=](const QVariant &) {
 		d->toggleSetGetVariableType();
 		d->updateLocalVarsFormState();
+	});
+
+	ui.leSetVarValue->setVisible(false);
+	connect(ui.cbSetVarUnitName, &QComboBox::currentTextChanged, this, [=](const QString &text) {
+		bool isString = (text == QLatin1Literal("string"));
+		ui.dsbSetVarValue->setVisible(!isString);
+		ui.leSetVarValue->setVisible(isString);
 	});
 
 	// Init the request editor form

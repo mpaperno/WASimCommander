@@ -129,7 +129,7 @@ namespace WASimCommander
 		uint32_t requestId;                  ///< Unique ID for the request, subsequent use of this ID overwrites any previous request definition (but size may not grow).
 		uint32_t valueSize;                  ///< Byte size of stored value; can also be one of the predefined DATA_TYPE_* constants. \sa WASimCommander::DATA_TYPE_INT8, etc
 		float deltaEpsilon;                  ///< Minimum change in numeric value required to trigger an update. The default of `0.0` is to send updates only if the value changes, but even on the smallest changes.
-		                                     ///  Setting this to some positive value can be especially useful for high-precision floating-point numbers which may fluctuate within an insignifcant range,
+		                                     ///  Setting this to some positive value can be especially useful for high-precision floating-point numbers which may fluctuate within an insignificant range,
 		                                     ///  but may be used with any numeric value (for integer value types, only the integer part of the epsilon value is considered).
 		                                     ///  Conversely, to send data updates _every time_ the value is read, and skip any comparison check altogether, set this to a negative value like `-1.0`.
 		                                     ///< \note For the positive epsilon settings to work, the `valueSize` must be set to one of the predefined `DATA_TYPE_*` constants.
@@ -139,7 +139,7 @@ namespace WASimCommander
 		WSE::RequestType requestType;        ///< Named variable or calculated value.
 		WSE::CalcResultType calcResultType;  ///< Expected calculator result type.
 		uint8_t simVarIndex;                 ///< Some SimVars require an index for access, default is 0.
-		char varTypePrefix;                  ///< Variable type prefix for named variables. Types: 'L' (local), 'A' (SimVar) and 'T' (Token, not an actual GaugeAPI prefix) are checked using respecitive GaugeAPI methods.
+		char varTypePrefix;                  ///< Variable type prefix for named variables. Types: 'L' (local), 'A' (SimVar) and 'T' (Token, not an actual GaugeAPI prefix) are checked using respective GaugeAPI methods.
 		char nameOrCode[STRSZ_REQ] = {0};    ///< Variable name or full calculator string.
 		char unitName[STRSZ_UNIT] = {0};     ///< Unit name for named variables (optional to override variable's default units). Only 'L' and 'A' variable types support unit specifiers.
 		                                     //  1088/1088 B (packed/unpacked), 8/16 B aligned
@@ -165,6 +165,8 @@ namespace WASimCommander
 				setNameOrCode(nameOrCode);
 			if (unitName)
 				setUnitName(unitName);
+			if (!valueSize && requestType == WSE::RequestType::Calculated)
+				this->valueSize = (calcResultType == WSE::CalcResultType::Double ? DATA_TYPE_DOUBLE : calcResultType == WSE::CalcResultType::Integer ? DATA_TYPE_INT32 : 256);
 		}
 
 		/// Constructs a request for a named variable (`requestType = RequestType::Named`) with optional update period, interval, and epsilon values.
@@ -181,6 +183,15 @@ namespace WASimCommander
 		explicit DataRequest(uint32_t requestId, WSE::CalcResultType resultType, const char *calculatorCode, uint32_t valueSize,
 		                     WSE::UpdatePeriod period = WSE::UpdatePeriod::Tick, uint32_t interval = 0, float deltaEpsilon = 0.0f) :
 			DataRequest(requestId, valueSize, WSE::RequestType::Calculated, resultType, period, calculatorCode, nullptr, 'Q', deltaEpsilon, interval)
+		{ }
+		/// Constructs a calculator code request (`requestType = RequestType::Calculated`) with optional update period, interval, and epsilon values. \n
+		/// This overload, w/out a `valueSize` argument automatically determines the size based on the `resultType` argument:
+		/// - `CalcResultType::Double`  = `WASimCommander::DATA_TYPE_DOUBLE`
+		/// - `CalcResultType::Integer` = `WASimCommander::DATA_TYPE_INT32`
+		/// - `CalcResultType::String`  = 256
+		explicit DataRequest(uint32_t requestId, WSE::CalcResultType resultType, const char *calculatorCode,
+                         WSE::UpdatePeriod period = WSE::UpdatePeriod::Tick, uint32_t interval = 0, float deltaEpsilon = 0.0f) :
+			DataRequest(requestId, 0, WSE::RequestType::Calculated, resultType, period, calculatorCode, nullptr, 'Q', deltaEpsilon, interval)
 		{ }
 
 		void setNameOrCode(const char *name) { setCharArrayValue(nameOrCode, STRSZ_REQ, name); }  ///< Set the `nameOrCode` member using a const char array.

@@ -283,11 +283,17 @@ INVOKE_SIMCONNECT(SimConnect_AddToClientDataDefinition, hSim, cddId, offset, szO
 
 		// Static functions ---------------------------------------------------
 
+		template <typename T> static bool isNullptr(T* ptr) { return !ptr; }
+		template <typename T> static bool isNullptr(T) { return false; }
+
 		/// Recursively output all arguments to a stream, with comma separator between each (no spaces). Args types must have stream operators, obviously.
 		template <typename T, typename... Args>
 		static void streamArgs(std::ostream &os, T var1, Args... var2)
 		{
-			os << var1;
+			if (!isNullptr(var1))
+				os << var1;
+			else
+				os << "NULL";
 			if (sizeof...(var2) > 0) {
 				os << ',';
 				streamArgs(os, var2...);

@@ -60,6 +60,8 @@ using namespace WASimCommander::Enums;
 /// \private
 using Clock = std::chrono::steady_clock;
 
+static const uint32_t CUSTOM_KEY_EVENT_LEGACY_TRIGGER_FLAG = 0x80000000;
+
 // -------------------------------------------------------------
 #pragma region DataRequestRecord struct
 // -------------------------------------------------------------
@@ -255,8 +257,18 @@ class WASimClient::Private
 	responseMap_t reponses {};
 	requestMap_t requests {};
 	eventMap_t events {};
-	using eventNameCache_t = unordered_map<std::string, int32_t>;
-	eventNameCache_t keyEventNameCache {};
+
+	// Cached mapping of Key Event names to actual IDs, used in `sendKeyEvent(string)` convenience overload,
+	// and also to track registered (mapped) custom-named sim Events as used in `registerCustomKeyEvent()` and related methods.
+	unordered_map<std::string, uint32_t> keyEventNameCache {};
+	shared_mutex mtxKeyEventNames;
+	uint32_t nextCustomEventID = CUSTOM_KEY_EVENT_ID_MIN;  // auto-generated IDs for custom event registrations
+
+	// Saved mappings of variable names to SIMCONNECT_DATA_DEFINITION_ID values we assigned to them.
+	// Used for setting string values on SimVars, which we do locally since WASM module can't.
+	map<std::string, uint32_t> mappedVarsNameCache {};
+	shared_mutex mtxMappedVarNames;
+	uint32_t nextMappedVarID = 1;  // auto-generated IDs for mapping variable names to SimConnect IDs
 
 #pragma endregion
 #pragma region  Callback handling templates  ----------------------------------------------
@@ -598,6 +610,8 @@ class WASimClient::Private
 
 		// possibly re-register SimConnect CDAs for any existing data requests
 		registerAllDataRequestAreas();
+		// re-register all Simulator Custom Events
+		mapAllCustomKeyEvents();
 
 		setStatus(ClientStatus::SimConnected);
 		return S_OK;
@@ -634,6 +648,13 @@ class WASimClient::Private
 		if (hSimEvent)
 			CloseHandle(hSimEvent);
 		hSimEvent = nullptr;
+
+		{
+			// clear cached var name mappings, new mapping will need to be made if re-connecting
+			unique_lock lock { mtxMappedVarNames };
+			mappedVarsNameCache.clear();
+			nextMappedVarID = 1;
+		}
 
 		setStatus(ClientStatus::Idle);
 		LOG_INF << "Shutdown complete, network disconnected.";
@@ -910,11 +931,11 @@ class WASimClient::Private
 #pragma endregion
 #pragma region  Remote Variables accessors  ----------------------------------------------
 
-	const string buildVariableCommandString(const VariableRequest &v, bool forSet) const
+	// shared for getVariable() and setLocalVariable()
+	const string buildVariableCommandString(const VariableRequest &v, bool isLocal) const
 	{
-		// only L vars can be set by an index value
-		const bool isIndexed = forSet ? (v.variableType == 'L') : Utilities::isIndexedVariableType(v.variableType);
-		const bool hasUnits = Utilities::isUnitBasedVariableType(v.variableType);
+		const bool isIndexed = isLocal || Utilities::isIndexedVariableType(v.variableType);
+		const bool hasUnits = isLocal || Utilities::isUnitBasedVariableType(v.variableType);
 		string sValue = (isIndexed && v.variableId > -1 ? to_string(v.variableId) : v.variableName);
 		if (sValue.empty())
 			return sValue;
@@ -950,16 +971,84 @@ class WASimClient::Private
 		return S_OK;
 	}
 
+	HRESULT setLocalVariable(const VariableRequest &v, const double value)
+	{
+		const string sValue = buildVariableCommandString(v, true);
+		if (sValue.empty() || sValue.length() >= STRSZ_CMD)
+			return E_INVALIDARG;
+		return sendServerCommand(Command(v.createLVar ? CommandId::SetCreate : CommandId::Set, 'L', sValue.c_str(), value));
+	}
+
 	HRESULT setVariable(const VariableRequest &v, const double value)
 	{
-		if (Utilities::isSettableVariableType(v.variableType)) {
-			const string sValue = buildVariableCommandString(v, true);
-			if (sValue.empty() || sValue.length() >= STRSZ_CMD)
-				return E_INVALIDARG;
-			return sendServerCommand(Command(v.createLVar && v.variableType == 'L' ? CommandId::SetCreate : CommandId::Set, v.variableType, sValue.c_str(), value));
+		if (v.variableType == 'L')
+			return setLocalVariable(v, value);
+
+		if (!Utilities::isSettableVariableType(v.variableType)) {
+			LOG_WRN << "Cannot Set a variable of type '" << v.variableType << "'.";
+			return E_INVALIDARG;
 		}
-		LOG_WRN << "Cannot Set a variable of type '" << v.variableType << "'.";
-		return E_INVALIDARG;
+		// All other variable types can only be set via calculator code and require a string-based name
+		if (v.variableName.empty()) {
+			LOG_WRN << "A variable name is required to set variable of type '" << v.variableType << "'.";
+			return E_INVALIDARG;
+		}
+		if (v.unitId > -1 && v.unitName.empty()) {
+			LOG_WRN << "A variable of type '" << v.variableType << "' unit ID; use a unit name instead.";
+			return E_INVALIDARG;
+		}
+
+		// Build the RPN code string.
+		ostringstream codeStr = ostringstream();
+		codeStr << fixed << setprecision(7) << value;
+		codeStr << " (>" << v.variableType << ':' << v.variableName;
+		if (v.variableType == 'A' && v.simVarIndex)
+			codeStr << ':' << (uint16_t)v.simVarIndex;
+		if (!v.unitName.empty())
+			codeStr << ',' << v.unitName;
+		codeStr << ')';
+
+		if (codeStr.tellp() == -1 || (size_t)codeStr.tellp() >= STRSZ_CMD)
+			return E_INVALIDARG;
+
+		// Send it.
+		return sendServerCommand(Command(CommandId::Exec, +CalcResultType::None, codeStr.str().c_str()));
+	}
+
+	HRESULT setStringVariable(const VariableRequest &v, const std::string &value)
+	{
+		if (!checkInit()) {
+			LOG_ERR << "Simulator not connected, cannot set string variable.";
+			return E_NOT_CONNECTED;
+		}
+		if (v.variableType != 'A') {
+			LOG_WRN << "Cannot Set a string value on variable of type '" << v.variableType << "'.";
+			return E_INVALIDARG;
+		}
+		if (v.variableName.empty()) {
+			LOG_WRN << "A variable name is required to set variable of type '" << v.variableType << "'.";
+			return E_INVALIDARG;
+		}
+
+		uint32_t mapId = 0;
+		{
+			// Check for existing mapped ID
+			shared_lock lock { mtxMappedVarNames };
+			const auto pos = mappedVarsNameCache.find(v.variableName);
+			if (pos != mappedVarsNameCache.cend())
+				mapId = pos->second;
+		}
+		if (!mapId) {
+			// Create a new mapping and save it
+			HRESULT hr;
+			if FAILED(hr = INVOKE_SIMCONNECT(AddToDataDefinition, hSim, (SIMCONNECT_DATA_DEFINITION_ID)nextMappedVarID, v.variableName.c_str(), (const char*)nullptr, SIMCONNECT_DATATYPE_STRINGV, 0.0f, SIMCONNECT_UNUSED))
+				return hr;
+			mapId = nextMappedVarID++;
+			unique_lock lock { mtxMappedVarNames };
+			mappedVarsNameCache.insert(std::pair{ v.variableName, mapId });
+		}
+		// Use SimConnect to set the value.
+		return INVOKE_SIMCONNECT(SetDataOnSimObject, hSim, (SIMCONNECT_DATA_DEFINITION_ID)mapId, SIMCONNECT_OBJECT_ID_USER, 0UL, 0UL, (DWORD)(value.length() + 1), (void*)value.c_str());
 	}
 
 #pragma endregion
@@ -1045,7 +1134,7 @@ class WASimClient::Private
 	}
 
 	// Note that this method does NOT acquire the requests mutex.
-	HRESULT deregisterDataRequestArea(const TrackedRequest * const tr)
+	HRESULT deregisterDataRequestArea(const TrackedRequest * const tr) const
 	{
 		// We need to first suspend updates for this request before removing it, otherwise it seems SimConnect will sometimes crash
 		INVOKE_SIMCONNECT(
@@ -1084,8 +1173,7 @@ class WASimClient::Private
 
 		if (isNewRequest) {
 			unique_lock lock{mtxRequests};
-			requests.try_emplace(req.requestId, req, nextDefId++);
-			tr = &requests.at(req.requestId);
+			tr = &requests.try_emplace(req.requestId, req, nextDefId++).first->second;
 		}
 		else {
 			if (actualValSize > tr->dataSize) {
@@ -1221,14 +1309,83 @@ class WASimClient::Private
 #pragma region Simulator Key Events -------------------------------------------
 
 	// Writes KeyEvent data to the corresponding CDA.
-	HRESULT writeKeyEvent(const KeyEvent &kev)
+	HRESULT writeKeyEvent(const KeyEvent &kev) const
 	{
 		if (!isConnected()) {
-			LOG_ERR << "Server not connected, cannot send KeyEvent " << kev;
+			LOG_ERR << "Server not connected, cannot send " << kev;
 			return E_NOT_CONNECTED;
 		}
-		LOG_DBG << "Sending Key Event: " << kev;
+		LOG_TRC << "Sending: " << kev;
 		return INVOKE_SIMCONNECT(SetClientData, hSim, (SIMCONNECT_CLIENT_DATA_ID)CLI_DATA_KEYEVENT, (SIMCONNECT_CLIENT_DATA_DEFINITION_ID)CLI_DATA_KEYEVENT, SIMCONNECT_CLIENT_DATA_SET_FLAG_DEFAULT, 0UL, (DWORD)sizeof(KeyEvent), (void *)&kev);
+	}
+
+	// Custom Events
+
+	// This private version does _not_ check if the event name is valid. The `mtxKeyEventNames` _must_ be unlocked before entry.
+	HRESULT registerCustomKeyEvent(const std::string &name, uint32_t *pRetId, bool useLegacy)
+	{
+		// Prevent multiple threads from registering the same Event
+		unique_lock lock(mtxKeyEventNames);
+		// Check for duplicates.
+		const auto pos = keyEventNameCache.find(name);
+		if (pos != keyEventNameCache.cend()) {
+			// Custom Event already exists - return the eventId if required
+			if (pRetId)
+				*pRetId = pos->second;
+			return S_OK;
+		}
+
+		// Register a new event mapping with a unique ID. These start at CUSTOM_KEY_EVENT_ID_MIN.
+		uint32_t keyId = nextCustomEventID++;
+		// Use high bit as flag of ID for forcing "legacy" SimConnect_TransmitClientEvent() usage as trigger.
+		if (useLegacy)
+			keyId |= CUSTOM_KEY_EVENT_LEGACY_TRIGGER_FLAG;
+		// Cache the event name and ID. This is possibly used for lookups later in `sendKeyEvent(string)` and/or to register event mappings when (re)connecting to SimConnect.
+		keyEventNameCache.insert(std::pair{ name, keyId });
+
+		if (pRetId)
+			*pRetId = keyId;
+
+		// Try to register the new Event now if already connected to SimConnect.
+		if (simConnected)
+			return mapCustomKeyEvent(keyId, name);
+		LOG_DBG << "Queued registration of custom simulator key event " << quoted(name) << " with ID " << keyId << ".";
+		return S_OK;
+	}
+
+	// Invokes SimConnect_MapClientEventToSimEvent() with given name and id
+	HRESULT mapCustomKeyEvent(uint32_t id, const std::string &name) const
+	{
+		const HRESULT hr = SimConnectHelper::newClientEvent(hSim, id, name);
+		if SUCCEEDED(hr)
+			LOG_DBG << "Registered custom simulator key event " << quoted(name) << " with id " << id << ".";
+		else
+			LOG_ERR << "Registration custom simulator key event " << quoted(name) << " for id " << id << " failed with HRESULT " << LOG_HR(hr);
+		return hr;
+	}
+
+	// called from connectSimulator()
+	void mapAllCustomKeyEvents()
+	{
+		shared_lock lock(mtxKeyEventNames);
+		for (const auto& [name, id] : keyEventNameCache) {
+			if (id >= CUSTOM_KEY_EVENT_ID_MIN)
+				mapCustomKeyEvent(id, name);
+		}
+	}
+
+	// Sends a registered Custom Event using TransmitClientEvent(_EX1)
+	HRESULT sendSimCustomKeyEvent(uint32_t keyEventId, DWORD v1, DWORD v2, DWORD v3, DWORD v4, DWORD v5) const
+	{
+		if (!simConnected) {
+			LOG_ERR << "Simulator not connected, cannot send a Custom Key Event.";
+			return E_NOT_CONNECTED;
+		}
+
+		LOG_TRC << "Invoking " << ((keyEventId & CUSTOM_KEY_EVENT_LEGACY_TRIGGER_FLAG) ? "TransmitClientEvent" : "TransmitClientEvent_EX1") << " with Event ID " << keyEventId << "; values: " << v1 << "; " << v2 << "; " << v3 << "; " << v4 << "; " << v5 << ';';
+		if (keyEventId & CUSTOM_KEY_EVENT_LEGACY_TRIGGER_FLAG)
+			return INVOKE_SIMCONNECT(TransmitClientEvent, hSim, SIMCONNECT_OBJECT_ID_USER, (SIMCONNECT_CLIENT_EVENT_ID)keyEventId, v1, SIMCONNECT_GROUP_PRIORITY_HIGHEST, SIMCONNECT_EVENT_FLAG_GROUPID_IS_PRIORITY);
+		return INVOKE_SIMCONNECT(TransmitClientEvent_EX1, hSim, SIMCONNECT_OBJECT_ID_USER, (SIMCONNECT_CLIENT_EVENT_ID)keyEventId, SIMCONNECT_GROUP_PRIORITY_HIGHEST, SIMCONNECT_EVENT_FLAG_GROUPID_IS_PRIORITY, v1, v2, v3, v4, v5);
 	}
 
 #pragma endregion
@@ -1565,16 +1722,21 @@ HRESULT WASimClient::getOrCreateLocalVariable(const std::string &variableName, d
 	return d->getVariable(VariableRequest(variableName, true, unitName), pfResult, nullptr, defaultValue);
 }
 
+
 HRESULT WASimClient::setVariable(const VariableRequest & variable, const double value) {
 	return d->setVariable(variable, value);
 }
 
+HRESULT WASimClient::setVariable(const VariableRequest &variable, const std::string &value) {
+	return d->setStringVariable(variable, value);
+}
+
 HRESULT WASimClient::setLocalVariable(const std::string &variableName, const double value, const std::string &unitName) {
-	return d->setVariable(VariableRequest(variableName, false, unitName), value);
+	return d->setLocalVariable(VariableRequest(variableName, false, unitName), value);
 }
 
 HRESULT WASimClient::setOrCreateLocalVariable(const std::string &variableName, const double value, const std::string &unitName) {
-	return d->setVariable(VariableRequest(variableName, true, unitName), value);
+	return d->setLocalVariable(VariableRequest(variableName, true, unitName), value);
 }
 
 #pragma endregion
@@ -1732,25 +1894,78 @@ vector<RegisteredEvent> WASimClient::registeredEvents() const
 
 HRESULT WASimClient::sendKeyEvent(uint32_t keyEventId, uint32_t v1, uint32_t v2, uint32_t v3, uint32_t v4, uint32_t v5) const
 {
-	return d->writeKeyEvent(KeyEvent(keyEventId, { v1, v2, v3, v4, v5 }, d->nextCmdToken++));
+	if (keyEventId < CUSTOM_KEY_EVENT_ID_MIN)
+		return d_const->writeKeyEvent(KeyEvent(keyEventId, { v1, v2, v3, v4, v5 }, d->nextCmdToken++));
+	else
+		return d_const->sendSimCustomKeyEvent(keyEventId, v1, v2, v3, v4, v5);
 }
 
-HRESULT WASimClient::sendKeyEvent(const std::string & keyEventName, uint32_t v1, uint32_t v2, uint32_t v3, uint32_t v4, uint32_t v5)
+inline static bool isCustomKeyEventName(const std::string &name) {
+	return name[0] == '#' || name.find('.') != string::npos;
+}
+
+HRESULT WASimClient::sendKeyEvent(const std::string &keyEventName, uint32_t v1, uint32_t v2, uint32_t v3, uint32_t v4, uint32_t v5)
 {
-	int32_t keyId;
-	// check the cache first
-	const Private::eventNameCache_t::iterator pos = d->keyEventNameCache.find(keyEventName);
-	if (pos != d->keyEventNameCache.cend()) {
-		keyId = pos->second;
+	if (keyEventName.empty())
+		return E_INVALIDARG;
+
+	// check the cache first -- this stores both standard key events and custom (mapped) types.
+	{
+		shared_lock rdlock(d->mtxKeyEventNames);
+		const auto pos = d_const->keyEventNameCache.find(keyEventName);
+		if (pos != d_const->keyEventNameCache.cend())
+			return sendKeyEvent(pos->second, v1, v2, v3, v4, v5);
+		// mutex lock and iterator go out of scope
+	}
+
+	// The name wasn't in the cache...
+	uint32_t keyId;
+	if (isCustomKeyEventName(keyEventName)) {
+		// If the event name looks like a "custom" event then try to register it now.
+		const HRESULT hr = d->registerCustomKeyEvent(keyEventName, &keyId, false);
+		if FAILED(hr)
+			return hr;
 	}
 	else {
-		// try a lookup
-		HRESULT hr;
-		if ((hr = lookup(LookupItemType::KeyEventId, keyEventName, &keyId)) != S_OK)
-			return hr == E_FAIL ? E_INVALIDARG : hr;
-		d->keyEventNameCache.insert(std::pair{keyEventName, keyId});
+		// Otherwise try a lookup() -- this can only work for standard Key Events, and only if we're currently connected.
+		int32_t id;
+		const HRESULT hr = lookup(LookupItemType::KeyEventId, keyEventName, &id);
+		if FAILED(hr)
+			return hr == E_FAIL ? E_INVALIDARG : hr;  // E_FAIL means event name wasn't found at server
+		keyId = (uint32_t)id;
+		// save the lookup result
+		unique_lock rwlock(d->mtxKeyEventNames);
+		d->keyEventNameCache.insert(std::pair{ keyEventName, keyId });
 	}
-	return sendKeyEvent((uint32_t)keyId, v1, v2, v3, v4, v5);
+
+	return sendKeyEvent(keyId, v1, v2, v3, v4, v5);
+}
+
+// Custom-named Key Event registration
+
+HRESULT WASimClient::registerCustomKeyEvent(const std::string &customEventName, uint32_t *puiCustomEventId, bool useLegacyTransmit)
+{
+	if (isCustomKeyEventName(customEventName))
+		return d->registerCustomKeyEvent(customEventName, puiCustomEventId, useLegacyTransmit);
+
+	LOG_ERR << "Custom event name " << quoted(customEventName) << " must start with '#' or include a period.";
+	return E_INVALIDARG;
+}
+
+HRESULT WASimClient::removeCustomKeyEvent(uint32_t eventId)
+{
+	unique_lock lock(d->mtxKeyEventNames);
+	const auto pos = find_if(cbegin(d_const->keyEventNameCache), cend(d_const->keyEventNameCache), [eventId](const auto &p) { return p.second == eventId; });
+	if (pos == d_const->keyEventNameCache.cend())
+		return E_INVALIDARG;
+	d->keyEventNameCache.erase(pos);
+	return S_OK;
+}
+
+HRESULT WASimClient::removeCustomKeyEvent(const std::string &customEventName)
+{
+	unique_lock lock(d->mtxKeyEventNames);
+	return d->keyEventNameCache.erase(customEventName) > 0 ? S_OK : E_INVALIDARG;
 }
 
 #pragma endregion Key Events

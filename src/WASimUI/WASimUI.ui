@@ -61,7 +61,7 @@
       <property name="title">
        <string>Variables</string>
       </property>
-      <layout class="QGridLayout" name="gridLayout_6" columnstretch="0,1,0,0,0,0,0,0,0">
+      <layout class="QGridLayout" name="gridLayout_6" columnstretch="0,1,0,0,0,0,0,0,0,0">
        <property name="leftMargin">
         <number>4</number>
        </property>
@@ -96,26 +96,13 @@
          </property>
         </widget>
        </item>
-       <item row="0" column="0">
-        <widget class="WASimUiNS::VariableTypeComboBox" name="cbGetSetVarType">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="6">
-        <widget class="QToolButton" name="btnSetVar">
+       <item row="0" column="9">
+        <widget class="QToolButton" name="btnCopyLVarToRequest">
          <property name="text">
-          <string>Set</string>
+          <string>Copy</string>
          </property>
          <property name="toolButtonStyle">
           <enum>Qt::ToolButtonIconOnly</enum>
-         </property>
-         <property name="autoRaise">
-          <bool>false</bool>
          </property>
         </widget>
        </item>
@@ -185,7 +172,7 @@
          </item>
         </layout>
        </item>
-       <item row="0" column="6">
+       <item row="0" column="7">
         <widget class="QToolButton" name="btnGetVar">
          <property name="text">
           <string>Get</string>
@@ -195,50 +182,29 @@
          </property>
         </widget>
        </item>
-       <item row="1" column="2">
-        <widget class="QLabel" name="lblLocalVars_3">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="font">
-          <font>
-           <weight>75</weight>
-           <bold>true</bold>
-          </font>
-         </property>
+       <item row="1" column="7">
+        <widget class="QToolButton" name="btnSetVar">
          <property name="text">
           <string>Set</string>
          </property>
+         <property name="toolButtonStyle">
+          <enum>Qt::ToolButtonIconOnly</enum>
+         </property>
+         <property name="autoRaise">
+          <bool>false</bool>
+         </property>
         </widget>
        </item>
-       <item row="1" column="4" colspan="2">
-        <widget class="QDoubleSpinBox" name="dsbSetVarValue">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
+       <item row="1" column="8">
+        <widget class="QToolButton" name="btnSetCreate">
+         <property name="text">
+          <string>Set/Create</string>
          </property>
-         <property name="focusPolicy">
-          <enum>Qt::StrongFocus</enum>
+         <property name="toolButtonStyle">
+          <enum>Qt::ToolButtonIconOnly</enum>
          </property>
-         <property name="toolTip">
-          <string>The value to set the variable to.</string>
-         </property>
-         <property name="decimals">
-          <number>8</number>
-         </property>
-         <property name="minimum">
-          <double>-4294967295.999899864196777</double>
-         </property>
-         <property name="maximum">
-          <double>4294969056.999899864196777</double>
-         </property>
-         <property name="stepType">
-          <enum>QAbstractSpinBox::AdaptiveDecimalStepType</enum>
+         <property name="autoRaise">
+          <bool>false</bool>
          </property>
         </widget>
        </item>
@@ -403,95 +369,60 @@
               </property>
              </widget>
             </item>
-           </layout>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item row="0" column="4" colspan="2">
-        <layout class="QHBoxLayout" name="horizontalLayout_14">
-         <property name="spacing">
-          <number>0</number>
-         </property>
-         <property name="leftMargin">
-          <number>0</number>
-         </property>
-         <property name="topMargin">
-          <number>0</number>
-         </property>
-         <property name="rightMargin">
-          <number>0</number>
-         </property>
-         <property name="bottomMargin">
-          <number>0</number>
-         </property>
-         <item>
-          <widget class="WASimUiNS::UnitTypeComboBox" name="cbSetVarUnitName">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="focusPolicy">
-            <enum>Qt::StrongFocus</enum>
-           </property>
-           <property name="editable">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QWidget" name="wGetSetSimVarIndex" native="true">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <layout class="QHBoxLayout" name="horizontalLayout_13">
-            <property name="spacing">
-             <number>3</number>
-            </property>
-            <property name="leftMargin">
-             <number>6</number>
-            </property>
-            <property name="topMargin">
-             <number>0</number>
-            </property>
-            <property name="rightMargin">
-             <number>0</number>
-            </property>
-            <property name="bottomMargin">
-             <number>0</number>
-            </property>
             <item>
-             <widget class="BuddyLabel" name="lblIndex_2">
+             <widget class="QWidget" name="wGetSetSimVarIndex" native="true">
               <property name="sizePolicy">
-               <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+               <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
                 <horstretch>0</horstretch>
                 <verstretch>0</verstretch>
                </sizepolicy>
               </property>
-              <property name="text">
-               <string>Idx:</string>
-              </property>
-              <property name="buddy">
-               <cstring>sbGetSetSimVarIndex</cstring>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QSpinBox" name="sbGetSetSimVarIndex">
-              <property name="toolTip">
-               <string>SimVar Index (if any, zero is blank)</string>
-              </property>
-              <property name="wrapping">
-               <bool>true</bool>
-              </property>
-              <property name="specialValueText">
-               <string notr="true"/>
-              </property>
+              <layout class="QHBoxLayout" name="horizontalLayout_13">
+               <property name="spacing">
+                <number>3</number>
+               </property>
+               <property name="leftMargin">
+                <number>6</number>
+               </property>
+               <property name="topMargin">
+                <number>0</number>
+               </property>
+               <property name="rightMargin">
+                <number>0</number>
+               </property>
+               <property name="bottomMargin">
+                <number>0</number>
+               </property>
+               <item>
+                <widget class="BuddyLabel" name="lblIndex_2">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="text">
+                  <string>Idx:</string>
+                 </property>
+                 <property name="buddy">
+                  <cstring>sbGetSetSimVarIndex</cstring>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QSpinBox" name="sbGetSetSimVarIndex">
+                 <property name="toolTip">
+                  <string>SimVar Index (if any, zero is blank)</string>
+                 </property>
+                 <property name="wrapping">
+                  <bool>true</bool>
+                 </property>
+                 <property name="specialValueText">
+                  <string notr="true"/>
+                 </property>
+                </widget>
+               </item>
+              </layout>
              </widget>
             </item>
            </layout>
@@ -499,62 +430,36 @@
          </item>
         </layout>
        </item>
-       <item row="1" column="3">
-        <widget class="BuddyLabel" name="label_7">
+       <item row="0" column="0">
+        <widget class="WASimUiNS::VariableTypeComboBox" name="cbGetSetVarType">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
-         <property name="text">
-          <string> Value:</string>
-         </property>
-         <property name="buddy">
-          <cstring>dsbSetVarValue</cstring>
-         </property>
         </widget>
        </item>
-       <item row="0" column="3">
-        <widget class="BuddyLabel" name="lblSetVarUnit">
+       <item row="1" column="2">
+        <widget class="QLabel" name="lblLocalVars_3">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
+         <property name="font">
+          <font>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
          <property name="text">
-          <string> Unit:</string>
-         </property>
-         <property name="buddy">
-          <cstring>cbSetVarUnitName</cstring>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="7">
-        <widget class="QToolButton" name="btnSetCreate">
-         <property name="text">
-          <string>Set/Create</string>
-         </property>
-         <property name="toolButtonStyle">
-          <enum>Qt::ToolButtonIconOnly</enum>
-         </property>
-         <property name="autoRaise">
-          <bool>false</bool>
+          <string>Set</string>
          </property>
         </widget>
        </item>
        <item row="0" column="8">
-        <widget class="QToolButton" name="btnCopyLVarToRequest">
-         <property name="text">
-          <string>Copy</string>
-         </property>
-         <property name="toolButtonStyle">
-          <enum>Qt::ToolButtonIconOnly</enum>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="7">
         <widget class="QToolButton" name="btnGetCreate">
          <property name="text">
           <string>Get/Create</string>
@@ -562,6 +467,138 @@
          <property name="toolButtonStyle">
           <enum>Qt::ToolButtonIconOnly</enum>
          </property>
+        </widget>
+       </item>
+       <item row="1" column="4" colspan="3">
+        <widget class="QWidget" name="wSetVarValue" native="true">
+         <layout class="QHBoxLayout" name="horizontalLayout_18">
+          <property name="spacing">
+           <number>6</number>
+          </property>
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="BuddyLabel" name="label_7">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text">
+             <string> Value:</string>
+            </property>
+            <property name="buddy">
+             <cstring>dsbSetVarValue</cstring>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_19">
+            <property name="spacing">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QDoubleSpinBox" name="dsbSetVarValue">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="focusPolicy">
+               <enum>Qt::StrongFocus</enum>
+              </property>
+              <property name="toolTip">
+               <string>The value to set the variable to.</string>
+              </property>
+              <property name="decimals">
+               <number>8</number>
+              </property>
+              <property name="minimum">
+               <double>-4294967295.999899864196777</double>
+              </property>
+              <property name="maximum">
+               <double>4294969056.999899864196777</double>
+              </property>
+              <property name="stepType">
+               <enum>QAbstractSpinBox::AdaptiveDecimalStepType</enum>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="leSetVarValue">
+              <property name="toolTip">
+               <string>The string value to set the variable to.</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="0" column="4" colspan="3">
+        <widget class="QWidget" name="wGetSetVarUnit" native="true">
+         <layout class="QHBoxLayout" name="horizontalLayout_14">
+          <property name="spacing">
+           <number>6</number>
+          </property>
+          <property name="leftMargin">
+           <number>1</number>
+          </property>
+          <property name="topMargin">
+           <number>1</number>
+          </property>
+          <property name="rightMargin">
+           <number>1</number>
+          </property>
+          <property name="bottomMargin">
+           <number>1</number>
+          </property>
+          <item>
+           <widget class="BuddyLabel" name="lblSetVarUnit">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text">
+             <string> Unit:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="WASimUiNS::UnitTypeComboBox" name="cbSetVarUnitName">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="focusPolicy">
+             <enum>Qt::StrongFocus</enum>
+            </property>
+            <property name="editable">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </widget>
        </item>
       </layout>
@@ -2342,7 +2379,6 @@ Submitted requests will appear in the &quot;Data Requests&quot; window. Double-c
   <tabstop>btnGetVar</tabstop>
   <tabstop>btnGetCreate</tabstop>
   <tabstop>btnCopyLVarToRequest</tabstop>
-  <tabstop>dsbSetVarValue</tabstop>
   <tabstop>btnSetVar</tabstop>
   <tabstop>btnSetCreate</tabstop>
   <tabstop>cbLookupItemType</tabstop>
