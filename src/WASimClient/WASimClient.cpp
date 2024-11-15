@@ -264,6 +264,12 @@ class WASimClient::Private
 	shared_mutex mtxKeyEventNames;
 	uint32_t nextCustomEventID = CUSTOM_KEY_EVENT_ID_MIN;  // auto-generated IDs for custom event registrations
 
+	// Saved mappings of variable names to SIMCONNECT_DATA_DEFINITION_ID values we assigned to them.
+	// Used for setting string values on SimVars, which we do locally since WASM module can't.
+	map<std::string, uint32_t> mappedVarsNameCache {};
+	shared_mutex mtxMappedVarNames;
+	uint32_t nextMappedVarID = 1;  // auto-generated IDs for mapping variable names to SimConnect IDs
+
 #pragma endregion
 #pragma region  Callback handling templates  ----------------------------------------------
 
@@ -643,6 +649,13 @@ class WASimClient::Private
 			CloseHandle(hSimEvent);
 		hSimEvent = nullptr;
 
+		{
+			// clear cached var name mappings, new mapping will need to be made if re-connecting
+			unique_lock lock { mtxMappedVarNames };
+			mappedVarsNameCache.clear();
+			nextMappedVarID = 1;
+		}
+
 		setStatus(ClientStatus::Idle);
 		LOG_INF << "Shutdown complete, network disconnected.";
 	}
@@ -1002,6 +1015,42 @@ class WASimClient::Private
 		return sendServerCommand(Command(CommandId::Exec, +CalcResultType::None, codeStr.str().c_str()));
 	}
 
+	HRESULT setStringVariable(const VariableRequest &v, const std::string &value)
+	{
+		if (!checkInit()) {
+			LOG_ERR << "Simulator not connected, cannot set string variable.";
+			return E_NOT_CONNECTED;
+		}
+		if (v.variableType != 'A') {
+			LOG_WRN << "Cannot Set a string value on variable of type '" << v.variableType << "'.";
+			return E_INVALIDARG;
+		}
+		if (v.variableName.empty()) {
+			LOG_WRN << "A variable name is required to set variable of type '" << v.variableType << "'.";
+			return E_INVALIDARG;
+		}
+
+		uint32_t mapId = 0;
+		{
+			// Check for existing mapped ID
+			shared_lock lock { mtxMappedVarNames };
+			const auto pos = mappedVarsNameCache.find(v.variableName);
+			if (pos != mappedVarsNameCache.cend())
+				mapId = pos->second;
+		}
+		if (!mapId) {
+			// Create a new mapping and save it
+			HRESULT hr;
+			if FAILED(hr = INVOKE_SIMCONNECT(AddToDataDefinition, hSim, (SIMCONNECT_DATA_DEFINITION_ID)nextMappedVarID, v.variableName.c_str(), (const char*)nullptr, SIMCONNECT_DATATYPE_STRINGV, 0.0f, SIMCONNECT_UNUSED))
+				return hr;
+			mapId = nextMappedVarID++;
+			unique_lock lock { mtxMappedVarNames };
+			mappedVarsNameCache.insert(std::pair{ v.variableName, mapId });
+		}
+		// Use SimConnect to set the value.
+		return INVOKE_SIMCONNECT(SetDataOnSimObject, hSim, (SIMCONNECT_DATA_DEFINITION_ID)mapId, SIMCONNECT_OBJECT_ID_USER, 0UL, 0UL, (DWORD)(value.length() + 1), (void*)value.c_str());
+	}
+
 #pragma endregion
 #pragma region  Data Requests  ----------------------------------------------
 
@@ -1085,7 +1134,7 @@ class WASimClient::Private
 	}
 
 	// Note that this method does NOT acquire the requests mutex.
-	HRESULT deregisterDataRequestArea(const TrackedRequest * const tr)
+	HRESULT deregisterDataRequestArea(const TrackedRequest * const tr) const
 	{
 		// We need to first suspend updates for this request before removing it, otherwise it seems SimConnect will sometimes crash
 		INVOKE_SIMCONNECT(
@@ -1673,8 +1722,13 @@ HRESULT WASimClient::getOrCreateLocalVariable(const std::string &variableName, d
 	return d->getVariable(VariableRequest(variableName, true, unitName), pfResult, nullptr, defaultValue);
 }
 
+
 HRESULT WASimClient::setVariable(const VariableRequest & variable, const double value) {
 	return d->setVariable(variable, value);
+}
+
+HRESULT WASimClient::setVariable(const VariableRequest &variable, const std::string &value) {
+	return d->setStringVariable(variable, value);
 }
 
 HRESULT WASimClient::setLocalVariable(const std::string &variableName, const double value, const std::string &unitName) {
@@ -1846,7 +1900,7 @@ HRESULT WASimClient::sendKeyEvent(uint32_t keyEventId, uint32_t v1, uint32_t v2,
 		return d_const->sendSimCustomKeyEvent(keyEventId, v1, v2, v3, v4, v5);
 }
 
-inline bool isCustomKeyEventName(const std::string &name) {
+inline static bool isCustomKeyEventName(const std::string &name) {
 	return name[0] == '#' || name.find('.') != string::npos;
 }
 

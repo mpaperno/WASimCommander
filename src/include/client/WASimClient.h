@@ -231,6 +231,12 @@ static const uint32_t CUSTOM_KEY_EVENT_ID_MIN = 0x00020000;
 		/// \return `S_OK` on success, `E_INVALIDARG` on parameter validation errors, `E_NOT_CONNECTED` if not connected to server, or `E_FAIL` on general failure (unlikely).
 		/// \sa \refwce{CommandId::Set}
 		HRESULT setVariable(const VariableRequest &variable, const double value);
+		/// This is an overloaded method. This version allows setting an 'A' type (SimVar) variable to a string value. **Only 'A' type variables can be set this way.** \n
+		/// Since there is actually no direct way to set string-type values from WASM code, this is just a conveneince method and simply invokes SimConnect to do the work.
+		/// On first use with a new variable name it will set up a mapping of the name to an internally-assigned ID (calling `SimConnect_AddToDataDefinition()`) and cache that mapping.
+		/// Then on subsequent invocations on the same variable the mapped ID will be used directly. The mappings are invalidated when disconnecting from the simulator.
+		HRESULT setVariable(const VariableRequest &variable, const std::string &stringValue);
+
 		/// A convenience version of `setVariable()` for Local variable types. Equivalent to `setVariable(VariableRequest(variableName, false, unitName), value)`. See `setVariable()` and `VariableRequest` for details.
 		/// \param variableName Name of the local variable.
 		/// \param value The value to set.

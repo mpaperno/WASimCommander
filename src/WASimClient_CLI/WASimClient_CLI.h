@@ -183,8 +183,11 @@ namespace WASimCommander::CLI::Client
 		/// \sa \refwccc{getOrCreateLocalVariable()}
 		HR getOrCreateLocalVariable(String ^variableName, String ^unitName, double defaultValue, [Out] double %pfResult);
 
-		/// See \refwccc{setVariable()}
+		/// See \refwccc{setVariable(const VariableRequest &, double)}
 		HR setVariable(VariableRequest ^var, const double value) { return (HR)m_client->setVariable(var, value); }
+		/// See \refwccc{setVariable(const VariableRequest &, const std::string &)}
+		HR setVariable(VariableRequest ^var, String ^stringValue) { return (HR)m_client->setVariable(var, marshal_as<std::string>(stringValue)); }
+
 		/// See \refwccc{setLocalVariable()}
 		HR setLocalVariable(String ^variableName, const double value) { return (HR)m_client->setLocalVariable(marshal_as<std::string>(variableName), value); }
 		HR setLocalVariable(String ^variableName, String ^unitName, const double value) {
