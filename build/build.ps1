@@ -35,7 +35,7 @@ $ModulePackage = "${PackagePath}\module"
 $DocsDistroPath = "$RootPath\..\gh-pages"
 
 $testApps = @{
-	"$BuildPath\CS_BasicConsole\Release-$Platform\$Platform\Release\net8.0-windows" = "$PackagePath\bin\CS_BasicConsole";
+	"$BuildPath\CS_BasicConsole\Release-net8-$Platform\$Platform\Release-net8\net8.0-windows" = "$PackagePath\bin\CS_BasicConsole";
 	"$BuildPath\CPP_BasicConsole\Release-$Platform" = "$PackagePath\bin\CPP_BasicConsole"
 	"$SrcPath\Testing\Py_BasicConsole" = "$PackagePath\bin\Py_BasicConsole"
 }
