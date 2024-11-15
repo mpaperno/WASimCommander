@@ -165,6 +165,8 @@ namespace WASimCommander
 				setNameOrCode(nameOrCode);
 			if (unitName)
 				setUnitName(unitName);
+			if (!valueSize && requestType == WSE::RequestType::Calculated)
+				this->valueSize = (calcResultType == WSE::CalcResultType::Double ? DATA_TYPE_DOUBLE : calcResultType == WSE::CalcResultType::Integer ? DATA_TYPE_INT32 : 256);
 		}
 
 		/// Constructs a request for a named variable (`requestType = RequestType::Named`) with optional update period, interval, and epsilon values.
@@ -181,6 +183,15 @@ namespace WASimCommander
 		explicit DataRequest(uint32_t requestId, WSE::CalcResultType resultType, const char *calculatorCode, uint32_t valueSize,
 		                     WSE::UpdatePeriod period = WSE::UpdatePeriod::Tick, uint32_t interval = 0, float deltaEpsilon = 0.0f) :
 			DataRequest(requestId, valueSize, WSE::RequestType::Calculated, resultType, period, calculatorCode, nullptr, 'Q', deltaEpsilon, interval)
+		{ }
+		/// Constructs a calculator code request (`requestType = RequestType::Calculated`) with optional update period, interval, and epsilon values. \n
+		/// This overload, w/out a `valueSize` argument automatically determines the size based on the `resultType` argument:
+		/// - `CalcResultType::Double`  = `WASimCommander::DATA_TYPE_DOUBLE`
+		/// - `CalcResultType::Integer` = `WASimCommander::DATA_TYPE_INT32`
+		/// - `CalcResultType::String`  = 256
+		explicit DataRequest(uint32_t requestId, WSE::CalcResultType resultType, const char *calculatorCode,
+                         WSE::UpdatePeriod period = WSE::UpdatePeriod::Tick, uint32_t interval = 0, float deltaEpsilon = 0.0f) :
+			DataRequest(requestId, 0, WSE::RequestType::Calculated, resultType, period, calculatorCode, nullptr, 'Q', deltaEpsilon, interval)
 		{ }
 
 		void setNameOrCode(const char *name) { setCharArrayValue(nameOrCode, STRSZ_REQ, name); }  ///< Set the `nameOrCode` member using a const char array.

@@ -223,6 +223,7 @@ namespace WASimCommander::CLI::Structs
 			char_array<STRSZ_REQ> nameOrCode;
 			char_array<STRSZ_UNIT> unitName;
 
+			/// <summary> Default constructor. Properties must be set to valid values, either later or inline, eg. `new DataRequest() { requestId: 1, requestType: RequestType::Named, ...}`. </summary>
 			DataRequest() { }
 			/// <summary> Constructs a request for a named variable (`requestType = RequestType::Named`) with default update period on every `UpdatePeriod.Tick`. </summary>
 			explicit DataRequest(UInt32 requestId, Char variableType, String ^variableName, UInt32 valueSize) :
@@ -252,6 +253,24 @@ namespace WASimCommander::CLI::Structs
 			/// <summary> Constructs a calculator code request (`requestType = RequestType::Calculated`) with given update period, interval, and epsilon values.. </summary>
 			explicit DataRequest(UInt32 requestId, CalcResultType resultType, String ^calculatorCode, UInt32 valueSize, UpdatePeriod period, UInt32 interval, float deltaEpsilon) :
 				requestId(requestId), valueSize(valueSize), deltaEpsilon(deltaEpsilon), interval(interval), period(period),
+				requestType(RequestType::Calculated), calcResultType(resultType), nameOrCode(calculatorCode)
+			{	}
+			/// <summary> Constructs a calculator code request (`requestType = RequestType::Calculated`) with default update period on every `UpdatePeriod.Tick`. </summary>
+			/// This overload, w/out a `valueSize` argument automatically determines the size based on the `resultType` argument:
+			/// - `CalcResultType::Double`  = `WASimCommander::DATA_TYPE_DOUBLE`
+			/// - `CalcResultType::Integer` = `WASimCommander::DATA_TYPE_INT32`
+			/// - `CalcResultType::String`  = 256
+			explicit DataRequest(UInt32 requestId, CalcResultType resultType, String ^calculatorCode) :
+				requestId(requestId), valueSize(calcResultToValueSize(resultType)), period(UpdatePeriod::Tick),
+				requestType(RequestType::Calculated), calcResultType(resultType), nameOrCode(calculatorCode)
+			{	}
+			/// <summary> Constructs a calculator code request (`requestType = RequestType::Calculated`) with given update period, interval, and epsilon values.. </summary>
+			/// This overload, w/out a `valueSize` argument automatically determines the size based on the `resultType` argument:
+			/// - `CalcResultType::Double`  = `WASimCommander::DATA_TYPE_DOUBLE`
+			/// - `CalcResultType::Integer` = `WASimCommander::DATA_TYPE_INT32`
+			/// - `CalcResultType::String`  = 256
+			explicit DataRequest(UInt32 requestId, CalcResultType resultType, String ^calculatorCode, UpdatePeriod period, UInt32 interval, float deltaEpsilon) :
+				requestId(requestId), valueSize(calcResultToValueSize(resultType)), deltaEpsilon(deltaEpsilon), interval(interval), period(period),
 				requestType(RequestType::Calculated), calcResultType(resultType), nameOrCode(calculatorCode)
 			{	}
 
@@ -296,6 +315,9 @@ namespace WASimCommander::CLI::Structs
 				return dr;
 			}
 
+			UInt32 calcResultToValueSize(CalcResultType type) {
+				return (type == CalcResultType::Double ? DATA_TYPE_DOUBLE : type == CalcResultType::Integer ? DATA_TYPE_INT32 : 256);
+			}
 	};  // DataRequest
 
 
