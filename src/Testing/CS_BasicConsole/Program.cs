@@ -82,8 +82,8 @@ namespace CS_BasicConsole
 			}
 
 			// set up a Simulator Variable for testing.
-			const string simVarName = "COCKPIT CAMERA ZOOM";
-			const string simVarUnit = "percent";
+			string simVarName = "COCKPIT CAMERA ZOOM";
+			string simVarUnit = "percent";
 			// containers for result values
 			double fResult = 0;
 
@@ -118,7 +118,15 @@ namespace CS_BasicConsole
 			client.OnDataReceived += DataSubscriptionHandler;
 			// We subscribe to it using a "data request" and set it up to return as a float value, using a predefined value type (we could also use `4` here, for the number of bytes in a float).
 			// This should also immediately return the current value, which will be delivered to the DataSubscriptionHandler we assigned earlier.
-			if (client.saveDataRequest(new DataRequest((uint)Requests.REQUEST_ID_1_FLOAT, 'L', variableName, ValueTypes.DATA_TYPE_FLOAT)) == HR.OK)
+			hr = client.saveDataRequest(
+				new DataRequest(
+					requestId:    (uint)Requests.REQUEST_ID_1_FLOAT,
+					variableType: 'L',
+					variableName: variableName,
+					valueSize:    ValueTypes.DATA_TYPE_FLOAT
+				)
+			);
+			if (hr == HR.OK)
 				Log($"Subscribed to value changes for local variable {variableName}.");
 
 			// Now let's change the value of our local variable and watch the updates come in via the subscription.
@@ -132,22 +140,47 @@ namespace CS_BasicConsole
 					break;
 			}
 
-			// Test subscribing to a string type value. We'll use the Sim var "TITLE" (airplane name), which can only be retrieved using calculator code.
-			// We allocate 64 Bytes here to hold the result and we request this one with an update period of Once, which will return a result right away
+			// Test subscribing to a string type value. We'll use the Sim var "ATC AIRLINE" (airplane name), which can only be retrieved using calculator code.
+			// We allocate 32 Bytes here to hold the result and we request this one with an update period of Once, which will return a result right away
 			// but will not be scheduled for regular updates. If we wanted to update this value later, we could call the client's `updateDataRequest(requestId)` method.
+			// A negative `deltaEpsilon` value disables equality checks at the server, so we'll get a value back when we request it again later, even if it hasn't changed.
 			// Also we can use the "async" version which doesn't wait for the server to respond before returning. We're going to wait for a result anyway after submitting the request.
-			Log($"Requesting TITLE variable....", ">>");
-			hr = client.saveDataRequestAsync(new DataRequest(
-				requestId: (uint)Requests.REQUEST_ID_2_STR,
-				resultType: CalcResultType.String,
-				calculatorCode: "(A:TITLE, String)",
-				valueSize: 64,
-				period: UpdatePeriod.Once,
-				interval: 0,
-				deltaEpsilon: 0.0f)
+			simVarName = "ATC AIRLINE";
+			simVarUnit = "string";
+			Log($"Requesting {simVarName} variable....", ">>");
+			hr = client.saveDataRequestAsync(
+				new DataRequest(
+					requestId:      (uint)Requests.REQUEST_ID_2_STR,
+					resultType:     CalcResultType.String,
+					calculatorCode: $"(A:{simVarName}, {simVarUnit})",
+					valueSize:      32,
+					period:         UpdatePeriod.Once,
+					interval:       0,
+					deltaEpsilon:   -1.0f
+				)
 			);
 			if (hr == HR.OK)
 				AwaitData();
+			else
+				Log($"saveDataRequestAsync() for '{simVarName}' returned error result {hr}", "!!");
+
+			// Test setting the variable. This test the `setVariable()` overload which takes a string value, though it would be a little more efficient to use `executeCalculatorCode()` directly.
+			// I'm adding a semi-random string here, otherwise this test will only seem to work the first time it runs.
+			var rand = new Random();
+			char[] chars = { (char)('A' + rand.Next(26)), (char)('A' + rand.Next(26)) };
+			string stringValue = "Blue Heron Airlines " + new string(chars);
+			Log($"Setting variable {simVarName} to string value \"{stringValue}\"...", ">>");
+			// `setSimVarVariable()` is just a convenience version of `setVariable()` SimVars, especially string types since we don't need to specify a unit type here.
+			hr = client.setSimVarVariable(simVarName, stringValue);
+			if (hr == HR.OK) {
+				// Since we registered the variable request with "Once" period, we should request an update now.
+				client.updateDataRequest((uint)Requests.REQUEST_ID_2_STR);
+				// And wait for the update to come in.
+				AwaitData();
+			}
+			else {
+				Log($"setSimVarVariable(\"{simVarName}\", \"{stringValue}\") returned error result {hr}", "!!");
+			}
 
 			// Test getting a list of our data requests back from the Client.
 			Log("Saved Data Requests:", "::");
@@ -158,7 +191,7 @@ namespace CS_BasicConsole
 			// Test removing a data subscription.
 			hr = client.removeDataRequest((uint)Requests.REQUEST_ID_2_STR);
 			if (hr != HR.OK)
-				Log($"removeDataRequest() for TITLE var returned error result {hr}", "!!");
+				Log($"removeDataRequest() for {simVarName} var returned error result {hr}", "!!");
 
 			// Get a list of all local variables...
 			// Connect to the list results Event

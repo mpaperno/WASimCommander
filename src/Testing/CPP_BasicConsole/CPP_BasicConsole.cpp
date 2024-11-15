@@ -18,6 +18,7 @@ and is also available at <http://www.gnu.org/licenses/>.
 */
 
 
+#include <ctime>
 #include <iomanip>
 #include <iostream>
 #include <string>
@@ -44,7 +45,6 @@ enum Requests : char {
 
 // A wait handle is used in this test/demo to keep the program alive while data processes in the background.
 static const HANDLE g_dataUpdateEvent = CreateEvent(nullptr, false, false, nullptr);
-
 
 // -----------------------------
 // Logging output helpers
@@ -138,6 +138,9 @@ int main()
 {
 	Log()() << "Initializing WASimClient...";
 
+	// init random generator
+	srand((int)time(0));
+
 	// Create
 	WASimClient client = WASimClient(0x0C997E57);  // "CPPTEST"  :)
 
@@ -230,21 +233,38 @@ int main()
 			break;
 	}
 
-	// Test subscribing to a string type value. We'll use the Sim var "TITLE" (airplane name), which can only be retrieved using calculator code.
-	// We allocate 64 Bytes here to hold the result and we request this one with an update period of Once, which will return a result right away
+	// Test subscribing to a string type value. We'll use a string-type Sim var, which can only be retrieved using calculator code.
+	// We allocate 32 Bytes here to hold the result and we request this one with an update period of Once, which will return a result right away
 	// but will not be scheduled for regular updates. If we wanted to update this value later, we could call the client's `updateDataRequest(requestId)` method.
-	Log(">>")() << "Requesting TITLE variable...";
+	simVarName = "ATC AIRLINE";
+	simVarUnit = "string";
+	Log(">>")() << "Requesting " << simVarName << " variable...";
 	hr = client.saveDataRequest(DataRequest(
 		/*requestId*/      REQUEST_ID_2_STR,
 		/*resultType*/     CalcResultType::String,
-		/*calculatorCode*/ "(A:TITLE, String)",
-		/*valueSize*/      64,
+		/*calculatorCode*/ string("(A:" + simVarName + "," + simVarUnit + ")").c_str(),
+		/*valueSize*/      32,
 		/*period*/         UpdatePeriod::Once)
 	);
 	if (hr == S_OK)
 		AwaitData();
 	else
-		Log("!!")() << "saveDataRequest() for TITLE var returned error result " << hr;
+		Log("!!")() << "saveDataRequest() for " << simVarName << " var returned error result " << hr;
+
+	// Test setting the variable. This test the `setVariable()` overload which takes a string value, though it would be a little more efficient to use `executeCalculatorCode()` directly.
+	// I'm adding a semi-random string here, otherwise this test will only work the first time it runs.
+	string stringValue = string("Blue Heron Airlines ") + string(1, 'A' + rand() % 26) + string(1, 'A' + rand() % 26);
+	Log("<<")() << "calling setVariable(" << simVarName << ", " << simVarUnit << ", " << quoted(stringValue) << ")";
+	hr = client.setVariable(VariableRequest(simVarName, simVarUnit), stringValue);
+	if (hr == S_OK) {
+		// Since we registered the variable request with "Once" period, we should request an update now.
+		client.updateDataRequest(REQUEST_ID_2_STR);
+		// And wait for the update to come in.
+		AwaitData();
+	}
+	else {
+		Log("!!")() << "setVariable(" << simVarName << ", " << simVarUnit << ", " << quoted(stringValue) << ") returned error result " << hr;
+	}
 
 	// Test getting a list of our data requests back from the Client.
 	Log("::")() << "Saved Data Requests:";
@@ -254,7 +274,7 @@ int main()
 
 	// Test removing a data subscriptions.
 	if ((hr = client.removeDataRequest(REQUEST_ID_2_STR)) != S_OK)
-		Log("!!")() << "removeDataRequest() for TITLE var returned error result " << hr;
+		Log("!!")() << "removeDataRequest() for " << simVarName << " var returned error result " << hr;
 
 	// Get a list of all local variables...
 	// Connect to the list results Event
