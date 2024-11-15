@@ -34,7 +34,7 @@
 ### Other
 * All distributed pre-built libraries and module are built against MSFS SDK v0.24.3.0.
 
-**[Full Change Log](https://github.com/mpaperno/WASimCommander/compare/v1.2.0.0...v1.3.0.0)**
+**[Full Change Log](https://github.com/mpaperno/WASimCommander/compare/1.2.0.0...1.3.0.0)**
 
 [8f42b51d]: https://github.com/mpaperno/WASimCommander/commit/8f42b51d1d94f704e001940abe2ff3f1434a9481
 [b115d8b6]: https://github.com/mpaperno/WASimCommander/commit/b115d8b64e77eaf8112de7a15c9d0dfc2fa29904
