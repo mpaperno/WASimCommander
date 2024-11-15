@@ -132,6 +132,10 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:aa525c57f5a5cf1fd0f1b2a6382f8b782"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_w_a_sim_commander_1_1_data_request.html#aa525c57f5a5cf1fd0f1b2a6382f8b782">DataRequest</a> (uint32_t <a class="el" href="struct_w_a_sim_commander_1_1_data_request.html#a2972cffe60e96a9e0c1ba2873e17ee64">requestId</a>, <a class="el" href="namespace_w_a_sim_commander_1_1_enums.html#ac056a41f7fdbf2fb2599ad86c3949922">WASimCommander::Enums::CalcResultType</a> resultType, const char *calculatorCode, uint32_t <a class="el" href="struct_w_a_sim_commander_1_1_data_request.html#aa2dd2b40458cc54969289a3d96bc4173">valueSize</a>, <a class="el" href="namespace_w_a_sim_commander_1_1_enums.html#a43b33b172f6f4b43947d3a6da9847044">WASimCommander::Enums::UpdatePeriod</a> <a class="el" href="struct_w_a_sim_commander_1_1_data_request.html#a6965fcd542896b4b9357ef58ea33f074">period</a>=<a class="el" href="namespace_w_a_sim_commander_1_1_enums.html#a43b33b172f6f4b43947d3a6da9847044a0b3516a5bbb77566f904f9d3877f4710">WASimCommander::Enums::UpdatePeriod::Tick</a>, uint32_t <a class="el" href="struct_w_a_sim_commander_1_1_data_request.html#adbf6778bebda3a5555c0ca85724151bc">interval</a>=0, float <a class="el" href="struct_w_a_sim_commander_1_1_data_request.html#ab2bd74a4e4251de9d624030c0f9a7adc">deltaEpsilon</a>=0.0f)</td></tr>
 <tr class="memdesc:aa525c57f5a5cf1fd0f1b2a6382f8b782"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs a calculator code request (<code>requestType = RequestType::Calculated</code>) with optional update period, interval, and epsilon values.  <a href="struct_w_a_sim_commander_1_1_data_request.html#aa525c57f5a5cf1fd0f1b2a6382f8b782">More...</a><br /></td></tr>
 <tr class="separator:aa525c57f5a5cf1fd0f1b2a6382f8b782"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5d2d8f43b6e0aeb0de5771af73a995da"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_w_a_sim_commander_1_1_data_request.html#a5d2d8f43b6e0aeb0de5771af73a995da">DataRequest</a> (uint32_t <a class="el" href="struct_w_a_sim_commander_1_1_data_request.html#a2972cffe60e96a9e0c1ba2873e17ee64">requestId</a>, <a class="el" href="namespace_w_a_sim_commander_1_1_enums.html#ac056a41f7fdbf2fb2599ad86c3949922">WASimCommander::Enums::CalcResultType</a> resultType, const char *calculatorCode, <a class="el" href="namespace_w_a_sim_commander_1_1_enums.html#a43b33b172f6f4b43947d3a6da9847044">WASimCommander::Enums::UpdatePeriod</a> <a class="el" href="struct_w_a_sim_commander_1_1_data_request.html#a6965fcd542896b4b9357ef58ea33f074">period</a>=<a class="el" href="namespace_w_a_sim_commander_1_1_enums.html#a43b33b172f6f4b43947d3a6da9847044a0b3516a5bbb77566f904f9d3877f4710">WASimCommander::Enums::UpdatePeriod::Tick</a>, uint32_t <a class="el" href="struct_w_a_sim_commander_1_1_data_request.html#adbf6778bebda3a5555c0ca85724151bc">interval</a>=0, float <a class="el" href="struct_w_a_sim_commander_1_1_data_request.html#ab2bd74a4e4251de9d624030c0f9a7adc">deltaEpsilon</a>=0.0f)</td></tr>
+<tr class="memdesc:a5d2d8f43b6e0aeb0de5771af73a995da"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs a calculator code request (<code>requestType = RequestType::Calculated</code>) with optional update period, interval, and epsilon values. <br  />
+This overload, w/out a <code>valueSize</code> argument automatically determines the size based on the <code>resultType</code> argument:  <a href="struct_w_a_sim_commander_1_1_data_request.html#a5d2d8f43b6e0aeb0de5771af73a995da">More...</a><br /></td></tr>
+<tr class="separator:a5d2d8f43b6e0aeb0de5771af73a995da"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abd286b545585729f67b92e8ffb2f2cc1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_w_a_sim_commander_1_1_data_request.html#abd286b545585729f67b92e8ffb2f2cc1">setNameOrCode</a> (const char *name)</td></tr>
 <tr class="memdesc:abd286b545585729f67b92e8ffb2f2cc1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the <code>nameOrCode</code> member using a const char array.  <a href="struct_w_a_sim_commander_1_1_data_request.html#abd286b545585729f67b92e8ffb2f2cc1">More...</a><br /></td></tr>
 <tr class="separator:abd286b545585729f67b92e8ffb2f2cc1"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -182,7 +186,7 @@ Public Attributes</h2></td></tr>
 <p class="definition">Definition at line <a class="el" href="_w_a_sim_commander_8h_source.html#l00127">127</a> of file <a class="el" href="_w_a_sim_commander_8h_source.html">WASimCommander.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="abfb8d574eef854deafdda667e363efdd" name="abfb8d574eef854deafdda667e363efdd"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abfb8d574eef854deafdda667e363efdd">&#9670;&nbsp;</a></span>DataRequest() <span class="overload">[1/4]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#abfb8d574eef854deafdda667e363efdd">&#9670;&nbsp;</a></span>DataRequest() <span class="overload">[1/5]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -276,7 +280,7 @@ Public Attributes</h2></td></tr>
 </div>
 </div>
 <a id="a9a528481c38e9c831b02f599d4058549" name="a9a528481c38e9c831b02f599d4058549"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9a528481c38e9c831b02f599d4058549">&#9670;&nbsp;</a></span>DataRequest() <span class="overload">[2/4]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a9a528481c38e9c831b02f599d4058549">&#9670;&nbsp;</a></span>DataRequest() <span class="overload">[2/5]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -341,12 +345,12 @@ Public Attributes</h2></td></tr>
 
 <p>Constructs a request for a named variable (<code>requestType = RequestType::Named</code>) with optional update period, interval, and epsilon values. </p>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_commander_8h_source.html#l00171">171</a> of file <a class="el" href="_w_a_sim_commander_8h_source.html">WASimCommander.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_commander_8h_source.html#l00173">173</a> of file <a class="el" href="_w_a_sim_commander_8h_source.html">WASimCommander.h</a>.</p>
 
 </div>
 </div>
 <a id="a2b8f2d1291d4b8648fcf9823ea1ad483" name="a2b8f2d1291d4b8648fcf9823ea1ad483"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2b8f2d1291d4b8648fcf9823ea1ad483">&#9670;&nbsp;</a></span>DataRequest() <span class="overload">[3/4]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a2b8f2d1291d4b8648fcf9823ea1ad483">&#9670;&nbsp;</a></span>DataRequest() <span class="overload">[3/5]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -417,12 +421,12 @@ Public Attributes</h2></td></tr>
 
 <p>Constructs a request for a named Simulator Variable (<code>requestType = RequestType::Named</code> and &lsquo;varTypePrefix = 'A&rsquo;`) with optional update period, interval, and epsilon values. </p>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_commander_8h_source.html#l00176">176</a> of file <a class="el" href="_w_a_sim_commander_8h_source.html">WASimCommander.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_commander_8h_source.html#l00178">178</a> of file <a class="el" href="_w_a_sim_commander_8h_source.html">WASimCommander.h</a>.</p>
 
 </div>
 </div>
 <a id="aa525c57f5a5cf1fd0f1b2a6382f8b782" name="aa525c57f5a5cf1fd0f1b2a6382f8b782"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa525c57f5a5cf1fd0f1b2a6382f8b782">&#9670;&nbsp;</a></span>DataRequest() <span class="overload">[4/4]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#aa525c57f5a5cf1fd0f1b2a6382f8b782">&#9670;&nbsp;</a></span>DataRequest() <span class="overload">[4/5]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -487,7 +491,77 @@ Public Attributes</h2></td></tr>
 
 <p>Constructs a calculator code request (<code>requestType = RequestType::Calculated</code>) with optional update period, interval, and epsilon values. </p>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_commander_8h_source.html#l00181">181</a> of file <a class="el" href="_w_a_sim_commander_8h_source.html">WASimCommander.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_commander_8h_source.html#l00183">183</a> of file <a class="el" href="_w_a_sim_commander_8h_source.html">WASimCommander.h</a>.</p>
+
+</div>
+</div>
+<a id="a5d2d8f43b6e0aeb0de5771af73a995da" name="a5d2d8f43b6e0aeb0de5771af73a995da"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5d2d8f43b6e0aeb0de5771af73a995da">&#9670;&nbsp;</a></span>DataRequest() <span class="overload">[5/5]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">WASimCommander::DataRequest::DataRequest </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>requestId</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespace_w_a_sim_commander_1_1_enums.html#ac056a41f7fdbf2fb2599ad86c3949922">WASimCommander::Enums::CalcResultType</a>&#160;</td>
+          <td class="paramname"><em>resultType</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>calculatorCode</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespace_w_a_sim_commander_1_1_enums.html#a43b33b172f6f4b43947d3a6da9847044">WASimCommander::Enums::UpdatePeriod</a>&#160;</td>
+          <td class="paramname"><em>period</em> = <code><a class="el" href="namespace_w_a_sim_commander_1_1_enums.html#a43b33b172f6f4b43947d3a6da9847044a0b3516a5bbb77566f904f9d3877f4710">WASimCommander::Enums::UpdatePeriod::Tick</a></code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>interval</em> = <code>0</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>deltaEpsilon</em> = <code>0.0f</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">explicit</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Constructs a calculator code request (<code>requestType = RequestType::Calculated</code>) with optional update period, interval, and epsilon values. <br  />
+This overload, w/out a <code>valueSize</code> argument automatically determines the size based on the <code>resultType</code> argument: </p>
+<ul>
+<li><code>CalcResultType::Double</code> = <code><a class="el" href="namespace_w_a_sim_commander.html#ae21811deaaddf64ed19d040df8592ede" title="64-bit floating-point number">WASimCommander::DATA_TYPE_DOUBLE</a></code></li>
+<li><code>CalcResultType::Integer</code> = <code><a class="el" href="namespace_w_a_sim_commander.html#a3fd2d80e9ebdf7f070877b660e558bcc" title="32-bit integer number (signed or unsigned)">WASimCommander::DATA_TYPE_INT32</a></code></li>
+<li><code>CalcResultType::String</code> = 256 </li>
+</ul>
+
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_commander_8h_source.html#l00192">192</a> of file <a class="el" href="_w_a_sim_commander_8h_source.html">WASimCommander.h</a>.</p>
 
 </div>
 </div>
@@ -518,7 +592,7 @@ Public Attributes</h2></td></tr>
 
 <p>Set the <code>nameOrCode</code> member using a const char array. </p>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_commander_8h_source.html#l00186">186</a> of file <a class="el" href="_w_a_sim_commander_8h_source.html">WASimCommander.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_commander_8h_source.html#l00197">197</a> of file <a class="el" href="_w_a_sim_commander_8h_source.html">WASimCommander.h</a>.</p>
 
 </div>
 </div>
@@ -548,7 +622,7 @@ Public Attributes</h2></td></tr>
 
 <p>Set the <code>unitName</code> member using a const char array. </p>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_commander_8h_source.html#l00187">187</a> of file <a class="el" href="_w_a_sim_commander_8h_source.html">WASimCommander.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_commander_8h_source.html#l00198">198</a> of file <a class="el" href="_w_a_sim_commander_8h_source.html">WASimCommander.h</a>.</p>
 
 </div>
 </div>

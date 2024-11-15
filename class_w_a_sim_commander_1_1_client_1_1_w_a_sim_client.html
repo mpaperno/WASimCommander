@@ -210,12 +210,33 @@ In both cases, using <code><a class="el" href="class_w_a_sim_commander_1_1_clien
 Other variables types can also be set this way but such requests are simply converted to a calculator string and evaluated via the <em>Gauge API</em> <code>execute_calculator_code()</code>. Using <code><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a289fcb4566f6f44714412e8e27bbd361" title="Run a string of MSFS Gauge API calculator code in RPN format, possibly with some kind of result expec...">WASimClient::executeCalculatorCode()</a></code> directly may be more efficient. <br  />
 The following conditions must be observed:  <a href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a8a9f6943f86f904f1db38a4b77e288bb">More...</a><br /></td></tr>
 <tr class="separator:a8a9f6943f86f904f1db38a4b77e288bb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a725be5c00b1d6861826c898d095db118"><td class="memItemLeft" align="right" valign="top">HRESULT&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a725be5c00b1d6861826c898d095db118">setVariable</a> (const <a class="el" href="struct_w_a_sim_commander_1_1_client_1_1_variable_request.html">VariableRequest</a> &amp;variable, const std::string &amp;stringValue)</td></tr>
+<tr class="memdesc:a725be5c00b1d6861826c898d095db118"><td class="mdescLeft">&#160;</td><td class="mdescRight">This is an overloaded method. This version allows setting an 'A' type (SimVar) variable to a string value. <b>Only 'A' type variables can be set this way.</b> <br  />
+Since there is actually no direct way to set string-type values from WASM code, this is just a conveneince method and simply invokes SimConnect to do the work. On first use with a new variable name it will set up a mapping of the name to an internally-assigned ID (calling <code>SimConnect_AddToDataDefinition()</code>) and cache that mapping. Then on subsequent invocations on the same variable the mapped ID will be used directly. The mappings are invalidated when disconnecting from the simulator.  <a href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a725be5c00b1d6861826c898d095db118">More...</a><br /></td></tr>
+<tr class="separator:a725be5c00b1d6861826c898d095db118"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af7079d6f950285c7bf8bda6be1cdfb21"><td class="memItemLeft" align="right" valign="top">HRESULT&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#af7079d6f950285c7bf8bda6be1cdfb21">setLocalVariable</a> (const std::string &amp;variableName, const double value, const std::string &amp;unitName=std::string())</td></tr>
 <tr class="memdesc:af7079d6f950285c7bf8bda6be1cdfb21"><td class="mdescLeft">&#160;</td><td class="mdescRight">A convenience version of <code><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a8a9f6943f86f904f1db38a4b77e288bb" title="Set a Variable value by name, with optional named unit type. Although any settable variable type can ...">setVariable()</a></code> for Local variable types. Equivalent to <code>setVariable(VariableRequest(variableName, false, unitName), value)</code>. See <code><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a8a9f6943f86f904f1db38a4b77e288bb" title="Set a Variable value by name, with optional named unit type. Although any settable variable type can ...">setVariable()</a></code> and <code><a class="el" href="struct_w_a_sim_commander_1_1_client_1_1_variable_request.html" title="Structure for using with WASimClient::getVariable() and WASimClient::setVariable() to specify informa...">VariableRequest</a></code> for details.  <a href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#af7079d6f950285c7bf8bda6be1cdfb21">More...</a><br /></td></tr>
 <tr class="separator:af7079d6f950285c7bf8bda6be1cdfb21"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8534d234863884d37f8dd90de8cc5fff"><td class="memItemLeft" align="right" valign="top">HRESULT&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a8534d234863884d37f8dd90de8cc5fff">setOrCreateLocalVariable</a> (const std::string &amp;variableName, const double value, const std::string &amp;unitName=std::string())</td></tr>
 <tr class="memdesc:a8534d234863884d37f8dd90de8cc5fff"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set a Local Variable value by variable name, creating it first if it does not already exist. This first calls the <code>register_named_variable()</code> <em>Gauge API</em> function to get the ID from the name, which creates the variable if it doesn't exist. The returned ID (new or existing) is then used to set the value. Use the <code><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a602e0e104484dce8d22e572b3803e567" title="Request server-side lookup of an named item to find the corresponding numeric ID.">lookup()</a></code> method to check for the existence of a variable name. Equivalent to <code>setVariable(VariableRequest(variableName, true, unitName), value)</code>. See <code><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a8a9f6943f86f904f1db38a4b77e288bb" title="Set a Variable value by name, with optional named unit type. Although any settable variable type can ...">setVariable()</a></code> and <code><a class="el" href="struct_w_a_sim_commander_1_1_client_1_1_variable_request.html" title="Structure for using with WASimClient::getVariable() and WASimClient::setVariable() to specify informa...">VariableRequest</a></code> for details.  <a href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a8534d234863884d37f8dd90de8cc5fff">More...</a><br /></td></tr>
 <tr class="separator:a8534d234863884d37f8dd90de8cc5fff"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5f0f7e3575c605a44516a407251567fe"><td class="memItemLeft" align="right" valign="top">HRESULT&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a5f0f7e3575c605a44516a407251567fe">setSimVarVariable</a> (const std::string &amp;variableName, const std::string &amp;unitName, double value)</td></tr>
+<tr class="memdesc:a5f0f7e3575c605a44516a407251567fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets a numeric value on an 'A' (aka "SimVar" / "Simulator Variable") type variable. <br  />
+This is a convenience version of <code><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a8a9f6943f86f904f1db38a4b77e288bb" title="Set a Variable value by name, with optional named unit type. Although any settable variable type can ...">setVariable()</a></code>, equivalent to <code>setVariable(VariableRequest(variableName, unitName), value)</code>. See <code><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a8a9f6943f86f904f1db38a4b77e288bb" title="Set a Variable value by name, with optional named unit type. Although any settable variable type can ...">setVariable()</a></code> and <code><a class="el" href="struct_w_a_sim_commander_1_1_client_1_1_variable_request.html" title="Structure for using with WASimClient::getVariable() and WASimClient::setVariable() to specify informa...">VariableRequest</a></code> for details.<br  />
+Note that <code>variableName</code> can optionally contain an index after a colon (eg. <code>VAR NAME:1</code>), or the <code><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#ae0b929bc859f598829be1ef20944160e" title="Sets a numeric value on an indexed &#39;A&#39; (aka &quot;SimVar&quot; / &quot;Simulator Variable&quot;) type variable....">setSimVarVariable(const string&amp; name, uint8_t index, const string&amp; unit, double value)</a></code> overload could be used to provide the index separately.  <a href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a5f0f7e3575c605a44516a407251567fe">More...</a><br /></td></tr>
+<tr class="separator:a5f0f7e3575c605a44516a407251567fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae0b929bc859f598829be1ef20944160e"><td class="memItemLeft" align="right" valign="top">HRESULT&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#ae0b929bc859f598829be1ef20944160e">setSimVarVariable</a> (const std::string &amp;variableName, uint8_t simVarIndex, const std::string &amp;unitName, double value)</td></tr>
+<tr class="memdesc:ae0b929bc859f598829be1ef20944160e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets a numeric value on an indexed 'A' (aka "SimVar" / "Simulator Variable") type variable. <br  />
+This is a convenience version of <code><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a8a9f6943f86f904f1db38a4b77e288bb" title="Set a Variable value by name, with optional named unit type. Although any settable variable type can ...">setVariable()</a></code>, equivalent to <code>setVariable(VariableRequest(variableName, unitName, simVarIndex), value)</code>. See <code><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a8a9f6943f86f904f1db38a4b77e288bb" title="Set a Variable value by name, with optional named unit type. Although any settable variable type can ...">setVariable()</a></code> and <code><a class="el" href="struct_w_a_sim_commander_1_1_client_1_1_variable_request.html" title="Structure for using with WASimClient::getVariable() and WASimClient::setVariable() to specify informa...">VariableRequest</a></code> for details.  <a href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#ae0b929bc859f598829be1ef20944160e">More...</a><br /></td></tr>
+<tr class="separator:ae0b929bc859f598829be1ef20944160e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a79b80707c04ebfd07c42b46abc753dfc"><td class="memItemLeft" align="right" valign="top">HRESULT&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a79b80707c04ebfd07c42b46abc753dfc">setSimVarVariable</a> (const std::string &amp;variableName, const std::string &amp;stringValue)</td></tr>
+<tr class="memdesc:a79b80707c04ebfd07c42b46abc753dfc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets a string value on an 'A' (aka "SimVar" / "Simulator Variable") type variable. <br  />
+This is a convenience version of <code><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a8a9f6943f86f904f1db38a4b77e288bb" title="Set a Variable value by name, with optional named unit type. Although any settable variable type can ...">setVariable()</a></code>, equivalent to &lsquo;setVariable(<a class="el" href="struct_w_a_sim_commander_1_1_client_1_1_variable_request.html" title="Structure for using with WASimClient::getVariable() and WASimClient::setVariable() to specify informa...">VariableRequest</a>('A&rsquo;, variableName), stringValue)<code>. See</code><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a725be5c00b1d6861826c898d095db118" title="This is an overloaded method. This version allows setting an &#39;A&#39; type (SimVar) variable to a string v...">setVariable(const VariableRequest &amp;, const std::string &amp;)</a>` for details.  <a href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a79b80707c04ebfd07c42b46abc753dfc">More...</a><br /></td></tr>
+<tr class="separator:a79b80707c04ebfd07c42b46abc753dfc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae3e6289323d9d13cbf928e0bbf521595"><td class="memItemLeft" align="right" valign="top">HRESULT&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#ae3e6289323d9d13cbf928e0bbf521595">setSimVarVariable</a> (const std::string &amp;variableName, uint8_t index, const std::string &amp;stringValue)</td></tr>
+<tr class="memdesc:ae3e6289323d9d13cbf928e0bbf521595"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets a string value on an indexed 'A' (aka "SimVar" / "Simulator Variable") type variable. <br  />
+This is a convenience version of <code><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a8a9f6943f86f904f1db38a4b77e288bb" title="Set a Variable value by name, with optional named unit type. Although any settable variable type can ...">setVariable()</a></code>, equivalent to <code>setVariable(<a class="el" href="struct_w_a_sim_commander_1_1_client_1_1_variable_request.html" title="Structure for using with WASimClient::getVariable() and WASimClient::setVariable() to specify informa...">VariableRequest</a>(variableName, {}, index), stringValue)</code>. See <code><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a725be5c00b1d6861826c898d095db118" title="This is an overloaded method. This version allows setting an &#39;A&#39; type (SimVar) variable to a string v...">setVariable(const VariableRequest &amp;, const std::string &amp;)</a></code> for details.  <a href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#ae3e6289323d9d13cbf928e0bbf521595">More...</a><br /></td></tr>
+<tr class="separator:ae3e6289323d9d13cbf928e0bbf521595"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">Data change subscriptions (variables and calculated results)</div></td></tr>
 <tr class="memitem:af8882cc52796013b92dbee001de27bfe"><td class="memItemLeft" align="right" valign="top">HRESULT&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#af8882cc52796013b92dbee001de27bfe">saveDataRequest</a> (const <a class="el" href="struct_w_a_sim_commander_1_1_data_request.html">DataRequest</a> &amp;request, bool async=false)</td></tr>
 <tr class="memdesc:af8882cc52796013b92dbee001de27bfe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add a new <code><a class="el" href="struct_w_a_sim_commander_1_1_data_request.html" title="Structure for variable value subscription requests.">WASimCommander::DataRequest</a></code> for a variable or calculated result, or update an existing data request with the same <code><a class="el" href="struct_w_a_sim_commander_1_1_data_request.html#a2972cffe60e96a9e0c1ba2873e17ee64" title="Unique ID for the request, subsequent use of this ID overwrites any previous request definition (but ...">DataRequest::requestId</a></code>. Data changes (updates) are delivered asynchronously via the callback function set with <code><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a1ddabb80726df8220e3a6ed4272bf737" title="Sets a callback for value update data arriving from the server. Pass a nullptr value to remove a prev...">setDataCallback()</a></code>, which then passes a <code><a class="el" href="struct_w_a_sim_commander_1_1_client_1_1_data_request_record.html" title="DataRequestRecord inherits and extends WASimCommander::DataRequest with data pertinent for use by a d...">DataRequestRecord</a></code> structure as the callback argument (this provides both a reference to the original <code><a class="el" href="struct_w_a_sim_commander_1_1_data_request.html" title="Structure for variable value subscription requests.">DataRequest</a></code> registered here, as well as result data).  <a href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#af8882cc52796013b92dbee001de27bfe">More...</a><br /></td></tr>
@@ -399,7 +420,7 @@ The client can be built with <a class="el" href="_w_a_sim_client_8h.html#a322d2a
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l01568">1568</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l01613">1613</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
 
 </div>
 </div>
@@ -420,7 +441,7 @@ The client can be built with <a class="el" href="_w_a_sim_client_8h.html#a322d2a
 
 <p>Any open network connections are automatically closed upon destruction, though it is better to close them yourself before deleting the client. </p>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l01572">1572</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l01617">1617</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
 
 </div>
 </div>
@@ -443,7 +464,7 @@ The client can be built with <a class="el" href="_w_a_sim_client_8h.html#a322d2a
 <p>Get current connection status of this client. </p>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="namespace_w_a_sim_commander_1_1_client.html#afd4f3e93b7e8dc26cd2d99ad61584521" title="Client status flags.">WASimCommander::Client::ClientStatus</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l01995">1995</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l02041">2041</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
 
 </div>
 </div>
@@ -465,7 +486,7 @@ The client can be built with <a class="el" href="_w_a_sim_client_8h.html#a322d2a
 <p>Check if simulator network link is established. </p>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a63e0680ef8577c67435b93dd6087604e" title="Initialize the simulator network link and set up minimum necessary for WASimCommander server ping or ...">connectSimulator()</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l01996">1996</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l02042">2042</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
 
 </div>
 </div>
@@ -487,7 +508,7 @@ The client can be built with <a class="el" href="_w_a_sim_client_8h.html#a322d2a
 <p>Check <a class="el" href="namespace_w_a_sim_commander.html" title="WASimCommander main namespace. Defines constants and structs used in Client-Server interactions....">WASimCommander</a> server connection status. </p>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a6dea7988fb87f798ab0dc4b4e2d8307a" title="Connect to WASimCommander server. This will implicitly call connectSimulator() first if it hasn&#39;t alr...">connectServer()</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l01997">1997</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l02043">2043</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
 
 </div>
 </div>
@@ -508,7 +529,7 @@ The client can be built with <a class="el" href="_w_a_sim_client_8h.html#a322d2a
 
 <p>Return the current <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html" title="WASimCommander Client implementation. Handles all aspects of communication with the WASimCommander Se...">WASimClient</a> version number. Version numbers are in "BCD" format: <code>MAJOR &lt;&lt; 24 | MINOR &lt;&lt; 16 | PATCH &lt;&lt; 8 | BUILD</code>, eg: <code>1.23.45.67 = 0x01234567</code> </p>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l01998">1998</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l02044">2044</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
 
 </div>
 </div>
@@ -529,7 +550,7 @@ The client can be built with <a class="el" href="_w_a_sim_client_8h.html#a322d2a
 
 <p>Return the version number of the last-connected, or successfully pinged, WASimModule (sever), or zero if unknown. See <code><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a3896927262d7753a083f10d81c613120" title="Return the current WASimClient version number. Version numbers are in &quot;BCD&quot; format: MAJOR &lt;&lt; 24 | MIN...">clientVersion()</a></code> for numbering details. </p>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l01999">1999</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l02045">2045</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
 
 </div>
 </div>
@@ -563,7 +584,7 @@ The client can be built with <a class="el" href="_w_a_sim_client_8h.html#a322d2a
 <dl class="section note"><dt>Note</dt><dd>This method blocks until either the Simulator responds or the timeout has expired. </dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a1e42faa467496da45a14d721454bb66f" title="Get the current default server response timeout value, which is used in all network requests....">defaultTimeout()</a>, <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#afc733727533140b748a5fd5a73b32d3f" title="Get current connection status of this client.">setDefaultTimeout()</a>, <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#aecab5d50e285540699a3367a432e4e35" title="SimConnect is used for the network layer. This setting specifies the SimConnect.cfg index to use....">networkConfigurationId()</a> <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a77d7fb31081553650053d0ce43b64527" title="SimConnect is used for the network layer. This setting specifies the SimConnect.cfg index to use,...">setNetworkConfigurationId()</a>, <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a1416b7453c56a87f5597af1201d220c8" title="Initialize the simulator network link and set up minimum necessary for WASimCommander server ping or ...">connectSimulator(int, uint32_t)</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l01581">1581</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l01626">1626</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
 
 </div>
 </div>
@@ -608,7 +629,7 @@ The client can be built with <a class="el" href="_w_a_sim_client_8h.html#a322d2a
 <dl class="section note"><dt>Note</dt><dd>This method blocks until either the Simulator responds or the timeout has expired. </dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a63e0680ef8577c67435b93dd6087604e" title="Initialize the simulator network link and set up minimum necessary for WASimCommander server ping or ...">connectSimulator()</a>, <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a1e42faa467496da45a14d721454bb66f" title="Get the current default server response timeout value, which is used in all network requests....">defaultTimeout()</a>, <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#afc733727533140b748a5fd5a73b32d3f" title="Get current connection status of this client.">setDefaultTimeout()</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l01590">1590</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l01635">1635</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
 
 </div>
 </div>
@@ -629,7 +650,7 @@ The client can be built with <a class="el" href="_w_a_sim_client_8h.html#a322d2a
 
 <p>Shut down all network connections (and disconnect <a class="el" href="namespace_w_a_sim_commander.html" title="WASimCommander main namespace. Defines constants and structs used in Client-Server interactions....">WASimCommander</a> server if connected). After calling this method, one must call <code><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a63e0680ef8577c67435b93dd6087604e" title="Initialize the simulator network link and set up minimum necessary for WASimCommander server ping or ...">connectSimulator()</a></code>/<code><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a6dea7988fb87f798ab0dc4b4e2d8307a" title="Connect to WASimCommander server. This will implicitly call connectSimulator() first if it hasn&#39;t alr...">connectServer()</a></code>/<code><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#ad36c715f1600be9590015bc429549077" title="Check if WASimCommander Server exists (Simulator running, the WASIM module is installed and working)....">pingServer()</a></code> again before any other commands. </p>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l01594">1594</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l01639">1639</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
 
 </div>
 </div>
@@ -661,7 +682,7 @@ This will implicitly call <code><a class="el" href="class_w_a_sim_commander_1_1_
 <dl class="section note"><dt>Note</dt><dd>This method blocks until either the Server responds or the timeout has expired. </dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a1e42faa467496da45a14d721454bb66f" title="Get the current default server response timeout value, which is used in all network requests....">defaultTimeout()</a>, <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#afc733727533140b748a5fd5a73b32d3f" title="Get current connection status of this client.">setDefaultTimeout()</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l01606">1606</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l01651">1651</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
 
 </div>
 </div>
@@ -695,7 +716,7 @@ This will implicitly call <code><a class="el" href="class_w_a_sim_commander_1_1_
 <dl class="section note"><dt>Note</dt><dd>This method blocks until either the Server responds or the timeout has expired. </dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a1e42faa467496da45a14d721454bb66f" title="Get the current default server response timeout value, which is used in all network requests....">defaultTimeout()</a>, <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#afc733727533140b748a5fd5a73b32d3f" title="Get current connection status of this client.">setDefaultTimeout()</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l01598">1598</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l01643">1643</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
 
 </div>
 </div>
@@ -716,7 +737,7 @@ This will implicitly call <code><a class="el" href="class_w_a_sim_commander_1_1_
 
 <p>Disconnect from the <a class="el" href="namespace_w_a_sim_commander.html" title="WASimCommander main namespace. Defines constants and structs used in Client-Server interactions....">WASimCommander</a> server. This does <em>not</em> close the Simulator network connection (use <code><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#aa9fafdc4bca37ac75d58acc8f75d9f84" title="Shut down all network connections (and disconnect WASimCommander server if connected)....">disconnectSimulator()</a></code> to do that or both at once). </p>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l01602">1602</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l01647">1647</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
 
 </div>
 </div>
@@ -740,7 +761,7 @@ This will implicitly call <code><a class="el" href="class_w_a_sim_commander_1_1_
 <dd>
 <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a1e42faa467496da45a14d721454bb66f" title="Get the current default server response timeout value, which is used in all network requests....">defaultTimeout()</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l02001">2001</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l02047">2047</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
 
 </div>
 </div>
@@ -763,7 +784,7 @@ This will implicitly call <code><a class="el" href="class_w_a_sim_commander_1_1_
 <p>Get current connection status of this client. </p>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="namespace_w_a_sim_commander_1_1_client.html#afd4f3e93b7e8dc26cd2d99ad61584521" title="Client status flags.">WASimCommander::Client::ClientStatus</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l02002">2002</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l02048">2048</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
 
 </div>
 </div>
@@ -785,7 +806,7 @@ This will implicitly call <code><a class="el" href="class_w_a_sim_commander_1_1_
 <p>SimConnect is used for the network layer. This setting specifies the SimConnect.cfg index to use. The value of -1 forces a local connection. The initial default setting is read from the <code>client_conf.ini</code> file or set to <code>-1</code> if no config file was found. </p>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a77d7fb31081553650053d0ce43b64527" title="SimConnect is used for the network layer. This setting specifies the SimConnect.cfg index to use,...">setNetworkConfigurationId()</a>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l02004">2004</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l02050">2050</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
 
 </div>
 </div>
@@ -808,7 +829,7 @@ This will implicitly call <code><a class="el" href="class_w_a_sim_commander_1_1_
 <p>SimConnect is used for the network layer. This setting specifies the SimConnect.cfg index to use, or -1 to force a local connection. Note that this must be called before <code><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a63e0680ef8577c67435b93dd6087604e" title="Initialize the simulator network link and set up minimum necessary for WASimCommander server ping or ...">connectSimulator()</a></code> invocation in order to have any effect. </p>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#aecab5d50e285540699a3367a432e4e35" title="SimConnect is used for the network layer. This setting specifies the SimConnect.cfg index to use....">networkConfigurationId()</a>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l02005">2005</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l02051">2051</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
 
 </div>
 </div>
@@ -865,7 +886,7 @@ If a result is expected, may also return <code>E_FAIL</code> if the server retur
 <dl class="section note"><dt>Note</dt><dd><em>If</em> a result is expected (<code>resultType</code> != <code><a class="el" href="namespace_w_a_sim_commander_1_1_enums.html#ac056a41f7fdbf2fb2599ad86c3949922a6adf97f83acf6453d4a6a4b1070f3754" title="No result is expected (eg. triggering an event).">Enums::CalcResultType::None</a></code>) then this method blocks until either the Server responds or the timeout has expired (see <code><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a1e42faa467496da45a14d721454bb66f" title="Get the current default server response timeout value, which is used in all network requests....">defaultTimeout()</a></code>). To request calculated results in a non-blocking fashion, use a data request instead.</dd></dl>
 <p>If you need to execute the same code multiple times, it would be more efficient to save the code as either a data request (for code returning values) or a registered event (for code not returning values). The advantage is that in those cases the calculator string is pre-compiled to byte code and saved once, then each invocation of the <em>Gauge API</em> calculator functions uses the more efficient byte code version. (To prevent automatic data updates for data requests, just set the data request period to <code><a class="el" href="namespace_w_a_sim_commander_1_1_enums.html#a43b33b172f6f4b43947d3a6da9847044a6e7b34fa59e1bd229b207892956dc41c" title="Suspend all automatic updates, only check value on Enums::CommandId::Update command.">Enums::UpdatePeriod::Never</a></code> or <code><a class="el" href="namespace_w_a_sim_commander_1_1_enums.html#a43b33b172f6f4b43947d3a6da9847044ae1a9dc9f23534e63de9df0d540ac1611" title="Update once when DataRequest is added/updated, and then only on Update command.">Enums::UpdatePeriod::Once</a></code> and use the <code><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a4e9b08a6f6d21fa934f860dc6e259a9b" title="Trigger a data update on a previously-added DataRequest. Designed to refresh data on subscriptions wi...">updateDataRequest()</a></code> method to poll for value updates as needed.) See <code><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#af8882cc52796013b92dbee001de27bfe" title="Add a new WASimCommander::DataRequest for a variable or calculated result, or update an existing data...">saveDataRequest()</a></code> and <code><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a098e51fad57fdbd62ef2a45385156c5f" title="Register a reusable event which executes a pre-set RPN calculator code string. The code is pre-compil...">registerEvent()</a></code> respectively for details. </p><dl class="section see"><dt>See also</dt><dd><a class="el" href="namespace_w_a_sim_commander_1_1_enums.html#ae3b1cd5348286e86d8c64ce44734e039a953feeff1e20f40677fb7f77c073b3be">Enums::CommandId::Exec</a>, <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a1e42faa467496da45a14d721454bb66f" title="Get the current default server response timeout value, which is used in all network requests....">defaultTimeout()</a>, <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#afc733727533140b748a5fd5a73b32d3f" title="Get current connection status of this client.">setDefaultTimeout()</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l01634">1634</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l01679">1679</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
 
 </div>
 </div>
@@ -917,7 +938,7 @@ In both cases, using <code><a class="el" href="class_w_a_sim_commander_1_1_clien
 <dl class="section note"><dt>Note</dt><dd>This method blocks until either the Server responds or the timeout has expired. </dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="struct_w_a_sim_commander_1_1_client_1_1_variable_request.html">Client::VariableRequest</a>, <a class="el" href="namespace_w_a_sim_commander_1_1_enums.html#ae3b1cd5348286e86d8c64ce44734e039ac55582518cba2c464f29f5bae1c68def">Enums::CommandId::Get</a>, <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a1e42faa467496da45a14d721454bb66f" title="Get the current default server response timeout value, which is used in all network requests....">defaultTimeout()</a>, <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#afc733727533140b748a5fd5a73b32d3f" title="Get current connection status of this client.">setDefaultTimeout()</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l01663">1663</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l01708">1708</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
 
 </div>
 </div>
@@ -966,7 +987,7 @@ In both cases, using <code><a class="el" href="class_w_a_sim_commander_1_1_clien
 <dl class="section note"><dt>Note</dt><dd>This method blocks until either the Server responds or the timeout has expired. </dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="namespace_w_a_sim_commander_1_1_enums.html#ae3b1cd5348286e86d8c64ce44734e039ac55582518cba2c464f29f5bae1c68def">Enums::CommandId::Get</a>, <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a1e42faa467496da45a14d721454bb66f" title="Get the current default server response timeout value, which is used in all network requests....">defaultTimeout()</a>, <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#afc733727533140b748a5fd5a73b32d3f" title="Get current connection status of this client.">setDefaultTimeout()</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l01672">1672</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l01717">1717</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
 
 </div>
 </div>
@@ -1022,12 +1043,12 @@ In both cases, using <code><a class="el" href="class_w_a_sim_commander_1_1_clien
 <dl class="section note"><dt>Note</dt><dd>This method blocks until either the Server responds or the timeout has expired. </dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="namespace_w_a_sim_commander_1_1_enums.html#ae3b1cd5348286e86d8c64ce44734e039a1d5c1a7fde77e84c993d6fea61f88c2a">Enums::CommandId::GetCreate</a>, <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a1e42faa467496da45a14d721454bb66f" title="Get the current default server response timeout value, which is used in all network requests....">defaultTimeout()</a>, <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#afc733727533140b748a5fd5a73b32d3f" title="Get current connection status of this client.">setDefaultTimeout()</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l01676">1676</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l01721">1721</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
 
 </div>
 </div>
 <a id="a8a9f6943f86f904f1db38a4b77e288bb" name="a8a9f6943f86f904f1db38a4b77e288bb"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8a9f6943f86f904f1db38a4b77e288bb">&#9670;&nbsp;</a></span>setVariable()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a8a9f6943f86f904f1db38a4b77e288bb">&#9670;&nbsp;</a></span>setVariable() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1073,7 +1094,40 @@ The following conditions must be observed: </p>
 <dl class="section return"><dt>Returns</dt><dd><code>S_OK</code> on success, <code>E_INVALIDARG</code> on parameter validation errors, <code>E_NOT_CONNECTED</code> if not connected to server, or <code>E_FAIL</code> on general failure (unlikely). </dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="namespace_w_a_sim_commander_1_1_enums.html#ae3b1cd5348286e86d8c64ce44734e039a5d5b78699e57104f2fa03bbdf7b9197b">Enums::CommandId::Set</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l01680">1680</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l01726">1726</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a725be5c00b1d6861826c898d095db118" name="a725be5c00b1d6861826c898d095db118"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a725be5c00b1d6861826c898d095db118">&#9670;&nbsp;</a></span>setVariable() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">HRESULT WASimCommander::Client::WASimClient::setVariable </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="struct_w_a_sim_commander_1_1_client_1_1_variable_request.html">VariableRequest</a> &amp;&#160;</td>
+          <td class="paramname"><em>variable</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>stringValue</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>This is an overloaded method. This version allows setting an 'A' type (SimVar) variable to a string value. <b>Only 'A' type variables can be set this way.</b> <br  />
+Since there is actually no direct way to set string-type values from WASM code, this is just a conveneince method and simply invokes SimConnect to do the work. On first use with a new variable name it will set up a mapping of the name to an internally-assigned ID (calling <code>SimConnect_AddToDataDefinition()</code>) and cache that mapping. Then on subsequent invocations on the same variable the mapped ID will be used directly. The mappings are invalidated when disconnecting from the simulator. </p>
+
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l01730">1730</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
 
 </div>
 </div>
@@ -1121,7 +1175,7 @@ The following conditions must be observed: </p>
 <dl class="section return"><dt>Returns</dt><dd><code>S_OK</code> on success, <code>E_INVALIDARG</code> on parameter validation errors, <code>E_NOT_CONNECTED</code> if not connected to server, or <code>E_FAIL</code> on general failure (unlikely). </dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="namespace_w_a_sim_commander_1_1_enums.html#ae3b1cd5348286e86d8c64ce44734e039a5d5b78699e57104f2fa03bbdf7b9197b">Enums::CommandId::Set</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l01688">1688</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l01734">1734</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
 
 </div>
 </div>
@@ -1169,7 +1223,200 @@ The following conditions must be observed: </p>
 <dl class="section return"><dt>Returns</dt><dd><code>S_OK</code> on success, <code>E_INVALIDARG</code> on parameter validation errors, <code>E_NOT_CONNECTED</code> if not connected to server, or <code>E_FAIL</code> on general failure (unlikely). </dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="namespace_w_a_sim_commander_1_1_enums.html#ae3b1cd5348286e86d8c64ce44734e039a372978c0739253c563ef7cb07d0606f2">Enums::CommandId::SetCreate</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l01692">1692</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l01738">1738</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a5f0f7e3575c605a44516a407251567fe" name="a5f0f7e3575c605a44516a407251567fe"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5f0f7e3575c605a44516a407251567fe">&#9670;&nbsp;</a></span>setSimVarVariable() <span class="overload">[1/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">HRESULT WASimCommander::Client::WASimClient::setSimVarVariable </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>variableName</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>unitName</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>value</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Sets a numeric value on an 'A' (aka "SimVar" / "Simulator Variable") type variable. <br  />
+This is a convenience version of <code><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a8a9f6943f86f904f1db38a4b77e288bb" title="Set a Variable value by name, with optional named unit type. Although any settable variable type can ...">setVariable()</a></code>, equivalent to <code>setVariable(VariableRequest(variableName, unitName), value)</code>. See <code><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a8a9f6943f86f904f1db38a4b77e288bb" title="Set a Variable value by name, with optional named unit type. Although any settable variable type can ...">setVariable()</a></code> and <code><a class="el" href="struct_w_a_sim_commander_1_1_client_1_1_variable_request.html" title="Structure for using with WASimClient::getVariable() and WASimClient::setVariable() to specify informa...">VariableRequest</a></code> for details.<br  />
+Note that <code>variableName</code> can optionally contain an index after a colon (eg. <code>VAR NAME:1</code>), or the <code><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#ae0b929bc859f598829be1ef20944160e" title="Sets a numeric value on an indexed &#39;A&#39; (aka &quot;SimVar&quot; / &quot;Simulator Variable&quot;) type variable....">setSimVarVariable(const string&amp; name, uint8_t index, const string&amp; unit, double value)</a></code> overload could be used to provide the index separately. </p>
+<dl class="section since"><dt>Since</dt><dd>v1.3.0 </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8h_source.html#l00262">262</a> of file <a class="el" href="_w_a_sim_client_8h_source.html">WASimClient.h</a>.</p>
+
+</div>
+</div>
+<a id="ae0b929bc859f598829be1ef20944160e" name="ae0b929bc859f598829be1ef20944160e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae0b929bc859f598829be1ef20944160e">&#9670;&nbsp;</a></span>setSimVarVariable() <span class="overload">[2/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">HRESULT WASimCommander::Client::WASimClient::setSimVarVariable </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>variableName</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint8_t&#160;</td>
+          <td class="paramname"><em>simVarIndex</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>unitName</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>value</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Sets a numeric value on an indexed 'A' (aka "SimVar" / "Simulator Variable") type variable. <br  />
+This is a convenience version of <code><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a8a9f6943f86f904f1db38a4b77e288bb" title="Set a Variable value by name, with optional named unit type. Although any settable variable type can ...">setVariable()</a></code>, equivalent to <code>setVariable(VariableRequest(variableName, unitName, simVarIndex), value)</code>. See <code><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a8a9f6943f86f904f1db38a4b77e288bb" title="Set a Variable value by name, with optional named unit type. Although any settable variable type can ...">setVariable()</a></code> and <code><a class="el" href="struct_w_a_sim_commander_1_1_client_1_1_variable_request.html" title="Structure for using with WASimClient::getVariable() and WASimClient::setVariable() to specify informa...">VariableRequest</a></code> for details. </p>
+<dl class="section since"><dt>Since</dt><dd>v1.3.0 </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8h_source.html#l00266">266</a> of file <a class="el" href="_w_a_sim_client_8h_source.html">WASimClient.h</a>.</p>
+
+</div>
+</div>
+<a id="a79b80707c04ebfd07c42b46abc753dfc" name="a79b80707c04ebfd07c42b46abc753dfc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a79b80707c04ebfd07c42b46abc753dfc">&#9670;&nbsp;</a></span>setSimVarVariable() <span class="overload">[3/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">HRESULT WASimCommander::Client::WASimClient::setSimVarVariable </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>variableName</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>stringValue</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Sets a string value on an 'A' (aka "SimVar" / "Simulator Variable") type variable. <br  />
+This is a convenience version of <code><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a8a9f6943f86f904f1db38a4b77e288bb" title="Set a Variable value by name, with optional named unit type. Although any settable variable type can ...">setVariable()</a></code>, equivalent to &lsquo;setVariable(<a class="el" href="struct_w_a_sim_commander_1_1_client_1_1_variable_request.html" title="Structure for using with WASimClient::getVariable() and WASimClient::setVariable() to specify informa...">VariableRequest</a>('A&rsquo;, variableName), stringValue)<code>. See</code><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a725be5c00b1d6861826c898d095db118" title="This is an overloaded method. This version allows setting an &#39;A&#39; type (SimVar) variable to a string v...">setVariable(const VariableRequest &amp;, const std::string &amp;)</a>` for details. </p>
+<dl class="section since"><dt>Since</dt><dd>v1.3.0 </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8h_source.html#l00270">270</a> of file <a class="el" href="_w_a_sim_client_8h_source.html">WASimClient.h</a>.</p>
+
+</div>
+</div>
+<a id="ae3e6289323d9d13cbf928e0bbf521595" name="ae3e6289323d9d13cbf928e0bbf521595"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae3e6289323d9d13cbf928e0bbf521595">&#9670;&nbsp;</a></span>setSimVarVariable() <span class="overload">[4/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">HRESULT WASimCommander::Client::WASimClient::setSimVarVariable </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>variableName</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint8_t&#160;</td>
+          <td class="paramname"><em>index</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>stringValue</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Sets a string value on an indexed 'A' (aka "SimVar" / "Simulator Variable") type variable. <br  />
+This is a convenience version of <code><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a8a9f6943f86f904f1db38a4b77e288bb" title="Set a Variable value by name, with optional named unit type. Although any settable variable type can ...">setVariable()</a></code>, equivalent to <code>setVariable(<a class="el" href="struct_w_a_sim_commander_1_1_client_1_1_variable_request.html" title="Structure for using with WASimClient::getVariable() and WASimClient::setVariable() to specify informa...">VariableRequest</a>(variableName, {}, index), stringValue)</code>. See <code><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a725be5c00b1d6861826c898d095db118" title="This is an overloaded method. This version allows setting an &#39;A&#39; type (SimVar) variable to a string v...">setVariable(const VariableRequest &amp;, const std::string &amp;)</a></code> for details. </p>
+<dl class="section since"><dt>Since</dt><dd>v1.3.0 </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8h_source.html#l00274">274</a> of file <a class="el" href="_w_a_sim_client_8h_source.html">WASimClient.h</a>.</p>
 
 </div>
 </div>
@@ -1213,7 +1460,7 @@ If currently connected to the server and <code>async</code> is <code>false</code
 <dl class="section user"><dt>Tracking async calls</dt><dd>To track the status of an async request, set a callback function with <code><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a9c6e16335bfa8a31859c87a7e008d9c6" title="Sets a callback for delivering command results returned by the server. Pass a nullptr value to remove...">setCommandResultCallback()</a></code>. The server should respond with an <a class="el" href="namespace_w_a_sim_commander_1_1_enums.html#ae3b1cd5348286e86d8c64ce44734e039ab25d8b2099e52bb9300aca6661601b8b">Enums::CommandId::Ack</a> or <a class="el" href="namespace_w_a_sim_commander_1_1_enums.html#ae3b1cd5348286e86d8c64ce44734e039a2bc5084deb803abafb983e69c555526a">Enums::CommandId::Nak</a> <a class="el" href="struct_w_a_sim_commander_1_1_command.html">Command</a> where the <code>uData</code> value is <a class="el" href="namespace_w_a_sim_commander_1_1_enums.html#ae3b1cd5348286e86d8c64ce44734e039ab26917587d98330d93f87808fc9d7267">Enums::CommandId::Subscribe</a> and the <a class="el" href="struct_w_a_sim_commander_1_1_command.html#ac259cea9ef6e314d5f1c53ebf511778d">Command::token</a> will be the <code>requestId</code> value from the given <code>request</code> struct. </dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="struct_w_a_sim_commander_1_1_data_request.html">DataRequest</a> <a class="el" href="namespace_w_a_sim_commander_1_1_enums.html#ae3b1cd5348286e86d8c64ce44734e039ab26917587d98330d93f87808fc9d7267">Enums::CommandId::Subscribe</a>, <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a64d455fb0bbc94e4eb6634fd648c58e7" title="Remove a previously-added DataRequest. This clears the subscription and any tracking/meta data from b...">removeDataRequest()</a>, <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a4e9b08a6f6d21fa934f860dc6e259a9b" title="Trigger a data update on a previously-added DataRequest. Designed to refresh data on subscriptions wi...">updateDataRequest()</a>, <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a1ddabb80726df8220e3a6ed4272bf737" title="Sets a callback for value update data arriving from the server. Pass a nullptr value to remove a prev...">setDataCallback()</a>, <a class="el" href="struct_w_a_sim_commander_1_1_client_1_1_data_request_record.html" title="DataRequestRecord inherits and extends WASimCommander::DataRequest with data pertinent for use by a d...">DataRequestRecord</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l01700">1700</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l01746">1746</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
 
 </div>
 </div>
@@ -1244,7 +1491,7 @@ If currently connected to the server and <code>async</code> is <code>false</code
 <dl class="section note"><dt>Note</dt><dd>If the subscription data may be needed again in the future, it would be more efficient to edit the request (using <code><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#af8882cc52796013b92dbee001de27bfe" title="Add a new WASimCommander::DataRequest for a variable or calculated result, or update an existing data...">saveDataRequest()</a></code>) and suspend updates by setting the <code><a class="el" href="struct_w_a_sim_commander_1_1_data_request.html#a6965fcd542896b4b9357ef58ea33f074" title="How often to read/calculate this value.">DataRequest::period</a></code> to <code>UpdatePeriod::Never</code>. To resume updates change the period again. </dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="struct_w_a_sim_commander_1_1_data_request.html">DataRequest</a>, <a class="el" href="namespace_w_a_sim_commander_1_1_enums.html#ae3b1cd5348286e86d8c64ce44734e039ab26917587d98330d93f87808fc9d7267">Enums::CommandId::Subscribe</a>, <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#af8882cc52796013b92dbee001de27bfe" title="Add a new WASimCommander::DataRequest for a variable or calculated result, or update an existing data...">saveDataRequest()</a>, <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a4e9b08a6f6d21fa934f860dc6e259a9b" title="Trigger a data update on a previously-added DataRequest. Designed to refresh data on subscriptions wi...">updateDataRequest()</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l01704">1704</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l01750">1750</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
 
 </div>
 </div>
@@ -1274,7 +1521,7 @@ If currently connected to the server and <code>async</code> is <code>false</code
 <dl class="section return"><dt>Returns</dt><dd><code>S_OK</code> on success, <code>E_FAIL</code> if the original request wasn't found,. </dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="namespace_w_a_sim_commander_1_1_enums.html#ae3b1cd5348286e86d8c64ce44734e039a06933067aafd48425d67bcb01bba5cb6">Enums::CommandId::Update</a>, <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#af8882cc52796013b92dbee001de27bfe" title="Add a new WASimCommander::DataRequest for a variable or calculated result, or update an existing data...">saveDataRequest()</a>, <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a64d455fb0bbc94e4eb6634fd648c58e7" title="Remove a previously-added DataRequest. This clears the subscription and any tracking/meta data from b...">removeDataRequest()</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l01708">1708</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l01754">1754</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
 
 </div>
 </div>
@@ -1296,7 +1543,7 @@ If currently connected to the server and <code>async</code> is <code>false</code
 
 <p>Returns a copy of a <code><a class="el" href="struct_w_a_sim_commander_1_1_client_1_1_data_request_record.html" title="DataRequestRecord inherits and extends WASimCommander::DataRequest with data pertinent for use by a d...">DataRequestRecord</a></code> which has been previously added. If the request with the given <code>requestId</code> doesn't exist, an invalid <code><a class="el" href="struct_w_a_sim_commander_1_1_client_1_1_data_request_record.html" title="DataRequestRecord inherits and extends WASimCommander::DataRequest with data pertinent for use by a d...">DataRequestRecord</a></code> is returned which has the members <code><a class="el" href="struct_w_a_sim_commander_1_1_data_request.html#a2972cffe60e96a9e0c1ba2873e17ee64" title="Unique ID for the request, subsequent use of this ID overwrites any previous request definition (but ...">DataRequest::requestId</a></code> set to <code>-1</code>, <code><a class="el" href="struct_w_a_sim_commander_1_1_data_request.html#aa2dd2b40458cc54969289a3d96bc4173" title="Byte size of stored value; can also be one of the predefined DATA_TYPE_* constants.">DataRequest::valueSize</a></code> set to <code>0</code>, and <code><a class="el" href="struct_w_a_sim_commander_1_1_data_request.html#a8021ab093ea048b14590e507bd73d5ca" title="Named variable or calculated value.">DataRequest::requestType</a></code> set to <code>RequestType::None</code>. </p>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l01715">1715</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l01761">1761</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
 
 </div>
 </div>
@@ -1317,7 +1564,7 @@ If currently connected to the server and <code>async</code> is <code>false</code
 
 <p>Returns a list of all data requests which have been added to the <a class="el" href="namespace_w_a_sim_commander_1_1_client.html" title="WASimCommander::Client namespace. Defines/declares everything needed to interact with the WASimComman...">Client</a> so far. (These are returned by copy operation, so for a long list it may get "expensive.") </p>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l01726">1726</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l01772">1772</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
 
 </div>
 </div>
@@ -1338,7 +1585,7 @@ If currently connected to the server and <code>async</code> is <code>false</code
 
 <p>Returns a list of all <code><a class="el" href="struct_w_a_sim_commander_1_1_data_request.html#a2972cffe60e96a9e0c1ba2873e17ee64" title="Unique ID for the request, subsequent use of this ID overwrites any previous request definition (but ...">DataRequest::requestId</a></code>s which have been added to the <a class="el" href="namespace_w_a_sim_commander_1_1_client.html" title="WASimCommander::Client namespace. Defines/declares everything needed to interact with the WASimComman...">Client</a> so far. </p>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l01738">1738</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l01784">1784</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
 
 </div>
 </div>
@@ -1362,7 +1609,7 @@ If currently connected to the server and <code>async</code> is <code>false</code
 <dl class="section user"><dt>Since v1.2</dt><dd>This method can be called while not connected to the server. In this case the setting is saved and sent to the server upon next connection, before sending any data request subscriptions. This way updates could be suspended upon initial connection, then re-enabled when the data is actually needed. </dd></dl>
 <dl class="section return"><dt>Returns</dt><dd><code>S_OK</code> on success; If currently connected to the server, may also return <code>E_TIMEOUT</code> on general server communication failure. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l01750">1750</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l01796">1796</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
 
 </div>
 </div>
@@ -1386,7 +1633,7 @@ If currently connected to the server and <code>async</code> is <code>false</code
 <dl class="section return"><dt>Returns</dt><dd><code>S_OK</code> on success, <code>E_INVALIDARG</code> if the resulting code string is too long or if trying to change the name of an already registered event. </dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="struct_w_a_sim_commander_1_1_client_1_1_registered_event.html" title="Structure to hold data for registered (reusable) calculator events. Used to submit events with WASimC...">RegisteredEvent</a>, <a class="el" href="namespace_w_a_sim_commander_1_1_enums.html#ae3b1cd5348286e86d8c64ce44734e039a0ba7583639a274c434bbe6ef797115a4">Enums::CommandId::Register</a>, <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a6fcab53da1ed6149f524e921c72aa265" title="Remove an event previously registered with registerEvent() method. This is effectively the same as ca...">removeEvent()</a>, <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a79df757ffd7e9c5d3a984475b79eeccc" title="Trigger an event previously registered with registerEvent(). This is a more direct alternative to tri...">transmitEvent()</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l01765">1765</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l01811">1811</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
 
 </div>
 </div>
@@ -1416,7 +1663,7 @@ If currently connected to the server and <code>async</code> is <code>false</code
 <dl class="section return"><dt>Returns</dt><dd><code>S_OK</code> on success, <code>E_INVALIDARG</code> if the eventId wasn't found. </dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="namespace_w_a_sim_commander_1_1_enums.html#ae3b1cd5348286e86d8c64ce44734e039a0ba7583639a274c434bbe6ef797115a4">Enums::CommandId::Register</a>, <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a098e51fad57fdbd62ef2a45385156c5f" title="Register a reusable event which executes a pre-set RPN calculator code string. The code is pre-compil...">registerEvent()</a>, <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a79df757ffd7e9c5d3a984475b79eeccc" title="Trigger an event previously registered with registerEvent(). This is a more direct alternative to tri...">transmitEvent()</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l01800">1800</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l01846">1846</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
 
 </div>
 </div>
@@ -1446,7 +1693,7 @@ If currently connected to the server and <code>async</code> is <code>false</code
 <dl class="section return"><dt>Returns</dt><dd><code>S_OK</code> on success, <code>E_FAIL</code> on general failure (unlikely), <code>E_NOT_CONNECTED</code> if not connected to server. </dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="namespace_w_a_sim_commander_1_1_enums.html#ae3b1cd5348286e86d8c64ce44734e039a6c2958de5e2295b8cb67bac908244879">Enums::CommandId::Transmit</a>, <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a098e51fad57fdbd62ef2a45385156c5f" title="Register a reusable event which executes a pre-set RPN calculator code string. The code is pre-compil...">registerEvent()</a>, <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a6fcab53da1ed6149f524e921c72aa265" title="Remove an event previously registered with registerEvent() method. This is effectively the same as ca...">removeEvent()</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l01820">1820</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l01866">1866</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
 
 </div>
 </div>
@@ -1468,7 +1715,7 @@ If currently connected to the server and <code>async</code> is <code>false</code
 
 <p>Returns a copy of a <code><a class="el" href="struct_w_a_sim_commander_1_1_client_1_1_registered_event.html" title="Structure to hold data for registered (reusable) calculator events. Used to submit events with WASimC...">RegisteredEvent</a></code> which has been previously added with <code><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a098e51fad57fdbd62ef2a45385156c5f" title="Register a reusable event which executes a pre-set RPN calculator code string. The code is pre-compil...">registerEvent()</a></code>. If the event with the given <code>eventId</code> doesn't exist, an invalid <code><a class="el" href="struct_w_a_sim_commander_1_1_client_1_1_registered_event.html" title="Structure to hold data for registered (reusable) calculator events. Used to submit events with WASimC...">RegisteredEvent</a></code> is returned which has the members <code><a class="el" href="struct_w_a_sim_commander_1_1_client_1_1_registered_event.html#adb3356a2ddc47392812aeed042cd1352" title="A unique ID for this event. The ID can later be used to modify, trigger, or remove this event.">RegisteredEvent::eventId</a></code> set to <code>-1</code>, and <code><a class="el" href="struct_w_a_sim_commander_1_1_client_1_1_registered_event.html#a6811a11341ca99b102f5b775aa906b9e" title="The calculator code string to execute as the event action. The code is pre-compiled and stored on the...">RegisteredEvent::code</a></code> and <code><a class="el" href="struct_w_a_sim_commander_1_1_client_1_1_registered_event.html#a4fc8ad1b32e699be03c666c8c8165cf0" title="Optional custom name for this event. The name is for use with SimConnect_MapClientEventToSimEvent(id,...">RegisteredEvent::name</a></code> both empty. </p>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l01824">1824</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l01870">1870</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
 
 </div>
 </div>
@@ -1489,7 +1736,7 @@ If currently connected to the server and <code>async</code> is <code>false</code
 
 <p>Returns a list of all registered events which have been added to the <a class="el" href="namespace_w_a_sim_commander_1_1_client.html" title="WASimCommander::Client namespace. Defines/declares everything needed to interact with the WASimComman...">Client</a> with <code><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a098e51fad57fdbd62ef2a45385156c5f" title="Register a reusable event which executes a pre-set RPN calculator code string. The code is pre-compil...">registerEvent()</a></code>. The list members are created by copy. </p>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l01833">1833</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l01879">1879</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
 
 </div>
 </div>
@@ -1564,7 +1811,7 @@ See docs for <code><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_
  For <em>custom named</em> events, triggered via <code>SimConnect_TransmitClientEvent[_EX1()]</code>, SimConnect may asynchronously send EXCEPTION type response messages if the ID isn't valid (likely because the event hasn't been successfully registered with <code><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a6e7bf0b7c6b741081bc2ce43d937ba11" title="Register a &quot;Custom Simulator [Key] Event&quot; by providing an event name. The method optionally returns t...">registerCustomKeyEvent()</a></code>). These messages are passed through to <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html" title="WASimCommander Client implementation. Handles all aspects of communication with the WASimCommander Se...">WASimClient</a>'s logging facilities at the <code>Warning</code> level. But again there is no actual confirmation that the event is going to do anything. </dd></dl>
 <dl class="section since"><dt>Since</dt><dd>v1.3.0 - Added ability to trigger custom named events. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l01849">1849</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l01895">1895</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
 
 </div>
 </div>
@@ -1636,7 +1883,7 @@ All simulator event names must be resolved, or mapped, to a numeric ID before th
 <dl class="section note"><dt>Note</dt><dd>The name-to-ID cache is kept as a simple <code>std::unordered_map</code> type, so if you have a better way to save the event IDs from <code><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a602e0e104484dce8d22e572b3803e567" title="Request server-side lookup of an named item to find the corresponding numeric ID.">lookup()</a></code> or <code><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a6e7bf0b7c6b741081bc2ce43d937ba11" title="Register a &quot;Custom Simulator [Key] Event&quot; by providing an event name. The method optionally returns t...">registerCustomKeyEvent()</a></code>, use that instead, and call the more efficient <code>sendKeyEvent(eventId, ...)</code> overload directly. </dd></dl>
 <dl class="section since"><dt>Since</dt><dd>v1.3.0 - Added ability to trigger custom named events. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l01861">1861</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l01907">1907</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
 
 </div>
 </div>
@@ -1694,7 +1941,7 @@ Note that the custom event mapping/triggering feature is actually just a conveni
 <dl class="section return"><dt>Returns</dt><dd><code>S_OK</code> on success, <code>E_INVALIDARG</code> if the event name is invalid. </dd></dl>
 <dl class="section since"><dt>Since</dt><dd>v1.3.0 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l01900">1900</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l01946">1946</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
 
 </div>
 </div>
@@ -1725,7 +1972,7 @@ Note that the custom event mapping/triggering feature is actually just a conveni
 <dl class="section return"><dt>Returns</dt><dd><code>S_OK</code> on success, <code>E_INVALIDARG</code> if the eventId wasn't found. </dd></dl>
 <dl class="section since"><dt>Since</dt><dd>v1.3.0 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l01919">1919</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l01965">1965</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
 
 </div>
 </div>
@@ -1755,7 +2002,7 @@ Note that the custom event mapping/triggering feature is actually just a conveni
 <dl class="section return"><dt>Returns</dt><dd><code>S_OK</code> on success, <code>E_INVALIDARG</code> if the eventId wasn't found. </dd></dl>
 <dl class="section since"><dt>Since</dt><dd>v1.3.0 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l01909">1909</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l01955">1955</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
 
 </div>
 </div>
@@ -1786,7 +2033,7 @@ Note that the custom event mapping/triggering feature is actually just a conveni
 <dl class="section note"><dt>Note</dt><dd>The list result callback is invoked from a new thread which delivers the results (<a class="el" href="namespace_w_a_sim_commander_1_1_client.html#struct_w_a_sim_commander_1_1_client_1_1_list_result">Client::ListResult</a> structure). Also check the <code><a class="el" href="namespace_w_a_sim_commander_1_1_client.html#a0843c42b1baa1b3e13871cedaf476ed1" title="Execution result, one of: S_OK, E_FAIL, E_TIMEOUT">ListResult::result</a></code> HRESULT return code to be sure the list command completed successfully (which may be <code>S_OK</code>, <code>E_FAIL</code> if server returned <code>Nak</code>, or <code>E_TIMEOUT</code> if the list request did not complete (results may be empty or partial)). </dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="namespace_w_a_sim_commander_1_1_enums.html#ae3b1cd5348286e86d8c64ce44734e039a4ee29ca12c7d126654bd0e5275de6135">Enums::CommandId::List</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l01929">1929</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l01975">1975</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
 
 </div>
 </div>
@@ -1835,7 +2082,7 @@ Note that the custom event mapping/triggering feature is actually just a conveni
 <dl class="section note"><dt>Note</dt><dd>This method blocks until either the Server responds or the timeout has expired. </dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a1e42faa467496da45a14d721454bb66f" title="Get the current default server response timeout value, which is used in all network requests....">defaultTimeout()</a>, <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#afc733727533140b748a5fd5a73b32d3f" title="Get current connection status of this client.">setDefaultTimeout()</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l01959">1959</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l02005">2005</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
 
 </div>
 </div>
@@ -1858,7 +2105,7 @@ Note that the custom event mapping/triggering feature is actually just a conveni
 <p>Sends a command, in the form of a <code><a class="el" href="struct_w_a_sim_commander_1_1_command.html" title="Command data structure. The member contents depend on the command type as described in each command t...">WASimCommander::Command</a></code> structure, to the server for processing. The various command types and the data requirements for each are described in the <code><a class="el" href="namespace_w_a_sim_commander_1_1_enums.html#ae3b1cd5348286e86d8c64ce44734e039" title="Commands for client-server interaction. Both sides can send commands via dedicated channels by writin...">WASimCommander::Enums::CommandId</a></code> documentation. To receive command responses from the server, set a callback with <code><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a9c6e16335bfa8a31859c87a7e008d9c6" title="Sets a callback for delivering command results returned by the server. Pass a nullptr value to remove...">setCommandResultCallback()</a></code>, then check the results for a <code><a class="el" href="struct_w_a_sim_commander_1_1_command.html#ac259cea9ef6e314d5f1c53ebf511778d" title="A unique ID for this command instance. Echoed back by server in command responses....">Command::token</a></code> which matches the <code>token</code> set in the command you're sending here. </p>
 <dl class="section return"><dt>Returns</dt><dd><code>S_OK</code> on success, <code>E_NOT_CONNECTED</code> if not connected to server, <code>E_TIMEOUT</code> on server communication failure. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l01983">1983</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l02029">2029</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
 
 </div>
 </div>
@@ -1905,7 +2152,7 @@ Note that the custom event mapping/triggering feature is actually just a conveni
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><code>S_OK</code> on success, <code>E_NOT_CONNECTED</code> if not connected to server, <code>E_TIMEOUT</code> on server communication failure, or possibly <code>E_FAIL</code> on unknown error (check log for details). </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l01987">1987</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l02033">2033</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
 
 </div>
 </div>
@@ -1947,7 +2194,7 @@ Note that the custom event mapping/triggering feature is actually just a conveni
 <dl class="section return"><dt>Returns</dt><dd>The current <code>WASimCommander::LogLevel</code> value, or <code>LogLevel::None</code> if the parameters were ivalid or the actual level is unknown (see Note below). </dd></dl>
 <dl class="section note"><dt>Note</dt><dd>The remote server logging level for <code>File</code> and <code>Console</code> facilities is unknown at <a class="el" href="namespace_w_a_sim_commander_1_1_client.html" title="WASimCommander::Client namespace. Defines/declares everything needed to interact with the WASimComman...">Client</a> startup. The returned values are only going to be correct if they were set by this instance of the <a class="el" href="namespace_w_a_sim_commander_1_1_client.html" title="WASimCommander::Client namespace. Defines/declares everything needed to interact with the WASimComman...">Client</a> (using <code><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a568048640b4b1fb9e965af60c9cd4520" title="Set the current minimum logging severity level for the specified facility and source to level.">setLogLevel()</a></code>). </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l02007">2007</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l02053">2053</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
 
 </div>
 </div>
@@ -1994,7 +2241,7 @@ Note that the custom event mapping/triggering feature is actually just a conveni
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l02008">2008</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l02054">2054</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
 
 </div>
 </div>
@@ -2019,7 +2266,7 @@ Note that the custom event mapping/triggering feature is actually just a conveni
 <div class="fragment"><div class="line">client-&gt;setClientEventCallback(std::bind(&amp;MyClass::onClientEvent, <span class="keyword">this</span>, std::placeholders::_1)); </div>
 </div><!-- fragment --><p> This callback may be invoked from the main thread (where <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html" title="WASimCommander Client implementation. Handles all aspects of communication with the WASimCommander Se...">WASimClient</a> was created), the dedicated "dispatch" thread the client maintains, or a temporary thread in one specific case when SimConnect sends a "Quit" command. </p><dl class="section see"><dt>See also</dt><dd><a class="el" href="namespace_w_a_sim_commander_1_1_client.html#af0c0e090f7c4f26992daf57de64ca526" title="Client event type enumeration.">ClientEventType</a>, <a class="el" href="namespace_w_a_sim_commander_1_1_client.html#struct_w_a_sim_commander_1_1_client_1_1_client_event" title="Client Event data, delivered via callback.">ClientEvent</a>, <a class="el" href="_w_a_sim_client_8h.html#a322d2a2abb9d43f7c3f0a6ddd9d3adee" title="Define with value of 0 (zero) to invoke all callbacks consecutively, using a mutex lock....">WSMCMND_CLIENT_USE_CONCURRENT_CALLBACKS</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l02024">2024</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l02070">2070</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
 
 </div>
 </div>
@@ -2064,7 +2311,7 @@ template&lt;class Tcaller &gt; </div>
 <div class="fragment"><div class="line">client-&gt;setClientEventCallback(&amp;MyClass::onClientEvent, <span class="keyword">this</span>); </div>
 </div><!-- fragment --> <dl class="section see"><dt>See also</dt><dd><a class="el" href="namespace_w_a_sim_commander_1_1_client.html#struct_w_a_sim_commander_1_1_client_1_1_client_event" title="Client Event data, delivered via callback.">ClientEvent</a>, <a class="el" href="_w_a_sim_client_8h.html#a322d2a2abb9d43f7c3f0a6ddd9d3adee" title="Define with value of 0 (zero) to invoke all callbacks consecutively, using a mutex lock....">WSMCMND_CLIENT_USE_CONCURRENT_CALLBACKS</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8h_source.html#l00553">553</a> of file <a class="el" href="_w_a_sim_client_8h_source.html">WASimClient.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8h_source.html#l00578">578</a> of file <a class="el" href="_w_a_sim_client_8h_source.html">WASimClient.h</a>.</p>
 
 </div>
 </div>
@@ -2089,7 +2336,7 @@ template&lt;class Tcaller &gt; </div>
 <div class="fragment"><div class="line">client-&gt;setListResultsCallback(std::bind(&amp;MyClass::onListResult, <span class="keyword">this</span>, std::placeholders::_1)); </div>
 </div><!-- fragment --><p> This callback is invoked from temporary thread which accumulates incoming list results until the listing is complete (or times out). Currently, only one pending list request can be active at any time, though this may change in the future. </p><dl class="section see"><dt>See also</dt><dd><a class="el" href="namespace_w_a_sim_commander_1_1_client.html#struct_w_a_sim_commander_1_1_client_1_1_list_result" title="Structure for delivering list results, eg. of local variables sent from Server.">ListResult</a>, <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#ae34ec025c8965441cd9a178e8dac734e" title="Send a request for a list update to the server. The results are delivered using the callback set in s...">list()</a>, <a class="el" href="namespace_w_a_sim_commander_1_1_enums.html#ae3b1cd5348286e86d8c64ce44734e039a4ee29ca12c7d126654bd0e5275de6135">Enums::CommandId::List</a>, <a class="el" href="_w_a_sim_client_8h.html#a322d2a2abb9d43f7c3f0a6ddd9d3adee" title="Define with value of 0 (zero) to invoke all callbacks consecutively, using a mutex lock....">WSMCMND_CLIENT_USE_CONCURRENT_CALLBACKS</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l02025">2025</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l02071">2071</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
 
 </div>
 </div>
@@ -2134,7 +2381,7 @@ template&lt;class Tcaller &gt; </div>
 <div class="fragment"><div class="line">client-&gt;setListResultsCallback(&amp;MyClass::onListResult, <span class="keyword">this</span>); </div>
 </div><!-- fragment --> <dl class="section see"><dt>See also</dt><dd><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#ae34ec025c8965441cd9a178e8dac734e" title="Send a request for a list update to the server. The results are delivered using the callback set in s...">list()</a>, <a class="el" href="namespace_w_a_sim_commander_1_1_enums.html#ae3b1cd5348286e86d8c64ce44734e039a4ee29ca12c7d126654bd0e5275de6135">Enums::CommandId::List</a>, <a class="el" href="_w_a_sim_client_8h.html#a322d2a2abb9d43f7c3f0a6ddd9d3adee" title="Define with value of 0 (zero) to invoke all callbacks consecutively, using a mutex lock....">WSMCMND_CLIENT_USE_CONCURRENT_CALLBACKS</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8h_source.html#l00559">559</a> of file <a class="el" href="_w_a_sim_client_8h_source.html">WASimClient.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8h_source.html#l00584">584</a> of file <a class="el" href="_w_a_sim_client_8h_source.html">WASimClient.h</a>.</p>
 
 </div>
 </div>
@@ -2159,7 +2406,7 @@ template&lt;class Tcaller &gt; </div>
 <div class="fragment"><div class="line">client-&gt;setDataCallback(std::bind(&amp;MyClass::onDataResult, <span class="keyword">this</span>, std::placeholders::_1)); </div>
 </div><!-- fragment --><p> This callback is invoked from the dedicated "dispatch" thread the client maintains. </p><dl class="section see"><dt>See also</dt><dd><a class="el" href="struct_w_a_sim_commander_1_1_client_1_1_data_request_record.html" title="DataRequestRecord inherits and extends WASimCommander::DataRequest with data pertinent for use by a d...">DataRequestRecord</a>, <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#af8882cc52796013b92dbee001de27bfe" title="Add a new WASimCommander::DataRequest for a variable or calculated result, or update an existing data...">saveDataRequest()</a>, <a class="el" href="_w_a_sim_client_8h.html#a322d2a2abb9d43f7c3f0a6ddd9d3adee" title="Define with value of 0 (zero) to invoke all callbacks consecutively, using a mutex lock....">WSMCMND_CLIENT_USE_CONCURRENT_CALLBACKS</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l02026">2026</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l02072">2072</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
 
 </div>
 </div>
@@ -2204,7 +2451,7 @@ template&lt;class Tcaller &gt; </div>
 <div class="fragment"><div class="line">client-&gt;setDataCallback(&amp;MyClass::onDataResult, <span class="keyword">this</span>) </div>
 </div><!-- fragment --> <dl class="section see"><dt>See also</dt><dd><a class="el" href="namespace_w_a_sim_commander_1_1_client.html#a4e101c8c07197b490c3d1e2929f080a5" title="Callback function for subscription result data.">dataCallback_t</a>, <a class="el" href="struct_w_a_sim_commander_1_1_client_1_1_data_request_record.html" title="DataRequestRecord inherits and extends WASimCommander::DataRequest with data pertinent for use by a d...">DataRequestRecord</a>, <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#af8882cc52796013b92dbee001de27bfe" title="Add a new WASimCommander::DataRequest for a variable or calculated result, or update an existing data...">saveDataRequest()</a>, <a class="el" href="_w_a_sim_client_8h.html#a322d2a2abb9d43f7c3f0a6ddd9d3adee" title="Define with value of 0 (zero) to invoke all callbacks consecutively, using a mutex lock....">WSMCMND_CLIENT_USE_CONCURRENT_CALLBACKS</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8h_source.html#l00565">565</a> of file <a class="el" href="_w_a_sim_client_8h_source.html">WASimClient.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8h_source.html#l00590">590</a> of file <a class="el" href="_w_a_sim_client_8h_source.html">WASimClient.h</a>.</p>
 
 </div>
 </div>
@@ -2229,7 +2476,7 @@ template&lt;class Tcaller &gt; </div>
 <div class="fragment"><div class="line">client-&gt;setLogCallback(std::bind(&amp;MyClass::onLogMessage, <span class="keyword">this</span>, std::placeholders::_1)); </div>
 </div><!-- fragment --><p> This callback may be invoked from either the main thread (where <a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html" title="WASimCommander Client implementation. Handles all aspects of communication with the WASimCommander Se...">WASimClient</a> was created), or the dedicated "dispatch" thread which the client maintains. </p><dl class="section see"><dt>See also</dt><dd><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a568048640b4b1fb9e965af60c9cd4520" title="Set the current minimum logging severity level for the specified facility and source to level.">setLogLevel()</a>, <a class="el" href="_w_a_sim_client_8h.html#a322d2a2abb9d43f7c3f0a6ddd9d3adee" title="Define with value of 0 (zero) to invoke all callbacks consecutively, using a mutex lock....">WSMCMND_CLIENT_USE_CONCURRENT_CALLBACKS</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l02027">2027</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l02073">2073</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
 
 </div>
 </div>
@@ -2274,7 +2521,7 @@ template&lt;class Tcaller &gt; </div>
 <div class="fragment"><div class="line">client-&gt;setLogCallback(&amp;MyClass::onLogMessage, <span class="keyword">this</span>) </div>
 </div><!-- fragment --> <dl class="section see"><dt>See also</dt><dd><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a568048640b4b1fb9e965af60c9cd4520" title="Set the current minimum logging severity level for the specified facility and source to level.">setLogLevel()</a>, <a class="el" href="_w_a_sim_client_8h.html#a322d2a2abb9d43f7c3f0a6ddd9d3adee" title="Define with value of 0 (zero) to invoke all callbacks consecutively, using a mutex lock....">WSMCMND_CLIENT_USE_CONCURRENT_CALLBACKS</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8h_source.html#l00571">571</a> of file <a class="el" href="_w_a_sim_client_8h_source.html">WASimClient.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8h_source.html#l00596">596</a> of file <a class="el" href="_w_a_sim_client_8h_source.html">WASimClient.h</a>.</p>
 
 </div>
 </div>
@@ -2299,7 +2546,7 @@ template&lt;class Tcaller &gt; </div>
 <div class="fragment"><div class="line">client-&gt;setCommandResultCallback(std::bind(&amp;MyClass::onCommandResult, <span class="keyword">this</span>, std::placeholders::_1)); </div>
 </div><!-- fragment --><p> This callback is invoked from the dedicated "dispatch" thread the client maintains. </p><dl class="section see"><dt>See also</dt><dd><a class="el" href="namespace_w_a_sim_commander_1_1_enums.html#ae3b1cd5348286e86d8c64ce44734e039">Enums::CommandId</a>, <a class="el" href="struct_w_a_sim_commander_1_1_command.html" title="Command data structure. The member contents depend on the command type as described in each command t...">WASimCommander::Command</a>, <a class="el" href="_w_a_sim_client_8h.html#a322d2a2abb9d43f7c3f0a6ddd9d3adee" title="Define with value of 0 (zero) to invoke all callbacks consecutively, using a mutex lock....">WSMCMND_CLIENT_USE_CONCURRENT_CALLBACKS</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l02028">2028</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l02074">2074</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
 
 </div>
 </div>
@@ -2344,7 +2591,7 @@ template&lt;class Tcaller &gt; </div>
 <div class="fragment"><div class="line">client-&gt;setCommandResultCallback(&amp;MyClass::onCommandResult, <span class="keyword">this</span>); </div>
 </div><!-- fragment --> <dl class="section see"><dt>See also</dt><dd><a class="el" href="class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a9c6e16335bfa8a31859c87a7e008d9c6" title="Sets a callback for delivering command results returned by the server. Pass a nullptr value to remove...">setCommandResultCallback(commandCallback_t)</a>, <a class="el" href="_w_a_sim_client_8h.html#a322d2a2abb9d43f7c3f0a6ddd9d3adee" title="Define with value of 0 (zero) to invoke all callbacks consecutively, using a mutex lock....">WSMCMND_CLIENT_USE_CONCURRENT_CALLBACKS</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8h_source.html#l00577">577</a> of file <a class="el" href="_w_a_sim_client_8h_source.html">WASimClient.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8h_source.html#l00602">602</a> of file <a class="el" href="_w_a_sim_client_8h_source.html">WASimClient.h</a>.</p>
 
 </div>
 </div>
@@ -2369,7 +2616,7 @@ template&lt;class Tcaller &gt; </div>
 <div class="fragment"><div class="line">client-&gt;setResponseCallback(std::bind(&amp;MyClass::onServerResponse, <span class="keyword">this</span>, std::placeholders::_1)); </div>
 </div><!-- fragment --><p> This callback is invoked from the dedicated "dispatch" thread the client maintains. </p><dl class="section see"><dt>See also</dt><dd>sendServerCommand(), <a class="el" href="_w_a_sim_client_8h.html#a322d2a2abb9d43f7c3f0a6ddd9d3adee" title="Define with value of 0 (zero) to invoke all callbacks consecutively, using a mutex lock....">WSMCMND_CLIENT_USE_CONCURRENT_CALLBACKS</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l02029">2029</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8cpp_source.html#l02075">2075</a> of file <a class="el" href="_w_a_sim_client_8cpp_source.html">WASimClient.cpp</a>.</p>
 
 </div>
 </div>
@@ -2414,7 +2661,7 @@ template&lt;class Tcaller &gt; </div>
 <div class="fragment"><div class="line">client-&gt;setResponseCallback(&amp;MyClass::onServerResponse, <span class="keyword">this</span>); </div>
 </div><!-- fragment --> <dl class="section see"><dt>See also</dt><dd>setResponseCallback(responseCallback_t), <a class="el" href="_w_a_sim_client_8h.html#a322d2a2abb9d43f7c3f0a6ddd9d3adee" title="Define with value of 0 (zero) to invoke all callbacks consecutively, using a mutex lock....">WSMCMND_CLIENT_USE_CONCURRENT_CALLBACKS</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8h_source.html#l00583">583</a> of file <a class="el" href="_w_a_sim_client_8h_source.html">WASimClient.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_w_a_sim_client_8h_source.html#l00608">608</a> of file <a class="el" href="_w_a_sim_client_8h_source.html">WASimClient.h</a>.</p>
 
 </div>
 </div>
