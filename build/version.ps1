@@ -1,7 +1,7 @@
 
 $VER_MAJOR = 1
 $VER_MINOR = 3
-$VER_PATCH = 0
+$VER_PATCH = 1
 $VER_BUILD = 0
 $VER_COMIT = 0
 $VER_NAME  = ""

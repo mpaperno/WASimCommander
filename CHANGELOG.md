@@ -1,5 +1,29 @@
 # WASimCommander - Change Log
 
+## 1.3.1.0 (29-Nov-2024)
+
+### WASimModule
+* Updated reference list of KEY event names for MSFS 2024 SDK v1.0.0 ([e1a0f865]).
+
+### WASimClient
+* Key Event ID lookup is now performed locally instead of querying the server.  ([e4609257])
+* Marked 'B' type (Input Events) variables as "settable."  ([e66498b4])
+  * MSFS 24 apparently has at least some support for using 'B' vars from within RPN calculator code in standalone modules. YMMV.
+* Building (not using) the client now requires MSFS 2024 SDK installed.
+
+### WASimUI
+* 'B' and 'R' variable types are available in the various variable type selectors for experimentation. ([36e925c4])
+* Updated database of imported Event IDs and Simulator Variables from online SDK docs for MSFS 2020 and 2024 as of Nov-25-2024.
+  * The data now also contains flags indicating if a variable/event is supported in FSX, FS20, & FS24 versions.
+
+**[Full Change Log](https://github.com/mpaperno/WASimCommander/compare/1.3.0.0...1.3.1.0)**
+
+[e1a0f865]: https://github.com/mpaperno/WASimCommander/commit/e1a0f865
+[e4609257]: https://github.com/mpaperno/WASimCommander/commit/e4609257
+[e66498b4]: https://github.com/mpaperno/WASimCommander/commit/e66498b4
+[36e925c4]: https://github.com/mpaperno/WASimCommander/commit/36e925c4
+
+---
 ## 1.3.0.0 (15-Nov-2024)
 
 ### WASimModule
@@ -97,7 +121,7 @@
   * Add optional `create` flag and unit name to `VariableRequest()` c'tor overloads.
 * Added async option to `saveDataRequest()` which doesn't wait for server response (`saveDataRequestAsync()` for the C# version). ([82ea4252], [0a30646d])
 * Added ability to return a string value with `getVariable()` to make use of new WASimModule feature. ([8e75eb8c], [0e54794b])
-* The request updates paused state (set with `setDataRequestsPaused()`) is now saved locally even if not connected to server and will be sent to server upon connection and before sending any queued data requests. 
+* The request updates paused state (set with `setDataRequestsPaused()`) is now saved locally even if not connected to server and will be sent to server upon connection and before sending any queued data requests.
   This allows connecting and sending queued requests but suspending any actual value checks until needed. ([bea8bccb])
 * The `setVariable()` method now verifies that the specified variable type is settable before sending the command to the server. ([576914a2])
 * Removed logged version mismatch warning on Ping response.
@@ -186,7 +210,7 @@ Updates for MSFS 2020 SU10 changes and new event trigger API for sending multipl
 * Added Key Event lookup names for new KEY_PROP_FORCE_BETA_* events.
 * Added Token variable name lookups for CIRCUIT_NAVCOM4_ON and BREAKER_NAVCOM4.
 * Remove usage of deprecated `send_key_event()` for `SendKey` command in favor of `trigger_key_event_EX1()`.
-* Module is now built with `/clang:-O1` optimization level (the newly-recommended `O3` level revealed a nasty MSFS memory corruption bug which 
+* Module is now built with `/clang:-O1` optimization level (the newly-recommended `O3` level revealed a nasty MSFS memory corruption bug which
   should be fixed in SU11; I will have an update after SU11 release).
 
 ### WASimClient
