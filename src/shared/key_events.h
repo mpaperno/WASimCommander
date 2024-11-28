@@ -19,7 +19,6 @@ and is also available at <http://www.gnu.org/licenses/>.
 
 #pragma once
 #include <map>
-#include <MSFS/Legacy/gauges.h>
 
 namespace WASimCommander {
 	namespace Utilities {
