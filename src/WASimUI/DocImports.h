@@ -141,7 +141,12 @@ public:
 			return;
 		}
 
-		int col = fieldIndex("Multiplayer");
+		removeColumnName("Multiplayer");
+		removeColumnName("Deprecated");
+	}
+
+	void removeColumnName(const QString &name) {
+		const int col = fieldIndex(name);
 		if (col > -1)
 			removeColumn(col);
 	}

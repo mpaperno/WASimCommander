@@ -234,7 +234,7 @@ class Utils
 		}
 
 		static bool isSettableVariableType(const char type) {
-			static const std::vector<char> VAR_TYPES_SETTABLE = { 'A', 'C', 'H', 'K', 'L', 'Z' };
+			static const std::vector<char> VAR_TYPES_SETTABLE = { 'A', 'B', 'C', 'H', 'K', 'L', 'Z' };
 			return find(VAR_TYPES_SETTABLE.cbegin(), VAR_TYPES_SETTABLE.cend(), type) != VAR_TYPES_SETTABLE.cend();
 		}
 

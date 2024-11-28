@@ -27,7 +27,7 @@ and is also available at <http://www.gnu.org/licenses/>.
 #include "client/WASimClient.h"
 #include "DataComboBox.h"
 #include "DeletableItemsComboBox.h"
-#include "Utils.h"
+#include "../Utils.h"
 
 namespace WASimUiNS
 {
@@ -269,7 +269,7 @@ public:
 		setToolTip(tr("Named variable type. Types marked with a * use Unit specifiers. Most 'L' vars will ignore the Unit (default is 'number')."));
 
 		addItem(tr("A: SimVar *"), 'A');
-		//addItem(tr("B: Input"),    'B');  // only for gauge modules
+		addItem(tr("B: Input"),    'B');  // only for gauge modules in FS20
 		addItem(tr("C: GPS *"),    'C');
 		addItem(tr("E: Env. *"),   'E');
 		addItem(tr("H: HTML"),     'H');
@@ -278,7 +278,7 @@ public:
 		addItem(tr("L: Local *"),  'L');
 		addItem(tr("M: Mouse"),    'M');
 		//addItem(tr("O: Comp."),    'O');  // only for gauge modules
-		//addItem(tr("R: Resource"), 'R');  // strings only, can't be read with "Get" command or set at all
+		addItem(tr("R: Resource"), 'R');
 		addItem(tr("T: Token"),    'T');
 		addItem(tr("Z: Custom"),   'Z');
 
