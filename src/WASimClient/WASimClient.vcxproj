@@ -79,7 +79,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(ProjectDir);$(SolutionDir)\shared;$(MSFS_SDK)\SimConnect SDK\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir);$(SolutionDir)\shared;$(MSFS_SDK)SimConnect SDK\include;$(MSFS2024_SDK)WASM\include\MSFS\Types;$(IncludePath)</IncludePath>
     <LibraryPath>$(MSFS_SDK)\SimConnect SDK\lib\static;$(LibraryPath)</LibraryPath>
     <CopyLocalDeploymentContent>true</CopyLocalDeploymentContent>
     <CopyLocalProjectReference>true</CopyLocalProjectReference>
@@ -87,21 +87,21 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(ProjectDir);$(SolutionDir)\shared;$(MSFS_SDK)\SimConnect SDK\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir);$(SolutionDir)\shared;$(MSFS_SDK)SimConnect SDK\include;$(MSFS2024_SDK)WASM\include\MSFS\Types;$(IncludePath)</IncludePath>
     <LibraryPath>$(MSFS_SDK)\SimConnect SDK\lib\static;$(LibraryPath)</LibraryPath>
     <CopyLocalDeploymentContent>true</CopyLocalDeploymentContent>
     <CopyLocalProjectReference>true</CopyLocalProjectReference>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-DLL|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(ProjectDir);$(SolutionDir)\shared;$(MSFS_SDK)\SimConnect SDK\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir);$(SolutionDir)\shared;$(MSFS_SDK)SimConnect SDK\include;$(MSFS2024_SDK)WASM\include\MSFS\Types;$(IncludePath)</IncludePath>
     <LibraryPath>$(MSFS_SDK)\SimConnect SDK\lib\static;$(LibraryPath)</LibraryPath>
     <CopyLocalDeploymentContent>true</CopyLocalDeploymentContent>
     <CopyLocalProjectReference>true</CopyLocalProjectReference>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-DLL|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(ProjectDir);$(SolutionDir)\shared;$(MSFS_SDK)\SimConnect SDK\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir);$(SolutionDir)\shared;$(MSFS_SDK)SimConnect SDK\include;$(MSFS2024_SDK)WASM\include\MSFS\Types;$(IncludePath)</IncludePath>
     <LibraryPath>$(MSFS_SDK)\SimConnect SDK\lib\static;$(LibraryPath)</LibraryPath>
     <CopyLocalDeploymentContent>true</CopyLocalDeploymentContent>
     <CopyLocalProjectReference>true</CopyLocalProjectReference>
@@ -252,10 +252,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\client\enums.h" />
+    <ClInclude Include="..\include\client\enums_impl.h" />
     <ClInclude Include="..\include\client\exports.h" />
     <ClInclude Include="..\include\client\structs.h" />
     <ClInclude Include="..\include\client\WASimClient.h" />
-    <ClInclude Include="..\include\enums.h" />
     <ClInclude Include="..\include\enums_impl.h" />
     <ClInclude Include="..\include\global.h" />
     <ClInclude Include="..\include\WASimCommander.h" />
