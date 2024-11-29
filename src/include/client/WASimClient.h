@@ -219,7 +219,7 @@ static const uint32_t CUSTOM_KEY_EVENT_ID_MIN = 0x00020000;
 		/// Other variables types can also be set this way but such requests are simply converted to a calculator string and
 		/// evaluated via the _Gauge API_ `execute_calculator_code()`. Using `WASimClient::executeCalculatorCode()` directly may be more efficient. \n
 		/// The following conditions must be observed:
-		/// - The variable type in `VariableRequest::variableType` must be "settable" ('A', 'C', 'H', 'K', 'L', or 'Z'), otherwise an `E_INVALIDARG` result is returned.
+		/// - The variable type in `VariableRequest::variableType` must be "settable" ('A', 'B', 'C', 'H', 'K', 'L', or 'Z'), otherwise an `E_INVALIDARG` result is returned.
 		/// - Setting an 'A' type variable this way _requires_ the actual variable name in `VariableRequest::variableName` -- using just an ID returns `E_INVALIDARG`. \n
 		///   (Other settable variable types don't have any associated ID anyway, so this is not an issue.)
 		/// - For any variable type _other than_ 'L', a Unit can only be specified as a string (in `VariableRequest::unitName`), not an ID.
@@ -232,7 +232,7 @@ static const uint32_t CUSTOM_KEY_EVENT_ID_MIN = 0x00020000;
 		/// \sa \refwce{CommandId::Set}
 		HRESULT setVariable(const VariableRequest &variable, const double value);
 		/// This is an overloaded method. This version allows setting an 'A' type (SimVar) variable to a string value. **Only 'A' type variables can be set this way.** \n
-		/// Since there is actually no direct way to set string-type values from WASM code, this is just a conveneince method and simply invokes SimConnect to do the work.
+		/// Since there is actually no direct way to set string-type values from WASM code, this is just a convenience method and simply invokes SimConnect to do the work.
 		/// On first use with a new variable name it will set up a mapping of the name to an internally-assigned ID (calling `SimConnect_AddToDataDefinition()`) and cache that mapping.
 		/// Then on subsequent invocations on the same variable the mapped ID will be used directly. The mappings are invalidated when disconnecting from the simulator.
 		HRESULT setVariable(const VariableRequest &variable, const std::string &stringValue);
@@ -248,7 +248,7 @@ static const uint32_t CUSTOM_KEY_EVENT_ID_MIN = 0x00020000;
 		/// which creates the variable if it doesn't exist. The returned ID (new or existing) is then used to set the value. Use the `lookup()` method to check for the existence of a variable name.
 		/// Equivalent to `setVariable(VariableRequest(variableName, true, unitName), value)`. See `setVariable()` and `VariableRequest` for details.
 		/// \param variableName Name of the local variable.
-		/// \param value The value to set. Becomes the intial value if the variable is created.
+		/// \param value The value to set. Becomes the initial value if the variable is created.
 		/// \param unitName Optional unit specifier to use. Most Local vars do not specify a unit and default to a generic "number" type.
 		/// \return `S_OK` on success, `E_INVALIDARG` on parameter validation errors, `E_NOT_CONNECTED` if not connected to server, or `E_FAIL` on general failure (unlikely).
 		/// \sa \refwce{CommandId::SetCreate}
@@ -257,15 +257,15 @@ static const uint32_t CUSTOM_KEY_EVENT_ID_MIN = 0x00020000;
 		/// Sets a numeric value on an 'A' (aka "SimVar" / "Simulator Variable") type variable. \n
 		/// This is a convenience version of `setVariable()`, equivalent to `setVariable(VariableRequest(variableName, unitName), value)`. See `setVariable()` and `VariableRequest` for details.\n
 		/// Note that `variableName` can optionally contain an index after a colon (eg. `VAR NAME:1`), or the `setSimVarVariable(const string& name, uint8_t index, const string& unit, double value)`
-		/// overload could be used to provide the index separately.
+		/// overload could be used to provide the index separately. For MSFS 2024 Sim Vars which use component name suffixes, specify them in the variable name itself.
 		/// \since v1.3.0
 		inline HRESULT setSimVarVariable(const std::string &variableName, const std::string &unitName, double value) { return setVariable(VariableRequest(variableName, unitName), value); }
 		/// Sets a numeric value on an indexed 'A' (aka "SimVar" / "Simulator Variable") type variable. \n
-		/// This is a convenience version of `setVariable()`, equivalent to `setVariable(VariableRequest(variableName, unitName, simVarIndex), value)`. See `setVariable()` and `VariableRequest` for details.
+		/// This is a convenience version of `setVariable()`, equivalent to `setVariable(VariableRequest(variableName, unitName, index), value)`. See `setVariable()` and `VariableRequest` for details.
 		/// \since v1.3.0
-		inline HRESULT setSimVarVariable(const std::string &variableName, uint8_t simVarIndex, const std::string &unitName, double value) { return setVariable(VariableRequest(variableName, unitName, simVarIndex), value); }
+		inline HRESULT setSimVarVariable(const std::string &variableName, uint8_t index, const std::string &unitName, double value) { return setVariable(VariableRequest(variableName, unitName, index), value); }
 		/// Sets a string value on an 'A' (aka "SimVar" / "Simulator Variable") type variable. \n
-		/// This is a convenience version of `setVariable()`, equivalent to `setVariable(VariableRequest('A', variableName), stringValue)`. See `setVariable(const VariableRequest &, const std::string &)` for details.
+		/// This is a convenience version of `setVariable()`, equivalent to `setVariable(VariableRequest(`'A'`, variableName), stringValue)`. See `setVariable(const VariableRequest &, const std::string &)` for details.
 		/// \since v1.3.0
 		inline HRESULT setSimVarVariable(const std::string &variableName, const std::string &stringValue) { return setVariable(VariableRequest('A', variableName), stringValue); }
 		/// Sets a string value on an indexed 'A' (aka "SimVar" / "Simulator Variable") type variable. \n
@@ -339,7 +339,7 @@ static const uint32_t CUSTOM_KEY_EVENT_ID_MIN = 0x00020000;
 		/// \sa \refwce{CommandId::Register}, registerEvent(), transmitEvent()
 		HRESULT removeEvent(uint32_t eventId);
 		/// Trigger an event previously registered with `registerEvent()`. This is a more direct alternative to triggering events by name via SimConnect.
-		/// \param eventId ID of the previously registered event. If the event hasn't been registerd, the server will log a warning but otherwise nothing will happen.
+		/// \param eventId ID of the previously registered event. If the event hasn't been registered, the server will log a warning but otherwise nothing will happen.
 		/// \return `S_OK` on success, `E_FAIL` on general failure (unlikely), `E_NOT_CONNECTED` if not connected to server.
 		/// \sa \refwce{CommandId::Transmit}, registerEvent(), removeEvent()
 		HRESULT transmitEvent(uint32_t eventId);
@@ -357,7 +357,7 @@ static const uint32_t CUSTOM_KEY_EVENT_ID_MIN = 0x00020000;
 		/// Can be used to trigger standard Simulator "Key Events" as well as "custom" _Gauge API/SimConnect_ events. Up to 5 optional values can be passed onto the event handler.
 		/// This provides functionality similar to the _Gauge API_ function `trigger_key_event_EX1()` and `SimConnect_TransmitClientEvent[_EX1()]`.  \n\n
 		/// *Standard* Key Event IDs can be found in the SimConnect SDK header file 'MSFS/Legacy/gauges.h' in the form of `KEY_*` macro values, and event names can also be
-		/// resolved to IDs programmatically using the `lookup()` method. No preliminary setup is required to trigger these events, but a full connection to WASimModule ("Server") is needed.
+		/// resolved to IDs programmatically using the `lookup()` method. No preliminary setup is required to trigger these events, but a full connection to WASimModule ("server") is needed.
 		/// These are triggered on the simulator side using `trigger_key_event_EX1()` function calls. \n\n
 		/// *Custom Events* for which a numeric ID is already known (typically in the _Gauge API_ `THIRD_PARTY_EVENT_ID_MIN`/`THIRD_PARTY_EVENT_ID_MAX` ID range)
 		/// can also be triggered directly as with standard events. These types of events are also passed directly to `trigger_key_event_EX1()`. \n\n
@@ -398,11 +398,13 @@ static const uint32_t CUSTOM_KEY_EVENT_ID_MIN = 0x00020000;
 		/// Register a "Custom Simulator [Key] Event" by providing an event name. The method optionally returns the generated event ID, which can later be used with `sendKeyEvent()` method instead of the event name.
 		/// It can also be used to look up a previous registration's ID if the event name has already been registered. \n\n
 		/// Custom event names are mapped to internally-generated unique IDs using a standard SimConnect call to
-		/// [`MapClientEventToSimEvent`](https://docs.flightsimulator.com/html/Programming_Tools/SimConnect/API_Reference/Events_And_Data/SimConnect_MapClientEventToSimEvent.htm#parameters),
-		/// which briefly describes custom event usage and name syntax in the `EventName` parameter description. This method serves a similar purpose (and in fact eventually calls that same SimConnect function). \n\n
+		/// [MapClientEventToSimEvent](https://docs.flightsimulator.com/html/Programming_Tools/SimConnect/API_Reference/Events_And_Data/SimConnect_MapClientEventToSimEvent.htm#parameters),
+		/// and the documentation briefly describes custom event usage and name syntax in the `EventName` parameter description. This method serves a similar purpose (and in fact eventually calls that same SimConnect function). \n\n
 		/// The mappings must be re-established every time a new connection with SimConnect is made, which WASimClient takes care of automatically. If currently connected to the simulator, the event is immediately mapped,
 		/// otherwise it will be mapped upon the next connection. An event registration can be removed with `removeCustomKeyEvent()` which will prevent any SimConnect mapping from being created upon the _next_ connection. \n\n
-		/// Note that the custom event mapping/triggering feature is actually just a convenience for the WASimClient user and doesn't involve the usual Server interactions (WASimModule) at all. \n
+		/// If you're not going to store the ID that will be generated anyway, `sendKeyEvent(customEventName, ...)` can be used directly, which will automatically call this method the first time the event name is used.
+		/// The ID can always be looked up later if needed (by calling this method). \n\n
+		/// Note that the custom event mapping/triggering feature is actually just a convenience for the WASimClient user and doesn't involve the usual server interactions (WASimModule) at all.
 		/// \param customEventName Name of the Event to register. The event name _must_ contain a "." (period) or start with a "#", otherwise an `E_INVALIDARG` result is returned. \n
 		///   If an event with the same name has already been registered, the method returns `S_OK` and no further actions are performed (besides setting the optional `puiCustomEventId` pointer value, see below).
 		/// \param puiCustomEventId Optional pointer to 32-bit unsigned integer variable to return the generated event ID. This ID can be used to trigger the event later using `sendKeyEvent()` (which is more efficient than using the event name each time).
@@ -439,12 +441,13 @@ static const uint32_t CUSTOM_KEY_EVENT_ID_MIN = 0x00020000;
 		/// \sa \refwce{CommandId::List}
 		HRESULT list(WASimCommander::Enums::LookupItemType itemsType = WASimCommander::Enums::LookupItemType::LocalVariable);
 
-		/// Request server-side lookup of an named item to find the corresponding numeric ID.
-		/// \param itemType The type of item to look up. A type of variable or a measurement unit. See the `WASimCommander::LookupItemType` documentation for details.
+		/// Request a lookup of a named item to find its corresponding numeric ID. \n
+		/// Most lookup types are done on the server side, so an active connection is required. The exception is looking up Key Event IDs (\refwce{LookupItemType::KeyEventId}), which are performed locally.
+		/// \param itemType The type of item to look up. A type of variable or a measurement unit. See the \refwce{LookupItemType} documentation for details.
 		/// \param itemName The name of the thing to check for.
 		/// \param piResult Pointer to 32-bit signed integer variable to hold the result.
 		/// \return `S_OK` on success, `E_FAIL` if server returns a Nak response (typically means the item name wasn't found), `E_NOT_CONNECTED` if not connected to server, `E_TIMEOUT` on server communication failure.
-		/// \note This method blocks until either the Server responds or the timeout has expired. \sa defaultTimeout(), setDefaultTimeout()
+		/// \note Except for Key Event ID type lookups, this method blocks until either the Server responds or the timeout has expired. \sa defaultTimeout(), setDefaultTimeout()
 		HRESULT lookup(WASimCommander::Enums::LookupItemType itemType, const std::string &itemName, int32_t *piResult);
 
 		/// \}
@@ -474,7 +477,7 @@ static const uint32_t CUSTOM_KEY_EVENT_ID_MIN = 0x00020000;
 		/// \note The remote server logging level for `File` and `Console` facilities is unknown at Client startup. The returned values are only going to be correct if they were set by this instance of the Client (using `setLogLevel()`).
 		WASimCommander::Enums::LogLevel logLevel(WASimCommander::Enums::LogFacility facility, LogSource source = LogSource::Client) const;
 		/// Set the current minimum logging severity level for the specified `facility` and `source` to `level`. \sa logLevel(), setLogCallback(), \refwce{CommandId::Log}
-		/// \param level The new minimum level. One of `WASimCommander::LogLevel` enum values. Use `LogLevel::None` to disable logging on the given faciliity/source.
+		/// \param level The new minimum level. One of `WASimCommander::LogLevel` enum values. Use `LogLevel::None` to disable logging on the given facility/source.
 		/// \param facility One or more of `WASimCommander::LogFacility` enum flags. The `LogFacility::Remote` facility is the one delivered via the log callback handler.
 		/// \param source One of \refwcc{LogSource} enum values.
 		void setLogLevel(WASimCommander::Enums::LogLevel level, WASimCommander::Enums::LogFacility facility = WASimCommander::Enums::LogFacility::Remote, LogSource source = LogSource::Client);
