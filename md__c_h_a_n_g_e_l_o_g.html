@@ -35,7 +35,7 @@
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="Logo.png" title="WASimCommander - Remote access to the Microsoft Flight Simulator 2020 Gauge API."/></td>
   <td id="projectalign">
-   <div id="projectname"><!-- WASimCommander --><span id="projectnumber">&#160;v1.3.0.0</span>
+   <div id="projectname"><!-- WASimCommander --><span id="projectnumber">&#160;v1.3.1.0</span>
    </div>
   </td>
  </tr>
@@ -109,14 +109,42 @@ $(document).ready(function(){initNavTree('md__c_h_a_n_g_e_l_o_g.html',''); initR
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><h1><a class="anchor" id="autotoc_md27"></a>
-1.3.0.0 (15-Nov-2024)</h1>
+1.3.1.0 (29-Nov-2024)</h1>
 <h2><a class="anchor" id="autotoc_md28"></a>
+WASimModule</h2>
+<ul>
+<li>Updated reference list of KEY event names for MSFS 2024 SDK v1.0.0 (<a href="https://github.com/mpaperno/WASimCommander/commit/e1a0f865" target="_blank">e1a0f865</a>).</li>
+</ul>
+<h2><a class="anchor" id="autotoc_md29"></a>
+WASimClient</h2>
+<ul>
+<li>Key Event ID lookup is now performed locally instead of querying the server. (<a href="https://github.com/mpaperno/WASimCommander/commit/e4609257" target="_blank">e4609257</a>)</li>
+<li>Marked 'B' type (Input Events) variables as "settable." (<a href="https://github.com/mpaperno/WASimCommander/commit/e66498b4" target="_blank">e66498b4</a>)<ul>
+<li>MSFS 24 apparently has at least some support for using 'B' vars from within RPN calculator code in standalone modules. YMMV.</li>
+</ul>
+</li>
+<li>Building (not using) the client now requires MSFS 2024 SDK installed.</li>
+</ul>
+<h2><a class="anchor" id="autotoc_md30"></a>
+WASimUI</h2>
+<ul>
+<li>'B' and 'R' variable types are available in the various variable type selectors for experimentation. (<a href="https://github.com/mpaperno/WASimCommander/commit/36e925c4" target="_blank">36e925c4</a>)</li>
+<li>Updated database of imported Event IDs and Simulator Variables from online SDK docs for MSFS 2020 and 2024 as of Nov-25-2024.<ul>
+<li>The data now also contains flags indicating if a variable/event is supported in FSX, FS20, &amp; FS24 versions.</li>
+</ul>
+</li>
+</ul>
+<p ><b><a href="https://github.com/mpaperno/WASimCommander/compare/1.3.0.0...1.3.1.0" target="_blank">Full Change Log</a></b></p>
+<hr  />
+ <h1><a class="anchor" id="autotoc_md32"></a>
+1.3.0.0 (15-Nov-2024)</h1>
+<h2><a class="anchor" id="autotoc_md33"></a>
 WASimModule</h2>
 <ul>
 <li>The server will now handle connection, ping, and custom calculator events initiated with <code>SimConnect_TransmitClientEvent_EX1()</code> (as well as the older <code>TransmitClientEvent()</code> version). (<a href="https://github.com/mpaperno/WASimCommander/commit/8f42b51d1d94f704e001940abe2ff3f1434a9481" target="_blank">8f42b51d</a>)</li>
 <li>Updated reference list of KEY event names for MSFS SDK v0.23.1.0 (<a href="https://github.com/mpaperno/WASimCommander/commit/b115d8b64e77eaf8112de7a15c9d0dfc2fa29904" target="_blank">b115d8b6</a>) and v0.24.3.0 (<a href="https://github.com/mpaperno/WASimCommander/commit/495274d5ca509d6663f7575f8888360ccd6907f8" target="_blank">495274d5</a>).</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md29"></a>
+<h2><a class="anchor" id="autotoc_md34"></a>
 WASimClient (C++) and WASimClient_CLI (managed .NET)</h2>
 <ul>
 <li>Added ability to use "custom named simulator events" (such as "Custom.Event") directly from <code>WASimClient</code>, w/out needing a separate <code>SimConnect</code> session (<a href="https://github.com/mpaperno/WASimCommander/commit/61912e66f5e51791d51fce42bb96de38f7d5b6a0" target="_blank">61912e66</a>):<ul>
@@ -132,34 +160,34 @@ WASimClient (C++) and WASimClient_CLI (managed .NET)</h2>
 <li>Fixed that the key event name lookup cache used with <code>sendKeyEvent(eventName)</code> string overload wasn't entirely thread-safe. Thanks to <a href="https://github.com/HansBilliet" target="_blank">Hans Billiet</a> for reporting! (<a href="https://github.com/mpaperno/WASimCommander/commit/03753d8b834bfd0239aee2df1043c3b0377d4a55" target="_blank">03753d8b</a>)</li>
 <li>Added new <a href="https://wasimcommander.max.paperno.us/struct_w_a_sim_commander_1_1_data_request.html#a5d2d8f43b6e0aeb0de5771af73a995da" target="_blank"><code>DataRequest()</code> constructor</a> overloads for calculated result type w/out <code>valueSize</code> argument where the size is determined based on the desired calculation result type. (<a href="https://github.com/mpaperno/WASimCommander/commit/9f7aa9c588fb5976363692c3ca160cfe4bbd97fd" target="_blank">9f7aa9c5</a>)</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md30"></a>
+<h2><a class="anchor" id="autotoc_md35"></a>
 WASimClient_CLI (managed .NET)</h2>
 <ul>
 <li>Fixed possible <code>null</code> <code>String</code> references in <code>RegisteredEvent</code> and <code>VariableRequest</code> structs when created with some constructor overloads (for example when attempting to send a <code>new VariableRequest(localVariableId)</code>). Thanks to <a href="https://github.com/HansBilliet" target="_blank">Hans Billiet</a> for reporting! (<a href="https://github.com/mpaperno/WASimCommander/commit/1632ed1883108f0ba5ff03610ce4fc902d84387c" target="_blank">1632ed18</a>)</li>
 <li>Added .NET8 builds to SDK distribution. This is also now the default .NET version for the VS solution's Release &amp; Debug build configurations.</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md31"></a>
+<h2><a class="anchor" id="autotoc_md36"></a>
 WASimUI</h2>
 <ul>
 <li>Can now set Sim Var string type values in the "Variables" section. The "string" unit type must be selected to show the text value entry box. (<a href="https://github.com/mpaperno/WASimCommander/commit/8616c6080308f4dbb1963ce6787ab0221babab20" target="_blank">8616c608</a>)</li>
 <li>Updated database of imported Event IDs and Simulator Variables from published online SDK docs as of Mar-1-2024. (<a href="https://github.com/mpaperno/WASimCommander/commit/35a495c6a3dc9beb13ffc05bdeab105f3b7a9fae" target="_blank">35a495c6</a>)</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md32"></a>
+<h2><a class="anchor" id="autotoc_md37"></a>
 Documentation</h2>
 <ul>
 <li>Split <a href="https://wasimcommander.max.paperno.us/class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html" target="_blank">WASimClient's</a> "high level API" methods overview into more specific groups.</li>
 <li>Added/improved some details about <code>WASimClient</code>'s event callbacks and possible concurrency issues. (<a href="https://github.com/mpaperno/WASimCommander/commit/e474c7fdb9074d29064392354e2829c3d2267dee" target="_blank">e474c7fd</a>)</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md33"></a>
+<h2><a class="anchor" id="autotoc_md38"></a>
 Other</h2>
 <ul>
 <li>All distributed pre-built libraries and module are built against MSFS SDK v0.24.3.0.</li>
 </ul>
-<p ><b><a href="https://github.com/mpaperno/WASimCommander/compare/v1.2.0.0...v1.3.0.0" target="_blank">Full Change Log</a></b></p>
+<p ><b><a href="https://github.com/mpaperno/WASimCommander/compare/1.2.0.0...1.3.0.0" target="_blank">Full Change Log</a></b></p>
 <hr  />
- <h1><a class="anchor" id="autotoc_md35"></a>
+ <h1><a class="anchor" id="autotoc_md40"></a>
 1.2.0.0 (07-Nov-2023)</h1>
-<h2><a class="anchor" id="autotoc_md36"></a>
+<h2><a class="anchor" id="autotoc_md41"></a>
 WASimModule</h2>
 <ul>
 <li>Fix binary data representation in results for named variable requests with 1-4 byte integer value sizes (<code>int8</code> - <code>int32</code> types) &ndash; the result data would be encoded as a float type instead. (<a href="https://github.com/mpaperno/WASimCommander/commit/8c7724e60ed94e622d5ee2669cf7e000031c2c18" target="_blank">8c7724e6</a>)</li>
@@ -176,7 +204,7 @@ WASimModule</h2>
 <li>Data requests with <code>Once</code> type update period are now queued if data updates are paused when the request is submitted. These requests will be sent when/if updates are resumed again by the client. Fixes that data would be sent anyway when the request is initially submitted, even if updates are paused. (<a href="https://github.com/mpaperno/WASimCommander/commit/fe99bbb25c5dd907e8a4d513769759c4b430580f" target="_blank">fe99bbb2</a>)</li>
 <li>Update reference list of KEY events and aliases as of MSFS SDK v0.22.3.0. (<a href="https://github.com/mpaperno/WASimCommander/commit/f045e15007abd6b7b05b97c004a7a55488a33a9b" target="_blank">f045e150</a>)</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md37"></a>
+<h2><a class="anchor" id="autotoc_md42"></a>
 WASimClient and WASimClient_CLI (managed .NET)</h2>
 <ul>
 <li>Fixed incoming data size check for variable requests which are less than 4 bytes in size. (<a href="https://github.com/mpaperno/WASimCommander/commit/c8e74dfa706647cf785c7e6c811731d8945e49c6" target="_blank">c8e74dfa</a>)</li>
@@ -195,12 +223,12 @@ WASimClient and WASimClient_CLI (managed .NET)</h2>
 <li>Removed logged version mismatch warning on Ping response.</li>
 <li>Documentation updates.</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md38"></a>
+<h2><a class="anchor" id="autotoc_md43"></a>
 WASimClient_CLI (managed .NET)</h2>
 <ul>
 <li>Fixed possible exception when assembling list lookup results dictionary in the off-case of duplicate keys. (<a href="https://github.com/mpaperno/WASimCommander/commit/cf46967b499a9bb19a77a14a47bd2ac29b4d0989" target="_blank">cf46967b</a>)</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md39"></a>
+<h2><a class="anchor" id="autotoc_md44"></a>
 WASimUI</h2>
 <ul>
 <li>Added database of Simulator Variables, Key Events, and Unit types imported from SimConnect SDK online documentation. This is used for:<ul>
@@ -236,24 +264,24 @@ WASimUI</h2>
 </ul>
 <p ><b>Full log:</b> <a href="https://github.com/mpaperno/WASimCommander/compare/1.1.2.0...1.2.0.0" target="_blank">v1.1.2.0...1.2.0.0</a></p>
 <hr  />
- <h1><a class="anchor" id="autotoc_md41"></a>
+ <h1><a class="anchor" id="autotoc_md46"></a>
 1.1.2.0 (23-Feb-2023)</h1>
-<h2><a class="anchor" id="autotoc_md42"></a>
+<h2><a class="anchor" id="autotoc_md47"></a>
 WASimModule</h2>
 <ul>
 <li>Fixed KEY event alias for "AUTORUDDER_TOGGLE" -&gt; KEY_AUTOCOORD_TOGGLE.</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md43"></a>
+<h2><a class="anchor" id="autotoc_md48"></a>
 WASimUI</h2>
 <ul>
 <li>Fixed layout issue in "Variables" form which made the name selector/entry field too narrow.</li>
 <li>Renamed form group "Calculator Event" to "Evaluate Calculator Code".</li>
 </ul>
 <hr  />
- <h1><a class="anchor" id="autotoc_md45"></a>
+ <h1><a class="anchor" id="autotoc_md50"></a>
 1.1.1.0 (31-Jan-2023)</h1>
 <p >Patch update for MSFS SU11/SDK 0.20.5.0.</p>
-<h2><a class="anchor" id="autotoc_md46"></a>
+<h2><a class="anchor" id="autotoc_md51"></a>
 WASimModule</h2>
 <ul>
 <li>Added 73 Key Event lookup names from latest MSFS SDK v0.20.5.0.</li>
@@ -261,12 +289,12 @@ WASimModule</h2>
 <li>KEY_PROP_FORCE_BETA_* Key Event IDs (from last update) were updated again to reflect SDK v0.20.5.0 values.</li>
 <li>Release version is now built using <code>clang:-O3</code> level optimization since MSFS memory corruption issue confirmed fixed.</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md47"></a>
+<h2><a class="anchor" id="autotoc_md52"></a>
 WASimClient and WASimClient_CLI</h2>
 <ul>
 <li>Improved detection of configuration file parameter (<code>config</code>) in class constructor being a file or directory, which also validates existence.</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md48"></a>
+<h2><a class="anchor" id="autotoc_md53"></a>
 WASimUI</h2>
 <ul>
 <li>Improved visual separation of forms by function type (Variables, Lookup, etc).</li>
@@ -274,10 +302,10 @@ WASimUI</h2>
 <li>Fixed "About" dialog box transparency issue.</li>
 </ul>
 <hr  />
- <h1><a class="anchor" id="autotoc_md50"></a>
+ <h1><a class="anchor" id="autotoc_md55"></a>
 1.1.0.0 (2-Nov-2022)</h1>
 <p >Updates for MSFS 2020 SU10 changes and new event trigger API for sending multiple values.</p>
-<h2><a class="anchor" id="autotoc_md51"></a>
+<h2><a class="anchor" id="autotoc_md56"></a>
 WASimModule</h2>
 <ul>
 <li>Added new feature to trigger simulator Key Events with multiple value parameters (Gauge API <code>trigger_key_event_EX1()</code>).</li>
@@ -287,41 +315,41 @@ WASimModule</h2>
 <li>Remove usage of deprecated <code>send_key_event()</code> for <code>SendKey</code> command in favor of <code>trigger_key_event_EX1()</code>.</li>
 <li>Module is now built with <code>/clang:-O1</code> optimization level (the newly-recommended <code>O3</code> level revealed a nasty MSFS memory corruption bug which should be fixed in SU11; I will have an update after SU11 release).</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md52"></a>
+<h2><a class="anchor" id="autotoc_md57"></a>
 WASimClient</h2>
 <ul>
 <li>Added <code>sendKeyEvent()</code> methods for sending simulator Key Events with up to 5 values, either by event ID or by name.</li>
 <li>Unit type specifiers for getting/setting Local variables are ignored (no longer sent to the server even if provided in the method call).</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md53"></a>
+<h2><a class="anchor" id="autotoc_md58"></a>
 WASimClient_CLI</h2>
 <ul>
 <li>Added <code>sendKeyEvent()</code> methods (see above).</li>
 <li>Added .NET Framework 4.6 and .NET 6.0 targets/builds (pre-built DLLs added to SDK distribution).</li>
 <li>Re-targeted project for VS2022, MSVC v143.</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md54"></a>
+<h2><a class="anchor" id="autotoc_md59"></a>
 WASimUI</h2>
 <ul>
 <li>Added new form for sending Key Events with up to 5 value parameters.</li>
 <li>Added connected WASimModule (server) version number display.</li>
 <li>Fixed that the calculation result display text field could not be cleared.</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md55"></a>
+<h2><a class="anchor" id="autotoc_md60"></a>
 Shared Components</h2>
 <ul>
 <li>Minor optimization fix in SimConnect exception reporting module during lookup of a cached request record (for logging exception details).</li>
 </ul>
 <hr  />
- <h1><a class="anchor" id="autotoc_md57"></a>
+ <h1><a class="anchor" id="autotoc_md62"></a>
 1.0.0.9 (unpublished)</h1>
 <ul>
 <li>No changes from 1.0.0.8-rc1.</li>
 </ul>
 <hr  />
- <h1><a class="anchor" id="autotoc_md59"></a>
+ <h1><a class="anchor" id="autotoc_md64"></a>
 1.0.0.8-rc1 (2-Aug-2022)</h1>
-<h2><a class="anchor" id="autotoc_md60"></a>
+<h2><a class="anchor" id="autotoc_md65"></a>
 WASimClient (and dependents)</h2>
 <ul>
 <li>Fix possible SimConnect exception (Sim crash) when removing data request subscriptions. Seemed to only happen occasionally and when SimConnect was under load from other clients.</li>
@@ -330,52 +358,52 @@ WASimClient (and dependents)</h2>
 <li>Client validates that the configured ID is not zero before connecting to simulator.</li>
 <li>Check/warning of version match with server module is now limited to major version part only.</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md61"></a>
+<h2><a class="anchor" id="autotoc_md66"></a>
 WASIMClient_CLI</h2>
 <ul>
 <li>Added convenience methods for setting string values in Command and DataRequest structures.</li>
 <li>Added more Command struct constructors.</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md62"></a>
+<h2><a class="anchor" id="autotoc_md67"></a>
 General</h2>
 <ul>
 <li>Added Python example.</li>
 </ul>
 <hr  />
- <h1><a class="anchor" id="autotoc_md64"></a>
+ <h1><a class="anchor" id="autotoc_md69"></a>
 1.0.0.7-beta3 (12-Jul-2022)</h1>
-<h2><a class="anchor" id="autotoc_md65"></a>
+<h2><a class="anchor" id="autotoc_md70"></a>
 WASimClient, WASimClient_CLI, WASimUI</h2>
 <ul>
 <li>Fixed WASimClient bug introduced in v1.0.0.6 that prevented Client from completing connection to Server on first attempt (but would work on the 2nd).</li>
 </ul>
 <hr  />
- <h1><a class="anchor" id="autotoc_md67"></a>
+ <h1><a class="anchor" id="autotoc_md72"></a>
 1.0.0.6-beta2 (11-Jul-2022)</h1>
-<h2><a class="anchor" id="autotoc_md68"></a>
+<h2><a class="anchor" id="autotoc_md73"></a>
 WASimModule</h2>
 <ul>
 <li>The <code>SendKey</code> command can now accept known key event IDs by name (and do the lookup automatically).</li>
 <li>Stopped pre-compiling "Formatted" type calculator strings (for <code>format_calculator_string()</code>) since that seems to be broken in MSFS. (<a href="https://devsupport.flightsimulator.com/questions/9513/gauge-calculator-code-precompile-with-code-meant-f.html" target="_blank">Query posted to devsupport</a>)</li>
 <li>Pause event loop processing (<code>tick()</code>) when all clients disconnect.</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md69"></a>
+<h2><a class="anchor" id="autotoc_md74"></a>
 WASimClient</h2>
 <ul>
 <li>Minor adjustment to list result processing to ensure proper cancellation in case something is interrupted.</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md70"></a>
+<h2><a class="anchor" id="autotoc_md75"></a>
 WASimClient_CLI</h2>
 <ul>
 <li>Fix exception when setting a char_array&lt;&gt; value from empty strings. Eg. <code>DataRequest.unitName</code> or <code>Command.sData</code>.</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md71"></a>
+<h2><a class="anchor" id="autotoc_md76"></a>
 WASimUI</h2>
 <ul>
 <li>Display a message when a string-type calculator result returns an empty string (instead of just blank space).</li>
 </ul>
 <hr  />
- <h1><a class="anchor" id="autotoc_md73"></a>
+ <h1><a class="anchor" id="autotoc_md78"></a>
 1.0.0.5-beta1 (04-Jul-2022)</h1>
 <ul>
 <li>Initial release! </li>
@@ -387,7 +415,7 @@ WASimUI</h2>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated for WASimCommander &#160;v1.3.0.0 by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.4 </li>
+    <li class="footer">Generated for WASimCommander &#160;v1.3.1.0 by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.4 </li>
   </ul>
 </div>
 </body>
