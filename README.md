@@ -11,7 +11,7 @@
 <img src="https://github.com/mpaperno/WASimCommander/wiki/images/logo/WASim-Logo_640x160.png" style="width: auto;" />
 </div>
 
-## Remote access to the Microsoft Flight Simulator 2020 "Gauge API."
+## Remote access to the Microsoft Flight Simulator 2020 & 2024 "Gauge API."
 
 **A WASM module-based Server and a full Client API combination.**
 
@@ -30,7 +30,7 @@ One of the motivations for this project was seeing multiple MSFS tool authors an
 own product or need. There is nothing wrong with this, of course, but for the Sim user it can be a disadvantage on several levels. They may end up running
 multiple versions of modules which all do essentially the same thing, and it may be confusing which WASM module they need to support which tool,
 just to name two obvious issues. For the developer, programming the WASM modules comes with its own quirks, too, not to mention the time involved.
-And regardless of the supposed isolated environment a WASM module is supposed to run in, it's still very easy to take down the whole Simulator with 
+And regardless of the supposed isolated environment a WASM module is supposed to run in, it's still very easy to take down the whole Simulator with
 some errant code... ;-)
 
 Since MS/Asobo have been, ahem, "slow" to add further remote access features to _SimConnect_ (or come up with some other method), this project is an attempt
@@ -44,25 +44,25 @@ On a more practical note, I am using it with the [MSFS Touch Portal Plugin](http
 #### Remote Capabilities
 - **Execute Calculator Code**:
     - With or without a returned result; Result returned as numeric and string types.
-    - Formatted results from `format_calculator_string()` using 
+    - Formatted results from `format_calculator_string()` using
       [RPN String Formatting](https://docs.flightsimulator.com/html/Additional_Information/Reverse_Polish_Notation.htm#strings)
-- **Get Variable**: Return value result from any type of variable accessible to a standalone WASM module 
-    (basically everything but Gauge and Instrument types, but also including Token vars). 
+- **Get Variable**: Return value result from any type of variable accessible to a standalone WASM module
+    (basically everything but Gauge and Instrument types, but also including Token vars).
     - With optional Unit specifier for variable types which support it.
 - **Set Variable**: Set the value of any settable variable type, with optional Unit specifier for variable types which support it.
 - **Create Variable**: Create (and get/set) a new Local variable if it doesn't already exist.
 - **List Local Variables**: Get a list of all available 'L' variables with their names and current IDs.
 - **Lookup**: Return a numeric ID for a SimVar/Local/Token variable, Unit, or Key Event name.
 - **Subscribe** to _Calculator Code_ and _Get Variable_ results:
-    - Get "push" notifications whenever result values change; Change monitoring can be configured at any rate down to the millisecond (~25ms minimum). 
-        Can also be configured to use the "delta epsilon" feature of SimConnect (to ignore insignificant changes in value) or, conversely, to always send 
+    - Get "push" notifications whenever result values change; Change monitoring can be configured at any rate down to the millisecond (~25ms minimum).
+        Can also be configured to use the "delta epsilon" feature of SimConnect (to ignore insignificant changes in value) or, conversely, to always send
         updates even when values do not change.
     - Optionally perform manual ("polled") updates of subscriptions at any interval of your choice.
     - Any calculator code saved in subscriptions is **pre-compiled to a more efficient byte code** representation before being passed to the respective calculator
         functions. This significantly improves performance for recurring calculations.
 - **Register Named Events**:
-    - Save recurring "set events," like activating controls using calculator code, for more efficient and simpler re-use. 
-        Saved calculator code is pre-compiled to a more efficient byte code representation before being passed to the calculator function. 
+    - Save recurring "set events," like activating controls using calculator code, for more efficient and simpler re-use.
+        Saved calculator code is pre-compiled to a more efficient byte code representation before being passed to the calculator function.
         This significantly improves performance for recurring events.
     - Registered events can be executed "natively" via _WASim API_ by simply sending a short command with the saved event ID.
     - Saved events can also be named and executed via standard SimConnect commands `SimConnect_MapClientEventToSimEvent(id, "event_name")` and `SimConnect_TransmitClientEvent(id)`.
@@ -82,8 +82,8 @@ On a more practical note, I am using it with the [MSFS Touch Portal Plugin](http
 - No wasted data allocations, each data/variable subscription is stored independently avoiding complications with offsets or data overflows.
 - Minimum possible impact on MSFS in terms of memory and CPU usage; practically zero effect for Sim user when no clients are connected (Server is idle).
 - Server periodically checks that a client is still connected by sending "heartbeat" ping requests and enforcing a timeout if no response is received.
-- Extensive logging at configurable levels (debug/info/warning/etc) to multiple destinations (file/console/remote) for both Server and Client. 
-    - Uses an efficient **lazy logging** implementation which doesn't evaluate any arguments if the log message will be discarded anyway 
+- Extensive logging at configurable levels (debug/info/warning/etc) to multiple destinations (file/console/remote) for both Server and Client.
+    - Uses an efficient **lazy logging** implementation which doesn't evaluate any arguments if the log message will be discarded anyway
     (eg. a DEBUG level message when minimum logging level is INFO).
     - Logging levels can be set at startup via config files and changed at runtime for each facility (including remotely on the server).
 - Includes a SimConnect request/exception tracking feature for detailed diagnostics.
@@ -127,7 +127,7 @@ API documentation generated from source comments is published here: https://wasi
 A good place to start with the docs is probably the [`WASimClient`](https://wasimcommander.max.paperno.us/class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html) page.
 
 The GUI is written in C++ (using Qt library for UI), and while not the simplest example, _is_ a full implementation of almost all the available
-API features. The main `WASimClient` interactions all happen in the `MainWindow::Private` class at the top of the 
+API features. The main `WASimClient` interactions all happen in the `MainWindow::Private` class at the top of the
 [WASimUi.cpp](https://github.com/mpaperno/WASimCommander/tree/main/src/WASimUI/WASimUI.cpp#L80) file.
 
 More to come... or [Just Read The Source](https://github.com/mpaperno/WASimCommander/tree/main/src) :-)
@@ -170,8 +170,8 @@ There should be 2 console log messages from the module when it starts up, the la
 The module also logs to a file, though it's a bit tricky to find. On my edition (from MS store) the "working directory" for the modules is <br/>
 `D:\WpSystem\S-1-5-21-611220451-769921231-644967174-1000\AppData\Local\Packages\Microsoft.FlightSimulator_8wekyb3d8bbwe\LocalState\packages\wasimcommander-module\work`
 
-To enable more verbose logging on the module at startup, edit the `server_conf.ini` file which is found in the module's install folder 
-(`Community\wasimcommander-module\modules`). There are comments in there indicating the options. 
+To enable more verbose logging on the module at startup, edit the `server_conf.ini` file which is found in the module's install folder
+(`Community\wasimcommander-module\modules`). There are comments in there indicating the options.
 
 Keep in mind that the server logging level can also be changed remotely at runtime, but
 of course that only works if you can establish a connection to the module in the first place.
@@ -180,12 +180,12 @@ of course that only works if you can establish a connection to the module in the
 
 Basically the log is the primary source of information here. By default it logs at the "Info" level to:
 1) The current console window, assuming there is one (the host app is started from a console). So if using `WASimUI`, for example, just start it from a command prompt.
-2) A file in whatever current directory it is running in (so, for the UI, that would be the UI's install folder). 
+2) A file in whatever current directory it is running in (so, for the UI, that would be the UI's install folder).
 
 Of course if you're using `WASimUI`, it also provides a full logging interface and you can set all the log levels from there, for both client and server sides.
 
 There should also be a `client_conf.ini` file alongside whatever is using the Client
-where initial logging location, levels and network configuration (timeout and SimConnect.cfg index) is set. 
+where initial logging location, levels and network configuration (timeout and SimConnect.cfg index) is set.
 The config file has comments indicating the available options.
 
 -------------
@@ -197,7 +197,7 @@ Use the [Issues](https://github.com/mpaperno/WASimCommander/issues) feature for 
 
 Use [Discussions](https://github.com/mpaperno/WASimCommander/discussions) for any other topic.
 
-There is also a [Discord support forum](https://discord.gg/QhUDFX6Kun) on my server, 
+There is also a [Discord support forum](https://discord.gg/QhUDFX6Kun) on my server,
 along with [release announcement](https://discord.gg/StbmZ2ZgsF) and [general chat](https://discord.gg/meWyE4dcAt) channels.
 
 Most flight simulator forums seem fairly strict about _not_ using their site to provide product support. So please use GitHub,
@@ -239,8 +239,8 @@ or the GNU Lesser General Public License (**LGPL**), as published by the Free So
 Foundation, either **version 3** of the Licenses, or (at your option) any later version.
 
 #### WASM Module Server and GUI Components
-Licensed under the terms of the GNU General Public License (**GPL**) as published by 
-the Free Software Foundation, either **version 3** of the License, or (at your option) 
+Licensed under the terms of the GNU General Public License (**GPL**) as published by
+the Free Software Foundation, either **version 3** of the License, or (at your option)
 any later version.
 
 #### General
@@ -255,8 +255,8 @@ and are available at <http://www.gnu.org/licenses/>.
 
 Except as contained in this copyright notice, the names of the authors or
 their institutions shall not be used in advertising or otherwise to
-promote the sale, use, or other dealings in, any product using this 
-Software, or any derivative of this Software, without prior written 
+promote the sale, use, or other dealings in, any product using this
+Software, or any derivative of this Software, without prior written
 authorization from the authors.
 
 This project may also use 3rd-party Open Source software under the terms
