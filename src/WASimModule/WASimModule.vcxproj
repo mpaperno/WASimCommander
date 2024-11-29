@@ -122,7 +122,7 @@
     <ClInclude Include="..\include\enums.h" />
     <ClInclude Include="..\include\global.h" />
     <ClInclude Include="..\include\WASimCommander.h" />
-    <ClInclude Include="key_events.h" />
+    <ClInclude Include="..\shared\key_events.h" />
     <ClInclude Include="token_vars.h" />
   </ItemGroup>
   <ItemGroup>

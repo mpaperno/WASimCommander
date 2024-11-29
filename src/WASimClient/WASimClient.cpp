@@ -24,12 +24,9 @@ prior written authorization from the authors.
 
 #include <chrono>
 #include <condition_variable>
-#include <cstdio>
 #include <cstring>
-#include <ctime>
 #include <filesystem>
-#include <fstream>
-#include <future>
+#include <functional>
 #include <iomanip>
 #include <iostream>
 #include <list>
@@ -38,6 +35,7 @@ prior written authorization from the authors.
 #include <string>
 #include <sstream>
 #include <thread>
+#include <unordered_map>
 
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
@@ -46,10 +44,12 @@ prior written authorization from the authors.
 #define LOGFAULT_THREAD_NAME  WSMCMND_CLIENT_NAME
 
 #include "client/WASimClient.h"
-//#include "private/wasimclient_p.h"
 #include "utilities.h"
 #include "SimConnectHelper.h"
 #include "inipp.h"
+
+#include "MSFS_EventsEnum.h"  // from MSFS2024_SDK, for key_events.h
+#include "key_events.h"
 
 namespace WASimCommander::Client
 {
@@ -2004,6 +2004,16 @@ HRESULT WASimClient::list(LookupItemType itemsType)
 
 HRESULT WASimClient::lookup(LookupItemType itemType, const std::string &itemName, int32_t *piResult)
 {
+	// Short-circuit Key Event ID lookups from local source
+	if (itemType == LookupItemType::KeyEventId) {
+		const int32_t keyId = Utilities::getKeyEventId(itemName);
+		if (keyId < 0)
+			LOG_DBG << "Key Event named " << quoted(itemName) << " was not found in local lookup table.";
+		else if (!!piResult)
+			*piResult = keyId;
+		return keyId < 0 ? E_FAIL : S_OK;
+	}
+
 	if (itemName.length() >= STRSZ_CMD) {
 		LOG_ERR << "Item name length " << itemName.length() << " is greater then maximum size of " << STRSZ_CMD-1 << " bytes.";
 		return E_INVALIDARG;

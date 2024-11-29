@@ -31,10 +31,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "client", "client", "{0BFE83
 		include\client\WASimClient.h = include\client\WASimClient.h
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "private", "private", "{65FBCFE4-F383-4031-BF85-2D33E978AFA0}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "private", "private", "{BF3D1F07-C7B7-466E-B38F-4D504795FB89}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WASimClient_CLI", "WASimClient_CLI\WASimClient_CLI.vcxproj", "{DAF5B792-C4E6-4E54-9CBF-0A0335E80306}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Testing", "Testing", "{845BFBCA-6E0D-4938-AA53-BE186FFDEA50}"
@@ -44,6 +40,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "shared", "shared", "{397C8977-AEB9-4A40-A8AE-392CEF05C289}"
 	ProjectSection(SolutionItems) = preProject
 		shared\inipp.h = shared\inipp.h
+		shared\key_events.h = shared\key_events.h
 		shared\logfault.h = shared\logfault.h
 		shared\SimConnectHelper.h = shared\SimConnectHelper.h
 		shared\SimConnectRequestTracker.h = shared\SimConnectRequestTracker.h
@@ -236,8 +233,6 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{0BFE8311-11B1-49DE-98C9-3C1F6218AE11} = {7419AC0A-8375-4271-A7D7-0E36309C40A3}
-		{65FBCFE4-F383-4031-BF85-2D33E978AFA0} = {0BFE8311-11B1-49DE-98C9-3C1F6218AE11}
-		{BF3D1F07-C7B7-466E-B38F-4D504795FB89} = {7419AC0A-8375-4271-A7D7-0E36309C40A3}
 		{5B7D7234-D6C8-4D1F-B135-C5297D6476D8} = {845BFBCA-6E0D-4938-AA53-BE186FFDEA50}
 		{523ABD54-4C1A-4F21-8977-5EFA5821F71D} = {845BFBCA-6E0D-4938-AA53-BE186FFDEA50}
 		{C6D4303F-E717-4257-990B-2CAE894898A0} = {845BFBCA-6E0D-4938-AA53-BE186FFDEA50}
