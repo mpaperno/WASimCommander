@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['hr_0',['HR',['../namespace_w_a_sim_commander_1_1_c_l_i_1_1_enums.html#a54c5afbe79f156bc4bc22d65cf52f9fc',1,'WASimCommander::CLI::Enums']]]
+  ['7_20beta3_2012_20jul_202022_0',['1.0.0.7-beta3 (12-Jul-2022)',['../md__c_h_a_n_g_e_l_o_g.html#autotoc_md69',1,'']]]
 ];

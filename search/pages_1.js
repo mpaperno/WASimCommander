@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['wasimcommander_0',['WASimCommander',['../index.html',1,'']]],
-  ['wasimcommander_20_2d_20change_20log_1',['WASimCommander - Change Log',['../md__c_h_a_n_g_e_l_o_g.html',1,'']]]
+  ['gpl_20txt_0',['LICENSE.GPL.txt',['../_l_i_c_e_n_s_e_8_g_p_l_8txt.html',1,'']]]
 ];

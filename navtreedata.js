@@ -26,7 +26,7 @@ var NAVTREE =
 [
   [ "WASimCommander", "index.html", [
     [ "WASimCommander", "index.html#autotoc_md0", [
-      [ "Remote access to the Microsoft Flight Simulator 2020 \"Gauge API.\"", "index.html#autotoc_md1", [
+      [ "Remote access to the Microsoft Flight Simulator 2020 & 2024 \"Gauge API.\"", "index.html#autotoc_md1", [
         [ "Motivation", "index.html#autotoc_md2", null ],
         [ "Features", "index.html#autotoc_md4", [
           [ "Remote Capabilities", "index.html#autotoc_md5", null ],
@@ -126,7 +126,7 @@ var NAVTREE =
         [ "Variables", "functions_vars.html", null ],
         [ "Typedefs", "functions_type.html", null ],
         [ "Events", "functions_evnt.html", null ],
-        [ "Related Functions", "functions_rela.html", null ]
+        [ "Related Symbols", "functions_rela.html", null ]
       ] ]
     ] ],
     [ "Files", "files.html", [

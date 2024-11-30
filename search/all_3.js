@@ -1,10 +1,6 @@
 var searchData=
 [
-  ['e_5fnot_5fconnected_0',['E_NOT_CONNECTED',['../namespace_w_a_sim_commander_1_1_client.html#aaed3e026d9bf1ef254d300587e4dbdb5',1,'WASimCommander::Client']]],
-  ['e_5ftimeout_1',['E_TIMEOUT',['../namespace_w_a_sim_commander_1_1_client.html#a23b8cf1733162a35a02159b38c3af217',1,'WASimCommander::Client']]],
-  ['error_2',['Error',['../namespace_w_a_sim_commander_1_1_enums.html#a7311e9d8f917bbcbb202497114e5f2c5a902b0d55fddef6f8d651fe1035b7d4bd',1,'WASimCommander::Enums']]],
-  ['eventid_3',['eventId',['../struct_w_a_sim_commander_1_1_client_1_1_registered_event.html#adb3356a2ddc47392812aeed042cd1352',1,'WASimCommander::Client::RegisteredEvent::eventId()'],['../struct_w_a_sim_commander_1_1_key_event.html#a58d7456a2b8fbae363cca2932a5e5ffe',1,'WASimCommander::KeyEvent::eventId()']]],
-  ['eventtype_4',['eventType',['../namespace_w_a_sim_commander_1_1_client.html#a7e59de719690dfbf4e3f3fb0c9885b67',1,'WASimCommander::Client::ClientEvent']]],
-  ['exec_5',['Exec',['../namespace_w_a_sim_commander_1_1_enums.html#ae3b1cd5348286e86d8c64ce44734e039a953feeff1e20f40677fb7f77c073b3be',1,'WASimCommander::Enums']]],
-  ['executecalculatorcode_6',['executeCalculatorCode',['../class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a289fcb4566f6f44714412e8e27bbd361',1,'WASimCommander::Client::WASimClient::executeCalculatorCode()'],['../class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#ab3ea700ef47b4323db3500b31d4e8512',1,'WASimCommander::CLI::Client::WASimClient::executeCalculatorCode(String^ code)'],['../class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a3fc54902651b55a1edce436a3c39a0da',1,'WASimCommander::CLI::Client::WASimClient::executeCalculatorCode(String^ code, CalcResultType resultType, [Out] double % pfResult)'],['../class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a59ae7293efcb18b73407d25b3e02812e',1,'WASimCommander::CLI::Client::WASimClient::executeCalculatorCode(String^ code, CalcResultType resultType, [Out] String^ % psResult)'],['../class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a012084def5296f9a14f44e62bab09d49',1,'WASimCommander::CLI::Client::WASimClient::executeCalculatorCode(String^ code, CalcResultType resultType, [Out] double % pfResult, [Out] String^ % psResult)']]]
+  ['3_200_200_2015_20nov_202024_0',['1.3.0.0 (15-Nov-2024)',['../md__c_h_a_n_g_e_l_o_g.html#autotoc_md32',1,'']]],
+  ['3_201_200_2029_20nov_202024_1',['1.3.1.0 (29-Nov-2024)',['../md__c_h_a_n_g_e_l_o_g.html#autotoc_md27',1,'']]],
+  ['31_20jan_202023_2',['1.1.1.0 (31-Jan-2023)',['../md__c_h_a_n_g_e_l_o_g.html#autotoc_md50',1,'']]]
 ];

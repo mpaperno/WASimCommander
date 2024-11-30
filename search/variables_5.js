@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['lastupdate_0',['lastUpdate',['../struct_w_a_sim_commander_1_1_client_1_1_data_request_record.html#a62932af909f4c48982ee3f2157f1c66a',1,'WASimCommander::Client::DataRequestRecord::lastUpdate()'],['../struct_w_a_sim_commander_1_1_c_l_i_1_1_structs_1_1_data_request_record.html#a497363dd4fee1a21a1794a72ddd3e2ab',1,'WASimCommander::CLI::Structs::DataRequestRecord::lastUpdate()']]],
+  ['lastupdate_0',['lastUpdate',['../struct_w_a_sim_commander_1_1_client_1_1_data_request_record.html#a62932af909f4c48982ee3f2157f1c66a',1,'WASimCommander::Client::DataRequestRecord::lastUpdate'],['../struct_w_a_sim_commander_1_1_c_l_i_1_1_structs_1_1_data_request_record.html#a497363dd4fee1a21a1794a72ddd3e2ab',1,'WASimCommander::CLI::Structs::DataRequestRecord::lastUpdate']]],
   ['level_1',['level',['../struct_w_a_sim_commander_1_1_log_record.html#abc58668c87a23e44e1b5484dbae9a782',1,'WASimCommander::LogRecord']]],
   ['list_2',['list',['../namespace_w_a_sim_commander_1_1_client.html#a9482ca7c98511c25ffef10803a68e25e',1,'WASimCommander::Client::ListResult']]],
   ['listtype_3',['listType',['../namespace_w_a_sim_commander_1_1_client.html#a4f9221e2d8bc2fa9445b9002bd3ec55f',1,'WASimCommander::Client::ListResult']]],

@@ -1,5 +1,6 @@
 var searchData=
 [
-  ['message_0',['message',['../namespace_w_a_sim_commander_1_1_client.html#a8773e1c80550819b43855e7c60f94b11',1,'WASimCommander::Client::ClientEvent::message()'],['../struct_w_a_sim_commander_1_1_log_record.html#aeb620e56a1df92fc2dfc9306331eec0e',1,'WASimCommander::LogRecord::message()']]],
-  ['millisecond_1',['Millisecond',['../namespace_w_a_sim_commander_1_1_enums.html#a43b33b172f6f4b43947d3a6da9847044a988bbeeb80e7e0a6b4651aab5a76b413',1,'WASimCommander::Enums']]]
+  ['beta1_2004_20jul_202022_0',['1.0.0.5-beta1 (04-Jul-2022)',['../md__c_h_a_n_g_e_l_o_g.html#autotoc_md78',1,'']]],
+  ['beta2_2011_20jul_202022_1',['1.0.0.6-beta2 (11-Jul-2022)',['../md__c_h_a_n_g_e_l_o_g.html#autotoc_md72',1,'']]],
+  ['beta3_2012_20jul_202022_2',['1.0.0.7-beta3 (12-Jul-2022)',['../md__c_h_a_n_g_e_l_o_g.html#autotoc_md69',1,'']]]
 ];
