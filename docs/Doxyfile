@@ -191,14 +191,13 @@ HTML_EXTRA_FILES       = doxyawesome/doxygen-awesome-darkmode-toggle.js \
                          .nojekyll \
                          CNAME
 
-HTML_COLORSTYLE_HUE    = 235
-HTML_COLORSTYLE_SAT    = 19
-HTML_COLORSTYLE_GAMMA  = 185
-HTML_TIMESTAMP         = YES
+HTML_COLORSTYLE        = LIGHT
+HTML_DYNAMIC_MENUS     = YES
 HTML_DYNAMIC_SECTIONS  = YES
 
 GENERATE_TREEVIEW      = YES
 ENUM_VALUES_PER_LINE   = 1
+SHOW_ENUM_VALUES       = NO
 TREEVIEW_WIDTH         = 350
 EXT_LINKS_IN_WINDOW    = YES
 

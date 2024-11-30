@@ -75,6 +75,11 @@ div.fragment {
 	padding: 5px;
 }
 
+/* Fix colors on "detail level" links */
+.directory .levels span {
+	color: var(--fragment-link);
+}
+
 /*div.line {
 	padding: 2px 0;
 	text-indent: 0;
@@ -92,24 +97,24 @@ p.definition {	font-size: 11px !important; }
 /*h2.memtitle { display: none; }*/
 
 /* prettify detailed member titles */
-table.memname tr { display: inline-table; }
-table.memname td { padding: 1px 0; }
+/* table.memname tr { display: inline-table; } */
+/* table.memname td { padding: 1px 0; } */
 td.memname { font-weight: bold; }
 
 /* hide brief descriptions in member list, but not for parent class */
 tr[class^="memdesc"] { display: none; }
 
 .github-corner svg {
-    width: 63px;
-    height: 63px;
-		position: absolute;
-		top: 10px;
-		left: 300px;
-		/* right: -20px; */
-    /* fill: var(--primary-light-color); */
-    color: var(--page-background-color);
-		/* transform: scaleX(-1); */
-		z-index: 99;
+	width: 63px;
+	height: 63px;
+	position: absolute;
+	top: 10px;
+	left: 300px;
+	/* right: -20px; */
+	/* fill: var(--primary-light-color); */
+	color: var(--page-background-color);
+	/* transform: scaleX(-1); */
+	z-index: 99;
 }
 .github-corner svg .first-stop {
     stop-color: #00B4FF;
@@ -119,9 +124,9 @@ tr[class^="memdesc"] { display: none; }
 }
 
 @media screen and (max-width: 1087px) {
-    .github-corner svg {
-				left: auto;
-				right: 0;
-				/* transform: revert; */
-    }
+	.github-corner svg {
+		left: auto;
+		right: 0;
+		/* transform: revert; */
+	}
 }
