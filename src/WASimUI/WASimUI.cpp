@@ -831,8 +831,8 @@ public:
 		set.endGroup();
 
 		const QString defaultFileLoc = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
-		lastRequestsFile = set.value(QStringLiteral("lastRequestsFile"), defaultFileLoc + QStringLiteral("/WASimUI-requests.ini")).toString();
-		lastEventsFile = set.value(QStringLiteral("lastEventsFile"), defaultFileLoc + QStringLiteral("/WASimUI-events.ini")).toString();
+		lastRequestsFile = set.value(QStringLiteral("lastRequestsFile"),  QStringLiteral("%1/WASimUI-requests.ini").arg(defaultFileLoc)).toString();
+		lastEventsFile = set.value(QStringLiteral("lastEventsFile"), QStringLiteral("%1/WASimUI-events.ini").arg(defaultFileLoc)).toString();
 		const bool useDark = set.value(QStringLiteral("useDarkTheme"), true).toBool();
 		if (useDark != Utils::isDarkStyle())
 			Utils::toggleAppStyle(useDark);
