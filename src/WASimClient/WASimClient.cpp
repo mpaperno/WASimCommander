@@ -30,6 +30,7 @@ prior written authorization from the authors.
 #include <iomanip>
 #include <iostream>
 #include <list>
+#include <locale>
 #include <set>
 #include <shared_mutex>
 #include <string>
@@ -316,10 +317,18 @@ class WASimClient::Private
 #pragma endregion
 #pragma region  Constructor and status  ----------------------------------------------
 
+	// Returns integer ID as 8 char hex string using neutral locale formatting.
+	static std::string makeClientName(uint32_t id) {
+		std::ostringstream oss;
+		oss.imbue(std::locale::classic());
+		oss << STREAM_HEX8(id);
+		return oss.str();
+	}
+
 	Private(WASimClient *qptr, uint32_t clientId, const std::string &config) :
 		q{qptr},
 		clientId{clientId},
-		clientName{(ostringstream() << STREAM_HEX8(clientId)).str()}
+		clientName{makeClientName(clientId)}
 	{
 		error_code ec;
 		filesystem::path cwd = filesystem::current_path(ec);
@@ -1000,6 +1009,7 @@ class WASimClient::Private
 
 		// Build the RPN code string.
 		ostringstream codeStr = ostringstream();
+		codeStr.imbue(std::locale::classic());
 		codeStr << fixed << setprecision(7) << value;
 		codeStr << " (>" << v.variableType << ':' << v.variableName;
 		if (v.variableType == 'A' && v.simVarIndex)
