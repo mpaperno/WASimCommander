@@ -1,5 +1,24 @@
 # WASimCommander - Change Log
 
+## 1.3.2.0 (18-May-2025)
+
+### WASimModule
+* Updated reference list of KEY event names for MSFS 2024 SDK v1.3.4 ([2e4f3cbc]).
+
+### WASimClient
+* Fixed issue with generation of client name in some locales when locale-specific number formatting is enabled on the C++ program using WASimClient.
+  This would result in the client being unable to ping or connect to the server. Thanks to @mocsa for reporting! ([#25], [5f586d4f]).
+* Also ensured that locale formatting doesn't affect any auto-generated RPN code.
+* Improved handling of situation where SimConnect connection attempt is aborted while waiting for a response. [1866e336]
+
+**[Full Change Log](https://github.com/mpaperno/WASimCommander/compare/1.3.1.0...1.3.2.0)**
+
+[#25]: https://github.com/mpaperno/WASimCommander/issues/25
+[2e4f3cbc]: https://github.com/mpaperno/WASimCommander/commit/2e4f3cbc
+[5f586d4f]: https://github.com/mpaperno/WASimCommander/commit/5f586d4f
+[1866e336]: https://github.com/mpaperno/WASimCommander/commit/1866e336
+
+---
 ## 1.3.1.0 (29-Nov-2024)
 
 ### WASimModule

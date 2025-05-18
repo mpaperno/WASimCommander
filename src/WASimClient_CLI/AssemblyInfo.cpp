@@ -17,13 +17,13 @@ using namespace System::Security::Permissions;
 
 [assembly:AssemblyDescriptionAttribute(L"CLI Wrapper for WASimCommander's general API and the WASimClient class.")];
 [assembly:AssemblyCompanyAttribute(L"Maxim Paperno")];
-[assembly:AssemblyProductAttribute(L"WASimCommander - Remote access to the Microsoft Flight Simulator 2020 Gauge API.")];
+[assembly:AssemblyProductAttribute(L"WASimCommander - Remote access to the Microsoft Flight Simulator 2020 & 2024 Gauge API.")];
 [assembly:AssemblyCopyrightAttribute(L"Copyright Maxim Paperno; All rights reserved.")];
 [assembly:AssemblyTrademarkAttribute(L"")];
 [assembly:AssemblyCultureAttribute(L"")];
 
-[assembly:AssemblyVersionAttribute(L"1.3.1.0")];
-[assembly:AssemblyFileVersionAttribute("1.3.1.0")];
-[assembly:AssemblyInformationalVersionAttribute("1.3.1.0")];
+[assembly:AssemblyVersionAttribute(L"1.3.2.0")];
+[assembly:AssemblyFileVersionAttribute("1.3.2.0")];
+[assembly:AssemblyInformationalVersionAttribute("1.3.2.0")];
 
 [assembly:ComVisible(false)];
