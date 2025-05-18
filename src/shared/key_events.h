@@ -2089,6 +2089,15 @@ namespace WASimCommander {
 			{ "THROTTLE_DETENT_NEXT",                             (KEY_ID_MIN + 3039) },
 			{ "THROTTLE_DETENT_PREV",                             (KEY_ID_MIN + 3040) },
 
+			// SDK 1.3.4.0 (FS2024)
+			{ "TOOLS_QUICK_PREFLIGHT",                 (KEY_ID_MIN + 2149) },
+			{ "PC_RUN_TOGGLE",                         (KEY_ID_MIN + 3041) },
+			{ "THROTTLE_IDLE",                         (KEY_ID_MIN + 3042) },
+			{ "THROTTLE1_IDLE",                        (KEY_ID_MIN + 3043) },
+			{ "THROTTLE2_IDLE",                        (KEY_ID_MIN + 3044) },
+			{ "THROTTLE3_IDLE",                        (KEY_ID_MIN + 3045) },
+			{ "THROTTLE4_IDLE",                        (KEY_ID_MIN + 3046) },
+			{ "COCKPIT_INTERACTION_GROUP_TOGGLE",      (KEY_ID_MIN + 3047) },
 
 			// Aliases for published Event IDs which do not match KEY IDs
 			{ "ADF1_WHOLE_DEC",                       KEY_ADF_WHOLE_DEC },
