@@ -583,6 +583,10 @@ class WASimClient::Private
 			return E_TIMEOUT;
 		}
 
+		// bail out if connection was canceled while waiting
+		if (!runDispatchLoop)
+			return E_FAIL;
+
 		// register server's Connect command event, exit on failure
 		if FAILED(hr = SimConnectHelper::newClientEvent(hSim, CLI_EVENT_CONNECT, EVENT_NAME_CONNECT)) {
 			disconnectSimulator();
@@ -638,12 +642,15 @@ class WASimClient::Private
 		LOG_DBG << "Shutting down...";
 		disconnectServer(!onQuitEvent);
 		setStatus(ClientStatus::ShuttingDown);
-		SetEvent(hDispatchStopEvent);  // signal thread to exit
-		//d->dispatchThread.join();
 
-		// check for dispatch loop thread shutdown (this is really just for logging/debug purposes)
-		if (!waitCondition([&]() { return !runDispatchLoop; }, DISPATCH_LOOP_WAIT_TIME + 100))
-			LOG_CRT << "Dispatch loop thread still running!";
+		if (!!hDispatchStopEvent) {
+			SetEvent(hDispatchStopEvent);  // signal thread to exit
+			//d->dispatchThread.join();
+
+			// check for dispatch loop thread shutdown (this is really just for logging/debug purposes)
+			if (!waitCondition([&]() { return !runDispatchLoop; }, DISPATCH_LOOP_WAIT_TIME + 100))
+				LOG_CRT << "Dispatch loop thread still running!";
+		}
 
 		// reset flags/counters
 		simConnected = false;
