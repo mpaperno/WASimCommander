@@ -1,7 +1,7 @@
 var searchData=
 [
   ['gauge_20api_0',['Remote access to the Microsoft Flight Simulator 2020 &amp; 2024 &quot;Gauge API.&quot;',['../index.html#autotoc_md1',1,'']]],
-  ['general_1',['General',['../index.html#autotoc_md25',1,'General'],['../md__c_h_a_n_g_e_l_o_g.html#autotoc_md67',1,'General']]],
+  ['general_1',['General',['../index.html#autotoc_md25',1,'General'],['../md__c_h_a_n_g_e_l_o_g.html#autotoc_md71',1,'General']]],
   ['get_2',['Get',['../namespace_w_a_sim_commander_1_1_enums.html#ae3b1cd5348286e86d8c64ce44734e039ac55582518cba2c464f29f5bae1c68def',1,'WASimCommander::Enums']]],
   ['getcreate_3',['GetCreate',['../namespace_w_a_sim_commander_1_1_enums.html#ae3b1cd5348286e86d8c64ce44734e039a1d5c1a7fde77e84c993d6fea61f88c2a',1,'WASimCommander::Enums']]],
   ['getlocalvariable_4',['getLocalVariable',['../class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a25ef1d62f3ae142aa9619e93bd431cd1',1,'WASimCommander::Client::WASimClient::getLocalVariable()'],['../class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a5be56175c905b14756f6a77330f07988',1,'WASimCommander::CLI::Client::WASimClient::getLocalVariable(String ^ variableName, [Out] double % pfResult)'],['../class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a0730598e6397d05ab7bf985fcb4d56a9',1,'WASimCommander::CLI::Client::WASimClient::getLocalVariable(String ^ variableName, String ^ unitName, [Out] double % pfResult)']]],

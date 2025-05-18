@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['c_20and_20wasimclient_5fcli_20managed_20net_0',['WASimClient (C++) and WASimClient_CLI (managed .NET)',['../md__c_h_a_n_g_e_l_o_g.html#autotoc_md34',1,'']]],
+  ['c_20and_20wasimclient_5fcli_20managed_20net_0',['WASimClient (C++) and WASimClient_CLI (managed .NET)',['../md__c_h_a_n_g_e_l_o_g.html#autotoc_md38',1,'']]],
   ['calcresulttype_1',['CalcResultType',['../namespace_w_a_sim_commander_1_1_enums.html#ac056a41f7fdbf2fb2599ad86c3949922',1,'WASimCommander::Enums']]],
   ['calcresulttype_2',['calcResultType',['../struct_w_a_sim_commander_1_1_data_request.html#af981b897c641ade82b762e6c1d090707',1,'WASimCommander::DataRequest']]],
   ['calcresulttypenames_3',['CalcResultTypeNames',['../namespace_w_a_sim_commander_1_1_enums.html#a64a915ed5500fffc88b93e7687f0cd2b',1,'WASimCommander::Enums']]],
@@ -24,7 +24,7 @@ var searchData=
   ['commandid_21',['commandId',['../struct_w_a_sim_commander_1_1_command.html#a5d8cd571e0d8573b9c8e7fe559b54983',1,'WASimCommander::Command']]],
   ['commandidnames_22',['CommandIdNames',['../namespace_w_a_sim_commander_1_1_enums.html#a7830b5a3ae6fa53a6a999e9a42834dc6',1,'WASimCommander::Enums']]],
   ['commandresultdelegate_23',['CommandResultDelegate',['../class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#ae4711e6cec5c543f4c28d7376f3d799f',1,'WASimCommander::CLI::Client::WASimClient']]],
-  ['components_24',['Components',['../index.html#autotoc_md23',1,'API Library and Client Components'],['../index.html#autotoc_md6',1,'Core Components'],['../md__c_h_a_n_g_e_l_o_g.html#autotoc_md60',1,'Shared Components'],['../index.html#autotoc_md24',1,'WASM Module Server and GUI Components']]],
+  ['components_24',['Components',['../index.html#autotoc_md23',1,'API Library and Client Components'],['../index.html#autotoc_md6',1,'Core Components'],['../md__c_h_a_n_g_e_l_o_g.html#autotoc_md64',1,'Shared Components'],['../index.html#autotoc_md24',1,'WASM Module Server and GUI Components']]],
   ['conn_5ftimeout_5fsec_25',['CONN_TIMEOUT_SEC',['../namespace_w_a_sim_commander.html#abd7f03934354a0b7c44aa38ac5e1ce10',1,'WASimCommander']]],
   ['connect_26',['Connect',['../namespace_w_a_sim_commander_1_1_enums.html#ae3b1cd5348286e86d8c64ce44734e039a49ab28040dfa07f53544970c6d147e1e',1,'WASimCommander::Enums']]],
   ['connected_27',['Connected',['../namespace_w_a_sim_commander_1_1_client.html#afd4f3e93b7e8dc26cd2d99ad61584521a2ec0d16e4ca169baedb9b2d50ec5c6d7',1,'WASimCommander::Client']]],

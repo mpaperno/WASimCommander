@@ -17,7 +17,7 @@ var searchData=
   ['debug_14',['Debug',['../namespace_w_a_sim_commander_1_1_enums.html#a7311e9d8f917bbcbb202497114e5f2c5aa603905470e2a5b8c13e96b579ef0dba',1,'WASimCommander::Enums']]],
   ['defaulttimeout_15',['defaultTimeout',['../class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#a1e42faa467496da45a14d721454bb66f',1,'WASimCommander::Client::WASimClient::defaultTimeout()'],['../class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#aac6cf53a8eed915b696273ff41c7b6f1',1,'WASimCommander::CLI::Client::WASimClient::defaultTimeout()']]],
   ['deltaepsilon_16',['deltaEpsilon',['../struct_w_a_sim_commander_1_1_data_request.html#ab2bd74a4e4251de9d624030c0f9a7adc',1,'WASimCommander::DataRequest']]],
-  ['dependents_17',['WASimClient (and dependents)',['../md__c_h_a_n_g_e_l_o_g.html#autotoc_md65',1,'']]],
+  ['dependents_17',['WASimClient (and dependents)',['../md__c_h_a_n_g_e_l_o_g.html#autotoc_md69',1,'']]],
   ['desktop_20gui_18',['Desktop GUI',['../index.html#autotoc_md7',1,'']]],
   ['disclaimer_19',['Copyright, License, and Disclaimer',['../index.html#autotoc_md22',1,'']]],
   ['disconnect_20',['Disconnect',['../namespace_w_a_sim_commander_1_1_enums.html#ae3b1cd5348286e86d8c64ce44734e039a42ae25231906c83927831e0ef7c317ac',1,'WASimCommander::Enums']]],
@@ -25,7 +25,7 @@ var searchData=
   ['disconnectsimulator_22',['disconnectSimulator',['../class_w_a_sim_commander_1_1_client_1_1_w_a_sim_client.html#aa9fafdc4bca37ac75d58acc8f75d9f84',1,'WASimCommander::Client::WASimClient::disconnectSimulator()'],['../class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a8062e572036d29ed4df9e25908d94a34',1,'WASimCommander::CLI::Client::WASimClient::disconnectSimulator()']]],
   ['discussion_23',['Issues, Support, Suggestions, Discussion',['../index.html#autotoc_md18',1,'']]],
   ['dispose_24',['Dispose',['../class_w_a_sim_commander_1_1_c_l_i_1_1_client_1_1_w_a_sim_client.html#a28db1434322a500b7922148b4be17480',1,'WASimCommander::CLI::Client::WASimClient']]],
-  ['documentation_25',['Documentation',['../md__c_h_a_n_g_e_l_o_g.html#autotoc_md37',1,'']]],
+  ['documentation_25',['Documentation',['../md__c_h_a_n_g_e_l_o_g.html#autotoc_md41',1,'']]],
   ['documentation_20examples_26',['Documentation &amp; Examples',['../index.html#autotoc_md11',1,'']]],
   ['double_27',['Double',['../namespace_w_a_sim_commander_1_1_enums.html#ac056a41f7fdbf2fb2599ad86c3949922ad909d38d705ce75386dd86e611a82f5b',1,'WASimCommander::Enums']]],
   ['downloads_20and_20updates_28',['Downloads and Updates',['../index.html#autotoc_md9',1,'']]]
